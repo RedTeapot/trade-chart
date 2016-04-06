@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<meta name="viewport" content="initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, width = device-width">
+	<link rel = "stylesheet" href = "canvas/trade-chart_tick.css"/>
+	
+	<style type = "text/css">
+	canvas{
+		position: absolute;
+	}
+	canvas#detail{
+		z-index: 1;
+	}
+	</style>
+</head>
+<body>
+	<div class = "k-container"><canvas id = "chart"></canvas><canvas id = "detail"></canvas></div>
+	
+	<script type = "text/javascript" src = "../trade-chart.js"></script>
+	<script type = "text/javascript" src = "canvas/trade-chart_tick.js"></script>
+	<script type = "text/javascript" src = "testCanvas.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+svg{
+	display: block;
+	margin: 0 auto;
+	border: solid 1px #A0A0A0;
+}
+svg > g > path{
+	stroke: #232323;
+	shape-rendering: crispEdges;
+}
+.axis text{
+	fill: #232323;
+	font-size: 10px;
+	font-family: "Microsoft Yahei", sans-serif, serif;
+}
+.axis.x text{
+	text-anchor: middle;
+}
+.axis.y text{
+	text-anchor: end;
+}
+.axis path{
+	stroke: #232323;
+	stroke-width: 1px;
+	shape-rendering: crispEdges;
+}
+.axis .ticks line{
+	stroke: #226539;
+	stroke-width: 1px;
+	shape-rendering: crispEdges;
+}
