@@ -59,18 +59,19 @@
 		detailCanvas.width = chartCanvas.width;
 		detailCanvas.height = chartCanvas.height;
 		
-		var detailCtx = detailCanvas.getContext("2d")
+		window.detailCtx = detailCanvas.getContext("2d")
 		detailCtx.strokeStyle = "black";
 		detailCtx.lineWidth = 1;
 		
-		detailCanvas.addEventListener("mousemove", (function(){
+		var viewDetail = (function(){
 			var offsetLeft = detailCanvas.offsetLeft;
 			var lastCoordinate = null;
 		
 			return function(e){
-				var x = e.clientX - offsetLeft;
+				var x = (e instanceof TouchEvent? e.touches[0].clientX: e.clientX) - offsetLeft;
 				var dataIndex = window.renderedTickChart.getDataIndex(x);
 				var coordinate = window.renderedTickChart.getCoordinate(x);
+				
 				if(null == coordinate)
 					return;
 				
@@ -108,7 +109,16 @@
 				
 				lastCoordinate = coordinate;
 			};
-		})());
+		})();
+		
+		detailCanvas.addEventListener("mousemove", viewDetail);
+		detailCanvas.addEventListener("touchstart", function(e){e.preventDefault();});
+		detailCanvas.addEventListener("touchmove", function(e){
+			viewDetail(e);
+			
+			e.preventDefault();
+			e.stopPropagation();
+		})
 	});
 	
 })();

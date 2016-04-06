@@ -245,6 +245,18 @@
 			
 			var ctx = canvasObj.getContext("2d");
 			
+			/** 高分辨率适应 */
+			var pixelRatio = util.pixelRatio();
+			if(pixelRatio > 1){
+				canvasObj.width = pixelRatio * config.width;
+				canvasObj.height = pixelRatio * config.height;
+				
+				canvasObj.style.width = config.width + "px";
+				canvasObj.style.height = config.height + "px";
+				
+				ctx.scale(pixelRatio, pixelRatio);
+			}
+			
 			var _sketch = sketch(datas, dataParser, config);
 			console.log(_sketch);
 			
