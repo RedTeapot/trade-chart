@@ -20,7 +20,7 @@
 		var containerObj = document.querySelector(".k-container");
 		
 		var config = {
-			width: "90%",/* 整体图形宽度 */
+			width: "100%",/* 整体图形宽度 */
 			height: 300,/* 整体图形高度 */
 			
 			/** 图形内边距（坐标系外边距） */
@@ -58,8 +58,11 @@
 		config = window.renderedTickChart.getConfig();
 		detailCanvas.width = chartCanvas.width;
 		detailCanvas.height = chartCanvas.height;
+		detailCanvas.style.width = window.renderedTickChart.getRenderMetadata().cssWidth;
+		detailCanvas.style.height = window.renderedTickChart.getRenderMetadata().cssHeight;
 		
 		window.detailCtx = detailCanvas.getContext("2d")
+		detailCtx.scale(window.renderedTickChart.getRenderMetadata().scaleX, window.renderedTickChart.getRenderMetadata().scaleY);
 		detailCtx.strokeStyle = "black";
 		detailCtx.lineWidth = 1;
 		
@@ -103,7 +106,7 @@
 				/** 圆点 */
 				detailCtx.beginPath();
 				detailCtx.moveTo(x, y);
-				detailCtx.arc(x, y, 2, 2 * Math.PI, 0);
+				detailCtx.arc(x, y, 3, 2 * Math.PI, 0);
 				detailCtx.closePath();
 				detailCtx.fill();
 				

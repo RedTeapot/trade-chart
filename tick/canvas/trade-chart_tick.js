@@ -79,8 +79,9 @@
 	 * @param tickChart {TickChart} 分时图示例
 	 * @param sketch {JsonObject} 数据和图形的扫描分析结果
 	 * @param config {JsonObject} 渲染配置
+	 * @param renderMetadata {JsonObject} 渲染时使用的基准数据
 	 */
-	var RenderedTickChart = function(tickChart, sketch, config){
+	var RenderedTickChart = function(tickChart, sketch, config, renderMetadata){
 		if(!(tickChart instanceof TickChart))
 			throw new Error("Invalid arguemnt. TickChart instance is needed.");
 		
@@ -89,6 +90,13 @@
 		 */
 		this.getConfig = function(){
 			return config;
+		};
+		
+		/**
+		 * 获取渲染时使用的基准数据
+		 */
+		this.getRenderMetadata = function(){
+			return renderMetadata;
 		};
 		
 		/**
@@ -232,30 +240,34 @@
 				enclosedAreaBackground: null/** 折线与X轴围绕而成的封闭区域的背景色 */
 			});
 			
-			util.setAttributes(canvasObj, {width: config.width, height: config.height, style: "width: " + config.width + "; height: " + config.height});
 			/* 百分比尺寸自动转换 */
-			if(/[^\d\.]/.test(config.width)){
-				config.width = canvasObj.clientWidth;
-				util.setAttributes(canvasObj, {width: config.width});
-			}if(/[^\d\.]/.test(config.height)){
-				config.height = canvasObj.clientHeight;
-				util.setAttributes(canvasObj, {height: config.height});
-			}
-			canvasObj.style.cssText = "";
+			if(/%/.test(config.width))
+				config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
+			if(/%/.test(config.height))
+				config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
+			util.setAttributes(canvasObj, {width: config.width, height: config.height});
 			
 			var ctx = canvasObj.getContext("2d");
 			
 			/** 高分辨率适应 */
 			var pixelRatio = util.pixelRatio();
 			if(pixelRatio > 1){
-				canvasObj.width = pixelRatio * config.width;
-				canvasObj.height = pixelRatio * config.height;
-				
 				canvasObj.style.width = config.width + "px";
 				canvasObj.style.height = config.height + "px";
 				
+				canvasObj.width = pixelRatio * config.width;
+				canvasObj.height = pixelRatio * config.height;
+				
 				ctx.scale(pixelRatio, pixelRatio);
 			}
+			
+			var renderMetadata = {
+				scaleX: pixelRatio,
+				scaleY: pixelRatio,
+				cssWidth: config.width,
+				cssHeight: config.height
+			};
+			Object.freeze && Object.freeze(renderMetadata);
 			
 			var _sketch = sketch(datas, dataParser, config);
 			console.log(_sketch);
@@ -434,7 +446,7 @@
 				ctx.restore();
 			}
 			
-			return new RenderedTickChart(this, _sketch, config);
+			return new RenderedTickChart(this, _sketch, config, renderMetadata);
 		};
 		
 		/**
