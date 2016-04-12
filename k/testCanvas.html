@@ -3,7 +3,6 @@
 <head>
 	<meta charset = "UTF-8"/>
 	<meta name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, width = device-width">
-	<link rel = "stylesheet" href = "canvas/trade-chart_tick.css"/>
 	
 	<style type = "text/css">
 	html, body{
@@ -19,6 +18,8 @@
 	}
 	canvas{
 		position: absolute;
+		display: block;
+		margin: 0 auto;
 	}
 	canvas#detail{
 		z-index: 1;
@@ -29,8 +30,7 @@
 	<div class = "k-container"><canvas id = "chart"></canvas><canvas id = "detail"></canvas></div>
 	
 	<script type = "text/javascript" src = "../trade-chart.js"></script>
-	<script type = "text/javascript" src = "canvas/trade-chart_tick.js"></script>
-	<script type = "text/javascript" src = "tip.js"></script>
+	<script type = "text/javascript" src = "canvas/trade-chart_k.js"></script>
 	<script type = "text/javascript" src = "testCanvas.js"></script>
 </body>
 </html>

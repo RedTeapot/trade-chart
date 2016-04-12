@@ -29,40 +29,52 @@
 			paddingLeft: 60,
 			paddingRight: 20,
 			
-			dotGap: 5,/** 相邻两个点之间的间隔 */
+			groupWidth: 4,
+			groupGap: 3,
 			
 			axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 			axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 			axisLabelFont: null,
 			
 			axisXTickOffset: 30,/* 横坐标刻度距离原点的位移 */
-			axisXTickInterval: 20,/** 横坐标刻度之间相差的点的个数 */
+			axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 			
-			coordinateBackground: "#F9F9F9",
-			enclosedAreaBackground: new TradeChart.LinearGradient(["0, white","1, #212121"])
+			coordinateBackground: "#F9F9F9"
 		};
 		
 		/** 图形绘制 */
 		var chartCanvas = document.getElementById("chart"), detailCanvas = document.getElementById("detail");
-		window.renderedTickChart = new TradeChart.chart.TickChart().setDataParser(function(d, i){
-			var obj = {time: d[d.length - 1], price: +d[3]};
-			if(isNaN(obj.price)){
-				console.error(d, i, datas[i]);
-				obj.price = 0;
+		window.renderedKChart = new TradeChart.chart.KChart().setDataParser(function(d, i){
+			var obj = {time: d[1], openPrice: d[2], closePrice: d[3], highPrice: d[4], lowPrice: d[5]};
+			if(isNaN(obj.openPrice)){
+				console.error(d, i, obj.openPrice);
+				obj.openPrice = 0;
+			}
+			if(isNaN(obj.closePrice)){
+				console.error(d, i, obj.closePrice);
+				obj.closePrice = 0;
+			}
+			if(isNaN(obj.highPrice)){
+				console.error(d, i, obj.highPrice);
+				obj.highPrice = 0;
+			}
+			if(isNaN(obj.lowPrice)){
+				console.error(d, i, obj.lowPrice);
+				obj.lowPrice = 0;
 			}
 			
 			return obj;
 		}).setDatas(datas.slice(1)).render(chartCanvas, config);
 		
 		/** 明细查看 */
-		config = window.renderedTickChart.getConfig();
+		config = window.renderedKChart.getConfig();
 		detailCanvas.width = chartCanvas.width;
 		detailCanvas.height = chartCanvas.height;
-		detailCanvas.style.width = window.renderedTickChart.getRenderMetadata().cssWidth;
-		detailCanvas.style.height = window.renderedTickChart.getRenderMetadata().cssHeight;
+		detailCanvas.style.width = window.renderedKChart.getRenderMetadata().cssWidth;
+		detailCanvas.style.height = window.renderedKChart.getRenderMetadata().cssHeight;
 		
 		window.detailCtx = detailCanvas.getContext("2d")
-		detailCtx.scale(window.renderedTickChart.getRenderMetadata().scaleX, window.renderedTickChart.getRenderMetadata().scaleY);
+		detailCtx.scale(window.renderedKChart.getRenderMetadata().scaleX, window.renderedKChart.getRenderMetadata().scaleY);
 		detailCtx.strokeStyle = "black";
 		detailCtx.lineWidth = 0.5;
 		
@@ -72,43 +84,24 @@
 		
 			return function(e){
 				var x = (e instanceof TouchEvent? e.touches[0].clientX: e.clientX) - offsetLeft;
-				var dataIndex = window.renderedTickChart.getDataIndex(x);
-				var coordinate = window.renderedTickChart.getCoordinate(x);
+				var dataIndex = window.renderedKChart.getDataIndex(x);
+				var coordinate = window.renderedKChart.getCoordinate(x);
 				
 				if(null == coordinate)
 					return;
 				
-				var x = 0, y = 0;
+				var x = 0;
 				if(null != lastCoordinate){
 					x = lastCoordinate.x - 2;
-					y = lastCoordinate.y - 2;
 					x = x < 0? 0: x;
-					y = y < 0? 0: y;
 				}
-				detailCtx.clearRect(0, y, detailCtx.canvas.width, 5);
 				detailCtx.clearRect(x, 0, 5, detailCtx.canvas.height);
 				
-				var x1 = Math.floor(config.paddingLeft) + 0.5,
-					x2 = Math.floor(config.width - config.paddingRight) + 0.5;
-				y = Math.floor(coordinate.y) + 0.5;
-				
-				/** 横线 */
-				detailCtx.beginPath();
-				detailCtx.moveTo(x1, y);
-				detailCtx.lineTo(x2, y);
-				
 				/** 竖线 */
-				x = Math.floor(coordinate.x) + 0.5;
-				detailCtx.moveTo(x, Math.floor(config.paddingTop) + 0.5);
-				detailCtx.lineTo(x, Math.floor(config.height - config.paddingBottom) + 0.5);
-				detailCtx.stroke();
-				
-				/** 圆点 */
 				detailCtx.beginPath();
-				detailCtx.moveTo(x, y);
-				detailCtx.arc(x, y, 3, 2 * Math.PI, 0);
-				detailCtx.closePath();
-				detailCtx.fill();
+				detailCtx.moveTo(coordinate.x, Math.floor(config.paddingTop) + 0.5);
+				detailCtx.lineTo(coordinate.x, Math.floor(config.height - config.paddingBottom) + 0.5);
+				detailCtx.stroke();
 				
 				lastCoordinate = coordinate;
 			};

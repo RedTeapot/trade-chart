@@ -27,34 +27,34 @@
 			height: 0,/** 图表的高度 */
 			contentHeight: 0,/** 图表内容的高度 */
 			priceHeightRatio: 0,/** 高度与价格之间的映射比例 */
-			maxDotCount: 0/** 可呈现的最多的点的个数 */
+			maxGroupCount: 0/** 可呈现的最多的数据组的个数 */
 		};
 		
 		chartSketch.width = config.width - config.paddingLeft - config.paddingRight;
 		chartSketch.contentWidth = chartSketch.width - config.axisXTickOffset;
 		chartSketch.height = config.height - config.paddingTop - config.paddingBottom;
 		chartSketch.contentHeight = chartSketch.height - config.axisYTickOffset;
-		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / config.dotGap) + 1;
+		chartSketch.maxGroupCount = Math.floor((chartSketch.contentWidth + config.groupGap) / (config.groupGap + config.groupBarWidth)) + 1;
 		
 		/* 数据概览扫描 */
-		var previous = {price: 0};
 		var variationSum = 0;
-		for(var i = 0; i < datas.length && i < chartSketch.maxDotCount; i++){
+		for(var i = 0; i < datas.length && i < chartSketch.maxGroupCount; i++){
 			var d = datas[i];
 			/* 数据格式转换 */
 			d = dataParser? dataParser(d, i): d;
 			
-			if(+d.price > dataSketch.origin.max)
-				dataSketch.origin.max = +d.price;
-			if(+d.price < dataSketch.origin.min)
-				dataSketch.origin.min = +d.price;
+			var max = Math.max(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice),
+				min = Math.min(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice);
+			if(max > dataSketch.origin.max)
+				dataSketch.origin.max = max;
+			if(min < dataSketch.origin.min)
+				dataSketch.origin.min = min;
 			
-			var variation = Math.abs(+d.price - +previous.price);
+			var variation = Math.abs(max - min);
 			
 			/* 确定更大的价格变动幅度 */
 			if(variation > dataSketch.origin.maxVariation)
 				dataSketch.origin.maxVariation = variation;
-			previous = d;
 			variationSum += variation;
 		}
 		dataSketch.origin.avgVariation = variationSum / datas.length;
@@ -64,6 +64,12 @@
 		dataSketch.extended.priceFloor = dataSketch.extended.priceFloor < 0? 0: dataSketch.extended.priceFloor;
 		dataSketch.extended.priceCeiling = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor < 2E-7)? (dataSketch.extended.priceFloor + 1): dataSketch.extended.priceCeiling;
 		
+		chartSketch.width = config.width - config.paddingLeft - config.paddingRight;
+		chartSketch.contentWidth = chartSketch.width - config.axisXTickOffset;
+		chartSketch.height = config.height - config.paddingTop - config.paddingBottom;
+		chartSketch.contentHeight = chartSketch.height - config.axisYTickOffset;
+		chartSketch.maxGroupCount = Math.floor((chartSketch.contentWidth + config.groupGap) / (config.groupGap + config.groupBarWidth));
+		
 		chartSketch.priceHeightRatio = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor) / chartSketch.height;
 		
 		return {data: dataSketch, chart: chartSketch};
@@ -71,15 +77,15 @@
 	
 	/**
 	 * @constructor
-	 * 已完成渲染的分时图
-	 * @param tickChart {TickChart} 分时图实例
+	 * 已完成渲染的K线图
+	 * @param kChart {KChart} K线图实例
 	 * @param sketch {JsonObject} 数据和图形的扫描分析结果
 	 * @param config {JsonObject} 渲染配置
 	 * @param renderMetadata {JsonObject} 渲染时使用的基准数据
 	 */
-	var RenderedTickChart = function(tickChart, sketch, config, renderMetadata){
-		if(!(tickChart instanceof TickChart))
-			throw new Error("Invalid arguemnt. TickChart instance is needed.");
+	var RenderedKChart = function(kChart, sketch, config, renderMetadata){
+		if(!(kChart instanceof KChart))
+			throw new Error("Invalid arguemnt. KChart instance is needed.");
 		
 		/**
 		 * 获取渲染用到的配置数据
@@ -101,15 +107,15 @@
 		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
 		 */
 		this.getDataIndex = function(x){
-			var dotCount = Math.min(tickChart.getDatas().length, sketch.chart.maxDotCount);
+			var groupCount = Math.min(kChart.getDatas().length, sketch.chart.maxGroupCount);
 			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
-			var maxX = minX + (dotCount - 1) * config.dotGap;/** N个点之间有N-1个间隙 */
+			var maxX = minX + groupCount * config.groupBarWidth + (groupCount - 1) * config.groupGap;/** N组数据之间有N-1个间隙 */
 			
 			if(x < minX || x > maxX)
 				return -1;
 			
 			var tmpX = x - minX;
-			var index = Math.round(tmpX / config.dotGap);
+			var index = Math.round(tmpX / (config.groupBarWidth + config.groupGap));
 			return index;
 		};
 		
@@ -123,16 +129,10 @@
 			if(-1 == dataIndex)
 				return null;
 			
-			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5,
-				minY = Math.floor(config.paddingTop) + 0.5;
+			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
 			
-			var data = tickChart.getDatas()[dataIndex];
-			var dataParser = tickChart.getDataParser();
-			data = dataParser? dataParser(data): data;
-			
-			var obj = {x: 0, y: 0};
-			obj.x = minX + dataIndex * config.dotGap;
-			obj.y = minY + (Math.abs(sketch.data.extended.priceCeiling - data.price) / sketch.chart.priceHeightRatio);
+			var obj = {x: 0, y: -1};/** 纵坐标不确定 */
+			obj.x = minX + dataIndex * (config.groupBarWidth + config.groupGap) + Math.floor((config.groupBarWidth + 1 - config.groupLineWidth) / 2);
 			
 			return obj;
 		};
@@ -140,11 +140,10 @@
 	
 	/**
 	 * @constructor
-	 * 分时图
-	 * 数据格式：{time: "", price: 12.01}
-	 * 
+	 * K线图（OHLC图）
+	 * 数据格式：{time: "", openPrice: <Number>, highPrice: <Number>, lowPrice: <Number>, closePrice: <Number>}
 	 */
-	var TickChart = function(){
+	var KChart = function(){
 		TradeChart.apply(this, arguments);
 		
 		/** 数据数组 */
@@ -190,7 +189,7 @@
 		 * @param domContainerObj {HTMLCanvasElement} 画布
 		 * @param config {JsonObject} 渲染配置
 		 * @param config.enclosedAreaBackground {String|TradeChart.LinearGradient} 折线与X轴围成的区域的背景色
-		 * @return {RenderedTickChart} 绘制的分时图
+		 * @return {RenderedKChart} 绘制的K线图
 		 */
 		this.render = function(canvasObj, config){
 			config = util.cloneObject(config, true);
@@ -205,7 +204,9 @@
 				paddingLeft: 60,
 				paddingRight: 20,
 				
-				dotGap: 5,/** 相邻两个点之间的间隔 */
+				groupLineWidth: 1,/** 蜡烛线的宽度。大于1时最好为偶数，从而使得线可以正好在正中间。注：边框占据1像素 */
+				groupBarWidth: 4,/** 蜡烛的宽度，必须大于线的宽度。最好为偶数，从而使得线可以正好在正中间。注：边框占据1像素 */
+				groupGap: 5,/** 相邻两组数据之间的间隔 */
 				
 				axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 				axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
@@ -227,11 +228,11 @@
 				showVerticalGridLine: true,/** 是否绘制网格横线 */
 				verticalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
 				
-				lineWidth: 1,/** 折线线宽 */
-				lineColor: null,/** 折线颜色 */
+				appreciatedColor: "red",/** 收盘价大于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
+				depreciatedColor: "#21CB21",/** 收盘价小于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
+				keepedColor: "white",/** 收盘价等于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
 				
-				coordinateBackground: null,/** 坐标系围成的矩形区域的背景色 */
-				enclosedAreaBackground: null/** 折线与X轴围绕而成的封闭区域的背景色 */
+				coordinateBackground: null/** 坐标系围成的矩形区域的背景色 */
 			});
 			
 			/* 百分比尺寸自动转换 */
@@ -265,6 +266,18 @@
 			
 			var _sketch = sketch(datas, dataParser, config);
 			console.log(_sketch);
+			
+			/**
+			 * 获取指定价钱对应的物理高度
+			 * @param price1 {Number} 价钱1
+			 * @param price2 {Number} 价钱2。缺省时，为_sketch.data.extended.priceCeiling
+			 * @return {Number} 物理高度
+			 */
+			var getHeight = function(price1, price2){
+				if(arguments.length < 2)
+					price2 = _sketch.data.extended.priceCeiling;
+				return Math.abs(price2 - price1) / _sketch.chart.priceHeightRatio;
+			};
 			
 			/** 绘制坐标区域背景 */
 			if(config.coordinateBackground){
@@ -312,13 +325,14 @@
 			ctx.stroke();
 			
 			/* 绘制X轴刻度 */
-			var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);
-			for(var i = 0; i < dotCount; i += config.axisXTickInterval){
+			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
+			for(var i = 0; i < groupCount; i += config.axisXTickInterval){
 				var data = datas[i];
 				/* 数据格式转换 */
 				data = dataParser? dataParser(data, i): data;
 				
-				var tickX = Math.floor(i * config.dotGap) + config.axisXTickOffset;
+				var x = Math.floor(i * (config.groupBarWidth + config.groupGap) + config.axisXTickOffset);
+				var tickX = x + Math.floor((config.groupBarWidth + 1 - config.groupLineWidth) / 2);
 				
 				/** 绘制网格横线 */
 				if(showVerticalGridLine){
@@ -361,7 +375,6 @@
 			for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
 				var price = _sketch.data.extended.priceFloor + i * axisYPriceInterval,
 					tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
-				
 				var tickY = Math.round(tickOffset);
 				
 				/** 绘制网格横线 */
@@ -387,68 +400,58 @@
 			}
 			ctx.restore();
 			
-			/** 确定折线点 */
-			var dots = [];/** 第一个点和最后一个点是X轴的起始点和终止点。中间部分是折线点 */
-			dots.push([x_axisX + config.axisXTickOffset, y_axisX]);
-			var i = 0, dotX, dotY;
-			for(; i < dotCount; i++){
+			/** 绘制蜡烛 */
+			ctx.save();
+			for(var i = 0; i < groupCount; i++){
 				var data = datas[i];
 				/* 数据格式转换 */
 				data = dataParser? dataParser(data, i): data;
 				
-				var priceVariation = _sketch.data.extended.priceCeiling - data.price;
-				var height = priceVariation / _sketch.chart.priceHeightRatio;
+				var isAppreciated = data.closePrice > data.openPrice,
+					isDepreciated = data.closePrice < data.openPrice,
+					isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
 				
-				dotX = Math.floor(i * config.dotGap) + config.axisXTickOffset + x_axisX;
-				dotY = Math.floor(config.paddingTop + height) + 0.5;
+				var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
+					maxBarPrice = Math.max(data.openPrice, data.closePrice);
 				
-				dots.push([dotX, dotY]);
-			}
-			dots.push([Math.floor((dotCount - 1) * config.dotGap) + config.axisXTickOffset + x_axisX, y_axisX]);
-			
-			/** 绘制折现区域 */
-			config.lineWidth && (ctx.lineWidth = config.lineWidth);
-			config.lineColor && (ctx.strokeStyle = config.lineColor);
-			
-			ctx.beginPath();
-			for(i = 1; i < dots.length - 1; i++){
-				ctx.lineTo(dots[i][0], dots[i][1]);
-			}
-			ctx.stroke();
-			/** 绘制折现区域渐变背影 */
-			if(config.enclosedAreaBackground){
-				ctx.save();
+				var x = x_axisX + Math.floor(i * (config.groupBarWidth + config.groupGap) + config.axisXTickOffset);
+				ctx.fillStyle = ctx.strokeStyle = isKeeped? config.keepedColor: (isAppreciated? config.appreciatedColor: config.depreciatedColor);
+				
+				/** 绘制线 */
+				var lineX = x + Math.floor((config.groupBarWidth + 1 - config.groupLineWidth) / 2),
+					lineY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxLinePrice)) + 0.5;
+				var lineY2 = lineY + Math.floor(getHeight(data.highPrice, data.lowPrice));
 				ctx.beginPath();
-				ctx.moveTo(dots[0][0], dots[0][1]);
-				for(i = 1; i < dots.length; i++)
-					ctx.lineTo(dots[i][0], dots[i][1]);
-				
-				var bg = config.enclosedAreaBackground;
-				if(bg instanceof TradeChart.LinearGradient){
-					bg = ctx.createLinearGradient(config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
-					config.enclosedAreaBackground.getStops().forEach(function(stop){
-						var offset = stop.offset;
-						if(/%/.test(offset))
-							offset = parseInt(offset.replace(/%/, "")) / 100;
-						
-						bg.addColorStop(offset, stop.color);
-					});
+				if(config.groupLineWidth > 1){
+					ctx.rect(lineX, lineY, config.groupLineWidth, Math.abs(lineY2 - lineY));
+					ctx.stroke();
+					ctx.fill();
+				}else{
+					ctx.moveTo(lineX, lineY);
+					ctx.lineTo(lineX, lineY2);
+					ctx.stroke();
 				}
 				
-				ctx.fillStyle = bg;
+				/** 绘制蜡烛 */
+				var barX = x,
+					barY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxBarPrice)) + 0.5;
+				var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
+				ctx.beginPath();
+				ctx.rect(barX, barY, config.groupBarWidth, barHeight);
+				ctx.stroke();
 				ctx.fill();
-				ctx.restore();
 			}
+			ctx.restore();
 			
-			return new RenderedTickChart(this, _sketch, config, renderMetadata);
+			return new RenderedKChart(this, _sketch, config, renderMetadata);
 		};
 		
 		/**
 		 * 渲染图形，并呈现至指定的DOM容器中
 		 * @param domContainerObj {HTMLElement} DOM容器
 		 * @param config {JsonObject} 渲染配置
-		 * @param config.enclosedAreaBackground {String|TickChart.LinearGradient} 折线与X轴围成的区域的背景色
-		 * @return {RenderedTickChart} 绘制的分时图
+		 * @param config.enclosedAreaBackground {String|KChart.LinearGradient} 折线与X轴围成的区域的背景色
+		 * @return {RenderedKChart} 绘制的K线图
 		 */
 		this.renderAt = function(domContainerObj, config){
 			var canvasObj = document.createElement("canvas");
@@ -457,7 +460,7 @@
 			return this.render(canvasObj, config);
 		};
 	};
-	TickChart.prototype = Object.create(TradeChart.prototype);
+	KChart.prototype = Object.create(TradeChart.prototype);
 	
-	TradeChart.defineChart("TickChart", TickChart);
+	TradeChart.defineChart("KChart", KChart);
 })();
