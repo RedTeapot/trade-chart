@@ -110,7 +110,7 @@
 	 * 数据格式：{time: "", price: 12.01}
 	 * 
 	 */
-	var TickChart = function(){
+	var TrendChart = function(){
 		TradeChart.apply(this, arguments);
 		
 		/** 数据数组 */
@@ -147,7 +147,7 @@
 		 * 渲染图形，并呈现至指定的DOM容器中
 		 * @param domContainerObj {HTMLElement} DOM容器
 		 * @param config {JsonObject} 渲染配置
-		 * @param config.encircledAreaBackground {String|TickChart.LinearGradient} 折线与X轴围成的区域的背景色
+		 * @param config.encircledAreaBackground {String|TrendChart.LinearGradient} 折线与X轴围成的区域的背景色
 		 */
 		this.renderAt = function(domContainerObj, config){
 			config = util.cloneObject(config, true);
@@ -294,10 +294,10 @@
 			svgObj.appendChild(mainObj);
 		};
 	};
-	TickChart.prototype = Object.create(TradeChart.prototype);
+	TrendChart.prototype = Object.create(TradeChart.prototype);
 	
 	/** 接口暴露 */
-	Object.defineProperty(TickChart, "LinearGradient", {value: LinearGradient, writable: false, configurable: false});
+	Object.defineProperty(TrendChart, "LinearGradient", {value: LinearGradient, writable: false, configurable: false});
 	
-	TradeChart.defineChart("TickChart", TickChart);
+	TradeChart.defineChart("TrendChart", TrendChart);
 })();

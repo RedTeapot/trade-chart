@@ -209,24 +209,26 @@
 				groupGap: 5,/** 相邻两组数据之间的间隔 */
 				
 				axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
-				axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 				axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
 				axisLabelColor: null,/** 坐标标签颜色 */
 				axisLineColor: null,/** 坐标轴颜色 */
 				
 				axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
 				axisXTickInterval: 10,/** 横坐标刻度之间相差的点的个数 */
+				axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 				
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 				axisYPrecision: 2,/** 纵坐标的数字精度 */
+				axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
+				axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 				
 				gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 				showHorizontalGridLine: true,/** 是否绘制网格横线 */
 				horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
 				
 				showVerticalGridLine: true,/** 是否绘制网格横线 */
-				verticalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
+				verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 				
 				appreciatedColor: "red",/** 收盘价大于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
 				depreciatedColor: "#21CB21",/** 收盘价小于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
@@ -265,7 +267,7 @@
 			Object.freeze && Object.freeze(renderMetadata);
 			
 			var _sketch = sketch(datas, dataParser, config);
-			console.log(_sketch);
+			console.log("K chart sketch", _sketch);
 			
 			/**
 			 * 获取指定价钱对应的物理高度
@@ -337,7 +339,7 @@
 				/** 绘制网格横线 */
 				if(showVerticalGridLine){
 					ctx.save();
-					ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
+					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
 					ctx.strokeStyle = config.verticalGridLineColor;
 					
 					ctx.beginPath();
@@ -353,7 +355,7 @@
 				ctx.moveTo(x_axisX + tickX, y_axisX);
 				ctx.lineTo(x_axisX + tickX, y_axisX + config.axisTickLineLength);
 				ctx.stroke();
-				ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisLabelOffset);
+				ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
 			}
 			
 			var x_axisY = x_axisX,
@@ -380,7 +382,7 @@
 				/** 绘制网格横线 */
 				if(showHorizontalGridLine && (i > 0)){/** 最后一条网格横线不绘制，以避免和坐标轴的横线混合 */
 					ctx.save();
-					ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
+					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
 					ctx.strokeStyle = config.horizontalGridLineColor;
 					
 					ctx.beginPath();
@@ -396,7 +398,7 @@
 				ctx.moveTo(x_axisY, y_axisY + tickY);
 				ctx.lineTo(x_axisY - config.axisTickLineLength, y_axisY + tickY);
 				ctx.stroke();
-				ctx.fillText(util.formatMoney(price, config.axisYPrecision), x_axisY - config.axisTickLineLength - config.axisLabelOffset, y_axisY + tickY);
+				ctx.fillText(util.formatMoney(price, config.axisYPrecision), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
 			}
 			ctx.restore();
 			
@@ -406,7 +408,7 @@
 				var data = datas[i];
 				/* 数据格式转换 */
 				data = dataParser? dataParser(data, i): data;
-				
+
 				var isAppreciated = data.closePrice > data.openPrice,
 					isDepreciated = data.closePrice < data.openPrice,
 					isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
@@ -436,10 +438,13 @@
 				var barX = x,
 					barY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxBarPrice)) + 0.5;
 				var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
+
 				ctx.beginPath();
 				ctx.rect(barX, barY, config.groupBarWidth, barHeight);
 				ctx.stroke();
 				ctx.fill();
+				
+				data = null;
 			}
 			ctx.restore();
 			

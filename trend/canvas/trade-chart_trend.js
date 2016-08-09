@@ -72,14 +72,14 @@
 	/**
 	 * @constructor
 	 * 已完成渲染的分时图
-	 * @param tickChart {TickChart} 分时图实例
+	 * @param trendChart {TrendChart} 分时图实例
 	 * @param sketch {JsonObject} 数据和图形的扫描分析结果
 	 * @param config {JsonObject} 渲染配置
 	 * @param renderMetadata {JsonObject} 渲染时使用的基准数据
 	 */
-	var RenderedTickChart = function(tickChart, sketch, config, renderMetadata){
-		if(!(tickChart instanceof TickChart))
-			throw new Error("Invalid arguemnt. TickChart instance is needed.");
+	var RenderedTrendChart = function(trendChart, sketch, config, renderMetadata){
+		if(!(trendChart instanceof TrendChart))
+			throw new Error("Invalid arguemnt. TrendChart instance is needed.");
 		
 		/**
 		 * 获取渲染用到的配置数据
@@ -101,7 +101,7 @@
 		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
 		 */
 		this.getDataIndex = function(x){
-			var dotCount = Math.min(tickChart.getDatas().length, sketch.chart.maxDotCount);
+			var dotCount = Math.min(trendChart.getDatas().length, sketch.chart.maxDotCount);
 			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
 			var maxX = minX + (dotCount - 1) * config.dotGap;/** N个点之间有N-1个间隙 */
 			
@@ -126,8 +126,8 @@
 			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5,
 				minY = Math.floor(config.paddingTop) + 0.5;
 			
-			var data = tickChart.getDatas()[dataIndex];
-			var dataParser = tickChart.getDataParser();
+			var data = trendChart.getDatas()[dataIndex];
+			var dataParser = trendChart.getDataParser();
 			data = dataParser? dataParser(data): data;
 			
 			var obj = {x: 0, y: 0};
@@ -144,7 +144,7 @@
 	 * 数据格式：{time: "", price: 12.01}
 	 * 
 	 */
-	var TickChart = function(){
+	var TrendChart = function(){
 		TradeChart.apply(this, arguments);
 		
 		/** 数据数组 */
@@ -190,7 +190,7 @@
 		 * @param domContainerObj {HTMLCanvasElement} 画布
 		 * @param config {JsonObject} 渲染配置
 		 * @param config.enclosedAreaBackground {String|TradeChart.LinearGradient} 折线与X轴围成的区域的背景色
-		 * @return {RenderedTickChart} 绘制的分时图
+		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.render = function(canvasObj, config){
 			config = util.cloneObject(config, true);
@@ -208,24 +208,26 @@
 				dotGap: 5,/** 相邻两个点之间的间隔 */
 				
 				axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
-				axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 				axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
 				axisLabelColor: null,/** 坐标标签颜色 */
 				axisLineColor: null,/** 坐标轴颜色 */
 				
 				axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
 				axisXTickInterval: 10,/** 横坐标刻度之间相差的点的个数 */
+				axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 				
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 				axisYPrecision: 2,/** 纵坐标的数字精度 */
+				axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
+				axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 				
 				gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 				showHorizontalGridLine: true,/** 是否绘制网格横线 */
 				horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
 				
 				showVerticalGridLine: true,/** 是否绘制网格横线 */
-				verticalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
+				verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 				
 				lineWidth: 1,/** 折线线宽 */
 				lineColor: null,/** 折线颜色 */
@@ -264,7 +266,7 @@
 			Object.freeze && Object.freeze(renderMetadata);
 			
 			var _sketch = sketch(datas, dataParser, config);
-			console.log(_sketch);
+			console.log("Trend chart sketch", JSON.stringify(_sketch));
 			
 			/** 绘制坐标区域背景 */
 			if(config.coordinateBackground){
@@ -323,7 +325,7 @@
 				/** 绘制网格横线 */
 				if(showVerticalGridLine){
 					ctx.save();
-					ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
+					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
 					ctx.strokeStyle = config.verticalGridLineColor;
 					
 					ctx.beginPath();
@@ -339,7 +341,7 @@
 				ctx.moveTo(x_axisX + tickX, y_axisX);
 				ctx.lineTo(x_axisX + tickX, y_axisX + config.axisTickLineLength);
 				ctx.stroke();
-				ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisLabelOffset);
+				ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
 			}
 			
 			var x_axisY = x_axisX,
@@ -367,7 +369,7 @@
 				/** 绘制网格横线 */
 				if(showHorizontalGridLine && (i > 0)){/** 最后一条网格横线不绘制，以避免和坐标轴的横线混合 */
 					ctx.save();
-					ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
+					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
 					ctx.strokeStyle = config.horizontalGridLineColor;
 					
 					ctx.beginPath();
@@ -383,7 +385,7 @@
 				ctx.moveTo(x_axisY, y_axisY + tickY);
 				ctx.lineTo(x_axisY - config.axisTickLineLength, y_axisY + tickY);
 				ctx.stroke();
-				ctx.fillText(util.formatMoney(price, config.axisYPrecision), x_axisY - config.axisTickLineLength - config.axisLabelOffset, y_axisY + tickY);
+				ctx.fillText(util.formatMoney(price, config.axisYPrecision), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
 			}
 			ctx.restore();
 			
@@ -403,6 +405,8 @@
 				dotY = Math.floor(config.paddingTop + height) + 0.5;
 				
 				dots.push([dotX, dotY]);
+				
+				data = null;
 			}
 			dots.push([Math.floor((dotCount - 1) * config.dotGap) + config.axisXTickOffset + x_axisX, y_axisX]);
 			
@@ -440,15 +444,15 @@
 				ctx.restore();
 			}
 			
-			return new RenderedTickChart(this, _sketch, config, renderMetadata);
+			return new RenderedTrendChart(this, _sketch, config, renderMetadata);
 		};
 		
 		/**
 		 * 渲染图形，并呈现至指定的DOM容器中
 		 * @param domContainerObj {HTMLElement} DOM容器
 		 * @param config {JsonObject} 渲染配置
-		 * @param config.enclosedAreaBackground {String|TickChart.LinearGradient} 折线与X轴围成的区域的背景色
-		 * @return {RenderedTickChart} 绘制的分时图
+		 * @param config.enclosedAreaBackground {String|TrendChart.LinearGradient} 折线与X轴围成的区域的背景色
+		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.renderAt = function(domContainerObj, config){
 			var canvasObj = document.createElement("canvas");
@@ -457,7 +461,7 @@
 			return this.render(canvasObj, config);
 		};
 	};
-	TickChart.prototype = Object.create(TradeChart.prototype);
+	TrendChart.prototype = Object.create(TradeChart.prototype);
 	
-	TradeChart.defineChart("TickChart", TickChart);
+	TradeChart.defineChart("TrendChart", TrendChart);
 })();

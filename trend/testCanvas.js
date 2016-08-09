@@ -44,7 +44,7 @@
 		
 		/** 图形绘制 */
 		var chartCanvas = document.getElementById("chart"), detailCanvas = document.getElementById("detail");
-		window.renderedTickChart = new TradeChart.chart.TickChart().setDataParser(function(d, i){
+		window.renderedTickChart = new TradeChart.chart.TrendChart().setDataParser(function(d, i){
 			var obj = {time: d[d.length - 1], price: +d[3]};
 			if(isNaN(obj.price)){
 				console.error(d, i, datas[i]);
