@@ -100,14 +100,22 @@
 		this.getRenderMetadata = function(){
 			return renderMetadata;
 		};
-		
+
+		/**
+		 * 获取被渲染的群组的个数
+		 * @return {Integer} 被渲染的群组的个数
+		 */
+		this.getGroupCount = function(){
+			return Math.min(kChart.getDatas().length, sketch.chart.maxGroupCount);
+		};
+
 		/**
 		 * 获取指定的相对横坐标对应的数据索引
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
 		 */
 		this.getDataIndex = function(x){
-			var groupCount = Math.min(kChart.getDatas().length, sketch.chart.maxGroupCount);
+			var groupCount = this.getGroupCount();
 			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
 			var maxX = minX + groupCount * config.groupBarWidth + (groupCount - 1) * config.groupGap;/** N组数据之间有N-1个间隙 */
 			

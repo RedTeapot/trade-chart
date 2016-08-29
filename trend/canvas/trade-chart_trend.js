@@ -94,6 +94,14 @@
 		this.getRenderMetadata = function(){
 			return renderMetadata;
 		};
+
+		/**
+		 * 获取被渲染的点的个数
+		 * @return {Integer} 被渲染的点的个数
+		 */
+		this.getDotCount = function(){
+			return Math.min(trendChart.getDatas().length, sketch.chart.maxDotCount);
+		};
 		
 		/**
 		 * 获取指定的相对横坐标对应的数据索引
@@ -101,7 +109,7 @@
 		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
 		 */
 		this.getDataIndex = function(x){
-			var dotCount = Math.min(trendChart.getDatas().length, sketch.chart.maxDotCount);
+			var dotCount = this.getDotCount();
 			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
 			var maxX = minX + (dotCount - 1) * config.dotGap;/** N个点之间有N-1个间隙 */
 			
