@@ -30,11 +30,11 @@
 			maxGroupCount: 0/** 可呈现的最多的数据组的个数 */
 		};
 		
-		chartSketch.width = config.width - config.paddingLeft - config.paddingRight;
-		chartSketch.contentWidth = chartSketch.width - config.axisXTickOffset;
-		chartSketch.height = config.height - config.paddingTop - config.paddingBottom;
-		chartSketch.contentHeight = chartSketch.height - config.axisYTickOffset;
-		chartSketch.maxGroupCount = Math.floor((chartSketch.contentWidth + config.groupGap) / (config.groupGap + config.groupBarWidth)) + 1;
+		chartSketch.width = Math.floor(config.width - config.paddingLeft - config.paddingRight);
+		chartSketch.contentWidth = Math.floor(chartSketch.width - config.axisXTickOffset);
+		chartSketch.height = Math.floor(config.height - config.paddingTop - config.paddingBottom);
+		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
+		chartSketch.maxGroupCount = Math.floor((chartSketch.contentWidth - config.groupLineWidth) / (config.groupGap + config.groupBarWidth)) + 1;
 		
 		/* 数据概览扫描 */
 		var variationSum = 0;
@@ -64,12 +64,6 @@
 		dataSketch.extended.priceFloor = dataSketch.extended.priceFloor < 0? 0: dataSketch.extended.priceFloor;
 		dataSketch.extended.priceCeiling = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor < 2E-7)? (dataSketch.extended.priceFloor + 1): dataSketch.extended.priceCeiling;
 		
-		chartSketch.width = config.width - config.paddingLeft - config.paddingRight;
-		chartSketch.contentWidth = chartSketch.width - config.axisXTickOffset;
-		chartSketch.height = config.height - config.paddingTop - config.paddingBottom;
-		chartSketch.contentHeight = chartSketch.height - config.axisYTickOffset;
-		chartSketch.maxGroupCount = Math.floor((chartSketch.contentWidth + config.groupGap) / (config.groupGap + config.groupBarWidth));
-		
 		chartSketch.priceHeightRatio = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor) / chartSketch.height;
 		
 		return {data: dataSketch, chart: chartSketch};
@@ -86,7 +80,9 @@
 	var RenderedKChart = function(kChart, sketch, config, renderMetadata){
 		if(!(kChart instanceof KChart))
 			throw new Error("Invalid arguemnt. KChart instance is needed.");
-		
+
+		var self = this;
+
 		/**
 		 * 获取渲染用到的配置数据
 		 */
@@ -109,6 +105,15 @@
 			return Math.min(kChart.getDatas().length, sketch.chart.maxGroupCount);
 		};
 
+		var getMinX = function(){
+			return Math.floor(config.paddingLeft + config.axisXTickOffset) - Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
+		};
+
+		var getMaxX = function(){
+			var groupCount = self.getGroupCount();
+			return getMinX() + groupCount * config.groupBarWidth + (groupCount - 1) * config.groupGap;/** N组数据之间有N-1个间隙 */
+		};
+
 		/**
 		 * 获取指定的相对横坐标对应的数据索引
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
@@ -116,19 +121,19 @@
 		 */
 		this.getDataIndex = function(x){
 			var groupCount = this.getGroupCount();
-			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
-			var maxX = minX + groupCount * config.groupBarWidth + (groupCount - 1) * config.groupGap;/** N组数据之间有N-1个间隙 */
+			var minX = getMinX();
+			var maxX = getMaxX();
 			
 			if(x < minX || x > maxX)
 				return -1;
 			
 			var tmpX = x - minX;
-			var index = Math.round(tmpX / (config.groupBarWidth + config.groupGap));
+			var index = Math.ceil(tmpX / (config.groupBarWidth + Math.floor(config.groupGap))) - 1;
 			return index;
 		};
 		
 		/**
-		 * 获取指定的相对横坐标对应的数据在画布上的坐标位置
+		 * 获取指定的相对横坐标对应的数据在画布上的坐标位置（左侧位置）
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @return {JsonObject} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
 		 */
@@ -136,11 +141,11 @@
 			var dataIndex = this.getDataIndex(x);
 			if(-1 == dataIndex)
 				return null;
-			
-			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
+
+			var minX = getMinX();
 			
 			var obj = {x: 0, y: -1};/** 纵坐标不确定 */
-			obj.x = minX + dataIndex * (config.groupBarWidth + config.groupGap) + Math.floor((config.groupBarWidth + 1 - config.groupLineWidth) / 2);
+			obj.x = minX + dataIndex * (config.groupBarWidth + config.groupGap);
 			
 			return obj;
 		};
@@ -212,9 +217,9 @@
 				paddingLeft: 60,
 				paddingRight: 20,
 				
-				groupLineWidth: 1,/** 蜡烛线的宽度。大于1时最好为偶数，从而使得线可以正好在正中间。注：边框占据1像素 */
-				groupBarWidth: 4,/** 蜡烛的宽度，必须大于线的宽度。最好为偶数，从而使得线可以正好在正中间。注：边框占据1像素 */
-				groupGap: 5,/** 相邻两组数据之间的间隔 */
+				groupLineWidth: 1,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
+				groupBarWidth: 5,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
+				groupGap: 3,/** 相邻两组数据之间的间隔 */
 				
 				axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 				axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
@@ -244,6 +249,9 @@
 				
 				coordinateBackground: null/** 坐标系围成的矩形区域的背景色 */
 			});
+
+			if(config.groupBarWidth < config.groupLineWidth + 2)
+				throw new Error("Bar width should be bigger than group line width plus 2.");
 			
 			/* 百分比尺寸自动转换 */
 			if(/%/.test(config.width))
@@ -412,6 +420,8 @@
 			
 			/** 绘制蜡烛 */
 			ctx.save();
+			var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
+			var startX = Math.floor(x_axisX + config.axisXTickOffset - halfGroupBarWidth);
 			for(var i = 0; i < groupCount; i++){
 				var data = datas[i];
 				/* 数据格式转换 */
@@ -420,42 +430,42 @@
 				var isAppreciated = data.closePrice > data.openPrice,
 					isDepreciated = data.closePrice < data.openPrice,
 					isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
-				
+
 				var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
 					maxBarPrice = Math.max(data.openPrice, data.closePrice);
-				
-				var x = x_axisX + Math.floor(i * (config.groupBarWidth + config.groupGap) + config.axisXTickOffset);
+
+				var x = startX + Math.floor(i * (config.groupBarWidth + config.groupGap));
 				ctx.fillStyle = ctx.strokeStyle = isKeeped? config.keepedColor: (isAppreciated? config.appreciatedColor: config.depreciatedColor);
-				
+
 				/** 绘制线 */
-				var lineX = x + Math.floor((config.groupBarWidth + 1 - config.groupLineWidth) / 2),
-					lineY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxLinePrice)) + 0.5;
+				var lineX = x + halfGroupBarWidth,
+					lineY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxLinePrice));
 				var lineY2 = lineY + Math.floor(getHeight(data.highPrice, data.lowPrice));
 				ctx.beginPath();
 				if(config.groupLineWidth > 1){
 					ctx.rect(lineX, lineY, config.groupLineWidth, Math.abs(lineY2 - lineY));
-					ctx.stroke();
+					// ctx.stroke();
 					ctx.fill();
 				}else{
-					ctx.moveTo(lineX, lineY);
-					ctx.lineTo(lineX, lineY2);
+					ctx.moveTo(lineX + 0.5, lineY + 0.5);
+					ctx.lineTo(lineX + 0.5, lineY2 + 0.5);
 					ctx.stroke();
 				}
-				
+
 				/** 绘制蜡烛 */
 				var barX = x,
-					barY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxBarPrice)) + 0.5;
+					barY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxBarPrice));
 				var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
 
 				ctx.beginPath();
 				ctx.rect(barX, barY, config.groupBarWidth, barHeight);
-				ctx.stroke();
+				// ctx.stroke();
 				ctx.fill();
-				
+
 				data = null;
 			}
 			ctx.restore();
-			
+
 			return new RenderedKChart(this, _sketch, config, renderMetadata);
 		};
 		
@@ -474,6 +484,6 @@
 		};
 	};
 	KChart.prototype = Object.create(TradeChart.prototype);
-	
+
 	TradeChart.defineChart("KChart", KChart);
 })();
