@@ -343,13 +343,14 @@
 			ctx.stroke();
 			
 			/* 绘制X轴刻度 */
+			var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
 			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
 			for(var i = 0; i < groupCount; i += config.axisXTickInterval){
 				var data = datas[i];
 				/* 数据格式转换 */
 				data = dataParser? dataParser(data, i): data;
 				
-				var x = Math.floor(i * (config.groupBarWidth + config.groupGap) + config.axisXTickOffset);
+				var x = Math.floor(i * (config.groupBarWidth + config.groupGap) + config.axisXTickOffset - halfGroupBarWidth);
 				var tickX = x + Math.floor((config.groupBarWidth + 1 - config.groupLineWidth) / 2);
 				
 				/** 绘制网格横线 */
@@ -420,7 +421,6 @@
 			
 			/** 绘制蜡烛 */
 			ctx.save();
-			var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
 			var startX = Math.floor(x_axisX + config.axisXTickOffset - halfGroupBarWidth);
 			for(var i = 0; i < groupCount; i++){
 				var data = datas[i];
