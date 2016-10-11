@@ -58,10 +58,24 @@
 			variationSum += variation;
 		}
 		dataSketch.origin.avgVariation = variationSum / datas.length;
-		
-		dataSketch.extended.priceCeiling = dataSketch.origin.max + (dataSketch.origin.avgVariation / 2);
-		dataSketch.extended.priceFloor = dataSketch.origin.min - (dataSketch.origin.avgVariation / 2);
+
+		if(null != config.axisYPriceFloor){
+			if(typeof config.axisYPriceFloor == "function")
+				dataSketch.extended.priceFloor = config.axisYPriceFloor(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
+			else
+				dataSketch.extended.priceFloor = Number(config.axisYPriceFloor);
+		}else
+			dataSketch.extended.priceFloor = dataSketch.origin.min - (dataSketch.origin.avgVariation / 2);
+		if(null != config.axisYPriceCeiling){
+			if(typeof config.axisYPriceCeiling == "function")
+				dataSketch.extended.priceCeiling = config.axisYPriceCeiling(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
+			else
+				dataSketch.extended.priceCeiling = Number(config.axisYPriceCeiling);
+		}else
+			dataSketch.extended.priceCeiling = dataSketch.origin.max + (dataSketch.origin.avgVariation / 2);
+
 		dataSketch.extended.priceFloor = dataSketch.extended.priceFloor < 0? 0: dataSketch.extended.priceFloor;
+		dataSketch.extended.priceCeiling = dataSketch.extended.priceCeiling < dataSketch.origin.max? dataSketch.origin.max: dataSketch.extended.priceCeiling;
 		dataSketch.extended.priceCeiling = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor < 2E-7)? (dataSketch.extended.priceFloor + 1): dataSketch.extended.priceCeiling;
 		
 		chartSketch.priceHeightRatio = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor) / chartSketch.height;
@@ -229,6 +243,12 @@
 				axisYPrecision: 2,/** 纵坐标的数字精度 */
 				axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
 				axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
+				axisYPriceFloor: function(min, max, avgVariation, maxVariation){
+					return min - avgVariation / 2;
+				},
+				axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
+					return max + avgVariation / 2;
+				},
 				
 				gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 				showHorizontalGridLine: true,/** 是否绘制网格横线 */

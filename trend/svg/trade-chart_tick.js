@@ -58,11 +58,26 @@
 				}
 			};
 		})());
-		dataSketch.extended.priceCeiling = dataSketch.origin.max + (dataSketch.origin.avgVariation / 2);
-		dataSketch.extended.priceFloor = dataSketch.origin.min - (dataSketch.origin.avgVariation / 2);
+
+		if(null != config.axisYPriceFloor){
+			if(typeof config.axisYPriceFloor == "function")
+				dataSketch.extended.priceFloor = config.axisYPriceFloor(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
+			else
+				dataSketch.extended.priceFloor = Number(config.axisYPriceFloor);
+		}else
+			dataSketch.extended.priceFloor = dataSketch.origin.min - (dataSketch.origin.avgVariation / 2);
+		if(null != config.axisYPriceCeiling){
+			if(typeof config.axisYPriceCeiling == "function")
+				dataSketch.extended.priceCeiling = config.axisYPriceCeiling(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
+			else
+				dataSketch.extended.priceCeiling = Number(config.axisYPriceCeiling);
+		}else
+			dataSketch.extended.priceCeiling = dataSketch.origin.max + (dataSketch.origin.avgVariation / 2);
+
 		dataSketch.extended.priceFloor = dataSketch.extended.priceFloor < 0? 0: dataSketch.extended.priceFloor;
+		dataSketch.extended.priceCeiling = dataSketch.extended.priceCeiling < dataSketch.origin.max? dataSketch.origin.max: dataSketch.extended.priceCeiling;
 		dataSketch.extended.priceCeiling = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor < 2E-7)? (dataSketch.extended.priceFloor + 1): dataSketch.extended.priceCeiling;
-		
+
 		chartSketch.width = config.width - config.paddingLeft - config.paddingRight;
 		chartSketch.contentWidth = chartSketch.width - config.axisXTickOffset;
 		chartSketch.height = config.height - config.paddingTop - config.paddingBottom;
@@ -173,6 +188,12 @@
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 				axisYPrecision: 2,/** 纵坐标的数字精度 */
+				axisYPriceFloor: function(min, max, avgVariation, maxVariation){
+					return min - avgVariation / 2;
+				},
+				axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
+					return max + avgVariation / 2;
+				},
 				
 				encircledAreaBackground: "none"
 			});
