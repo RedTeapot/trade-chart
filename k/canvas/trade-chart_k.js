@@ -441,6 +441,8 @@
 				var lineX = x + halfGroupBarWidth,
 					lineY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxLinePrice));
 				var lineY2 = lineY + Math.floor(getHeight(data.highPrice, data.lowPrice));
+				if(lineY2 == lineY)
+					lineY2 += 1;
 				ctx.beginPath();
 				if(config.groupLineWidth > 1){
 					ctx.rect(lineX, lineY, config.groupLineWidth, Math.abs(lineY2 - lineY));
@@ -456,6 +458,8 @@
 				var barX = x,
 					barY = Math.floor(config.paddingTop) + Math.floor(getHeight(maxBarPrice));
 				var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
+				if(0 == barHeight)
+					barHeight = 1;
 
 				ctx.beginPath();
 				ctx.rect(barX, barY, config.groupBarWidth, barHeight);
