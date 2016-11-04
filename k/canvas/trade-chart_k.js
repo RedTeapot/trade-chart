@@ -246,7 +246,11 @@
 				
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
-				axisYPrecision: 2,/** 纵坐标的数字精度 */
+				axisYPrecision: 2,/** 纵坐标的数字精度（仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值） */
+				axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
+					/** price：价格；config：配置 */
+					return util.formatMoney(price, config.axisYPrecision);
+				},
 				axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
 				axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 				axisYPriceFloor: function(min, max, avgVariation, maxVariation){
@@ -255,6 +259,7 @@
 				axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
 					return max + avgVariation / 2;
 				},
+
 				
 				gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 				showHorizontalGridLine: true,/** 是否绘制网格横线 */
@@ -435,7 +440,8 @@
 				ctx.moveTo(x_axisY, y_axisY + tickY);
 				ctx.lineTo(x_axisY - config.axisTickLineLength, y_axisY + tickY);
 				ctx.stroke();
-				ctx.fillText(util.formatMoney(price, config.axisYPrecision), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
+				var format = config.axisYFormatter || util.formatMoney;
+				ctx.fillText(format(price, config), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
 			}
 			ctx.restore();
 			

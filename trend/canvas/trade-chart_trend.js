@@ -241,6 +241,10 @@
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 				axisYPrecision: 2,/** 纵坐标的数字精度 */
+				axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
+					/** price：价格；config：配置 */
+					return util.formatMoney(price, config.axisYPrecision);
+				},
 				axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
 				axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 				axisYPriceFloor: function(min, max, avgVariation, maxVariation){
@@ -413,7 +417,8 @@
 				ctx.moveTo(x_axisY, y_axisY + tickY);
 				ctx.lineTo(x_axisY - config.axisTickLineLength, y_axisY + tickY);
 				ctx.stroke();
-				ctx.fillText(util.formatMoney(price, config.axisYPrecision), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
+				var format = config.axisYFormatter || util.formatMoney;
+				ctx.fillText(format(price, config), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
 			}
 			ctx.restore();
 			

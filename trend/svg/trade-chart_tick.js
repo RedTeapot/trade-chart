@@ -188,6 +188,10 @@
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 				axisYPrecision: 2,/** 纵坐标的数字精度 */
+				axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
+					/** price：价格；config：配置 */
+					return util.formatMoney(price, config.axisYPrecision);
+				},
 				axisYPriceFloor: function(min, max, avgVariation, maxVariation){
 					return min - avgVariation / 2;
 				},
@@ -269,7 +273,8 @@
 				var price = _sketch.data.extended.priceFloor + i * axisYPriceInterval,
 					tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
 				
-				textObj.innerHTML = util.formatMoney(price, config.axisYPrecision);
+				var format = config.axisYFormatter || util.formatMoney;
+				textObj.innerHTML = format(price, config);
 				util.setAttributes(lineObj, {x2: -config.axisTickLineLength, y2: 0});
 				util.setAttributes(textObj, {x: -(config.axisTickLineLength + config.axisLabelOffset), dy: "0.5em"});
 				util.setAttributes(groupObj, {transform: "translate(0, " + tickOffset + ")"});
