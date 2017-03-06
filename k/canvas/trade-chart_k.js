@@ -241,8 +241,9 @@
 				axisLineColor: null,/** 坐标轴颜色 */
 				
 				axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
-				axisXTickInterval: 10,/** 横坐标刻度之间相差的点的个数 */
+				axisXTickInterval: 10,/** 横坐标刻度之间相差的群组的个数 */
 				axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
+				axisXLabelSize: null,/* 横坐标标签文字的长度（用于决定以何种方式绘制最后一个刻度：只绘制边界刻度，还是边界刻度和最后一个刻度都绘制） */
 				
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
@@ -367,10 +368,11 @@
 			ctx.lineTo(x2_axisX, y_axisX);
 			ctx.stroke();
 			
-			/* 绘制X轴刻度 */
-			var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
-			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
-			for(var i = 0; i < groupCount; i += config.axisXTickInterval){
+			/**
+			 * 根据提供的点的索引位置绘制刻度
+			 * @param {Integer} i 点的索引位置
+			 */
+			var renderXTick = function(i){
 				var data = datas[i];
 				/* 数据格式转换 */
 				data = dataParser? dataParser(data, i): data;
@@ -398,6 +400,21 @@
 				ctx.lineTo(x_axisX + tickX, y_axisX + config.axisTickLineLength);
 				ctx.stroke();
 				ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
+			};
+			
+			/* 绘制X轴刻度 */
+			var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
+			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
+			var i = 0, axisXTickCount = Math.floor(groupCount / config.axisXTickInterval) + 1;
+			for(; i < axisXTickCount - 1; i++)
+				renderXTick(i * config.axisXTickInterval);
+			/* 绘制最后一个刻度和边界刻度 */
+			var remainingSize = _sketch.chart.contentWidth - Math.ceil(i * (config.groupBarWidth + config.groupGap));
+			if(null == config.axisXLabelSize || config.axisXLabelSize >= remainingSize){/* 剩余空间不足，只绘制边界刻度 */
+				renderXTick(groupCount - 1);
+			}else{
+				renderXTick(i * config.axisXTickInterval);
+				renderXTick(groupCount - 1);
 			}
 			
 			var x_axisY = x_axisX,

@@ -38,6 +38,7 @@
 			
 			axisXTickOffset: 30,/* 横坐标刻度距离原点的位移 */
 			axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
+			axisXLabelSize: 100,
 			
 			coordinateBackground: "#F9F9F9"
 		};

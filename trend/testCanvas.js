@@ -36,7 +36,8 @@
 			axisLabelFont: null,
 			
 			axisXTickOffset: 30,/* 横坐标刻度距离原点的位移 */
-			axisXTickInterval: 20,/** 横坐标刻度之间相差的点的个数 */
+			axisXTickInterval: 17,/** 横坐标刻度之间相差的点的个数 */
+			axisXLabelSize: 20,
 			
 			coordinateBackground: "#F9F9F9",
 			enclosedAreaBackground: new TradeChart.LinearGradient(["0, white","1, #212121"])
