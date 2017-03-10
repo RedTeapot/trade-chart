@@ -369,8 +369,8 @@
 			ctx.stroke();
 			
 			/**
-			 * 根据提供的点的索引位置绘制刻度
-			 * @param {Integer} i 点的索引位置
+			 * 根据提供的群组的索引位置绘制刻度
+			 * @param {Integer} i 群组的索引位置
 			 */
 			var renderXTick = function(i){
 				var data = datas[i];
@@ -411,10 +411,17 @@
 			/* 绘制最后一个刻度和边界刻度 */
 			var remainingSize = _sketch.chart.contentWidth - Math.ceil(i * (config.groupBarWidth + config.groupGap));
 			if(null == config.axisXLabelSize || config.axisXLabelSize >= remainingSize){/* 剩余空间不足，只绘制边界刻度 */
-				renderXTick(groupCount - 1);
+				var index = groupCount - 1;
+				if(index >= 0 && index < groupCount)
+					renderXTick(index);
 			}else{
-				renderXTick(i * config.axisXTickInterval);
-				renderXTick(groupCount - 1);
+				var index = i * config.axisXTickInterval;
+				if(index >= 0 && index < groupCount)
+					renderXTick(index);
+
+				index = groupCount - 1;
+				if(index >= 0 && index < groupCount)
+					renderXTick(index);
 			}
 			
 			var x_axisY = x_axisX,

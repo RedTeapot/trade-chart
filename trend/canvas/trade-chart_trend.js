@@ -387,10 +387,17 @@
 			/* 绘制最后一个刻度和边界刻度 */
 			var remainingSize = _sketch.chart.contentWidth - Math.ceil(i * config.axisXTickInterval * config.dotGap);
 			if(null == config.axisXLabelSize || config.axisXLabelSize >= remainingSize){/* 剩余空间不足，只绘制边界刻度 */
-				renderXTick(dotCount - 1);
+				var index = dotCount - 1;
+				if(index >= 0 && index < dotCount)
+					renderXTick(index);
 			}else{
-				renderXTick(i * config.axisXTickInterval);
-				renderXTick(dotCount - 1);
+				var index = i * config.axisXTickInterval;
+				if(index >= 0 && index < dotCount)
+					renderXTick(index);
+
+				index = dotCount - 1;
+				if(index >= 0 && index < dotCount)
+					renderXTick(index);
 			}
 			
 			var x_axisY = x_axisX,
