@@ -592,12 +592,19 @@
 			/** 绘制折现区域 */
 			config.lineWidth && (ctx.lineWidth = config.lineWidth);
 			config.lineColor && (ctx.strokeStyle = config.lineColor);
-
-			ctx.beginPath();
-			for(i = 1; i < dots.length - 1; i++){
-				ctx.lineTo(dots[i][0], dots[i][1]);
+			if(dots.length == 3){
+				//只有一个点时
+				ctx.beginPath();
+				ctx.arc(dots[1][0], dots[1][1], ctx.lineWidth*2, 0, 2*Math.PI);
+				ctx.fillStyle = config.lineColor;
+				ctx.fill();
+			}else{
+				ctx.beginPath();
+				for(i = 1; i < dots.length - 1; i++){
+					ctx.lineTo(dots[i][0], dots[i][1]);
+				}
+				ctx.stroke();
 			}
-			ctx.stroke();
 
 			/** 绘制折现区域渐变背影 */
 			if(config.enclosedAreaBackground){
