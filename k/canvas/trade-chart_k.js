@@ -43,7 +43,7 @@
 		chartSketch.contentWidth = Math.floor(chartSketch.width - config.axisXTickOffset);
 		/* 量图 */
 		if(config.showVolume){
-			chartSketch.height = Math.round(config.height * (1- config.volumeAreaRatio) - config.paddingTop - config.paddingBottom);
+			chartSketch.height = Math.round(config.height * (1- config.volumeAreaRatio) - config.paddingTop - config.volumeMarginTop);
 			chartSketch.volumeHeight = Math.round(config.height * config.volumeAreaRatio - config.paddingBottom);
 			chartSketch.volumeContentHeight = Math.floor(chartSketch.volumeHeight - config.volumeAxisYTickOffset);
 		}else{
@@ -180,8 +180,11 @@
 			var minX = getMinX();
 			var maxX = getMaxX();
 
-			if(x < minX || x > maxX)
-				return -1;
+			if (x < minX){
+				x = minX;
+			} else if (x > maxX){
+				x = maxX;
+			}
 
 			var tmpX = x - minX;
 			var index = Math.ceil(tmpX / (config.groupBarWidth + Math.floor(config.groupGap))) - 1;
@@ -283,9 +286,8 @@
 				axisLineColor: null,/** 坐标轴颜色 */
 
 				axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
-				axisXTickInterval: 10,/** 横坐标刻度之间相差的群组的个数 */
 				axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
-				axisXLabelSize: null,/* 横坐标标签文字的长度（用于决定以何种方式绘制最后一个刻度：只绘制边界刻度，还是边界刻度和最后一个刻度都绘制） */
+				axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定以何种方式绘制最后一个刻度：只绘制边界刻度，还是边界刻度和最后一个刻度都绘制） */
 
 				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
@@ -318,6 +320,7 @@
 
 				showVolume: false,  /** 是否显示量图 */
 				volumeAreaRatio: 0.33, /** 量图区域所占比例 0~1 */
+				volumeMarginTop: 15,/** 量图区的顶部外边距 （即与图形区的间距）*/
 				volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 				volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
 				axisYVolumeFloor: null, /** 纵坐标最小刻度, 为null时自动 */
@@ -384,7 +387,7 @@
 				ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop) + 0.5, _sketch.chart.width, _sketch.chart.height);
 				/* 量图 */
 				if(config.showVolume){
-					ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop + _sketch.chart.height + config.paddingBottom) + 0.5, _sketch.chart.width, _sketch.chart.volumeHeight);
+					ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop) + 0.5, _sketch.chart.width, _sketch.chart.volumeHeight);
 				}
 
 				var bg = config.coordinateBackground;
@@ -426,7 +429,7 @@
 			ctx.lineTo(x2_axisX, y_axisX);
 			/* 量图 */
 			if(config.showVolume){
-				var y_axisX_volume = Math.floor(config.paddingTop + _sketch.chart.height + config.paddingBottom + _sketch.chart.volumeHeight) + 0.5;
+				var y_axisX_volume = Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop + _sketch.chart.volumeHeight) + 0.5;
 				ctx.moveTo(x_axisX, y_axisX_volume);
 				ctx.lineTo(x2_axisX, y_axisX_volume);
 			}
@@ -466,12 +469,13 @@
 				ctx.beginPath();
 				ctx.moveTo(x_axisX + tickX, y_axisX);
 				ctx.lineTo(x_axisX + tickX, y_axisX + config.axisTickLineLength);
-				ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
 				/* 量图 */
 				if(config.showVolume){
 					ctx.moveTo(x_axisX + tickX, y_axisX_volume);
 					ctx.lineTo(x_axisX + tickX, y_axisX_volume + config.axisTickLineLength);
 					ctx.fillText(data.time, x_axisX + tickX, y_axisX_volume + config.axisTickLineLength + config.axisXLabelOffset);
+				}else{
+					ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
 				}
 				ctx.stroke();
 			};
@@ -479,17 +483,20 @@
 			/** 绘制X轴刻度 */
 			var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
 			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
-			var i = 0, axisXTickCount = Math.floor(groupCount / config.axisXTickInterval) + 1;
+			var axisXTickInterval = Math.ceil(config.axisXLabelSize / (config.groupBarWidth + config.groupGap));//两个坐标的最小间距
+			var i = 0, axisXTickCount = Math.floor(groupCount / axisXTickInterval);
 			for(; i < axisXTickCount - 1; i++)
-				renderXTick(i * config.axisXTickInterval);
+				renderXTick(i * axisXTickInterval);
 			/* 绘制最后一个刻度和边界刻度 */
-			var remainingSize = _sketch.chart.contentWidth - Math.ceil(i * (config.groupBarWidth + config.groupGap));
-			if(null == config.axisXLabelSize || config.axisXLabelSize >= remainingSize){/* 剩余空间不足，只绘制边界刻度 */
+			var remainingSize = Math.ceil((groupCount - 1 - i * axisXTickInterval) * (config.groupBarWidth + config.groupGap));
+			if(remainingSize < config.axisXLabelSize){
+				/* 剩余空间不足，只绘制边界刻度 */
 				var index = groupCount - 1;
 				if(index >= 0 && index < groupCount)
 					renderXTick(index);
 			}else{
-				var index = i * config.axisXTickInterval;
+				/* 绘制最后一个刻度和边界刻度 */
+				var index = i * axisXTickInterval;
 				if(index >= 0 && index < groupCount)
 					renderXTick(index);
 
@@ -508,7 +515,7 @@
 			ctx.lineTo(x_axisY, y2_axisY);
 			/* 量图 */
 			if(config.showVolume){
-				var y_axisY_volume = Math.floor(config.paddingTop + _sketch.chart.height + config.paddingBottom) + 0.5;
+				var y_axisY_volume = Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop) + 0.5;
 				var y2_axisY_volume = y_axisX_volume;
 				ctx.moveTo(x_axisY, y_axisY_volume);
 				ctx.lineTo(x_axisY, y2_axisY_volume);
