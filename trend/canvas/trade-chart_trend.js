@@ -132,7 +132,7 @@
 	 */
 	var RenderedTrendChart = function(trendChart, sketch, config, renderMetadata){
 		if(!(trendChart instanceof TrendChart))
-			throw new Error("Invalid arguemnt. TrendChart instance is needed.");
+			throw new Error("Invalid argument. TrendChart instance is needed.");
 
 		/**
 		 * 获取渲染用到的配置数据
@@ -253,12 +253,10 @@
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param domContainerObj {HTMLCanvasElement} 画布
 		 * @param config {JsonObject} 渲染配置
-		 * @param config.enclosedAreaBackground {String|TradeChart.LinearGradient} 折线与X轴围成的区域的背景色
 		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.render = function(canvasObj, config){
 			config = util.cloneObject(config, true);
-
 			config = util.setDftValue(config, {
 				width: "100%",/* 整体图形宽度 */
 				height: 300,/* 整体图形高度 */
@@ -269,7 +267,15 @@
 				paddingLeft: 60,
 				paddingRight: 20,
 
-				dotGap: 5,/** 相邻两个点之间的间隔 */
+				/**
+				 * 相邻两个点之间的间隔。
+				 *
+				 * //TODO 数据没有交易节信息的场景，尚未响应该属性取值为auto的配置
+				 *
+				 * 1. 赋值整数，以指定固定间隔（此时会根据可显示的数据量自动舍去超出渲染范围的的数据，从而导致可能只显示前一部分数据）；
+				 * 2. 赋值字符串：“auto”以渲染所有数据，并自动计算两个点之间的距离。
+				 */
+				dotGap: 5,
 
 				axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 				axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
@@ -300,7 +306,7 @@
 				showHorizontalGridLine: true,/** 是否绘制网格横线 */
 				horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
 
-				showVerticalGridLine: true,/** 是否绘制网格横线 */
+				showVerticalGridLine: true,/** 是否绘制网格竖线 */
 				verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 
 				lineWidth: 1,/** 折线线宽 */
@@ -320,8 +326,12 @@
 
 				showAvgPriceLine: false, /** 是否显示均价 */
 				avgPriceLineWidth: 1, /** 均线线宽 */
-				avgPriceLineColor: "orange" /** 均线颜色 */
+				avgPriceLineColor: "orange", /** 均线颜色 */
 			});
+
+			/* 历史兼容，待移除 */
+			if(!!config.showTrendAll)
+				config.dotGap = "auto";
 
 			/** 百分比尺寸自动转换 */
 			if(/%/.test(config.width))
@@ -415,17 +425,21 @@
 			 * @param {Integer} i 点的索引位置
 			 */
 			var renderXTick = function(i){
+				var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);
+				if(i < 0 || i >= dotCount)
+					return;
+
 				var data, tickX;
 				if(isNaN(i)){
 					data = i;
-					tickX = i.XRate * _sketch.chart.contentWidth + config.axisXTickOffset;
+					tickX = Math.floor(i.XRate * _sketch.chart.contentWidth) + config.axisXTickOffset;
 				}else{
 					/** 数据格式转换 */
 					data = dataParser? dataParser(datas[i], i): datas[i];
 					tickX = Math.floor(i * config.dotGap) + config.axisXTickOffset;
 				}
 
-				/** 绘制网格横线 */
+				/** 绘制网格竖线 */
 				if(showVerticalGridLine){
 					ctx.save();
 					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
@@ -460,13 +474,13 @@
 
 			/** 绘制X轴刻度 */
 			var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);
-			if(config.showTrendAll && config.timeSections != null && config.timeSections.length > 0){
-				var totalMinutes = 0;
-				config.timeSections.forEach(function(timeSection){
-					totalMinutes += timeSection.minutes;
-				});
+			if(config.dotGap == "auto" && config.timeSections != null && config.timeSections.length > 0){
+				var totalMinutes = config.timeSections.reduce(function(sum, timeSection){
+					return sum + timeSection.minutes;
+				}, 0);
 
-				var axisXTicks = [], minXTickIntervalRate = Infinity;
+				/* 绘制交易节时间 */
+				var axisXTicks = [], minTimeSectionWidthRatio = Infinity;
 				config.timeSections.forEach(function(timeSection){
 					if(axisXTicks.length == 0){
 						axisXTicks.push({
@@ -482,36 +496,33 @@
 						XRate: axisXTicks[axisXTicks.length-1].XRate + timeSection.minutes / totalMinutes
 					});
 
-					minXTickIntervalRate = Math.min(minXTickIntervalRate, timeSection.minutes / totalMinutes);
+					minTimeSectionWidthRatio = Math.min(minTimeSectionWidthRatio, timeSection.minutes / totalMinutes);
 				});
 
-				/* 绘制交易节时间 */
-				if(minXTickIntervalRate * _sketch.chart.contentWidth > config.axisXLabelSize){
+				/* 根据横坐标文本长度，决定呈现每个交易节的起止时间，还是只呈现第一个交易节的开始时间和最后一个交易节的结束时间 */
+				if(minTimeSectionWidthRatio * _sketch.chart.contentWidth > config.axisXLabelSize){
 					axisXTicks.forEach(renderXTick);
 				}else{
 					renderXTick(axisXTicks[0]);
 					renderXTick(axisXTicks[axisXTicks.length - 1]);
 				}
 			}else{
-				var axisXTickInterval = Math.ceil(config.axisXLabelSize / config.dotGap);//两个坐标的最小间距
+				var axisXTickInterval = Math.ceil(config.axisXLabelSize / config.dotGap);/* 横坐标刻度之间相差的点的个数 */
 				var i = 0, axisXTickCount = Math.floor(dotCount / axisXTickInterval);
 				for(; i < axisXTickCount - 1; i++)
 					renderXTick(i * axisXTickInterval);
 				var remainingSize = Math.ceil((dotCount - 1 - i * axisXTickInterval) * config.dotGap);
 				if(remainingSize < config.axisXLabelSize){
 					/* 剩余空间不足，只绘制边界刻度 */
-					var index = dotCount - 1;
-					if(index >= 0 && index < dotCount)
-						renderXTick(index);
+					renderXTick(dotCount - 1);
 				}else{
-					/* 绘制最后一个刻度和边界刻度 */
-					var index = i * axisXTickInterval;
-					if(index >= 0 && index < dotCount)
-						renderXTick(index);
+					var j = i * axisXTickInterval,
+						k = dotCount - 1;
 
-					index = dotCount - 1;
-					if(index >= 0 && index < dotCount)
-						renderXTick(index);
+					/* 绘制最后一个刻度和边界刻度 */
+					renderXTick(j);
+					if(j != k)
+						renderXTick(k);
 				}
 			}
 
@@ -574,7 +585,7 @@
 							tickOffset = (config.volumeAxisYMidTickQuota + 1 - i) * axisYHeightIntervalAux;
 						var tickY = Math.round(tickOffset);
 
-						/** 绘制网格横线, 最后一条网格横线和坐标轴重合时不绘制 */
+						/** 绘制网格横线, 最后（自上而下）一条网格横线和坐标轴重合时不绘制 */
 						if(showHorizontalGridLine && (config.volumeAxisYTickOffset != 0 || i > 0)){
 							ctx.save();
 							ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
@@ -618,7 +629,7 @@
 
 				var priceVariation = _sketch.data.extended.priceCeiling - data.price;
 				var height = priceVariation / _sketch.chart.priceHeightRatio;
-				dotX = Math.floor(i * config.dotGap) + config.axisXTickOffset + x_axisX;
+				dotX = Math.floor((i * config.dotGap + config.axisXTickOffset + x_axisX) * 100)/100;/* 保留两位小数 */
 				dotY = Math.floor(config.paddingTop + height) + 0.5;
 				dots.push([dotX, dotY]);
 
@@ -632,7 +643,7 @@
 
 				data = null;
 			}
-			dots.push([Math.floor((dotCount - 1) * config.dotGap) + config.axisXTickOffset + x_axisX, y_axisX]);
+			dots.push([Math.floor(((dotCount - 1) * config.dotGap + config.axisXTickOffset + x_axisX) * 100)/100, y_axisX]);
 
 			/** 绘制折现区域 */
 			config.lineWidth && (ctx.lineWidth = config.lineWidth);
@@ -656,8 +667,9 @@
 				ctx.save();
 				ctx.beginPath();
 				ctx.moveTo(dots[0][0], dots[0][1]);
-				for(i = 1; i < dots.length; i++)
+				for(i = 1; i < dots.length; i++){
 					ctx.lineTo(dots[i][0], dots[i][1]);
+				}
 
 				var bg = config.enclosedAreaBackground;
 				if(bg instanceof TradeChart.LinearGradient){
@@ -702,7 +714,7 @@
 					var volumeVariation = _sketch.data.extended.volumeCeiling - data.volume;
 					var height = volumeVariation / _sketch.chart.volumeHeightRatio;
 
-					dotX = Math.floor(i * config.dotGap) + config.axisXTickOffset + x_axisX;
+					dotX = Math.floor(i * config.dotGap * 100)/100 + config.axisXTickOffset + x_axisX;
 					dotY = Math.floor(height);
 
 					volumeDots.push([dotX, dotY]);
@@ -718,7 +730,7 @@
 				}
 				volumeDots.forEach(function(volumeDot, i){
 					ctx.beginPath();
-					var leftTopPointX = Math.floor(volumeDot[0] - volumeWidth / 2);
+					var leftTopPointX = config.dotGap == "auto" ? Math.floor((volumeDot[0] - volumeWidth / 2) * 100)/100: Math.floor(volumeDot[0] - volumeWidth / 2);
 					var outValue = x_axisX - leftTopPointX;
 					ctx.rect(outValue > 0 ? x_axisX : leftTopPointX, y_axisY_volume + volumeDot[1], outValue > 0 ? volumeWidth - outValue : volumeWidth, _sketch.chart.volumeHeight - volumeDot[1]);
 					var volumeColor = config.volumeColor;
