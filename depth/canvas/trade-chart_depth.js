@@ -369,8 +369,6 @@
 				/**
 				 * 相邻两个点之间的间隔。
 				 *
-				 * //TODO 数据没有交易节信息的场景，尚未响应该属性取值为auto的配置
-				 *
 				 * 1. 赋值整数，以指定固定间隔（此时会根据可显示的数据量自动舍去超出渲染范围的的数据，从而导致可能只显示前一部分数据）；
 				 * 2. 赋值字符串：“auto”以渲染所有数据，并自动计算两个点之间的距离。
 				 */
@@ -762,7 +760,7 @@
 
 				ctx.textBaseline = "top";
 				config.enclosedAreaBelongingTextFont && (ctx.font = config.enclosedAreaBelongingTextFont);
-				config.enclosedAreaBelongingTextColor && (ctx.fillStyle = enclosedAreaBelongingTextColor);
+				config.enclosedAreaBelongingTextColor && (ctx.fillStyle = config.enclosedAreaBelongingTextColor);
 
 				var text4Buyer = config.enclosedAreaBelongingText4Buyer;
 				if(null != text4Buyer && "" != (text4Buyer = String(text4Buyer).trim())){
