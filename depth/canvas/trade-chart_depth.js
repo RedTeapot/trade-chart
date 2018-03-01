@@ -241,7 +241,13 @@
 		 */
 		this.getConvertedData = function(dataIndex, area){
 			var list = depthChart.getDatas()[area] || [];
-			return list[dataIndex];
+
+			var dataParser = depthChart.getDataParser();
+			var d = list[dataIndex];
+			if(typeof dataParser == "function")
+				d = dataParser(d);
+				
+			return d;
 		};
 
 		/**

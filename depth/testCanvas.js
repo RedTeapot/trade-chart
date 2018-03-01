@@ -106,7 +106,9 @@
 		
 		var viewDetail = (function(){
 			var offsetLeft = detailCanvas.offsetLeft;
-			var lastCoordinate = null;
+			var lastCoordinate = null, timer;
+
+			var detailObj = document.querySelector(".detail");
 		
 			return function(e){
 				var x = (null != window.TouchEvent && e instanceof TouchEvent? e.touches[0].clientX: e.clientX) - offsetLeft;
@@ -158,6 +160,40 @@
 				detailCtx.arc(x, y, dotRadius / 2, 2 * Math.PI, 0);
 				detailCtx.closePath();
 				detailCtx.fill();
+
+				/* 在右上方呈现详细信息 */
+				var data = window.renderedDepthChart.getConvertedData(dataPosition.dataIndex, dataPosition.area);
+				detailObj.querySelector(".price span").innerHTML = data.price;
+				detailObj.querySelector(".amount span").innerHTML = data.amount;
+				detailObj.classList.add("visible");
+				var offset = 10, left = x + offset, bottom = (config.height - y) + offset, right = "", top = "",
+					detailOffsetWidth = detailObj.offsetWidth, containerClientWidth = containerObj.clientWidth,
+					detailOffsetHeight = detailObj.offsetHeight, containerClientHeight = containerObj.clientHeight;
+
+				/* 不能超过右侧边界和上侧边界 */
+				left = Math.min(left, containerClientWidth - detailOffsetWidth - offset);
+				bottom = Math.min(bottom, containerClientHeight - detailOffsetHeight - offset);
+
+				/* 调整为在左下方显示 */
+				if(left < x){
+					left = "";
+					right = (config.width - x) + 10;
+				}
+				if(config.height - bottom > y){
+					bottom = "";
+					top = y + 10;
+				}
+
+				detailObj.style.left = left;
+				detailObj.style.right = right;
+				detailObj.style.top = top;
+				detailObj.style.bottom = bottom;
+
+				/* 详细信息自动消失 */
+				clearTimeout(timer);
+				timer = setTimeout(function(){
+					detailObj.classList.remove("visible");
+				}, 4000);
 				
 				lastCoordinate = coordinate;
 			};
