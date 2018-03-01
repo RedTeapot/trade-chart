@@ -235,15 +235,29 @@
 		};
 
 		/**
+		 * 根据提供的点的索引位置和区域信息返回格式转换前的原始数据
+		 * @param {Integer} dataIndex 点的索引位置
+		 * @param {StringEnum} area 点所在的区域。buyer：买方区域（左侧）；seller：卖方区域（右侧）
+		 */
+		this.getOriginalData = function(dataIndex, area){
+			var list = depthChart.getDatas()[area] || [];
+			if(dataIndex < 0 || dataIndex >= list.length)
+				return null;
+			
+			var d = list[dataIndex];
+			return d;
+		};
+
+		/**
 		 * 根据提供的点的索引位置和区域信息返回格式转换后的数据
-		 * @param {Integer} i 点的索引位置（相对于特定的买方数据，或卖方数据）
+		 * @param {Integer} dataIndex 点的索引位置（相对于特定的买方数据，或卖方数据）
 		 * @param {StringEnum} area 点所在的区域。buyer：买方区域（左侧）；seller：卖方区域（右侧）
 		 */
 		this.getConvertedData = function(dataIndex, area){
-			var list = depthChart.getDatas()[area] || [];
-
-			var dataParser = depthChart.getDataParser();
-			var d = list[dataIndex];
+			var d = this.getOriginalData(dataIndex);
+			if(null == d)
+				return d;
+			
 			if(typeof dataParser == "function")
 				d = dataParser(d);
 				

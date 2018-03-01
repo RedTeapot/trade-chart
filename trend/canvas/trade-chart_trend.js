@@ -178,6 +178,34 @@
 		};
 
 		/**
+		 * 根据提供的点的索引位置返回格式转换前的原始数据
+		 * @param {Integer} dataIndex 点的索引位置
+		 */
+		this.getOriginalData = function(dataIndex){
+			var list = trendChart.getDatas() || [];
+			if(dataIndex < 0 || dataIndex >= list.length)
+				return null;
+			
+			var d = list[dataIndex];
+			return d;
+		};
+
+		/**
+		 * 根据提供的点的索引位置返回格式转换后的数据
+		 * @param {Integer} dataIndex 点的索引位置
+		 */
+		this.getConvertedData = function(dataIndex){
+			var d = this.getOriginalData(dataIndex);
+			if(null == d)
+				return d;
+			
+			if(typeof dataParser == "function")
+				d = dataParser(d);
+				
+			return d;
+		};
+
+		/**
 		 * 获取指定的相对横坐标对应的数据在画布上的坐标位置
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @return {JsonObject} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
@@ -750,7 +778,6 @@
 		 * 渲染图形，并呈现至指定的DOM容器中
 		 * @param domContainerObj {HTMLElement} DOM容器
 		 * @param config {JsonObject} 渲染配置
-		 * @param config.enclosedAreaBackground {String|TrendChart.LinearGradient} 折线与X轴围成的区域的背景色
 		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.renderAt = function(domContainerObj, config){

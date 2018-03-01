@@ -161,10 +161,16 @@
 			return Math.min(kChart.getDatas().length, sketch.chart.maxGroupCount);
 		};
 
+		/**
+		 * 获取图形正文区域的最小横坐标值
+		 */
 		var getMinX = function(){
 			return Math.floor(config.paddingLeft + config.axisXTickOffset) - Math.floor((config.groupBarWidth - config.groupLineWidth) / 2);
 		};
 
+		/**
+		 * 获取图形正文区域的最大横坐标值
+		 */
 		var getMaxX = function(){
 			var groupCount = self.getGroupCount();
 			return getMinX() + groupCount * config.groupBarWidth + (groupCount - 1) * config.groupGap;/** N组数据之间有N-1个间隙 */
@@ -177,8 +183,8 @@
 		 */
 		this.getDataIndex = function(x){
 			var groupCount = this.getGroupCount();
-			var minX = getMinX();
-			var maxX = getMaxX();
+			var minX = getMinX(),
+				maxX = getMaxX();
 
 			if (x < minX){
 				x = minX;
@@ -189,6 +195,34 @@
 			var tmpX = x - minX;
 			var index = Math.ceil(tmpX / (config.groupBarWidth + Math.floor(config.groupGap))) - 1;
 			return index;
+		};
+
+		/**
+		 * 根据提供的点的索引位置返回格式转换前的原始数据
+		 * @param {Integer} dataIndex 点的索引位置
+		 */
+		this.getOriginalData = function(dataIndex){
+			var list = kChart.getDatas() || [];
+			if(dataIndex < 0 || dataIndex >= list.length)
+				return null;
+			
+			var d = list[dataIndex];
+			return d;
+		};
+
+		/**
+		 * 根据提供的点的索引位置返回格式转换后的数据
+		 * @param {Integer} dataIndex 点的索引位置
+		 */
+		this.getConvertedData = function(dataIndex){
+			var d = this.getOriginalData(dataIndex);
+			if(null == d)
+				return d;
+			
+			if(typeof dataParser == "function")
+				d = dataParser(d);
+				
+			return d;
 		};
 
 		/**
@@ -720,7 +754,6 @@
 		 * 渲染图形，并呈现至指定的DOM容器中
 		 * @param domContainerObj {HTMLElement} DOM容器
 		 * @param config {JsonObject} 渲染配置
-		 * @param config.enclosedAreaBackground {String|KChart.LinearGradient} 折线与X轴围成的区域的背景色
 		 * @return {RenderedKChart} 绘制的K线图
 		 */
 		this.renderAt = function(domContainerObj, config){
