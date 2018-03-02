@@ -45,6 +45,8 @@
 	 * @param {JsonObject} config 渲染配置
 	 */
 	var calcMaxGroupCount = function(canvasObj, config){
+		config = util.cloneObject(config, true);
+
 		/** 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
