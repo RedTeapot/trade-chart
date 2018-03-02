@@ -11,7 +11,7 @@
 	};
 
 	/**
-	 * 根据给定的配置，计算图形内容区域（买方或卖方单方的宽度，约等于图标宽度的一半）的宽度
+	 * 根据给定的配置，计算图形内容区域（买方或卖方单方的宽度，约等于图表宽度的一半）的宽度
 	 * @param {JsonObject} config 渲染配置
 	 */
 	var calcChartContentWidth = function(config){
@@ -41,7 +41,7 @@
 		}, chartSketch = {
 			width: 0,/* 图表的宽度 */
 			height: 0,/* 图表的高度 */
-			contentWidth: 0,/* 图表内容的宽度（买方或卖方单方的宽度，约等于图标宽度的一半） */
+			contentWidth: 0,/* 图表内容的宽度（买方或卖方单方的宽度，约等于图表宽度的一半） */
 			contentHeight: 0,/* 图表内容的高度 */
 			maxDotCount: 0,/* 可呈现的最多的点的个数（买方或卖方单方区域中可以呈现的点的个数） */
 			amountHeightRatio: 0,/* 委托量与高度之间的映射比例 */
