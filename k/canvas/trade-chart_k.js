@@ -765,5 +765,6 @@
 	};
 	KChart.prototype = Object.create(TradeChart.prototype);
 
+	Kchart.sketch = sketch;
 	TradeChart.defineChart("KChart", KChart);
 })();

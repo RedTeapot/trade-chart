@@ -827,5 +827,6 @@
 	};
 	DepthChart.prototype = Object.create(TradeChart.prototype);
 
+	DepthChart.sketch = sketch;
 	TradeChart.defineChart("DepthChart", DepthChart);
 })();

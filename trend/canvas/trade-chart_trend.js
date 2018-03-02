@@ -789,5 +789,6 @@
 	};
 	TrendChart.prototype = Object.create(TradeChart.prototype);
 
+	TrendChart.sketch = sketch;
 	TradeChart.defineChart("TrendChart", TrendChart);
 })();
