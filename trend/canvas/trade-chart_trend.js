@@ -46,7 +46,7 @@
 	 */
 	var calcMaxDotCount = function(canvasObj, config){
 		config = util.cloneObject(config, true);
-		
+
 		/** 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
@@ -185,6 +185,16 @@
 		 */
 		this.getDotCount = function(){
 			return Math.min(trendChart.getDatas().length, sketch.chart.maxDotCount);
+		};
+
+		/**
+		 * 获取能够被渲染的原始数据列表
+		 */
+		this.getRenderingOriginalDatas = function(){
+			var datas = trendChart.getDatas() || [];
+			var count = Math.min(this.getDotCount(), datas.length);
+
+			return datas.slice(0, count);
 		};
 
 		/**

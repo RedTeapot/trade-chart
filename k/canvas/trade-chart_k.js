@@ -208,6 +208,16 @@
 		};
 
 		/**
+		 * 获取能够被渲染的原始数据列表
+		 */
+		this.getRenderingOriginalDatas = function(){
+			var datas = kChart.getDatas() || [];
+			var count = Math.min(this.getGroupCount(), datas.length);
+
+			return datas.slice(0, count);
+		};
+
+		/**
 		 * 获取指定的相对横坐标对应的数据索引
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1

@@ -53,7 +53,7 @@
 	 */
 	var calcMaxDotCount = function(canvasObj, config){
 		config = util.cloneObject(config, true);
-		
+
 		/** 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
@@ -263,6 +263,19 @@
 				return null;
 
 			return rst;
+		};
+
+		/**
+		 * 获取能够被渲染的原始数据列表
+		 */
+		this.getRenderingOriginalDatas = function(){
+			var datas = depthChart.getDatas() || {};
+			var datas4Buyer = datas.buyer || [],
+				datas4Seller = datas.seller || [];
+			var count4Buyer = Math.min(this.getBuyerDotCount(), datas4Buyer.length),
+				count4Seller = Math.min(this.getSellerDotCount(), datas4Seller.length);
+
+			return {buyer: datas4Buyer.slice(0, count4Buyer), seller: datas4Seller.slice(0, count4Seller)};
 		};
 
 		/**
