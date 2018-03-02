@@ -3,6 +3,58 @@
 	var util = TradeChart.util;
 
 	/**
+	 * 根据给定的配置信息计算绘制所需要的图形信息
+	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
+	 * @param {JsonObject} config 渲染配置
+	 */
+	var sketchChart = function(config){
+		var width = config.width,
+			height = config.height;
+		
+		var chartSketch = {
+			width: 0,/** 图表的宽度 */
+			contentWidth: 0,/** 图表内容的宽度 */
+			height: 0,/** 图表的高度 */
+			contentHeight: 0,/** 图表内容的高度 */
+			volumeHeight: 0,/** 量图高度 */
+			volumeContentHeight: 0,/** 量图内容的高度 */
+			maxDotCount: 0,/** 可呈现的最多的点的个数 */
+			priceHeightRatio: 0,/** 价格与高度之间的映射比例 */
+			volumeHeightRatio: 0/** 交易量与高度之间的映射比例 */
+		};
+
+		chartSketch.width = Math.floor(config.width - config.paddingLeft - config.paddingRight);
+		chartSketch.contentWidth = Math.floor(chartSketch.width - config.axisXTickOffset);
+		/* 量图 */
+		if(config.showVolume){
+			chartSketch.height =  Math.round(config.height * (1- config.volumeAreaRatio) - config.paddingTop - config.volumeMarginTop);
+			chartSketch.volumeHeight =  Math.round(config.height * config.volumeAreaRatio - config.paddingBottom);
+			chartSketch.volumeContentHeight = Math.floor(chartSketch.volumeHeight - config.volumeAxisYTickOffset);
+		}else{
+			chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
+		}
+		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
+		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / config.dotGap) + 1;
+
+		return chartSketch;
+	};
+
+	/**
+	 * 根据给定的配置信息和画布元素，计算最多可以绘制的数据个数
+	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
+	 * @param {JsonObject} config 渲染配置
+	 */
+	var calcMaxDotCount = function(canvasObj, config){
+		/** 百分比尺寸自动转换 */
+		if(/%/.test(config.width))
+			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
+		if(/%/.test(config.height))
+			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
+		
+		return sketchChart(config).maxDotCount;
+	};
+
+	/**
 	 * 扫描提供的数据，生成绘制所需的元数据
 	 * @param datas {JsonArray} 数据数组
 	 * @param dataParser {Function} 数据转换方法
@@ -27,30 +79,7 @@
 				volumeCeiling: 0,/* 坐标中成交量的最大值 */
 				volumeFloor: 0/* 坐标中成交量的最小值 */
 			}
-		}, chartSketch = {
-			width: 0,/** 图表的宽度 */
-			contentWidth: 0,/** 图表内容的宽度 */
-			height: 0,/** 图表的高度 */
-			contentHeight: 0,/** 图表内容的高度 */
-			volumeHeight: 0,/** 量图高度 */
-			volumeContentHeight: 0,/** 量图内容的高度 */
-			maxDotCount: 0,/** 可呈现的最多的点的个数 */
-			priceHeightRatio: 0,/** 价格与高度之间的映射比例 */
-			volumeHeightRatio: 0/** 交易量与高度之间的映射比例 */
-		};
-
-		chartSketch.width = Math.floor(config.width - config.paddingLeft - config.paddingRight);
-		chartSketch.contentWidth = Math.floor(chartSketch.width - config.axisXTickOffset);
-		/* 量图 */
-		if(config.showVolume){
-			chartSketch.height =  Math.round(config.height * (1- config.volumeAreaRatio) - config.paddingTop - config.volumeMarginTop);
-			chartSketch.volumeHeight =  Math.round(config.height * config.volumeAreaRatio - config.paddingBottom);
-			chartSketch.volumeContentHeight = Math.floor(chartSketch.volumeHeight - config.volumeAxisYTickOffset);
-		}else{
-			chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
-		}
-		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
-		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / config.dotGap) + 1;
+		}, chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
 		var previous = {price: 0, volume: 0};
@@ -789,6 +818,6 @@
 	};
 	TrendChart.prototype = Object.create(TradeChart.prototype);
 
-	TrendChart.sketch = sketch;
+	TrendChart.calcMaxDotCount = calcMaxDotCount;
 	TradeChart.defineChart("TrendChart", TrendChart);
 })();

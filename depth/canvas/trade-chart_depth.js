@@ -20,6 +20,48 @@
 	};
 
 	/**
+	 * 根据给定的配置信息计算绘制所需要的图形信息
+	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
+	 * @param {JsonObject} config 渲染配置
+	 */
+	var sketchChart = function(config){
+		var width = config.width,
+			height = config.height;
+		
+		var chartSketch = {
+			width: 0,/* 图表的宽度 */
+			height: 0,/* 图表的高度 */
+			contentWidth: 0,/* 图表内容的宽度（买方或卖方单方的宽度，约等于图表宽度的一半） */
+			contentHeight: 0,/* 图表内容的高度 */
+			maxDotCount: 0,/* 可呈现的最多的点的个数（买方或卖方单方区域中可以呈现的点的个数） */
+			amountHeightRatio: 0,/* 委托量与高度之间的映射比例 */
+		};
+
+		chartSketch.width = calcChartAxisWidth(config);
+		chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
+		chartSketch.contentWidth = calcChartContentWidth(config);
+		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
+		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / config.dotGap) + 1;
+
+		return chartSketch;
+	};
+
+	/**
+	 * 根据给定的配置信息和画布元素，计算最多可以绘制的数据个数（买方或卖方单方区域中可以呈现的点的个数）
+	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
+	 * @param {JsonObject} config 渲染配置
+	 */
+	var calcMaxDotCount = function(canvasObj, config){
+		/** 百分比尺寸自动转换 */
+		if(/%/.test(config.width))
+			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
+		if(/%/.test(config.height))
+			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
+		
+		return sketchChart(config).maxDotCount;
+	};
+
+	/**
 	 * 扫描提供的数据，生成绘制所需的元数据
 	 * @param {Array#JsonObject} datas 数据数组
 	 * @param {Function} dataParser 数据转换方法
@@ -38,20 +80,7 @@
 				amountCeiling: 0,/* 坐标中委托量的最大值 */
 				amountFloor: 0,/* 坐标中委托量的最小值 */
 			}
-		}, chartSketch = {
-			width: 0,/* 图表的宽度 */
-			height: 0,/* 图表的高度 */
-			contentWidth: 0,/* 图表内容的宽度（买方或卖方单方的宽度，约等于图表宽度的一半） */
-			contentHeight: 0,/* 图表内容的高度 */
-			maxDotCount: 0,/* 可呈现的最多的点的个数（买方或卖方单方区域中可以呈现的点的个数） */
-			amountHeightRatio: 0,/* 委托量与高度之间的映射比例 */
-		};
-
-		chartSketch.width = calcChartAxisWidth(config);
-		chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
-		chartSketch.contentWidth = calcChartContentWidth(config);
-		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
-		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / config.dotGap) + 1;
+		}, chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
 		var previous = {amount: 0};
@@ -827,6 +856,6 @@
 	};
 	DepthChart.prototype = Object.create(TradeChart.prototype);
 
-	DepthChart.sketch = sketch;
+	DepthChart.calcMaxDotCount = calcMaxDotCount;
 	TradeChart.defineChart("DepthChart", DepthChart);
 })();
