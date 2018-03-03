@@ -129,7 +129,7 @@
 		var stops = [];
 		
 		colorStops && colorStops.forEach(function(pair){
-			var tmp = pair.split(/\s*,\s*/);
+			var tmp = pair.split(/:/.test(pair)? /\s*:\s*/: /\s*,\s*/);
 			stops.push({offset: tmp[0], color: tmp[1]});
 		});
 		
