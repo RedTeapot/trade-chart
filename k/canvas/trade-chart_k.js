@@ -736,6 +736,9 @@
 
 			/** 绘制MA线 */
 			ctx.save();
+			ctx.textAlign = "left";
+			ctx.textBaseline = "top";
+			
 			var MALabel, MALabelX = config.MALabelX;
 			config.showMAArr.forEach(function(num, i){
 				ctx.beginPath();
@@ -806,6 +809,6 @@
 	};
 	KChart.prototype = Object.create(TradeChart.prototype);
 
-	Kchart.calcMaxGroupCount = calcMaxGroupCount;
+	KChart.calcMaxGroupCount = calcMaxGroupCount;
 	TradeChart.defineChart("KChart", KChart);
 })();
