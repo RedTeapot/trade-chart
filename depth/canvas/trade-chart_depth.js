@@ -2,6 +2,74 @@
 	var TradeChart = window.TradeChart;
 	var util = TradeChart.util;
 
+	/** 默认图形绘制选项 */
+	var defaultChartConfig = {
+		width: "100%",/* 整体图形宽度 */
+		height: 300,/* 整体图形高度 */
+
+		/** 图形内边距（坐标系外边距） */
+		paddingTop: 20,
+		paddingBottom: 20,
+		paddingLeft: 60,
+		paddingRight: 20,
+
+		/**
+		 * 相邻两个点之间的间隔。
+		 *
+		 * 1. 赋值整数，以指定固定间隔（此时会根据可显示的数据量自动舍去超出渲染范围的的数据，从而导致可能只显示前一部分数据）；
+		 * 2. 赋值字符串：“auto”以渲染所有数据，并自动计算两个点之间的距离。
+		 */
+		dotGap: 5,
+
+		axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
+		axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
+		axisLabelColor: null,/** 坐标标签颜色 */
+		axisLineColor: null,/** 坐标轴颜色 */
+
+		axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
+		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
+		axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
+
+		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
+		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
+		axisYPrecision: 2,/** 纵坐标的数字精度 */
+		axisYFormatter: function(amount, config){/** 纵坐标数字格式化方法 */
+			/** amount：委托量；config：配置 */
+			return util.formatMoney(amount, config.axisYPrecision);
+		},
+		axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
+		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
+		axisYAmountFloor: function(min, max, avgVariation, maxVariation){
+			return min - avgVariation / 2;
+		},
+		axisYAmountCeiling: function(min, max, avgVariation, maxVariation){
+			return max + avgVariation / 2;
+		},
+
+		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
+		showHorizontalGridLine: true,/** 是否绘制网格横线 */
+		horizontalGridLineColor: "#EAEAEA",/** 网格横线颜色 */
+
+		showVerticalGridLine: true,/** 是否绘制网格竖线 */
+		verticalGridLineColor: "#EAEAEA",/** 网格竖线颜色 */
+
+		coordinateBackground: null,/** 坐标系围成的矩形区域的背景色 */
+		enclosedAreaBackground4Buyer: "#79EABF",/** 折线与X轴围绕而成的，代表买方的封闭区域的背景色 */
+		enclosedAreaBackground4Seller: "#FFE0D1",/** 折线与X轴围绕而成的，代表卖方的封闭区域的背景色 */
+		enclosedAreaGap: 20,/** 买方区域与卖方区域之间的横向间隔 */
+
+		showEnclosedAreaEdgeLine: false,/** 是否绘制买卖区域的边界线 */
+		enclosedAreaEdgeLineWidth: 1,/** 买卖区域边界线的线条宽度 */
+		enclosedAreaEdgeLineColor: "#D0D0D0",/** 买卖区域边界线的线条颜色 */
+		enclosedAreaEdgeLineDash: [1],/** 买卖区域边界线的线条的虚线构造方法。如果需要用实线，则用“[1]”表示 */
+
+		showAreaColorBelonging: true,/** 是否呈现区域的买卖性质 */
+		enclosedAreaBelongingTextFont: "normal 10px sans-serif, serif",/** 卖方区域的买卖性质文本字体 */
+		enclosedAreaBelongingTextColor: null,/** 卖方区域的买卖性质文本颜色 */
+		enclosedAreaBelongingText4Buyer: "买",/** 买方区域的买卖性质文本 */
+		enclosedAreaBelongingText4Seller: "卖",/** 卖方区域的买卖性质文本 */
+	};
+
 	/**
 	 * 根据给定的配置，计算图形坐标系的宽度
 	 * @param {JsonObject} config 渲染配置
@@ -154,6 +222,44 @@
 		var minX = maxX - Math.floor(sketch.chart.contentWidth);
 
 		return {min: minX, max: maxX};
+	};
+
+	/**
+	 * 初始化画布（设置宽高、伸缩比例等）
+	 * @param domContainerObj {HTMLCanvasElement} 画布
+	 * @param config {JsonObject} 渲染配置
+	 */
+	var initCanvasAndConfig = function(canvasObj, config){
+		/* 百分比尺寸自动转换 */
+		if(/%/.test(config.width))
+			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
+		if(/%/.test(config.height))
+			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
+		util.setAttributes(canvasObj, {width: config.width, height: config.height});
+
+		/* 点之间的间隔自动调整 */
+		if("auto" == String(config.dotGap).toLowerCase()){
+			var contentWidth = calcChartContentWidth(config);
+			var dotGap = contentWidth / (Math.max((datas.buyer || []).length, (datas.seller || []).length) - 1);
+			if(dotGap < 1)
+				dotGap = 1;
+			
+			console.log("Depth chart auto set dot gap to " + dotGap);
+			config.dotGap = dotGap;
+		}
+
+		/** 高分辨率适应 */
+		var pixelRatio = util.pixelRatio();
+		if(pixelRatio > 1){
+			canvasObj.style.width = config.width + "px";
+			canvasObj.style.height = config.height + "px";
+
+			canvasObj.width = pixelRatio * config.width;
+			canvasObj.height = pixelRatio * config.height;
+
+			var ctx = canvasObj.getContext("2d");
+			ctx.scale(pixelRatio, pixelRatio);
+		}
 	};
 
 	/**
@@ -420,90 +526,10 @@
 		 */
 		this.render = function(canvasObj, config){
 			config = util.cloneObject(config, true);
-			config = util.setDftValue(config, {
-				width: "100%",/* 整体图形宽度 */
-				height: 300,/* 整体图形高度 */
+			config = util.setDftValue(config, defaultChartConfig);
 
-				/** 图形内边距（坐标系外边距） */
-				paddingTop: 20,
-				paddingBottom: 20,
-				paddingLeft: 60,
-				paddingRight: 20,
-
-				/**
-				 * 相邻两个点之间的间隔。
-				 *
-				 * 1. 赋值整数，以指定固定间隔（此时会根据可显示的数据量自动舍去超出渲染范围的的数据，从而导致可能只显示前一部分数据）；
-				 * 2. 赋值字符串：“auto”以渲染所有数据，并自动计算两个点之间的距离。
-				 */
-				dotGap: 5,
-
-				axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
-				axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
-				axisLabelColor: null,/** 坐标标签颜色 */
-				axisLineColor: null,/** 坐标轴颜色 */
-
-				axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
-				axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
-				axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
-
-				axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
-				axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
-				axisYPrecision: 2,/** 纵坐标的数字精度 */
-				axisYFormatter: function(amount, config){/** 纵坐标数字格式化方法 */
-					/** amount：委托量；config：配置 */
-					return util.formatMoney(amount, config.axisYPrecision);
-				},
-				axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
-				axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
-				axisYAmountFloor: function(min, max, avgVariation, maxVariation){
-					return min - avgVariation / 2;
-				},
-				axisYAmountCeiling: function(min, max, avgVariation, maxVariation){
-					return max + avgVariation / 2;
-				},
-
-				gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
-				showHorizontalGridLine: true,/** 是否绘制网格横线 */
-				horizontalGridLineColor: "#EAEAEA",/** 网格横线颜色 */
-
-				showVerticalGridLine: true,/** 是否绘制网格竖线 */
-				verticalGridLineColor: "#EAEAEA",/** 网格竖线颜色 */
-
-				coordinateBackground: null,/** 坐标系围成的矩形区域的背景色 */
-				enclosedAreaBackground4Buyer: "#79EABF",/** 折线与X轴围绕而成的，代表买方的封闭区域的背景色 */
-				enclosedAreaBackground4Seller: "#FFE0D1",/** 折线与X轴围绕而成的，代表卖方的封闭区域的背景色 */
-				enclosedAreaGap: 20,/** 买方区域与卖方区域之间的横向间隔 */
-
-				showEnclosedAreaEdgeLine: false,/** 是否绘制买卖区域的边界线 */
-				enclosedAreaEdgeLineWidth: 1,/** 买卖区域边界线的线条宽度 */
-				enclosedAreaEdgeLineColor: "#D0D0D0",/** 买卖区域边界线的线条颜色 */
-				enclosedAreaEdgeLineDash: [1],/** 买卖区域边界线的线条的虚线构造方法。如果需要用实线，则用“[1]”表示 */
-
-				showAreaColorBelonging: true,/** 是否呈现区域的买卖性质 */
-				enclosedAreaBelongingTextFont: "normal 10px sans-serif, serif",/** 卖方区域的买卖性质文本字体 */
-				enclosedAreaBelongingTextColor: null,/** 卖方区域的买卖性质文本颜色 */
-				enclosedAreaBelongingText4Buyer: "买",/** 买方区域的买卖性质文本 */
-				enclosedAreaBelongingText4Seller: "卖",/** 卖方区域的买卖性质文本 */
-			});
-
-			/* 百分比尺寸自动转换 */
-			if(/%/.test(config.width))
-				config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
-			if(/%/.test(config.height))
-				config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
-			util.setAttributes(canvasObj, {width: config.width, height: config.height});
-
-			/* 点之间的间隔自动调整 */
-			if("auto" == String(config.dotGap).toLowerCase()){
-				var contentWidth = calcChartContentWidth(config);
-				var dotGap = contentWidth / (Math.max((datas.buyer || []).length, (datas.seller || []).length) - 1);
-				if(dotGap < 1)
-					dotGap = 1;
-				
-				console.log("Depth chart auto set dot gap to " + dotGap);
-				config.dotGap = dotGap;
-			}
+			initCanvasAndConfig(canvasObj, config);
+			var ctx = canvasObj.getContext("2d");
 			
 			var _sketch = sketch(datas, dataParser, config);
 			console.log("Depth chart sketch: " + JSON.stringify(_sketch));
@@ -528,51 +554,33 @@
 			console.log("Depth chart seller area x section: " + JSON.stringify(sellerAreaXSection));
 			console.log("Depth chart seller area dot count: " + sellerAreaDotCount);
 			console.log("Depth chart x tick interval: " + axisXTickInterval);
-			
 
 			/* 数据排序 */
 			if(Array.isArray(datas.buyer))
 				datas.buyer.sort(function(a, b){
+					a = dataParser? dataParser(a): a;
+					b = dataParser? dataParser(b): b;
 					return a.price > b.price? 1: -1;
 				});
 			if(Array.isArray(datas.seller))
 				datas.seller.sort(function(a, b){
+					a = dataParser? dataParser(a): a;
+					b = dataParser? dataParser(b): b;
 					return a.price > b.price? 1: -1;
 				});
-
-			var ctx = canvasObj.getContext("2d");
-
-			/** 高分辨率适应 */
-			var pixelRatio = util.pixelRatio();
-			if(pixelRatio > 1){
-				canvasObj.style.width = config.width + "px";
-				canvasObj.style.height = config.height + "px";
-
-				canvasObj.width = pixelRatio * config.width;
-				canvasObj.height = pixelRatio * config.height;
-
-				ctx.scale(pixelRatio, pixelRatio);
-			}
-
+			
 			/* 绘制坐标区域背景 */
 			var bg = config.coordinateBackground;
-			if(bg){
+			if(null != bg){
 				ctx.save();
 				ctx.beginPath();
+
 				ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop) + 0.5, _sketch.chart.width, _sketch.chart.height);
-
 				if(bg instanceof TradeChart.LinearGradient){
-					bg = ctx.createLinearGradient(config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
-					config.coordinateBackground.getStops().forEach(function(stop){
-						var offset = stop.offset;
-						if(/%/.test(offset))
-							offset = parseInt(offset.replace(/%/, "")) / 100;
+					bg.apply(ctx, config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
+				}else
+					ctx.fillStyle = bg;
 
-						bg.addColorStop(offset, stop.color);
-					});
-				}
-
-				ctx.fillStyle = bg;
 				ctx.fill();
 				ctx.restore();
 			}
@@ -845,6 +853,7 @@
 				ctx.restore();
 			}
 
+			var pixelRatio = util.pixelRatio();
 			var renderMetadata = {
 				scaleX: pixelRatio,
 				scaleY: pixelRatio,

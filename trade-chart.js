@@ -103,6 +103,25 @@
 		for(var p in props)
 			obj.setAttribute(p, props[p]);
 	};
+
+	/**
+	 * 判断给定的字符串是否是空字符串
+	 * @param {String} str 要判断的字符串
+	 * @param {Boolean} [trim=true] 是否在判断前执行前后空白符号的裁剪操作
+	 */
+	var isEmptyString = function(str, trim){
+		if(arguments.length < 2)
+			trim = true;
+
+		if(null === str || undefined === str)
+			return true;
+
+		str = String(str);
+		if(trim)
+			str = str.trim();
+
+		return str.length == 0;
+	};
 	
 	/**
 	 * @constructor
@@ -150,6 +169,28 @@
 		this.getStops = function(){
 			return stops;
 		};
+
+		/**
+		 * 将线性渐变应用至指定的上下文中
+		 * @param {CanvasRenderingContext2D} ctx 画布上下文
+		 * @param {Float} x0 开始坐标的横坐标
+		 * @param {Float} y0 开始坐标的纵坐标
+		 * @param {Float} x1 结束坐标的横坐标
+		 * @param {Float} y1 结束坐标的纵坐标
+		 */
+		this.apply = function(ctx, x0, y0, x1, y1){
+			var bg = ctx.createLinearGradient(x0, y0, x1, y1);
+			stops.forEach(function(stop){
+				var offset = stop.offset;
+				if(/%/.test(offset))
+					offset = parseInt(offset.replace(/%/, "")) / 100;
+
+				bg.addColorStop(offset, stop.color);
+			});
+			ctx.fillStyle = bg;
+
+			return this;
+		};
 	};
 	
 	Object.defineProperty(CommonTradeChart, "LinearGradient", {value: LinearGradient, configurable: false, writable: false});
@@ -163,7 +204,8 @@
 		createSvgElement: createSvgElement,
 		formatMoney: formatMoney,
 		setAttributes: setAttributes,
-		pixelRatio: pixelRatio
+		pixelRatio: pixelRatio,
+		isEmptyString: isEmptyString,
 	};
 	Object.defineProperty(CommonTradeChart, "util", {value: util, configurable: false, writable: false});
 	
