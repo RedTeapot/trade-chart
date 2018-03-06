@@ -28,10 +28,12 @@
 		axisLabelColor: null,/** 坐标标签颜色 */
 		axisLineColor: null,/** 坐标轴颜色 */
 
-		axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
+		axisXTickOffset: 5,/* 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
+		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
 
+		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYPrecision: 2,/** 纵坐标的数字精度 */
@@ -68,11 +70,39 @@
 		volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYVolumeFloor: null, /** 纵坐标最小刻度, 为null时自动 */
 		volumeColor: "orange", /** 量图颜色（柱状图）, 可以为数组*/
-		volumeInterval: 2, /** 量图每个柱状图的间隔, 小于相邻两个点之间的间隔*/
+		volumeWidth: 3, /** 量图每个柱状图的宽度。最好为奇数，从而使得线可以正好在正中间*/
 
 		showAvgPriceLine: false, /** 是否显示均价 */
 		avgPriceLineWidth: 1, /** 均线线宽 */
 		avgPriceLineColor: "orange", /** 均线颜色 */
+
+		/**
+		 * 交易节信息（全部展示时使用）。
+		 * 数据格式：
+		 * {
+		 *    begin: 该交易节开始时间（HH:mm）,
+		 *    end：该交易节开始时间（HH:mm）
+		 *    minutes：该交易节分钟数
+		 * }
+		 */
+		timeSections: [],
+	};
+
+	/**
+	 * 根据给定的配置，计算图形坐标系的宽度
+	 * @param {JsonObject} config 渲染配置
+	 */
+	var calcChartAxisWidth = function(config){
+		return Math.floor(config.width - config.paddingLeft - config.paddingRight);
+	};
+
+	/**
+	 * 根据给定的配置，计算图形内容区域（买方或卖方单方的宽度，约等于图表宽度的一半）的宽度
+	 * @param {JsonObject} config 渲染配置
+	 */
+	var calcChartContentWidth = function(config){
+		var axisWidth = calcChartAxisWidth(config);
+		return Math.floor(axisWidth - config.axisXTickOffset - config.axisXTickOffsetFromRight);
 	};
 
 	/**
@@ -96,8 +126,11 @@
 			volumeHeightRatio: 0/** 交易量与高度之间的映射比例 */
 		};
 
-		chartSketch.width = Math.floor(config.width - config.paddingLeft - config.paddingRight);
-		chartSketch.contentWidth = Math.floor(chartSketch.width - config.axisXTickOffset);
+		var ifShowAxisYLeft = "left" == String(config.axisYPosition).toLowerCase();
+
+		chartSketch.width = calcChartAxisWidth(config);
+		chartSketch.contentWidth = calcChartContentWidth(config);
+
 		/* 量图 */
 		if(config.showVolume){
 			chartSketch.height =  Math.round(config.height * (1- config.volumeAreaRatio) - config.paddingTop - config.volumeMarginTop);
@@ -107,7 +140,7 @@
 			chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
 		}
 		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
-		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / config.dotGap) + 1;
+		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / (config.dotGap + 1)) + 1;
 
 		return chartSketch;
 	};
@@ -230,8 +263,9 @@
 	 * 初始化画布（设置宽高、伸缩比例等）
 	 * @param domContainerObj {HTMLCanvasElement} 画布
 	 * @param config {JsonObject} 渲染配置
+	 * @param {Array#JsonObject} datas 数据数组
 	 */
-	var initCanvasAndConfig = function(canvasObj, config){
+	var initCanvasAndConfig = function(canvasObj, config, datas){
 		/* 历史兼容，待移除 */
 		if(!!config.showTrendAll)
 			config.dotGap = "auto";
@@ -242,6 +276,21 @@
 		if(/%/.test(config.height))
 			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
 		util.setAttributes(canvasObj, {width: config.width, height: config.height});
+
+		/* 点之间的间隔自动调整 */
+		if("auto" == String(config.dotGap).toLowerCase()){
+			var contentWidth = calcChartContentWidth(config);
+			var dotGap = contentWidth / Math.max((datas || []).length - 1, 1);
+			if(dotGap < 1)
+				dotGap = 1;
+
+			console.log("Trend chart auto set dot gap to " + dotGap);
+			config.dotGap = dotGap;
+		}
+
+		/* 历史兼容，待移除 */
+		if(!!config.volumeInterval)
+			config.volumeGap = config.dotGap - (config.volumeWidth - 1);
 
 		/* 高分辨率适应 */
 		var pixelRatio = util.pixelRatio();
@@ -260,10 +309,10 @@
 	/**
 	 * @constructor
 	 * 已完成渲染的分时图
-	 * @param trendChart {TrendChart} 分时图实例
-	 * @param sketch {JsonObject} 数据和图形的扫描分析结果
-	 * @param config {JsonObject} 渲染配置
-	 * @param renderMetadata {JsonObject} 渲染时使用的基准数据
+	 * @param {TrendChart} trendChart 分时图实例
+	 * @param {JsonObject} sketch 数据和图形的扫描分析结果
+	 * @param {JsonObject} config 渲染配置
+	 * @param {JsonObject} renderMetadata 渲染时使用的基准数据
 	 */
 	var RenderedTrendChart = function(trendChart, sketch, config, renderMetadata){
 		if(!(trendChart instanceof TrendChart))
@@ -285,7 +334,7 @@
 
 		/**
 		 * 获取被渲染的点的个数
-		 * @return {Integer} 被渲染的点的个数
+		 * @returns {Integer} 被渲染的点的个数
 		 */
 		this.getDotCount = function(){
 			return Math.min(trendChart.getDatas().length, sketch.chart.maxDotCount);
@@ -303,13 +352,13 @@
 
 		/**
 		 * 获取指定的相对横坐标对应的数据索引
-		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
+		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
+		 * @reutrns {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
 		 */
 		this.getDataIndex = function(x){
 			var dotCount = this.getDotCount();
 			var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
-			var maxX = minX + (dotCount - 1) * config.dotGap;/** N个点之间有N-1个间隙 */
+			var maxX = minX + sketch.chart.contentWidth;
 
 			if (x < minX){
 				x = minX;
@@ -318,7 +367,10 @@
 			}
 
 			var tmpX = x - minX;
-			var index = Math.round(tmpX / config.dotGap);
+			var index = Math.round(tmpX / (config.dotGap + 1));
+			if(index < 0 || index >= dotCount)
+				return -1;
+
 			return index;
 		};
 
@@ -343,9 +395,10 @@
 			var d = this.getOriginalData(dataIndex);
 			if(null == d)
 				return d;
-			
+
+			var dataParser = trendChart.getDataParser();
 			if(typeof dataParser == "function")
-				d = dataParser(d);
+				d = dataParser(d, dataIndex);
 				
 			return d;
 		};
@@ -365,11 +418,11 @@
 
 			var data = trendChart.getDatas()[dataIndex];
 			var dataParser = trendChart.getDataParser();
-			data = dataParser? dataParser(data): data;
+			data = dataParser? dataParser(data, dataIndex): data;
 
 			var obj = {x: 0, y: 0};
-			obj.x = minX + dataIndex * config.dotGap;
-			obj.y = minY + (Math.abs(sketch.data.extended.priceCeiling - data.price) / sketch.chart.priceHeightRatio);
+			obj.x = minX + Math.round(dataIndex * (config.dotGap + 1));
+			obj.y = minY + Math.abs(sketch.data.extended.priceCeiling - data.price) / sketch.chart.priceHeightRatio;
 
 			return obj;
 		};
@@ -391,7 +444,7 @@
 
 		/**
 		 * 设置数据源
-		 * @param _datas {JsonArray} 数据源
+		 * @param {Array#JsonObject} _datas 数据源
 		 */
 		this.setDatas = function(_datas){
 			datas = _datas;
@@ -407,7 +460,7 @@
 
 		/**
 		 * 设置数据转换方法
-		 * @param parser {Function} 数据转换方法
+		 * @param {Function} parser 数据转换方法
 		 */
 		this.setDataParser = function(parser){
 			dataParser = parser;
@@ -416,7 +469,7 @@
 
 		/**
 		 * 获取数据转换方法
-		 * @return {Function} 数据转换方法
+		 * @returns {Function} 数据转换方法
 		 */
 		this.getDataParser = function(){
 			return dataParser;
@@ -424,8 +477,8 @@
 
 		/**
 		 * 渲染图形，并呈现至指定的画布中
-		 * @param domContainerObj {HTMLCanvasElement} 画布
-		 * @param config {JsonObject} 渲染配置
+		 * @param {HTMLCanvasElement} domContainerObj 画布
+		 * @param {JsonObject} config 渲染配置
 		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.render = function(canvasObj, config){
@@ -437,377 +490,433 @@
 			
 			var _sketch = sketch(datas, dataParser, config);
 			console.log("Trend chart sketch", JSON.stringify(_sketch));
+			console.log("Trend chart config", config);
 
-			/* 绘制坐标区域背景 */
-			var bg = config.coordinateBackground;
-			if(null != bg){
-				ctx.save();
-				ctx.beginPath();
+			/** 绘制的数据个数 */
+			var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);
+			/** 相邻两个纵坐标刻度之间的价格悬差 */
+			var axisYPriceInterval = (_sketch.data.extended.priceCeiling - _sketch.data.extended.priceFloor) / (config.axisYMidTickQuota + 1);
+			/** 相邻两个纵坐标刻度之间的高度悬差 */
+			var axisYHeightInterval = axisYPriceInterval / _sketch.chart.priceHeightRatio;
 
-				/* 蜡烛图 */
-				ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop) + 0.5, _sketch.chart.width, _sketch.chart.height);
-				/* 量图 */
-				!!config.showVolume && ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop) + 0.5, _sketch.chart.width, _sketch.chart.volumeHeight);
-				
-				if(bg instanceof TradeChart.LinearGradient){
-					bg.apply(ctx, config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
-				}else
-					ctx.fillStyle = bg;
+			var axisYPosition = String(config.axisYPosition).toLowerCase();
+			var ifShowAxisYLeft = "left" == axisYPosition,
+				ifShowAxisYRight = "right" == axisYPosition;
 
-				ctx.fill();
-				ctx.restore();
-			}
+			var ifShowVerticalGridLine = config.showVerticalGridLine && config.verticalGridLineColor,
+				ifShowHorizontalGridLine = config.showHorizontalGridLine && config.horizontalGridLineColor;
 
-			/** 绘制坐标系 */
-			ctx.save();
-			ctx.lineWidth = 1;
-			ctx.textAlign = "center";
-			ctx.textBaseline = "top";
-			config.axisLineColor && (ctx.strokeStyle = config.axisLineColor);
-			config.axisLabelFont && (ctx.font = config.axisLabelFont);
-			config.axisLabelColor && (ctx.fillStyle = config.axisLabelColor);
+			var xLeft_axisX = Math.floor(config.paddingLeft) + 0.5,
+				xRight_axisX = xLeft_axisX + Math.floor(_sketch.chart.width),
+				y_axisX = Math.floor(config.paddingTop + _sketch.chart.height) + 0.5,
+				y_volume_axisX,
 
-			var showVerticalGridLine = config.showVerticalGridLine && config.verticalGridLineColor,
-				showHorizontalGridLine = config.showHorizontalGridLine && config.horizontalGridLineColor;
+				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
+				yTop_axisY = Math.floor(config.paddingTop) + 0.5,
+				yBottom_axisY = y_axisX,
+				yTop_volume_axisY,
+				yBottom_volume_axisY;
 
-			var x_axisX = Math.floor(config.paddingLeft) + 0.5,
-				x2_axisX = x_axisX + _sketch.chart.width,
-				y_axisX = Math.floor(config.paddingTop + _sketch.chart.height) + 0.5;
-
-			/** 绘制X轴坐标线 */
-			ctx.beginPath();
-			ctx.moveTo(x_axisX, y_axisX);
-			ctx.lineTo(x2_axisX, y_axisX);
-			/* 量图 */
 			if(config.showVolume){
-				var y_axisX_volume = Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop + _sketch.chart.volumeHeight) + 0.5;
-				ctx.moveTo(x_axisX, y_axisX_volume);
-				ctx.lineTo(x2_axisX, y_axisX_volume);
+				yTop_volume_axisY = Math.floor(y_axisX + config.volumeMarginTop) + 0.5;
+				y_volume_axisX = Math.floor(yTop_volume_axisY + _sketch.chart.volumeHeight) + 0.5;
+				yBottom_volume_axisY = y_volume_axisX;
 			}
-			ctx.stroke();
 
 			/**
-			 * 根据提供的点的索引位置绘制刻度
-			 * @param {Integer} i 点的索引位置
+			 * 获取指定价钱对应的物理高度
+			 * @param {Number} price1 价钱1
+			 * @param {Number} [price2=_sketch.data.extended.priceCeiling] 价钱2
+			 * @returns {Number} 物理高度
 			 */
-			var renderXTick = function(i){
-				var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);
-				if(i < 0 || i >= dotCount)
-					return;
-
-				var data, tickX;
-				if(isNaN(i)){
-					data = i;
-					tickX = Math.floor(i.XRate * _sketch.chart.contentWidth) + config.axisXTickOffset;
-				}else{
-					/** 数据格式转换 */
-					data = dataParser? dataParser(datas[i], i): datas[i];
-					tickX = Math.floor(i * config.dotGap) + config.axisXTickOffset;
-				}
-
-				/** 绘制网格竖线 */
-				if(showVerticalGridLine){
-					ctx.save();
-					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
-					ctx.strokeStyle = config.verticalGridLineColor;
-
-					ctx.beginPath();
-					ctx.moveTo(x_axisX + tickX, y_axisX);
-					ctx.lineTo(x_axisX + tickX, y_axisX - Math.floor(_sketch.chart.height));
-					/* 量图 */
-					if(config.showVolume){
-						ctx.moveTo(x_axisX + tickX, y_axisX_volume);
-						ctx.lineTo(x_axisX + tickX, y_axisX_volume - Math.floor(_sketch.chart.volumeHeight));
-					}
-					ctx.stroke();
-					ctx.restore();
-				}
-
-				/** 绘制刻度线 */
-				ctx.beginPath();
-				ctx.moveTo(x_axisX + tickX, y_axisX);
-				ctx.lineTo(x_axisX + tickX, y_axisX + config.axisTickLineLength);
-				/* 量图 */
-				if(config.showVolume){
-					ctx.moveTo(x_axisX + tickX, y_axisX_volume);
-					ctx.lineTo(x_axisX + tickX, y_axisX_volume + config.axisTickLineLength);
-					ctx.fillText(data.time, x_axisX + tickX, y_axisX_volume + config.axisTickLineLength + config.axisXLabelOffset);
-				}else{
-					ctx.fillText(data.time, x_axisX + tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
-				}
-				ctx.stroke();
+			var getHeight = function(price1, price2){
+				if(arguments.length < 2)
+					price2 = _sketch.data.extended.priceCeiling;
+				return Math.abs(price2 - price1) / _sketch.chart.priceHeightRatio;
 			};
 
-			/** 绘制X轴刻度 */
-			var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);
-			if(config.dotGap == "auto" && config.timeSections != null && config.timeSections.length > 0){
-				var totalMinutes = config.timeSections.reduce(function(sum, timeSection){
-					return sum + timeSection.minutes;
-				}, 0);
+			/* 绘制坐标系 */
+			;(function(){
+				ctx.save();
 
-				/* 绘制交易节时间 */
-				var axisXTicks = [], minTimeSectionWidthRatio = Infinity;
-				config.timeSections.forEach(function(timeSection){
-					if(axisXTicks.length == 0){
-						axisXTicks.push({
-							time: timeSection.begin,
-							XRate: 0
-						});
-					}else{
-						axisXTicks[axisXTicks.length - 1].time += "/" + timeSection.begin;
+				ctx.lineWidth = 1;
+				config.axisLineColor && (ctx.strokeStyle = config.axisLineColor);
+				config.axisLabelFont && (ctx.font = config.axisLabelFont);
+				config.axisLabelColor && (ctx.fillStyle = config.axisLabelColor);
+
+				/* 绘制X轴及刻度 */
+				;(function(){
+					ctx.save();
+
+					ctx.textAlign = "center";
+					ctx.textBaseline = "top";
+
+					/* 绘制分时图X轴 */
+					ctx.beginPath();
+					ctx.moveTo(xLeft_axisX, y_axisX);
+					ctx.lineTo(xRight_axisX, y_axisX);
+					ctx.stroke();
+
+					/* 绘制量图X轴 */
+					if(config.showVolume){
+						ctx.beginPath();
+						ctx.moveTo(xLeft_axisX, y_volume_axisX);
+						ctx.lineTo(xRight_axisX, y_volume_axisX);
+						ctx.stroke();
 					}
 
-					axisXTicks.push({
-						time: timeSection.end,
-						XRate: axisXTicks[axisXTicks.length-1].XRate + timeSection.minutes / totalMinutes
-					});
+					/**
+					 * 绘制刻度
+					 * @param {String} label 刻度文本
+					 * @param {Float} x 刻度所在的横坐标位置（原点位置为坐标轴原点的横坐标 + 横坐标偏移）。如果没有提供，则根据点的索引位置自动计算
+					 */
+					var renderXTick = function(label, x){
+						var tickX = xLeft_axisX + config.axisXTickOffset + Math.floor(x);
 
-					minTimeSectionWidthRatio = Math.min(minTimeSectionWidthRatio, timeSection.minutes / totalMinutes);
-				});
+						/* 绘制网格竖线 */
+						if(ifShowVerticalGridLine){
+							ctx.save();
+							ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
+							ctx.strokeStyle = config.verticalGridLineColor;
 
-				/* 根据横坐标文本长度，决定呈现每个交易节的起止时间，还是只呈现第一个交易节的开始时间和最后一个交易节的结束时间 */
-				if(minTimeSectionWidthRatio * _sketch.chart.contentWidth > config.axisXLabelSize){
-					axisXTicks.forEach(renderXTick);
-				}else{
-					renderXTick(axisXTicks[0]);
-					renderXTick(axisXTicks[axisXTicks.length - 1]);
-				}
-			}else{
-				var axisXTickInterval = Math.ceil(config.axisXLabelSize / config.dotGap);/* 横坐标刻度之间相差的点的个数 */
-				var i = 0, axisXTickCount = Math.floor(dotCount / axisXTickInterval);
-				for(; i < axisXTickCount - 1; i++)
-					renderXTick(i * axisXTickInterval);
-				var remainingSize = Math.ceil((dotCount - 1 - i * axisXTickInterval) * config.dotGap);
-				if(remainingSize < config.axisXLabelSize){
-					/* 剩余空间不足，只绘制边界刻度 */
-					renderXTick(dotCount - 1);
-				}else{
-					var j = i * axisXTickInterval,
-						k = dotCount - 1;
+							ctx.beginPath();
+							/* 分时图 */
+							ctx.moveTo(tickX, y_axisX - 1);
+							ctx.lineTo(tickX, y_axisX - 1 - Math.floor(_sketch.chart.height));
+							/* 量图 */
+							if(config.showVolume){
+								ctx.moveTo(tickX, y_volume_axisX - 1);
+								ctx.lineTo(tickX, y_volume_axisX - 1 - Math.floor(_sketch.chart.volumeHeight));
+							}
+							ctx.stroke();
+							ctx.restore();
+						}
 
-					/* 绘制最后一个刻度和边界刻度 */
-					renderXTick(j);
-					if(j != k)
-						renderXTick(k);
-				}
-			}
+						/* 绘制刻度线 */
+						ctx.beginPath();
+						/* 分时图 */
+						ctx.moveTo(tickX, y_axisX);
+						ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
+						/* 量图 */
+						if(config.showVolume){
+							ctx.moveTo(tickX, y_volume_axisX);
+							ctx.lineTo(tickX, y_volume_axisX + config.axisTickLineLength);
+						}
+						ctx.fillText(label, tickX, config.axisTickLineLength + config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX));
+						ctx.stroke();
+					};
 
-			var x_axisY = x_axisX,
-				y_axisY = Math.floor(config.paddingTop) + 0.5,
-				y2_axisY = y_axisX;
+					/**
+					 * 根据提供的点的索引位置绘制刻度
+					 * @param {Integer} i 数据的索引位置
+					 * @param {String} [label] 刻度文本。缺省时，将显示数据的time字段
+					 */
+					var renderXTickByDataIndex = function(i, label){
+						if(i < 0 || i >= dotCount)
+							return;
 
-			/** 绘制Y轴坐标线 */
-			ctx.beginPath();
-			ctx.moveTo(x_axisY, y_axisY);
-			ctx.lineTo(x_axisY, y2_axisY);
-			/* 量图 */
-			if(config.showVolume){
-				var y_axisY_volume = Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop) + 0.5;
-				var y2_axisY_volume = y_axisX_volume;
-				ctx.moveTo(x_axisY, y_axisY_volume);
-				ctx.lineTo(x_axisY, y2_axisY_volume);
-			}
-			ctx.stroke();
+						if(arguments.length < 2){
+							var data = dataParser? dataParser(datas[i], i): datas[i];
+							label = data.time;
+						}
 
-			ctx.textAlign = "end";
-			ctx.textBaseline = "middle";
+						var x = Math.floor(i * (config.dotGap + 1));
+						return renderXTick(label, x);
+					};
 
-			/** 绘制Y轴刻度 */
-			var axisYPriceInterval = (_sketch.data.extended.priceCeiling - _sketch.data.extended.priceFloor) / (config.axisYMidTickQuota + 1);
-			var axisYHeightInterval = axisYPriceInterval / _sketch.chart.priceHeightRatio;
-			for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
-				var price = _sketch.data.extended.priceFloor + i * axisYPriceInterval,
-					tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
-				var tickY = Math.round(tickOffset);
+					/* 绘制刻度线 */
+					if(Array.isArray(config.timeSections) && config.timeSections.length > 0){/* 此时忽略dotGap配置，显示所有数据 */
+						var totalMinutes = config.timeSections.reduce(function(sum, timeSection){
+							return sum + timeSection.minutes;
+						}, 0);
 
-				/** 绘制网格横线, 最后一条网格横线和坐标轴重合时不绘制 */
-				if(showHorizontalGridLine && (config.axisYTickOffset != 0 || i > 0)){
-					ctx.save();
-					ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
-					ctx.strokeStyle = config.horizontalGridLineColor;
+						/** 最小的“交易节宽度与横坐标总宽度的比值” */
+						var axisXTicks = [];
+						var minTimeSectionWidthRatio = config.timeSections.reduce(function(min, timeSection, i){
+							if(axisXTicks.length == 0){
+								axisXTicks.push({
+									x: 0,
+									label: timeSection.begin
+								});
+							}else
+								axisXTicks[axisXTicks.length - 1].label += "/" + timeSection.begin;
 
-					ctx.beginPath();
-					ctx.moveTo(x_axisY, y_axisY + tickY);
-					ctx.lineTo(x_axisY + Math.floor(_sketch.chart.width), y_axisY + tickY);
-					ctx.stroke();
+							var timeSectionWidthRatio = timeSection.minutes / totalMinutes;
+							axisXTicks.push({
+								x: axisXTicks[axisXTicks.length - 1].x + timeSectionWidthRatio,
+								label: timeSection.end
+							});
+
+							return Math.min(min, timeSectionWidthRatio);
+						}, Infinity);
+
+						/* 根据横坐标文本长度，决定呈现每个交易节的起止时间，还是只呈现第一个交易节的开始时间和最后一个交易节的结束时间 */
+						if(minTimeSectionWidthRatio * _sketch.chart.contentWidth > config.axisXLabelSize){
+							axisXTicks.forEach(function(tick){
+								renderXTick(tick.label, tick.x);
+							});
+						}else{
+							renderXTick(axisXTicks[0].label, axisXTicks[0].x);
+
+							var lastTick = axisXTicks[axisXTicks.length - 1];
+							renderXTick(lastTick.label, lastTick.x);
+						}
+					}else{
+						var axisXTickInterval = Math.ceil(config.axisXLabelSize / (config.dotGap + 1));/* 横坐标刻度之间相差的点的个数 */
+						var axisXTickCount = Math.floor(dotCount / axisXTickInterval),
+							renderedTickCount = 0;
+						for(var i = 0; i < axisXTickCount; i++){
+							renderXTickByDataIndex(i * axisXTickInterval);
+							renderedTickCount++;
+						}
+						var totalSpace = _sketch.chart.contentWidth;
+						var remainingSpace = totalSpace - (renderedTickCount * axisXTickInterval * (config.dotGap + 1)  + config.axisXLabelSize / 2);
+						if(remainingSpace < config.axisXLabelSize){
+							/* 剩余空间不足，只绘制边界刻度 */
+							renderXTickByDataIndex(dotCount - 1);
+						}else{
+							var k = dotCount - 1,
+								j = Math.min(i * axisXTickInterval, k);
+
+							/* 绘制最后一个刻度和边界刻度 */
+							renderXTickByDataIndex(j);
+							if(j != k)
+								renderXTickByDataIndex(k);
+						}
+					}
+
 					ctx.restore();
-				}
+				})();
 
-				/** 绘制刻度线 */
-				ctx.beginPath();
-				ctx.moveTo(x_axisY, y_axisY + tickY);
-				ctx.lineTo(x_axisY - config.axisTickLineLength, y_axisY + tickY);
-				ctx.stroke();
-				var format = config.axisYFormatter || util.formatMoney;
-				ctx.fillText(format(price, config), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY + tickY + config.axisYLabelVerticalOffset);
-			}
-			/* 量图 */
-			if(config.showVolume){
-				var axisYVolumeInterval = (_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor) / (config.volumeAxisYMidTickQuota + 1);
-				if(_sketch.chart.volumeHeightRatio != 0){
-					var axisYHeightIntervalAux = axisYVolumeInterval / _sketch.chart.volumeHeightRatio;
-					for(var i = 0; i <= config.volumeAxisYMidTickQuota + 1; i++){
-						var volume = _sketch.data.extended.volumeFloor + i * axisYVolumeInterval,
-							tickOffset = (config.volumeAxisYMidTickQuota + 1 - i) * axisYHeightIntervalAux;
+				/* 绘制Y轴及刻度 */
+				;(function(){
+					ctx.save();
+
+					ctx.textAlign = ifShowAxisYLeft? "end": "start";
+					ctx.textBaseline = "middle";
+
+					/* 绘制分时图Y轴 */
+					ctx.beginPath();
+					ctx.moveTo(x_axisY, yTop_axisY);
+					ctx.lineTo(x_axisY, yBottom_axisY);
+					ctx.stroke();
+
+					/* 绘制量图Y轴 */
+					if(config.showVolume){
+						ctx.beginPath();
+						ctx.moveTo(x_axisY, yTop_volume_axisY);
+						ctx.lineTo(x_axisY, yBottom_volume_axisY);
+						ctx.stroke();
+					}
+
+					var axisTickLineOffset = (ifShowAxisYLeft? -1: 1) * config.axisTickLineLength,
+						axisYLabelOffset = (ifShowAxisYLeft? -1: 1) * (config.axisTickLineLength + config.axisYLabelOffset);
+
+					/* 绘制Y轴刻度 */
+					for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
+						var price = _sketch.data.extended.priceFloor + i * axisYPriceInterval,
+							tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
 						var tickY = Math.round(tickOffset);
 
-						/** 绘制网格横线, 最后（自上而下）一条网格横线和坐标轴重合时不绘制 */
-						if(showHorizontalGridLine && (config.volumeAxisYTickOffset != 0 || i > 0)){
+						/* 绘制网格横线 */
+						if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
 							ctx.save();
 							ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
 							ctx.strokeStyle = config.horizontalGridLineColor;
 
 							ctx.beginPath();
-							ctx.moveTo(x_axisY, y_axisY_volume + tickY);
-							ctx.lineTo(x_axisY + Math.floor(_sketch.chart.width), y_axisY_volume + tickY);
+							ctx.moveTo(x_axisY, yTop_axisY + tickY);
+							ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(_sketch.chart.width), yTop_axisY + tickY);
 							ctx.stroke();
 							ctx.restore();
 						}
 
-						/** 绘制刻度线 */
+						/* 绘制刻度线 */
 						ctx.beginPath();
-						ctx.moveTo(x_axisY, y_axisY_volume + tickY);
-						ctx.lineTo(x_axisY - config.axisTickLineLength, y_axisY_volume + tickY);
+						ctx.moveTo(x_axisY, yTop_axisY + tickY);
+						ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
 						ctx.stroke();
-						ctx.fillText(Math.floor(volume), x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y_axisY_volume + tickY + config.axisYLabelVerticalOffset);
+						var format = config.axisYFormatter || util.formatMoney;
+						ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + config.axisYLabelVerticalOffset);
 					}
-				}else{
-					/** 绘制刻度线 */
+					/* 量图 */
+					if(config.showVolume){
+						var axisYVolumeInterval = (_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor) / (config.volumeAxisYMidTickQuota + 1);
+						if(_sketch.chart.volumeHeightRatio != 0){
+							var axisYHeightIntervalAux = axisYVolumeInterval / _sketch.chart.volumeHeightRatio;
+							for(var i = 0; i <= config.volumeAxisYMidTickQuota + 1; i++){
+								var volume = _sketch.data.extended.volumeFloor + i * axisYVolumeInterval,
+									tickOffset = (config.volumeAxisYMidTickQuota + 1 - i) * axisYHeightIntervalAux;
+								var tickY = Math.round(tickOffset);
+
+								/* 绘制网格横线 */
+								if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
+									ctx.save();
+									ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
+									ctx.strokeStyle = config.horizontalGridLineColor;
+
+									ctx.beginPath();
+									ctx.moveTo(x_axisY, yTop_volume_axisY + tickY);
+									ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(_sketch.chart.width), yTop_volume_axisY + tickY);
+									ctx.stroke();
+									ctx.restore();
+								}
+
+								/* 绘制刻度线 */
+								ctx.beginPath();
+								ctx.moveTo(x_axisY, yTop_volume_axisY + tickY);
+								ctx.lineTo(x_axisY + axisTickLineOffset, yTop_volume_axisY + tickY);
+								ctx.stroke();
+								ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, yTop_volume_axisY + tickY + config.axisYLabelVerticalOffset);
+							}
+						}else{
+							/* 绘制刻度线 */
+							ctx.beginPath();
+							ctx.moveTo(x_axisY, yBottom_volume_axisY);
+							ctx.lineTo(x_axisY + axisTickLineOffset, yBottom_volume_axisY);
+							ctx.stroke();
+							ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
+						}
+					}
+
+					ctx.restore();
+				})();
+
+				/* 绘制坐标区域背景 */
+				var bg = config.coordinateBackground;
+				if(null != bg){
+					ctx.save();
 					ctx.beginPath();
-					ctx.moveTo(x_axisY, y2_axisY_volume);
-					ctx.lineTo(x_axisY - config.axisTickLineLength, y2_axisY_volume);
-					ctx.stroke();
-					ctx.fillText(0, x_axisY - config.axisTickLineLength - config.axisYLabelOffset, y2_axisY_volume + config.axisYLabelVerticalOffset);
-				}
-			}
 
-			ctx.restore();
+					/* 分时图 */
+					ctx.rect(xLeft_axisX, yTop_axisY, _sketch.chart.width, _sketch.chart.height);
+					/* 量图 */
+					!!config.showVolume && ctx.rect(xLeft_axisX, yTop_volume_axisY, _sketch.chart.width, _sketch.chart.volumeHeight);
 
-			/** 确定折线点 */
-			var dots = [];/** 第一个点和最后一个点是X轴的起始点和终止点。中间部分是折线点 */
-			var avgPriceDots = [];/** 均线 */
-			dots.push([x_axisX + config.axisXTickOffset, y_axisX]);
-			var i = 0, dotX, dotY;
-			for(; i < dotCount; i++){
-				var data = datas[i];
-				/* 数据格式转换 */
-				data = dataParser? dataParser(data, i): data;
+					ctx.strokeWidth = 0;
+					if(bg instanceof TradeChart.LinearGradient){
+						bg.apply(ctx, config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
+					}else
+						ctx.fillStyle = bg;
 
-				var priceVariation = _sketch.data.extended.priceCeiling - data.price;
-				var height = priceVariation / _sketch.chart.priceHeightRatio;
-				dotX = Math.floor((i * config.dotGap + config.axisXTickOffset + x_axisX) * 100)/100;/* 保留两位小数 */
-				dotY = Math.floor(config.paddingTop + height) + 0.5;
-				dots.push([dotX, dotY]);
-
-				/* 均线 */
-				if(config.showAvgPriceLine && data.avgPrice != null){
-					var avgPriceVariation = _sketch.data.extended.priceCeiling - data.avgPrice;
-					var avgHeight = avgPriceVariation / _sketch.chart.priceHeightRatio;
-					dotY = Math.floor(config.paddingTop + avgHeight) + 0.5;
-					avgPriceDots.push([dotX, dotY]);
+					ctx.fill();
+					ctx.restore();
 				}
 
-				data = null;
-			}
-			dots.push([Math.floor(((dotCount - 1) * config.dotGap + config.axisXTickOffset + x_axisX) * 100)/100, y_axisX]);
-
-			/** 绘制折现区域 */
-			config.lineWidth && (ctx.lineWidth = config.lineWidth);
-			config.lineColor && (ctx.strokeStyle = config.lineColor);
-			if(dots.length == 3){
-				//只有一个点时
-				ctx.beginPath();
-				ctx.arc(dots[1][0], dots[1][1], ctx.lineWidth*2, 0, 2*Math.PI);
-				ctx.fillStyle = config.lineColor;
-				ctx.fill();
-			}else{
-				ctx.beginPath();
-				for(i = 1; i < dots.length - 1; i++){
-					ctx.lineTo(dots[i][0], dots[i][1]);
-				}
-				ctx.stroke();
-			}
-
-			/** 绘制折现区域渐变背影 */
-			if(config.enclosedAreaBackground){
-				ctx.save();
-				ctx.beginPath();
-				ctx.moveTo(dots[0][0], dots[0][1]);
-				for(i = 1; i < dots.length; i++){
-					ctx.lineTo(dots[i][0], dots[i][1]);
-				}
-
-				var bg = config.enclosedAreaBackground;
-				if(bg instanceof TradeChart.LinearGradient){
-					bg = ctx.createLinearGradient(config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
-					config.enclosedAreaBackground.getStops().forEach(function(stop){
-						var offset = stop.offset;
-						if(/%/.test(offset))
-							offset = parseInt(offset.replace(/%/, "")) / 100;
-
-						bg.addColorStop(offset, stop.color);
-					});
-				}
-
-				ctx.fillStyle = bg;
-				ctx.fill();
 				ctx.restore();
-			}
+			})();
 
-			/** 绘制均线 */
-			if(config.showAvgPriceLine){
+			/* 绘制折线图 */
+			;(function(){
 				ctx.save();
-				ctx.beginPath();
-				config.avgPriceLineWidth && (ctx.lineWidth = config.avgPriceLineWidth);
-				config.avgPriceLineColor && (ctx.strokeStyle = config.avgPriceLineColor);
-				avgPriceDots.forEach(function(avgPriceDot){
-					ctx.lineTo(avgPriceDot[0], avgPriceDot[1]);
-				});
-				ctx.stroke();
-				ctx.restore();
-			}
 
-			/* 量图 */
-			if(config.showVolume){
-				/** 确定最高点（柱子顶部中点）*/
-				var volumeDots = [];
-				var i = 0, dotX, dotY;
-				for(; i < dotCount; i++){
-					var data = datas[i];
+				config.lineWidth && (ctx.lineWidth = config.lineWidth);
+				config.lineColor && (ctx.strokeStyle = config.lineColor);
+
+				/* 确定折线点及绘制量图 */
+				var volumeWidth = config.volumeWidth || (config.dotGap - config.volumeInterval),
+					halfVolumeWidth = Math.round((volumeWidth - 1) / 2);
+				var startX = xLeft_axisX + Math.floor(config.axisXTickOffset);
+				var dots = [],/** 第一个点和最后一个点是X轴的起始点和终止点。中间部分是折线点 */
+					avgPriceDots = [];/** 均线点 */
+				dots.push([startX, y_axisX]);
+				var dotX, dotY, data;
+				for(var i = 0; i < dotCount; i++){
+					data = datas[i];
 					/* 数据格式转换 */
 					data = dataParser? dataParser(data, i): data;
 
-					var volumeVariation = _sketch.data.extended.volumeCeiling - data.volume;
-					var height = volumeVariation / _sketch.chart.volumeHeightRatio;
+					/* 分时图折线 */
+					dotX = startX + Math.floor(i * (config.dotGap + 1));
+					dotY = yTop_axisY + Math.floor(getHeight(data.price));
+					dots.push([dotX, dotY]);
 
-					dotX = Math.floor(i * config.dotGap * 100)/100 + config.axisXTickOffset + x_axisX;
-					dotY = Math.floor(height);
-
-					volumeDots.push([dotX, dotY]);
-
-					data = null;
-				}
-
-				/** 绘制柱状图 */
-				ctx.save();
-				var volumeWidth = config.dotGap - config.volumeInterval;//柱状图宽度
-				if (volumeWidth <= 0){
-					volumeWidth = config.dotGap;
-				}
-				volumeDots.forEach(function(volumeDot, i){
-					ctx.beginPath();
-					var leftTopPointX = config.dotGap == "auto" ? Math.floor((volumeDot[0] - volumeWidth / 2) * 100)/100: Math.floor(volumeDot[0] - volumeWidth / 2);
-					var outValue = x_axisX - leftTopPointX;
-					ctx.rect(outValue > 0 ? x_axisX : leftTopPointX, y_axisY_volume + volumeDot[1], outValue > 0 ? volumeWidth - outValue : volumeWidth, _sketch.chart.volumeHeight - volumeDot[1]);
-					var volumeColor = config.volumeColor;
-					if(config.volumeColor instanceof Array){
-						volumeColor = config.volumeColor[i % config.volumeColor.length];
+					/* 均线折线 */
+					if(config.showAvgPriceLine && data.avgPrice != null){
+						dotY = yTop_axisY + Math.floor(getHeight(data.avgPrice));
+						avgPriceDots.push([dotX, dotY]);
 					}
-					ctx.fillStyle = volumeColor;
+
+					/* 绘制量图 */
+					if(config.showVolume){
+						ctx.save();
+
+						var volumeColor = config.volumeColor;
+						if(Array.isArray(volumeColor))
+							volumeColor = volumeColor[i % volumeColor.length];
+						ctx.fillStyle = volumeColor;
+						ctx.strokeWidth = 0;
+
+						var volumeHeight = Math.floor(data.volume / _sketch.chart.volumeHeightRatio) + config.volumeAxisYTickOffset;
+						var volumeX = Math.floor(dotX - halfVolumeWidth),
+							volumeY = Math.floor(y_volume_axisX);
+
+						ctx.beginPath();
+						ctx.rect(volumeX, volumeY - volumeHeight, volumeWidth, volumeHeight);
+						ctx.fill();
+
+						ctx.restore();
+					}
+				}
+				if(dots.length > 0)
+					dots.push([dots[dots.length - 1][0], y_axisX]);
+
+				/* 绘制分时图折线 */
+				if(dots.length - 2 == 1){/* 只有一个点 */
+					ctx.beginPath();
+					ctx.arc(dots[1][0], dots[1][1], ctx.lineWidth * 2, 0, 2*Math.PI);
+					ctx.fillStyle = config.lineColor;
 					ctx.fill();
-				});
+				}else if(dots.length - 2 > 1){
+					ctx.beginPath();
+					ctx.moveTo(dots[1][0], dots[1][1]);
+					for(var i = 2; i < dots.length - 1; i++){
+						ctx.lineTo(dots[i][0], dots[i][1]);
+					}
+					ctx.stroke();
+				}
+
+				/* 绘制分时图背景 */
+				var bg = config.enclosedAreaBackground;
+				if(null != bg){
+					ctx.save();
+
+					ctx.beginPath();
+					ctx.moveTo(dots[0][0], dots[0][1]);
+					for(i = 1; i < dots.length; i++){
+						ctx.lineTo(dots[i][0], dots[i][1]);
+					}
+
+					ctx.strokeWidth = 0;
+					if(bg instanceof TradeChart.LinearGradient){
+						bg.apply(ctx, config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
+					}else
+						ctx.fillStyle = bg;
+					ctx.fill();
+
+					ctx.restore();
+				}
+
+				/* 绘制均线 */
+				if(config.showAvgPriceLine && avgPriceDots.length > 0){
+					ctx.save();
+
+					ctx.strokeWidth = 1;
+					config.avgPriceLineWidth && (ctx.lineWidth = config.avgPriceLineWidth);
+					config.avgPriceLineColor && (ctx.strokeStyle = config.avgPriceLineColor);
+
+					ctx.beginPath();
+					ctx.moveTo(avgPriceDots[0][0], avgPriceDots[0][1]);
+					avgPriceDots.forEach(function(avgPriceDot){
+						ctx.lineTo(avgPriceDot[0], avgPriceDot[1]);
+					});
+					ctx.stroke();
+
+					ctx.restore();
+				}
+
 				ctx.restore();
-			}
+			})();
 
 			var pixelRatio = util.pixelRatio();
 			var renderMetadata = {
