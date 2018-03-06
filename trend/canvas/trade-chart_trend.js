@@ -280,17 +280,23 @@
 		/* 点之间的间隔自动调整 */
 		if("auto" == String(config.dotGap).toLowerCase()){
 			var contentWidth = calcChartContentWidth(config);
-			var dotGap = contentWidth / Math.max((datas || []).length - 1, 1);
-			if(dotGap < 1)
-				dotGap = 1;
+			var dotCount = Math.min(contentWidth, datas.length);/* 再密集，也只能一个点一个像素 */
 
-			console.log("Trend chart auto set dot gap to " + dotGap);
+			console.log(">>", contentWidth, dotCount);
+			var dotGap = dotCount <= 1? (contentWidth - dotCount): ((contentWidth - dotCount) / (dotCount - 1));
+			dotGap = Math.floor(dotGap);
+
+			console.info("Auto set trend chart dot gap to " + dotGap);
 			config.dotGap = dotGap;
 		}
 
-		/* 历史兼容，待移除 */
-		if(!!config.volumeInterval)
-			config.volumeGap = config.dotGap - (config.volumeWidth - 1);
+		var halfVolumeWidth = Math.floor((config.volumeWidth - 1) / 2);
+		var maxVolumeWidth = Math.floor(config.dotGap / 2) + 1;
+
+		if(config.volumeWidth > maxVolumeWidth){
+			console.warn("Configured volume width(" + config.volumeWidth + ") is to big, auto adjust to " + maxVolumeWidth);
+			config.volumeWidth = maxVolumeWidth;
+		}
 
 		/* 高分辨率适应 */
 		var pixelRatio = util.pixelRatio();
@@ -485,7 +491,7 @@
 			config = util.cloneObject(config, true);
 			config = util.setDftValue(config, defaultChartConfig);
 
-			initCanvasAndConfig(canvasObj, config);
+			initCanvasAndConfig(canvasObj, config, datas);
 			var ctx = canvasObj.getContext("2d");
 			
 			var _sketch = sketch(datas, dataParser, config);
@@ -630,8 +636,8 @@
 							return sum + timeSection.minutes;
 						}, 0);
 
-						/** 最小的“交易节宽度与横坐标总宽度的比值” */
 						var axisXTicks = [];
+						/** 最小的“交易节宽度与横坐标总宽度的比值” */
 						var minTimeSectionWidthRatio = config.timeSections.reduce(function(min, timeSection, i){
 							if(axisXTicks.length == 0){
 								axisXTicks.push({
@@ -643,7 +649,7 @@
 
 							var timeSectionWidthRatio = timeSection.minutes / totalMinutes;
 							axisXTicks.push({
-								x: axisXTicks[axisXTicks.length - 1].x + timeSectionWidthRatio,
+								x: axisXTicks[axisXTicks.length - 1].x + timeSectionWidthRatio * _sketch.chart.contentWidth,
 								label: timeSection.end
 							});
 
