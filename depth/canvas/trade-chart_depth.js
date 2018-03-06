@@ -228,8 +228,9 @@
 	 * 初始化画布（设置宽高、伸缩比例等）
 	 * @param domContainerObj {HTMLCanvasElement} 画布
 	 * @param config {JsonObject} 渲染配置
+	 * @param {JsonObject} datas 数据数组
 	 */
-	var initCanvasAndConfig = function(canvasObj, config){
+	var initCanvasAndConfig = function(canvasObj, config, datas){
 		/* 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
@@ -240,7 +241,7 @@
 		/* 点之间的间隔自动调整 */
 		if("auto" == String(config.dotGap).toLowerCase()){
 			var contentWidth = calcChartContentWidth(config);
-			var dotGap = contentWidth / (Math.max((datas.buyer || []).length, (datas.seller || []).length) - 1);
+			var dotGap = contentWidth / Math.max(Math.max((datas.buyer || []).length, (datas.seller || []).length) - 1, 1);
 			if(dotGap < 1)
 				dotGap = 1;
 			
@@ -407,9 +408,10 @@
 			var d = this.getOriginalData(dataIndex);
 			if(null == d)
 				return d;
-			
+
+			var dataParser = trendChart.getDataParser();
 			if(typeof dataParser == "function")
-				d = dataParser(d);
+				d = dataParser(d, dataIndex);
 				
 			return d;
 		};
@@ -432,7 +434,7 @@
 			
 			var data = depthChart.getDatas()[dataPosition.area][dataPosition.dataIndex];
 			var dataParser = depthChart.getDataParser();
-			data = dataParser? dataParser(data): data;
+			data = dataParser? dataParser(data, dataIndex): data;
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + Math.floor(dataPosition.dataIndex * config.dotGap) + ("seller" == dataPosition.area? sellerAreaHorizontalOffset: 0);
@@ -528,7 +530,7 @@
 			config = util.cloneObject(config, true);
 			config = util.setDftValue(config, defaultChartConfig);
 
-			initCanvasAndConfig(canvasObj, config);
+			initCanvasAndConfig(canvasObj, config, datas);
 			var ctx = canvasObj.getContext("2d");
 			
 			var _sketch = sketch(datas, dataParser, config);
@@ -576,6 +578,8 @@
 				ctx.beginPath();
 
 				ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop) + 0.5, _sketch.chart.width, _sketch.chart.height);
+
+				ctx.strokeWidth = 0;
 				if(bg instanceof TradeChart.LinearGradient){
 					bg.apply(ctx, config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
 				}else

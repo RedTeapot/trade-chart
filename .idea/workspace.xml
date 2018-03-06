@@ -3,13 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" afterPath="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
-      <change beforePath="$PROJECT_DIR$/k/cache.appcache" afterPath="" />
       <change beforePath="$PROJECT_DIR$/k/canvas/trade-chart_k.js" afterPath="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
-      <change beforePath="$PROJECT_DIR$/k/testCanvas.html" afterPath="$PROJECT_DIR$/k/testCanvas.html" />
-      <change beforePath="$PROJECT_DIR$/trade-chart.js" afterPath="$PROJECT_DIR$/trade-chart.js" />
-      <change beforePath="$PROJECT_DIR$/trend/cache.appcache" afterPath="" />
       <change beforePath="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" afterPath="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
-      <change beforePath="$PROJECT_DIR$/trend/testCanvas.html" afterPath="$PROJECT_DIR$/trend/testCanvas.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -26,16 +21,53 @@
       <file leaf-file-name="trade-chart_k.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
-              <caret line="885" column="51" lean-forward="false" selection-start-line="885" selection-start-column="40" selection-end-line="885" selection-end-column="51" />
+            <state relative-caret-position="479">
+              <caret line="640" column="52" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="934" selection-end-column="5" />
               <folding>
-                <element signature="e#4396#4776#0" expanded="false" />
-                <element signature="e#5239#9372#0" expanded="false" />
-                <element signature="e#9547#10273#0" expanded="false" />
-                <element signature="e#17920#21405#0" expanded="false" />
-                <element signature="e#18333#20080#0" expanded="false" />
-                <element signature="e#21445#24973#0" expanded="false" />
+                <element signature="e#2775#4204#0" expanded="false" />
+                <element signature="e#4392#4772#0" expanded="false" />
+                <element signature="e#4853#5009#0" expanded="false" />
+                <element signature="e#5235#9368#0" expanded="false" />
+                <element signature="e#9543#10269#0" expanded="false" />
+                <element signature="e#21591#25133#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="734">
+              <caret line="678" column="44" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="949" selection-end-column="5" />
+              <folding>
+                <element signature="e#2735#2817#0" expanded="false" />
+                <element signature="e#2958#3099#0" expanded="false" />
+                <element signature="e#3263#4544#0" expanded="false" />
+                <element signature="e#4730#5110#0" expanded="false" />
+                <element signature="e#5336#9392#0" expanded="false" />
+                <element signature="e#9615#10849#0" expanded="false" />
+                <element signature="e#11697#11839#0" expanded="false" />
+                <element signature="e#12543#12702#0" expanded="false" />
+                <element signature="e#14165#14205#0" expanded="false" />
+                <element signature="e#14262#14284#0" expanded="false" />
+                <element signature="e#14389#14434#0" expanded="false" />
+                <element signature="e#17763#18929#0" expanded="false" />
+                <element signature="e#17889#18450#0" expanded="false" />
+                <element signature="e#19115#19391#0" expanded="false" />
+                <element signature="e#21683#25258#0" expanded="false" />
+                <element signature="e#23483#25231#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="trade-chart_depth.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="700">
+              <caret line="369" column="25" lean-forward="true" selection-start-line="369" selection-start-column="25" selection-end-line="369" selection-end-column="25" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -44,16 +76,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>var half</find>
-      <find>halfGroupBarWidth</find>
-      <find>MADotsArr</find>
-      <find>getMinX</find>
-      <find>xLeft_axisX</find>
-      <find>xRight_axisX</find>
-      <find>getCoordinate</find>
       <find>getMaxX</find>
       <find>gridLineDash</find>
+      <find>ifShow</find>
+      <find>showVerticalGridLine</find>
+      <find>ifShowVerticalGridLine</find>
+      <find>axisXTickInterval</find>
+      <find>groupCount</find>
+      <find>`</find>
+      <find>XRate</find>
+      <find>timeSections</find>
+      <find>datas</find>
+      <find>initCanvasAndConfig</find>
+      <find>axisXTickCount</find>
+      <find>sketchChart</find>
+      <find>sketch</find>
+      <find>axisXTickOffsetFromRight</find>
+      <find>axisYTickOffset</find>
+      <find>axisYPrecision</find>
+      <find>axisYFormatter</find>
       <find>priceHeightRatio</find>
+      <find>console.log</find>
+      <find>var getHeight</find>
+      <find>strokeWidth</find>
+      <find>axisXTickOffset</find>
+      <find>volumeInterval</find>
+      <find>.</find>
+      <find>volumeWidth</find>
+      <find>getConvertedData</find>
+      <find>var edgeTickDataIndex,/** 处于边界位置</find>
+      <find>/* 剩余空间不足，</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -64,6 +116,8 @@
       <list>
         <option value="$PROJECT_DIR$/k/testCanvas.html" />
         <option value="$PROJECT_DIR$/trend/testCanvas.html" />
+        <option value="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+        <option value="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
         <option value="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
       </list>
     </option>
@@ -103,6 +157,17 @@
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="depth" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="depth" type="462c0819:PsiDirectoryNode" />
+              <item name="canvas" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
@@ -166,18 +231,18 @@
       <updated>1520156323921</updated>
       <workItem from="1520156337732" duration="1035000" />
       <workItem from="1520213539505" duration="6138000" />
-      <workItem from="1520229676319" duration="17000000" />
+      <workItem from="1520229676319" duration="39910000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24173000" />
+    <option name="totallyTimeSpent" value="47083000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.09636651" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13691416" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -204,7 +269,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -214,12 +279,12 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#4396#4776#0" expanded="false" />
-            <element signature="e#5239#9372#0" expanded="false" />
-            <element signature="e#9547#10273#0" expanded="false" />
-            <element signature="e#17920#21405#0" expanded="false" />
-            <element signature="e#18333#20080#0" expanded="false" />
-            <element signature="e#21445#24973#0" expanded="false" />
+            <element signature="e#2775#4204#0" expanded="false" />
+            <element signature="e#4392#4772#0" expanded="false" />
+            <element signature="e#4853#5009#0" expanded="false" />
+            <element signature="e#5235#9368#0" expanded="false" />
+            <element signature="e#9543#10269#0" expanded="false" />
+            <element signature="e#21591#25133#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -229,12 +294,12 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#4396#4776#0" expanded="false" />
-            <element signature="e#5239#9372#0" expanded="false" />
-            <element signature="e#9547#10273#0" expanded="false" />
-            <element signature="e#17920#21405#0" expanded="false" />
-            <element signature="e#18333#20080#0" expanded="false" />
-            <element signature="e#21445#24973#0" expanded="false" />
+            <element signature="e#2775#4204#0" expanded="false" />
+            <element signature="e#4392#4772#0" expanded="false" />
+            <element signature="e#4853#5009#0" expanded="false" />
+            <element signature="e#5235#9368#0" expanded="false" />
+            <element signature="e#9543#10269#0" expanded="false" />
+            <element signature="e#21591#25133#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -254,25 +319,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/trade-chart.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="39" column="26" lean-forward="true" selection-start-line="39" selection-start-column="26" selection-end-line="39" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="700">
+          <caret line="369" column="25" lean-forward="true" selection-start-line="369" selection-start-column="25" selection-end-line="369" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="800" column="151" lean-forward="false" selection-start-line="800" selection-start-column="140" selection-end-line="800" selection-end-column="151" />
-          <folding />
+        <state relative-caret-position="734">
+          <caret line="678" column="44" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="949" selection-end-column="5" />
+          <folding>
+            <element signature="e#2735#2817#0" expanded="false" />
+            <element signature="e#2958#3099#0" expanded="false" />
+            <element signature="e#3263#4544#0" expanded="false" />
+            <element signature="e#4730#5110#0" expanded="false" />
+            <element signature="e#5336#9392#0" expanded="false" />
+            <element signature="e#9615#10849#0" expanded="false" />
+            <element signature="e#11697#11839#0" expanded="false" />
+            <element signature="e#12543#12702#0" expanded="false" />
+            <element signature="e#14165#14205#0" expanded="false" />
+            <element signature="e#14262#14284#0" expanded="false" />
+            <element signature="e#14389#14434#0" expanded="false" />
+            <element signature="e#17763#18929#0" expanded="false" />
+            <element signature="e#17889#18450#0" expanded="false" />
+            <element signature="e#19115#19391#0" expanded="false" />
+            <element signature="e#21683#25258#0" expanded="false" />
+            <element signature="e#23483#25231#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="398">
-          <caret line="885" column="51" lean-forward="false" selection-start-line="885" selection-start-column="40" selection-end-line="885" selection-end-column="51" />
+        <state relative-caret-position="479">
+          <caret line="640" column="52" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="934" selection-end-column="5" />
           <folding>
-            <element signature="e#4396#4776#0" expanded="false" />
-            <element signature="e#5239#9372#0" expanded="false" />
-            <element signature="e#9547#10273#0" expanded="false" />
-            <element signature="e#17920#21405#0" expanded="false" />
-            <element signature="e#18333#20080#0" expanded="false" />
-            <element signature="e#21445#24973#0" expanded="false" />
+            <element signature="e#2775#4204#0" expanded="false" />
+            <element signature="e#4392#4772#0" expanded="false" />
+            <element signature="e#4853#5009#0" expanded="false" />
+            <element signature="e#5235#9368#0" expanded="false" />
+            <element signature="e#9543#10269#0" expanded="false" />
+            <element signature="e#21591#25133#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -45,10 +45,10 @@
 		},
 
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
-		ifShowHorizontalGridLine: true,/** 是否绘制网格横线 */
+		showHorizontalGridLine: true,/** 是否绘制网格横线 */
 		horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
 
-		ifShowVerticalGridLine: true,/** 是否绘制网格横线 */
+		showVerticalGridLine: true,/** 是否绘制网格横线 */
 		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 
 		appreciatedColor: "red",/** 收盘价大于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
@@ -353,6 +353,9 @@
 
 			var tmpX = x - minX;
 			var index = Math.ceil(tmpX / Math.floor(config.groupBarWidth + config.groupGap)) - 1;
+			if(index < 0 || index >= groupCount)
+				return -1;
+
 			return index;
 		};
 
@@ -378,8 +381,9 @@
 			if(null == d)
 				return d;
 
+			var dataParser = trendChart.getDataParser();
 			if(typeof dataParser == "function")
-				d = dataParser(d);
+				d = dataParser(d, dataIndex);
 
 			return d;
 		};
@@ -486,6 +490,7 @@
 
 			var _sketch = sketch(datas, dataParser, config);
 			console.log("K chart sketch", _sketch);
+			console.log("K chart config", config);
 
 			/** 蜡烛一半的宽度 */
 			var halfGroupBarWidth = calcHalfGroupBarWidth(config);
@@ -506,8 +511,8 @@
 			var ifShowAxisYLeft = "left" == axisYPosition,
 				ifShowAxisYRight = "right" == axisYPosition;
 
-			var ifShowVerticalGridLine = config.ifShowVerticalGridLine && config.verticalGridLineColor,
-				ifShowHorizontalGridLine = config.ifShowHorizontalGridLine && config.horizontalGridLineColor;
+			var ifShowVerticalGridLine = config.showVerticalGridLine && config.verticalGridLineColor,
+				ifShowHorizontalGridLine = config.showHorizontalGridLine && config.horizontalGridLineColor;
 
 			var xLeft_axisX = Math.floor(config.paddingLeft) + 0.5,
 				xRight_axisX = xLeft_axisX + Math.floor(_sketch.chart.width),
@@ -629,21 +634,21 @@
 
 					if(renderFromLeftToRight){/* 从左向右 */
 						edgeTickDataIndex = groupCount - 1;
-						for(var i = 0; i < axisXTickCount - 1; i++){
+						for(var i = 0; i <= axisXTickCount - 1; i++){
 							renderXTick(i * axisXTickInterval, true);
 							renderedTickCount++;
 						}
-						lastTickDataIndex = i * axisXTickInterval;
+						lastTickDataIndex = Math.min(i * axisXTickInterval, groupCount - 1);
 					}else{/* 从右向左 */
 						edgeTickDataIndex = 0;
-						for(var i = groupCount - 1, j = 0; i >= 0, j < axisXTickCount - 1; i -= axisXTickInterval, j++){
+						for(var i = groupCount - 1, j = 0; i >= 0, j <= axisXTickCount - 1; i -= axisXTickInterval, j++){
 							renderXTick(i, true);
 							renderedTickCount++;
 						}
 						lastTickDataIndex = Math.max(i, 0);
 					}
-					var totalSpace = (groupCount - 1) * config.groupGap + groupCount * config.groupBarWidth;
-					var remainingSize = totalSpace - Math.max(renderedTickCount - 1, 0) * axisXTickInterval * groupSize;
+					var totalSpace = _sketch.chart.contentWidth;
+					var remainingSize = totalSpace - (renderedTickCount * axisXTickInterval * groupSize + config.axisXLabelSize / 2);
 					if(remainingSize < config.axisXLabelSize){
 						/* 剩余空间不足，只绘制边界刻度 */
 						renderXTick(edgeTickDataIndex, renderFromLeftToRight);
@@ -657,6 +662,8 @@
 
 				/* 绘制Y轴及刻度 */
 				;(function(){
+					ctx.save();
+
 					/* 绘制Y轴坐标线 */
 					ctx.beginPath();
 					/* 蜡烛图 */
@@ -679,7 +686,7 @@
 					for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
 						var price = _sketch.data.extended.priceFloor + i * axisYPriceInterval,
 							tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
-						var tickY = config.axisYTickOffset + Math.round(tickOffset);
+						var tickY = Math.round(tickOffset);
 
 						/* 绘制网格横线 */
 						if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
@@ -741,6 +748,8 @@
 							ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
 						}
 					}
+
+					ctx.restore();
 				})();
 
 				/* 绘制坐标区域背景 */
@@ -750,10 +759,11 @@
 					ctx.beginPath();
 
 					/* 蜡烛图 */
-					ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop) + 0.5, _sketch.chart.width, _sketch.chart.height);
+					ctx.rect(xLeft_axisX, yTop_axisY, _sketch.chart.width, _sketch.chart.height);
 					/* 量图 */
-					!!config.showVolume && ctx.rect(Math.floor(config.paddingLeft) + 0.5, Math.floor(config.paddingTop + _sketch.chart.height + config.volumeMarginTop) + 0.5, _sketch.chart.width, _sketch.chart.volumeHeight);
+					!!config.showVolume && ctx.rect(xLeft_axisX, yTop_volume_axisY, _sketch.chart.width, _sketch.chart.volumeHeight);
 
+					ctx.strokeWidth = 0;
 					if(bg instanceof TradeChart.LinearGradient){
 						bg.apply(ctx, config.paddingLeft, config.paddingTop, config.paddingLeft, config.paddingTop + _sketch.chart.height);
 					}else
@@ -849,7 +859,7 @@
 						ctx.save();
 						ctx.fillStyle = config.volumeColor;
 
-						var volumeHeight = Math.floor(data.volume / _sketch.chart.volumeHeightRatio);
+						var volumeHeight = Math.floor(data.volume / _sketch.chart.volumeHeightRatio) + config.volumeAxisYTickOffset;
 						ctx.strokeWidth = 0;
 						ctx.rect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
 						ctx.fill();
