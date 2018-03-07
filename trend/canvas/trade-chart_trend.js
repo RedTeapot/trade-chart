@@ -279,17 +279,13 @@
 		if("auto" == String(config.dotGap).toLowerCase()){
 			var contentWidth = calcChartContentWidth(config);
 			var dotCount = Math.min(contentWidth, datas.length);/* 再密集，也只能一个点一个像素 */
-
-			console.log(">>", contentWidth, dotCount);
 			var dotGap = dotCount <= 1? (contentWidth - dotCount): ((contentWidth - dotCount) / (dotCount - 1));
 
 			console.info("Auto set trend chart dot gap to " + dotGap);
 			config.dotGap = dotGap;
 		}
 
-		var halfVolumeWidth = Math.floor((config.volumeWidth - 1) / 2);
 		var maxVolumeWidth = Math.floor(config.dotGap / 2) + 1;
-
 		if(config.volumeWidth > maxVolumeWidth){
 			console.warn("Configured volume width(" + config.volumeWidth + ") is to big, auto adjust to " + maxVolumeWidth);
 			config.volumeWidth = maxVolumeWidth;
@@ -425,7 +421,7 @@
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + Math.round(dataIndex * (config.dotGap + 1));
-			obj.y = minY + Math.abs(sketch.data.extended.priceCeiling - data.price) / sketch.chart.priceHeightRatio;
+			obj.y = minY + Math.round(Math.abs(sketch.data.extended.priceCeiling - data.price) / sketch.chart.priceHeightRatio);
 
 			return obj;
 		};
@@ -685,7 +681,7 @@
 							renderXTickByDataIndex(dotCount - 1);
 						}else{
 							var k = dotCount - 1,
-								j = Math.min(i * axisXTickInterval, k);
+								j = Math.min(lastTickDataIndex, k);
 
 							/* 绘制最后一个刻度和边界刻度 */
 							renderXTickByDataIndex(j);
@@ -756,7 +752,7 @@
 							for(var i = 0; i <= config.volumeAxisYMidTickQuota + 1; i++){
 								var volume = _sketch.data.extended.volumeFloor + i * axisYVolumeInterval,
 									tickOffset = (config.volumeAxisYMidTickQuota + 1 - i) * axisYHeightIntervalAux;
-								var tickY = Math.round(tickOffset);
+								var tickY = yTop_volume_axisY + Math.round(tickOffset);
 
 								/* 绘制网格横线 */
 								if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
@@ -765,18 +761,18 @@
 									ctx.strokeStyle = config.horizontalGridLineColor;
 
 									ctx.beginPath();
-									ctx.moveTo(x_axisY, yTop_volume_axisY + tickY);
-									ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(_sketch.chart.width), yTop_volume_axisY + tickY);
+									ctx.moveTo(x_axisY, tickY);
+									ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(_sketch.chart.width), tickY);
 									ctx.stroke();
 									ctx.restore();
 								}
 
 								/* 绘制刻度线 */
 								ctx.beginPath();
-								ctx.moveTo(x_axisY, yTop_volume_axisY + tickY);
-								ctx.lineTo(x_axisY + axisTickLineOffset, yTop_volume_axisY + tickY);
+								ctx.moveTo(x_axisY, tickY);
+								ctx.lineTo(x_axisY + axisTickLineOffset, tickY);
 								ctx.stroke();
-								ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, yTop_volume_axisY + tickY + config.axisYLabelVerticalOffset);
+								ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
 							}
 						}else{
 							/* 绘制刻度线 */
