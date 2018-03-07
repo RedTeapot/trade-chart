@@ -496,6 +496,8 @@
 			var halfGroupBarWidth = calcHalfGroupBarWidth(config);
 			/** 一组数据的宽度 */
 			var groupSize = config.groupBarWidth + config.groupGap;
+			/** 一组数据宽度的一半 */
+			var halfGroupSize = Math.max(groupSize / 2, config.axisXLabelSize / 2);
 			/** 绘制的数据个数 */
 			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
 			/** 横坐标刻度之间相差的数据的个数 */
@@ -571,6 +573,9 @@
 					 * @param {Integer} i 数据的索引位置
 					 */
 					var renderXTick = function(i){
+						if(i < 0 || i >= groupCount)
+							return;
+
 						ctx.save();
 
 						ctx.textAlign = "center";
@@ -630,26 +635,25 @@
 					/* 绘制X轴刻度 */
 					var edgeTickDataIndex,/** 处于边界位置的刻度所对应的数据索引 */
 						lastTickDataIndex;/** 最后一个的刻度所对应的数据索引 */
-					var renderedTickCount = 0;
-
 					if(renderFromLeftToRight){/* 从左向右 */
 						edgeTickDataIndex = groupCount - 1;
 						for(var i = 0; i <= axisXTickCount - 1; i++){
-							renderXTick(i * axisXTickInterval, true);
-							renderedTickCount++;
+							var k = Math.round(i * axisXTickInterval);
+							renderXTick(k, true);
 						}
-						lastTickDataIndex = Math.min(i * axisXTickInterval, groupCount - 1);
+						lastTickDataIndex = Math.min(Math.round(i * axisXTickInterval), groupCount - 1);
 					}else{/* 从右向左 */
 						edgeTickDataIndex = 0;
 						for(var i = groupCount - 1, j = 0; i >= 0, j <= axisXTickCount - 1; i -= axisXTickInterval, j++){
-							renderXTick(i, true);
-							renderedTickCount++;
+							var k = Math.round(i);
+							renderXTick(k, true);
 						}
-						lastTickDataIndex = Math.max(i, 0);
+						lastTickDataIndex = Math.max(Math.round(i), 0);
 					}
-					var totalSpace = _sketch.chart.contentWidth;
-					var remainingSize = totalSpace - (renderedTickCount * axisXTickInterval * groupSize + config.axisXLabelSize / 2);
-					if(remainingSize < config.axisXLabelSize){
+
+					var totalSpace = Math.min((groupCount - 1) * groupSize, _sketch.chart.contentWidth);
+					var remainingSpace = totalSpace - (lastTickDataIndex * groupSize - halfGroupBarWidth + halfGroupSize);
+					if(remainingSpace < halfGroupSize){
 						/* 剩余空间不足，只绘制边界刻度 */
 						renderXTick(edgeTickDataIndex, renderFromLeftToRight);
 					}else{

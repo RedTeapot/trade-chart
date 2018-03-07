@@ -16,8 +16,6 @@
 		/**
 		 * 相邻两个点之间的间隔。
 		 *
-		 * //TODO 数据没有交易节信息的场景，尚未响应该属性取值为auto的配置
-		 *
 		 * 1. 赋值整数，以指定固定间隔（此时会根据可显示的数据量自动舍去超出渲染范围的的数据，从而导致可能只显示前一部分数据）；
 		 * 2. 赋值字符串：“auto”以渲染所有数据，并自动计算两个点之间的距离。
 		 */
@@ -284,7 +282,6 @@
 
 			console.log(">>", contentWidth, dotCount);
 			var dotGap = dotCount <= 1? (contentWidth - dotCount): ((contentWidth - dotCount) / (dotCount - 1));
-			dotGap = Math.floor(dotGap);
 
 			console.info("Auto set trend chart dot gap to " + dotGap);
 			config.dotGap = dotGap;
@@ -668,16 +665,22 @@
 							renderXTick(lastTick.label, lastTick.x);
 						}
 					}else{
-						var axisXTickInterval = Math.ceil(config.axisXLabelSize / (config.dotGap + 1));/* 横坐标刻度之间相差的点的个数 */
+						var groupSize = config.dotGap + 1,
+							halfGroupSize = config.axisXLabelSize / 2;
+						
+						var axisXTickInterval = Math.ceil(config.axisXLabelSize / groupSize);/* 横坐标刻度之间相差的点的个数 */
 						var axisXTickCount = Math.floor(dotCount / axisXTickInterval),
-							renderedTickCount = 0;
-						for(var i = 0; i < axisXTickCount; i++){
-							renderXTickByDataIndex(i * axisXTickInterval);
-							renderedTickCount++;
-						}
-						var totalSpace = _sketch.chart.contentWidth;
-						var remainingSpace = totalSpace - (renderedTickCount * axisXTickInterval * (config.dotGap + 1)  + config.axisXLabelSize / 2);
-						if(remainingSpace < config.axisXLabelSize){
+							lastTickDataIndex;
+						for(var i = 0; i < axisXTickCount; i++)
+							renderXTickByDataIndex(Math.round(i * axisXTickInterval));
+						lastTickDataIndex = Math.round(i * axisXTickInterval);
+
+						var totalSpace = Math.min((dotCount - 1) * groupSize, _sketch.chart.contentWidth);
+						var remainingSpace = totalSpace - (lastTickDataIndex * groupSize + halfGroupSize);
+						
+						// var totalSpace = _sketch.chart.contentWidth;
+						// var remainingSpace = totalSpace - (renderedTickCount * axisXTickInterval * (config.dotGap + 1)  + config.axisXLabelSize / 2);
+						if(remainingSpace < halfGroupSize){
 							/* 剩余空间不足，只绘制边界刻度 */
 							renderXTickByDataIndex(dotCount - 1);
 						}else{
