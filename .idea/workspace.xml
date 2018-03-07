@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/k/canvas/trade-chart_k.js" afterPath="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
-      <change beforePath="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" afterPath="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+      <change beforePath="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" afterPath="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -17,11 +16,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="trade-chart_k.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="trade-chart_k.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="291">
-              <caret line="503" column="79" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="938" selection-end-column="5" />
+            <state relative-caret-position="546">
+              <caret line="518" column="54" lean-forward="false" selection-start-line="518" selection-start-column="54" selection-end-line="518" selection-end-column="54" />
               <folding>
                 <element signature="e#2775#4204#0" expanded="false" />
                 <element signature="e#4392#4772#0" expanded="false" />
@@ -43,11 +42,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="trade-chart_depth.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="trade-chart_depth.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5358">
-              <caret line="532" column="31" lean-forward="false" selection-start-line="532" selection-start-column="12" selection-end-line="532" selection-end-column="31" />
+            <state relative-caret-position="309">
+              <caret line="528" column="19" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="888" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -57,8 +56,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>groupCount</find>
-      <find>`</find>
       <find>XRate</find>
       <find>timeSections</find>
       <find>datas</find>
@@ -87,6 +84,8 @@
       <find>var render</find>
       <find>groupBarSize</find>
       <find>axisXTickInterval</find>
+      <find>trendChart</find>
+      <find>renderedKChart</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -97,9 +96,9 @@
       <list>
         <option value="$PROJECT_DIR$/k/testCanvas.html" />
         <option value="$PROJECT_DIR$/trend/testCanvas.html" />
-        <option value="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
         <option value="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
         <option value="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+        <option value="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
       </list>
     </option>
   </component>
@@ -212,12 +211,12 @@
       <updated>1520156323921</updated>
       <workItem from="1520156337732" duration="1035000" />
       <workItem from="1520213539505" duration="6138000" />
-      <workItem from="1520229676319" duration="51061000" />
+      <workItem from="1520229676319" duration="52116000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="58234000" />
+    <option name="totallyTimeSpent" value="59289000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -306,14 +305,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5358">
-          <caret line="532" column="31" lean-forward="false" selection-start-line="532" selection-start-column="12" selection-end-line="532" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="401">
@@ -324,8 +315,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="503" column="79" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="938" selection-end-column="5" />
+        <state relative-caret-position="546">
+          <caret line="518" column="54" lean-forward="false" selection-start-line="518" selection-start-column="54" selection-end-line="518" selection-end-column="54" />
           <folding>
             <element signature="e#2775#4204#0" expanded="false" />
             <element signature="e#4392#4772#0" expanded="false" />
@@ -333,6 +324,14 @@
             <element signature="e#9543#10269#0" expanded="false" />
             <element signature="e#21755#25297#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="309">
+          <caret line="528" column="19" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="888" selection-end-column="5" />
+          <folding />
         </state>
       </provider>
     </entry>

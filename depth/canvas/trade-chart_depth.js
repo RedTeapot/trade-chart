@@ -405,11 +405,11 @@
 		 * @param {StringEnum} area 点所在的区域。buyer：买方区域（左侧）；seller：卖方区域（右侧）
 		 */
 		this.getConvertedData = function(dataIndex, area){
-			var d = this.getOriginalData(dataIndex);
+			var d = this.getOriginalData(dataIndex, area);
 			if(null == d)
 				return d;
 
-			var dataParser = trendChart.getDataParser();
+			var dataParser = depthChart.getDataParser();
 			if(typeof dataParser == "function")
 				d = dataParser(d, dataIndex);
 				
@@ -434,7 +434,7 @@
 			
 			var data = depthChart.getDatas()[dataPosition.area][dataPosition.dataIndex];
 			var dataParser = depthChart.getDataParser();
-			data = dataParser? dataParser(data, dataIndex): data;
+			data = dataParser? dataParser(data, dataPosition.dataIndex): data;
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + Math.floor(dataPosition.dataIndex * config.dotGap) + ("seller" == dataPosition.area? sellerAreaHorizontalOffset: 0);
