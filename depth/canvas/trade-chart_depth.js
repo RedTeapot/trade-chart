@@ -97,7 +97,7 @@
 	var sketchChart = function(config){
 		var width = config.width,
 			height = config.height;
-		
+
 		var chartSketch = {
 			width: 0,/* 图表的宽度 */
 			height: 0,/* 图表的高度 */
@@ -129,7 +129,7 @@
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
 		if(/%/.test(config.height))
 			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
-		
+
 		return sketchChart(config).maxDotCount;
 	};
 
@@ -203,33 +203,33 @@
 	};
 
 	/**
-	 * 获取买方区域的横坐标起止坐标
+	 * 获取买方区域的横坐标起止坐标（起止坐标上也可以绘图，亦即闭区间）
 	 * @param {JsonObject} config 渲染配置
 	 * @param {JsonObject} sketch 数据和图形的扫描分析结果
 	 * @param {Array#JsonObject} [datas] 买方数据
 	 */
 	var getBuyerAreaXSection = function(config, sketch, datas){
 		var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
-		var maxX = minX + Math.floor(sketch.chart.contentWidth);
+		var maxX = minX + Math.floor(sketch.chart.contentWidth - 1);/* -1是因为minX占据了1个像素，其上也可以绘制。下同 */
 
 		if(arguments.length >= 3)
-			maxX = minX + Math.floor(Math.max(datas.length - 1, 0) * config.dotGap + datas.length);
+			maxX = minX + Math.floor(Math.max(datas.length - 1, 0) * config.dotGap + datas.length - 1);
 
 		return {min: minX, max: maxX};
 	};
 
 	/**
-	 * 获取卖方区域的横坐标起止坐标
+	 * 获取卖方区域的横坐标起止坐标（起止坐标上也可以绘图，亦即闭区间）
 	 * @param {JsonObject} config 渲染配置
 	 * @param {JsonObject} sketch 数据和图形的扫描分析结果
 	 * @param {Array#JsonObject} [datas] 买方数据
 	 */
 	var getSellerAreaXSection = function(config, sketch, datas){
-		var maxX = Math.floor(config.width - config.paddingRight - config.axisXTickOffsetFromRight) + 0.5;
-		var minX = maxX - Math.floor(sketch.chart.contentWidth);
+		var maxX = Math.floor(config.width - 1 - config.paddingRight - config.axisXTickOffsetFromRight) + 0.5;
+		var minX = maxX - Math.floor(sketch.chart.contentWidth - 1);/* -1是因为maxX占据了1个像素，其上也可以绘制。下同 */
 
 		if(arguments.length >= 3)
-			minX = maxX - Math.floor(Math.max(datas.length - 1, 0) * config.dotGap + datas.length);
+			minX = maxX - Math.floor(Math.max(datas.length - 1, 0) * config.dotGap + datas.length - 1);
 
 		return {min: minX, max: maxX};
 	};
@@ -322,9 +322,9 @@
 		/**
 		 * 判断指定的相对横坐标是否处于买方区域
 		 * 注：买方区域在左侧，卖方区域在右侧。两个区域之间有固定间隔（配置项）的空隙
-		 * 
+		 *
 		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布Canvas的左上角
-		 * @returns {Boolean} 
+		 * @returns {Boolean}
 		 */
 		this.isInBuyerArea = function(x){
 			var t = getBuyerAreaXSection(config, sketch, depthChart.getDatas().buyer);
@@ -334,9 +334,9 @@
 		/**
 		 * 判断指定的相对横坐标是否处于卖方区域
 		 * 注：买方区域在左侧，卖方区域在右侧。两个区域之间有固定间隔（配置项）的空隙
-		 * 
+		 *
 		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布Canvas的左上角
-		 * @returns {Boolean} 
+		 * @returns {Boolean}
 		 */
 		this.isInSellerArea = function(x){
 			var t = getSellerAreaXSection(config, sketch, depthChart.getDatas().seller);
@@ -351,7 +351,7 @@
 		this.getDataPosition = function(x){
 			var buyerAreaXSection = getBuyerAreaXSection(config, sketch, depthChart.getDatas().buyer),
 				sellerAreaXSection = getSellerAreaXSection(config, sketch, depthChart.getDatas().seller);
-			
+
 			var isInBuyerArea = this.isInBuyerArea(x),
 				isInSellerArea = this.isInSellerArea(x);
 			if(!isInBuyerArea && !isInSellerArea)
@@ -369,10 +369,10 @@
 
 				tmpX = x - section.min;
 				rst.dataIndex = Math.round(tmpX / (config.dotGap + 1));
-				
+
 				return rst;
 			};
-			
+
 			var area = isInBuyerArea? "buyer": "seller";
 			var rst = f(area, x);
 
@@ -405,7 +405,7 @@
 			var list = depthChart.getDatas()[area] || [];
 			if(dataIndex < 0 || dataIndex >= list.length)
 				return null;
-			
+
 			var d = list[dataIndex];
 			return d;
 		};
@@ -423,7 +423,7 @@
 			var dataParser = depthChart.getDataParser();
 			if(typeof dataParser == "function")
 				d = dataParser(d, dataIndex);
-				
+
 			return d;
 		};
 
@@ -442,7 +442,7 @@
 
 			var minX = "buyer" == dataPosition.area? buyerAreaXSection.min: sellerAreaXSection.min,
 				minY = Math.floor(config.paddingTop) + 0.5;
-			
+
 			var data = depthChart.getDatas()[dataPosition.area][dataPosition.dataIndex];
 			var dataParser = depthChart.getDataParser();
 			data = dataParser? dataParser(data, dataPosition.dataIndex): data;
@@ -546,7 +546,7 @@
 
 			initCanvasAndConfig(canvasObj, config, datas);
 			var ctx = canvasObj.getContext("2d");
-			
+
 			var _sketch = sketch(datas, dataParser, config);
 			console.log("Depth chart sketch: " + JSON.stringify(_sketch));
 
@@ -555,7 +555,7 @@
 
 				/** 卖方区域的起止横轴坐标 */
 				sellerAreaXSection = getSellerAreaXSection(config, _sketch, datas.seller),
-				
+
 				/** 买方区域中要呈现的点的个数 */
 				buyerAreaDotCount = Math.min(_sketch.chart.maxDotCount, datas.buyer.length),
 
@@ -627,7 +627,7 @@
 
 						var data = dataParser? dataParser(datas[area][i], i): datas[area][i];
 						var minX = "buyer" == area? buyerAreaXSection.min: sellerAreaXSection.min;
-						var tickX = minX + Math.floor(i * (config.dotGap + 1));
+						var tickX = minX + Math.round(i * (config.dotGap + 1));
 
 						/* 绘制网格竖线 */
 						if(ifShowVerticalGridLine){
@@ -780,7 +780,7 @@
 
 						var amountVariation = _sketch.data.extended.amountCeiling - data.amount;
 						var height = amountVariation / _sketch.chart.amountHeightRatio;
-						dotX = minX + Math.floor(i * (config.dotGap + 1));/* 保留两位小数 */
+						dotX = minX + Math.round(i * (config.dotGap + 1));/* 保留两位小数 */
 						dotY = yTop_axisY + Math.floor(height);
 						dots.push([dotX, dotY]);
 					}
@@ -836,7 +836,6 @@
 					}else
 						ctx.fillStyle = bg;
 
-					ctx.fillStyle = bg;
 					ctx.fill();
 					ctx.restore();
 				};
