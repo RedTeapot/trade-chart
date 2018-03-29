@@ -886,7 +886,7 @@
 					ctx.fillStyle = config.MAColorArr[i];
 
 					ctx.beginPath();
-					ctx.lineTo(maDots[0][0], maDots[0][1]);
+					ctx.moveTo(maDots[i][0][0], maDots[i][0][1]);
 					maDots[i].forEach(function(MADot, k){
 						if(k == 0)
 							return;
