@@ -169,7 +169,7 @@
 		for(var i = 0; i < datas.length && i < chartSketch.maxGroupCount; i++){
 			var d = datas[i];
 			/* 数据格式转换 */
-			d = dataParser? dataParser(d, i): d;
+			d = dataParser? dataParser(d, i, datas): d;
 
 			var max = Math.max(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice),
 				min = Math.min(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice);
@@ -383,7 +383,7 @@
 
 			var dataParser = trendChart.getDataParser();
 			if(typeof dataParser == "function")
-				d = dataParser(d, dataIndex);
+				d = dataParser(d, dataIndex, kChart.getDatas() || []);
 
 			return d;
 		};
@@ -583,7 +583,7 @@
 
 						var data = datas[i];
 						/* 数据格式转换 */
-						data = dataParser? dataParser(data, i): data;
+						data = dataParser? dataParser(data, i, datas): data;
 
 						var tickX = Math.floor(xLeft_axisX + i * groupSize + config.axisXTickOffset) + 0.5;
 						// if(fromLeft)
@@ -792,7 +792,7 @@
 				var renderCandle = function(i, callback){
 					var data = datas[i];
 					/* 数据格式转换 */
-					data = dataParser? dataParser(data, i): data;
+					data = dataParser? dataParser(data, i, datas): data;
 
 					var x = Math.floor(xLeft_axisX + config.axisXTickOffset + i * groupSize - halfGroupBarWidth);
 					// if(fromLeft)

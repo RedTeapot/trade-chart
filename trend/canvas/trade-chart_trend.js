@@ -193,7 +193,7 @@
 		for(var i = 0; i < datas.length && i < chartSketch.maxDotCount; i++){
 			var d = datas[i];
 			/* 数据格式转换 */
-			d = dataParser? dataParser(d, i): d;
+			d = dataParser? dataParser(d, i, datas): d;
 
 			if(d.avgPrice != null){
 				dataSketch.origin.max = Math.max(+d.price, +d.avgPrice, dataSketch.origin.max);
@@ -397,7 +397,7 @@
 
 			var dataParser = trendChart.getDataParser();
 			if(typeof dataParser == "function")
-				d = dataParser(d, dataIndex);
+				d = dataParser(d, dataIndex, trendChart.getDatas() || []);
 				
 			return d;
 		};
@@ -417,7 +417,7 @@
 
 			var data = trendChart.getDatas()[dataIndex];
 			var dataParser = trendChart.getDataParser();
-			data = dataParser? dataParser(data, dataIndex): data;
+			data = dataParser? dataParser(data, dataIndex, trendChart.getDatas() || []): data;
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + Math.round(dataIndex * (config.dotGap + 1));
@@ -615,7 +615,7 @@
 							return;
 
 						if(arguments.length < 2){
-							var data = dataParser? dataParser(datas[i], i): datas[i];
+							var data = dataParser? dataParser(datas[i], i, datas): datas[i];
 							label = data.time;
 						}
 
@@ -829,7 +829,7 @@
 				for(var i = 0; i < dotCount; i++){
 					data = datas[i];
 					/* 数据格式转换 */
-					data = dataParser? dataParser(data, i): data;
+					data = dataParser? dataParser(data, i, datas): data;
 
 					/* 分时图折线 */
 					dotX = startX + Math.floor(i * (config.dotGap + 1));
