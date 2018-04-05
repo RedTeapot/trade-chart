@@ -133,7 +133,7 @@
 		if(config.showVolume){
 			chartSketch.height =  Math.round(config.height * (1- config.volumeAreaRatio) - config.paddingTop - config.volumeMarginTop);
 			chartSketch.volumeHeight =  Math.round(config.height * config.volumeAreaRatio - config.paddingBottom);
-			chartSketch.volumeContentHeight = Math.floor(chartSketch.volumeHeight - config.volumeAxisYTickOffset);
+			chartSketch.volumeContentHeight = Math.floor(chartSketch.volumeHeight);
 		}else{
 			chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
 		}
@@ -852,7 +852,7 @@
 						ctx.fillStyle = volumeColor;
 						ctx.strokeWidth = 0;
 
-						var volumeHeight = Math.floor(data.volume / _sketch.chart.volumeHeightRatio) + config.volumeAxisYTickOffset;
+						var volumeHeight = Math.floor(data.volume / _sketch.chart.volumeHeightRatio);
 						var volumeX = Math.floor(dotX - halfVolumeWidth),
 							volumeY = Math.floor(y_volume_axisX);
 
