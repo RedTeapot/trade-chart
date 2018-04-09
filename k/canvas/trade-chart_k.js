@@ -1,6 +1,20 @@
 ;(function(){
 	var TradeChart = window.TradeChart;
 	var util = TradeChart.util;
+	var Big = util.Big;
+
+	var numBig = function(big){
+		return Number(big.toString());
+	};
+	var roundBig = function(big){
+		return Math.round(numBig(big));
+	};
+	var floorBig = function(big){
+		return Math.floor(numBig(big));
+	};
+	var ceilBig = function(big){
+		return Math.ceil(numBig(big));
+	};
 
 	/** 默认图形绘制选项 */
 	var defaultChartConfig = {
@@ -38,10 +52,26 @@
 		axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
 		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 		axisYPriceFloor: function(min, max, avgVariation, maxVariation){
-			return min - avgVariation / 2;
+			if(!isFinite(min))
+				min = 0;
+			if(!isFinite(avgVariation))
+				avgVariation = 0;
+
+			min = Math.max(min, 0);
+			avgVariation = Math.abs(avgVariation);
+
+			return numBig(new Big(min).minus(new Big(avgVariation).div(2)));
 		},
 		axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
-			return max + avgVariation / 2;
+			if(!isFinite(max))
+				max = 0;
+			if(!isFinite(avgVariation))
+				avgVariation = 0;
+
+			max = Math.max(max, 0);
+			avgVariation = Math.abs(avgVariation);
+
+			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
 		},
 
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
@@ -99,14 +129,14 @@
 		chartSketch.contentWidth = Math.floor(chartSketch.width - config.axisXTickOffset - config.axisXTickOffsetFromRight);
 		/* 量图 */
 		if(config.showVolume){
-			chartSketch.height = Math.round(config.height * (1 - config.volumeAreaRatio) - config.paddingTop - config.volumeMarginTop);
-			chartSketch.volumeHeight = Math.round(config.height * config.volumeAreaRatio - config.paddingBottom);
+			chartSketch.height = roundBig(new Big(config.height).mul(1 - config.volumeAreaRatio).minus(config.paddingTop + config.volumeMarginTop));
+			chartSketch.volumeHeight = roundBig(new Big(config.height).mul(config.volumeAreaRatio).minus(config.paddingBottom));
 			chartSketch.volumeContentHeight = Math.floor(chartSketch.volumeHeight);
 		}else{
 			chartSketch.height = Math.floor(config.height - config.paddingTop - config.paddingBottom);
 		}
 		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
-		chartSketch.maxGroupCount = Math.floor((chartSketch.contentWidth - config.groupLineWidth) / (config.groupGap + config.groupBarWidth)) + 1;
+		chartSketch.maxGroupCount = floorBig(new Big(chartSketch.contentWidth).minus(config.groupLineWidth).div(config.groupGap + config.groupBarWidth)) + 1;
 
 		return chartSketch;
 	};
@@ -132,8 +162,7 @@
 	 * 根据给定的配置信息计算蜡烛一半的宽度
 	 */
 	var calcHalfGroupBarWidth = function(config){
-		var halfGroupBarWidth = Math.floor((config.groupBarWidth - config.groupLineWidth) / 2 + (config.groupLineWidth - 1) / 2);
-		return halfGroupBarWidth;
+		return floorBig(new Big(config.groupBarWidth - config.groupLineWidth).div(2).plus(new Big(config.groupLineWidth - 1).div(2)));
 	};
 
 	/**
@@ -202,36 +231,60 @@
 
 			previous.volume = d.volume;
 		}
-		dataSketch.origin.avgVariation = variationSum / datas.length;
-		dataSketch.origin.avgVolumeVariation = volumeVariationSum / datas.length;
+		var len = datas.length;
+		dataSketch.origin.avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
+		dataSketch.origin.avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
 
+		/* 确定Y轴最小值 */
 		if(null != config.axisYPriceFloor){
 			if(typeof config.axisYPriceFloor == "function")
 				dataSketch.extended.priceFloor = config.axisYPriceFloor(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
 			else
 				dataSketch.extended.priceFloor = Number(config.axisYPriceFloor);
 		}else
-			dataSketch.extended.priceFloor = dataSketch.origin.min - (dataSketch.origin.avgVariation / 2);
+			dataSketch.extended.priceFloor = dataSketch.origin.min - numBig(new Big(dataSketch.origin.avgVariation).div(2));
+		if(!isFinite(dataSketch.extended.priceFloor) || dataSketch.extended.priceFloor < 0)
+			dataSketch.extended.priceFloor = 0;
+
+		/* 确定Y轴最大值 */
 		if(null != config.axisYPriceCeiling){
 			if(typeof config.axisYPriceCeiling == "function")
 				dataSketch.extended.priceCeiling = config.axisYPriceCeiling(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
 			else
 				dataSketch.extended.priceCeiling = Number(config.axisYPriceCeiling);
 		}else
-			dataSketch.extended.priceCeiling = dataSketch.origin.max + (dataSketch.origin.avgVariation / 2);
-		dataSketch.extended.priceFloor = dataSketch.extended.priceFloor < 0? 0: dataSketch.extended.priceFloor;
-		dataSketch.extended.priceCeiling = dataSketch.extended.priceCeiling < dataSketch.origin.max? dataSketch.origin.max: dataSketch.extended.priceCeiling;
-		dataSketch.extended.priceCeiling = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor < 2E-7)? (dataSketch.extended.priceFloor + 1): dataSketch.extended.priceCeiling;
+			dataSketch.extended.priceCeiling = dataSketch.origin.max + numBig(new Big(dataSketch.origin.avgVariation).div(2));
+		if(dataSketch.extended.priceCeiling < dataSketch.origin.max)
+			dataSketch.extended.priceCeiling = dataSketch.origin.max;
+		if(!isFinite(dataSketch.extended.priceCeiling) || dataSketch.extended.priceCeiling < 0)
+			dataSketch.extended.priceCeiling = dataSketch.extended.priceFloor;
 
+		/* 确保最大值与最小值不同 */
+		var b = new Big(dataSketch.extended.priceFloor);
+		if(b.eq(dataSketch.extended.priceCeiling))
+			dataSketch.extended.priceCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+
+		/* 确定量图Y轴最小值 */
+		b = new Big(dataSketch.origin.avgVolumeVariation).div(2);
 		if(null != config.axisYVolumeFloor)
 			dataSketch.extended.volumeFloor = Number(config.axisYVolumeFloor);
 		else
-			dataSketch.extended.volumeFloor = dataSketch.origin.minVolume - (dataSketch.origin.avgVolumeVariation / 2);
-		dataSketch.extended.volumeCeiling = dataSketch.origin.maxVolume + (dataSketch.origin.avgVolumeVariation / 2);
-		dataSketch.extended.volumeFloor = dataSketch.extended.volumeFloor < 0? 0: dataSketch.extended.volumeFloor;
+			dataSketch.extended.volumeFloor = dataSketch.origin.minVolume - numBig(b);
+		if(!isFinite(dataSketch.extended.volumeFloor) || dataSketch.extended.volumeFloor < 0)
+			dataSketch.extended.volumeFloor = 0;
 
-		chartSketch.priceHeightRatio = (dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor) / chartSketch.contentHeight;
-		chartSketch.volumeHeightRatio = (dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor) / chartSketch.volumeContentHeight;
+		/* 确定量图Y轴最大值 */
+		dataSketch.extended.volumeCeiling = dataSketch.origin.maxVolume + numBig(b);
+
+		/* 确保最大值与最小值不同 */
+		b = new Big(dataSketch.extended.volumeFloor);
+		if(b.eq(dataSketch.extended.volumeCeiling))
+			dataSketch.extended.volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+
+		chartSketch.priceHeightRatio = numBig(new Big(dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor).div(Math.max(chartSketch.contentHeight, 1)));
+		chartSketch.priceHeightRatio = Math.max(chartSketch.priceHeightRatio, 1);
+		chartSketch.volumeHeightRatio = numBig(new Big(dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1)));
+		chartSketch.volumeHeightRatio = Math.max(chartSketch.volumeHeightRatio, 1);
 
 		return {data: dataSketch, chart: chartSketch};
 	};
@@ -352,7 +405,8 @@
 			}
 
 			var tmpX = x - minX;
-			var index = Math.ceil(tmpX / Math.floor(config.groupBarWidth + config.groupGap)) - 1;
+
+			var index = ceilBig(new Big(tmpX).div(Math.floor(config.groupBarWidth + config.groupGap))) - 1;
 			if(index < 0 || index >= groupCount)
 				return -1;
 
@@ -497,17 +551,18 @@
 			/** 一组数据的宽度 */
 			var groupSize = config.groupBarWidth + config.groupGap;
 			/** 一组数据宽度的一半 */
-			var halfGroupSize = Math.max(groupSize / 2, config.axisXLabelSize / 2);
+			var halfGroupSize = Math.max(numBig(new Big(groupSize).div(2)), numBig(new Big(config.axisXLabelSize).div(2)));
 			/** 绘制的数据个数 */
 			var groupCount = Math.min(_sketch.chart.maxGroupCount, datas.length);
 			/** 横坐标刻度之间相差的数据的个数 */
-			var axisXTickInterval = Math.ceil(config.axisXLabelSize / groupSize);
+			var axisXTickInterval = ceilBig(new Big(config.axisXLabelSize).div(groupSize));
+			axisXTickInterval = Math.max(axisXTickInterval, 1);
 			/** 横坐标刻度个数 */
-			var axisXTickCount = Math.floor(groupCount / axisXTickInterval);
+			var axisXTickCount = floorBig(new Big(groupCount).div(axisXTickInterval));
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYPriceInterval = (_sketch.data.extended.priceCeiling - _sketch.data.extended.priceFloor) / (config.axisYMidTickQuota + 1);
+			var axisYPriceInterval = numBig(new Big(_sketch.data.extended.priceCeiling - _sketch.data.extended.priceFloor).div(config.axisYMidTickQuota + 1));
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
-			var axisYHeightInterval = axisYPriceInterval / _sketch.chart.priceHeightRatio;
+			var axisYHeightInterval = numBig(new Big(axisYPriceInterval).div(_sketch.chart.priceHeightRatio));
 
 			var axisYPosition = String(config.axisYPosition).toLowerCase();
 			var ifShowAxisYLeft = "left" == axisYPosition,
@@ -542,7 +597,8 @@
 			var getHeight = function(price1, price2){
 				if(arguments.length < 2)
 					price2 = _sketch.data.extended.priceCeiling;
-				return Math.abs(price2 - price1) / _sketch.chart.priceHeightRatio;
+
+				return numBig(new Big(Math.abs(price2 - price1)).div(_sketch.chart.priceHeightRatio));
 			};
 
 			/* 绘制坐标系 */
@@ -637,11 +693,13 @@
 						lastTickDataIndex;/** 最后一个的刻度所对应的数据索引 */
 					if(renderFromLeftToRight){/* 从左向右 */
 						edgeTickDataIndex = groupCount - 1;
+
+						var b = new Big(axisXTickInterval);
 						for(var i = 0; i <= axisXTickCount - 1; i++){
-							var k = Math.round(i * axisXTickInterval);
+							var k = roundBig(b.mul(i));
 							renderXTick(k, true);
 						}
-						lastTickDataIndex = Math.min(Math.round(i * axisXTickInterval), groupCount - 1);
+						lastTickDataIndex = Math.min(roundBig(b.mul(i)), groupCount - 1);
 					}else{/* 从右向左 */
 						edgeTickDataIndex = 0;
 						for(var i = groupCount - 1, j = 0; i >= 0, j <= axisXTickCount - 1; i -= axisXTickInterval, j++){
@@ -651,8 +709,9 @@
 						lastTickDataIndex = Math.max(Math.round(i), 0);
 					}
 
-					var totalSpace = Math.min((groupCount - 1) * groupSize, _sketch.chart.contentWidth);
-					var remainingSpace = totalSpace - (lastTickDataIndex * groupSize - halfGroupBarWidth + halfGroupSize);
+					b = new Big(groupSize);
+					var totalSpace = Math.min(numBig(b.mul(groupCount - 1)), _sketch.chart.contentWidth);
+					var remainingSpace = totalSpace - (numBig(b.mul(lastTickDataIndex)) - halfGroupBarWidth + halfGroupSize);
 					if(remainingSpace < halfGroupSize){
 						/* 剩余空间不足，只绘制边界刻度 */
 						renderXTick(edgeTickDataIndex, renderFromLeftToRight);
@@ -688,8 +747,8 @@
 
 					/* 绘制Y轴刻度 */
 					for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
-						var price = _sketch.data.extended.priceFloor + i * axisYPriceInterval,
-							tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
+						var price = _sketch.data.extended.priceFloor + numBig(new Big(axisYPriceInterval).mul(i)),
+							tickOffset = numBig(new Big(axisYHeightInterval).mul(config.axisYMidTickQuota + 1 - i));
 						var tickY = Math.round(tickOffset);
 
 						/* 绘制网格横线 */
@@ -715,12 +774,12 @@
 					}
 					/* 量图 */
 					if(config.showVolume){
-						var axisYVolumeInterval = (_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor) / (config.volumeAxisYMidTickQuota + 1);
+						var axisYVolumeInterval = numBig(new Big(_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor).div(config.volumeAxisYMidTickQuota + 1));
 						if(_sketch.chart.volumeHeightRatio != 0){
-							var axisYHeightIntervalAux = axisYVolumeInterval / _sketch.chart.volumeHeightRatio;
+							var axisYHeightIntervalAux = numBig(new Big(axisYVolumeInterval).div(_sketch.chart.volumeHeightRatio));
 							for(var i = 0; i <= config.volumeAxisYMidTickQuota + 1; i++){
-								var volume = _sketch.data.extended.volumeFloor + i * axisYVolumeInterval,
-									tickOffset = (config.volumeAxisYMidTickQuota + 1 - i) * axisYHeightIntervalAux;
+								var volume = _sketch.data.extended.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i)),
+									tickOffset = numBig(new Big(axisYHeightIntervalAux).mul(config.volumeAxisYMidTickQuota + 1 - i));
 								var tickY = Math.round(tickOffset);
 
 								/* 绘制网格横线 */
@@ -794,7 +853,7 @@
 					/* 数据格式转换 */
 					data = dataParser? dataParser(data, i, datas): data;
 
-					var x = Math.floor(xLeft_axisX + config.axisXTickOffset + i * groupSize - halfGroupBarWidth);
+					var x = Math.floor(xLeft_axisX + config.axisXTickOffset + numBig(new Big(groupSize).mul(i)) - halfGroupBarWidth);
 					// if(fromLeft)
 					// 	x = Math.floor(xLeft_axisX + config.axisXTickOffset + i * groupSize - halfGroupBarWidth);
 					// else
@@ -809,7 +868,7 @@
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);
 
 					/* 绘制线 */
-					var lineX = x + Math.floor((config.groupBarWidth - config.groupLineWidth) / 2),
+					var lineX = x + floorBig(new Big(config.groupBarWidth - config.groupLineWidth).div(2)),
 						lineYTop = Math.floor(yTop_axisY + getHeight(maxLinePrice));
 					var lineYBottom = lineYTop + Math.floor(getHeight(data.highPrice, data.lowPrice));
 					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
@@ -853,7 +912,7 @@
 						if(null == d)
 							return;
 
-						var dotX = lineX + Math.floor((config.groupLineWidth + 1) / 2),
+						var dotX = lineX + floorBig(new Big(config.groupLineWidth + 1).div(2)),
 							dotY = Math.floor(yTop_axisY + getHeight(d));
 						maDots[k].push([dotX, dotY]);
 					});
@@ -863,7 +922,7 @@
 						ctx.save();
 						ctx.fillStyle = config.volumeColor;
 
-						var volumeHeight = Math.floor(data.volume / _sketch.chart.volumeHeightRatio);
+						var volumeHeight = floorBig(new Big(data.volume).div(_sketch.chart.volumeHeightRatio));
 						ctx.strokeWidth = 0;
 						ctx.rect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
 						ctx.fill();

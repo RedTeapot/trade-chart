@@ -1,6 +1,20 @@
 ;(function(){
 	var TradeChart = window.TradeChart;
 	var util = TradeChart.util;
+	var Big = util.Big;
+
+	var numBig = function(big){
+		return Number(big.toString());
+	};
+	var roundBig = function(big){
+		return Math.round(numBig(big));
+	};
+	var floorBig = function(big){
+		return Math.floor(numBig(big));
+	};
+	var ceilBig = function(big){
+		return Math.ceil(numBig(big));
+	};
 
 	/** 默认图形绘制选项 */
 	var defaultChartConfig = {
@@ -42,10 +56,26 @@
 		axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
 		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 		axisYAmountFloor: function(min, max, avgVariation, maxVariation){
-			return min - avgVariation / 2;
+			if(!isFinite(min))
+				min = 0;
+			if(!isFinite(avgVariation))
+				avgVariation = 0;
+
+			min = Math.max(min, 0);
+			avgVariation = Math.abs(avgVariation);
+
+			return numBig(new Big(min).minus(new Big(avgVariation).div(2)));
 		},
 		axisYAmountCeiling: function(min, max, avgVariation, maxVariation){
-			return max + avgVariation / 2;
+			if(!isFinite(max))
+				max = 0;
+			if(!isFinite(avgVariation))
+				avgVariation = 0;
+
+			max = Math.max(max, 0);
+			avgVariation = Math.abs(avgVariation);
+
+			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
 		},
 
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
@@ -86,7 +116,8 @@
 	 */
 	var calcChartContentWidth = function(config){
 		var axisWidth = calcChartAxisWidth(config);
-		return Math.floor((axisWidth - config.axisXTickOffset - config.axisXTickOffsetFromRight - config.enclosedAreaGap) / 2);
+
+		return floorBig(new Big(axisWidth - config.axisXTickOffset - config.axisXTickOffsetFromRight - config.enclosedAreaGap).div(2));
 	};
 
 	/**
@@ -111,7 +142,7 @@
 		chartSketch.height =  Math.floor(config.height - config.paddingTop - config.paddingBottom);
 		chartSketch.contentWidth = calcChartContentWidth(config);
 		chartSketch.contentHeight = Math.floor(chartSketch.height - config.axisYTickOffset);
-		chartSketch.maxDotCount = Math.floor(chartSketch.contentWidth / (config.dotGap + 1)) + 1;
+		chartSketch.maxDotCount = floorBig(new Big(chartSketch.contentWidth).div(config.dotGap + 1)) + 1;
 
 		return chartSketch;
 	};
@@ -177,27 +208,40 @@
 			variationSum += variation;
 			previous = d;
 		}
-		dataSketch.origin.avgAmountVariation = variationSum / datas.length;
+		var len = datas.length;
+		dataSketch.origin.avgAmountVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
 
+		/* 确定Y轴最小值 */
 		if(null != config.axisYAmountFloor){
 			if(typeof config.axisYAmountFloor == "function")
 				dataSketch.extended.amountFloor = config.axisYAmountFloor(dataSketch.origin.minAmount, dataSketch.origin.maxAmount, dataSketch.origin.avgAmountVariation, dataSketch.origin.maxAmountVariation);
 			else
 				dataSketch.extended.amountFloor = Number(config.axisYAmountFloor);
 		}else
-			dataSketch.extended.amountFloor = dataSketch.origin.minAmount - (dataSketch.origin.avgAmountVariation / 2);
+			dataSketch.extended.amountFloor = dataSketch.origin.minAmount - numBig(new Big(dataSketch.origin.avgAmountVariation).div(2));
+		if(!isFinite(dataSketch.extended.amountFloor) || dataSketch.extended.amountFloor < 0)
+			dataSketch.extended.amountFloor = 0;
+
+		/* 确定Y轴最大值 */
 		if(null != config.axisYAmountCeiling){
 			if(typeof config.axisYAmountCeiling == "function")
 				dataSketch.extended.amountCeiling = config.axisYAmountCeiling(dataSketch.origin.minAmount, dataSketch.origin.maxAmount, dataSketch.origin.avgAmountVariation, dataSketch.origin.maxAmountVariation);
 			else
 				dataSketch.extended.amountCeiling = Number(config.axisYAmountCeiling);
 		}else
-			dataSketch.extended.amountCeiling = dataSketch.origin.maxAmount + (dataSketch.origin.avgAmountVariation / 2);
-		dataSketch.extended.amountFloor = dataSketch.extended.amountFloor < 0? 0: dataSketch.extended.amountFloor;
-		dataSketch.extended.amountCeiling = dataSketch.extended.amountCeiling < dataSketch.origin.maxAmount? dataSketch.origin.maxAmount: dataSketch.extended.amountCeiling;
-		dataSketch.extended.amountCeiling = (dataSketch.extended.amountCeiling - dataSketch.extended.amountFloor < 2E-7)? (dataSketch.extended.amountFloor + 1): dataSketch.extended.amountCeiling;
+			dataSketch.extended.amountCeiling = dataSketch.origin.maxAmount + numBig(new Big(dataSketch.origin.avgAmountVariation).div(2));
+		if(dataSketch.extended.amountCeiling < dataSketch.origin.maxAmount)
+			dataSketch.extended.amountCeiling = dataSketch.origin.maxAmount;
+		if(!isFinite(dataSketch.extended.amountCeiling) || dataSketch.extended.amountCeiling < 0)
+			dataSketch.extended.amountCeiling = dataSketch.extended.amountFloor;
 
-		chartSketch.amountHeightRatio = (dataSketch.extended.amountCeiling - dataSketch.extended.amountFloor) / chartSketch.contentHeight;
+		/* 确保最大值与最小值不同 */
+		var b = new Big(dataSketch.extended.amountFloor);
+		if(b.eq(dataSketch.extended.amountCeiling))
+			dataSketch.extended.amountCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+
+		chartSketch.amountHeightRatio = numBig(new Big(dataSketch.extended.amountCeiling - dataSketch.extended.amountFloor).div(chartSketch.contentHeight));
+		chartSketch.amountHeightRatio = Math.max(chartSketch.amountHeightRatio, 1);
 
 		return {data: dataSketch, chart: chartSketch};
 	};
@@ -213,7 +257,7 @@
 		var maxX = minX + Math.floor(sketch.chart.contentWidth - 1);/* -1是因为minX占据了1个像素，其上也可以绘制。下同 */
 
 		if(arguments.length >= 3)
-			maxX = minX + Math.floor(Math.max(datas.length - 1, 0) * config.dotGap + datas.length - 1);
+			maxX = minX + Math.floor(numBig(new Big(config.dotGap).mul(Math.max(datas.length - 1, 0))) + datas.length - 1);
 
 		return {min: minX, max: maxX};
 	};
@@ -229,7 +273,7 @@
 		var minX = maxX - Math.floor(sketch.chart.contentWidth - 1);/* -1是因为maxX占据了1个像素，其上也可以绘制。下同 */
 
 		if(arguments.length >= 3)
-			minX = maxX - Math.floor(Math.max(datas.length - 1, 0) * config.dotGap + datas.length - 1);
+			minX = maxX - Math.floor(numBig(new Big( config.dotGap).mul(Math.max(datas.length - 1, 0))) + datas.length - 1);
 
 		return {min: minX, max: maxX};
 	};
@@ -252,7 +296,7 @@
 		if("auto" == String(config.dotGap).toLowerCase()){
 			var contentWidth = calcChartContentWidth(config);
 			var dotCount = Math.min(contentWidth, Math.max((datas.buyer || []).length, (datas.seller || []).length));/* 再密集，也只能一个点一个像素 */
-			var dotGap = dotCount <= 1? (contentWidth - dotCount): ((contentWidth - dotCount) / (dotCount - 1));
+			var dotGap = dotCount <= 1? (contentWidth - dotCount): numBig(new Big(contentWidth - dotCount).div(dotCount - 1));
 
 			console.info("Auto set depth chart dot gap to " + dotGap);
 			config.dotGap = dotGap;
@@ -368,7 +412,7 @@
 				x = Math.min(section.max, x);
 
 				tmpX = x - section.min;
-				rst.dataIndex = Math.round(tmpX / (config.dotGap + 1));
+				rst.dataIndex = roundBig(new Big(tmpX).div(config.dotGap + 1));
 
 				return rst;
 			};
@@ -448,8 +492,8 @@
 			data = dataParser? dataParser(data, dataPosition.dataIndex): data;
 
 			var obj = {x: 0, y: 0};
-			obj.x = minX + Math.round(dataPosition.dataIndex * (config.dotGap + 1)) + ("seller" == dataPosition.area? sellerAreaHorizontalOffset: 0);
-			obj.y = minY + Math.round(Math.abs(sketch.data.extended.amountCeiling - data.amount) / sketch.chart.amountHeightRatio);
+			obj.x = minX + roundBig(new Big(dataPosition.dataIndex).mul(config.dotGap + 1)) + ("seller" == dataPosition.area? sellerAreaHorizontalOffset: 0);
+			obj.y = minY + roundBig(new Big(Math.abs(sketch.data.extended.amountCeiling - data.amount)).div(sketch.chart.amountHeightRatio));
 
 			return obj;
 		};
@@ -563,7 +607,7 @@
 				sellerAreaDotCount = Math.min(_sketch.chart.maxDotCount, datas.seller.length);
 
 			/** 横坐标刻度之间相差的点的个数 */
-			var axisXTickInterval = Math.ceil(config.axisXLabelSize / (config.dotGap + 1));
+			var axisXTickInterval = ceilBig(new Big(config.axisXLabelSize).div(config.dotGap + 1));
 
 			console.log("Depth chart buyer area x section: " + JSON.stringify(buyerAreaXSection));
 			console.log("Depth chart buyer area dot count: " + buyerAreaDotCount);
@@ -627,7 +671,7 @@
 
 						var data = dataParser? dataParser(datas[area][i], i): datas[area][i];
 						var minX = "buyer" == area? buyerAreaXSection.min: sellerAreaXSection.min;
-						var tickX = minX + Math.round(i * (config.dotGap + 1));
+						var tickX = minX + roundBig(new Big(config.dotGap + 1).mul(i));
 
 						/* 绘制网格竖线 */
 						if(ifShowVerticalGridLine){
@@ -662,16 +706,18 @@
 					 */
 					var renderAreaTick = function(area){
 						var groupSize = config.dotGap + 1,
-							halfGroupSize = config.axisXLabelSize / 2,
+							halfGroupSize = numBig(new Big(config.axisXLabelSize).div(2)),
 							dotCount = Math.min(_sketch.chart.maxDotCount, datas[area].length);
 
-						var i = 0, axisXTickCount = Math.floor(dotCount / axisXTickInterval);
-						for(; i < axisXTickCount; i++)
-							renderXTick(i * axisXTickInterval, area);
-						var lastTickDataIndex = Math.round(i * axisXTickInterval);
+						var i = 0, axisXTickCount = floorBig(new Big(dotCount).div(axisXTickInterval));
 
-						var totalSpace = Math.min((dotCount - 1) * (config.dotGap + 1), _sketch.chart.contentWidth);
-						var remainingSpace = totalSpace - (lastTickDataIndex * groupSize + halfGroupSize);
+						var b = new Big(axisXTickInterval);
+						for(; i < axisXTickCount; i++)
+							renderXTick(numBig(b.mul(i)), area);
+						var lastTickDataIndex = roundBig(b.mul(i));
+
+						var totalSpace = Math.min(numBig(new Big(dotCount - 1).mul(config.dotGap + 1)), _sketch.chart.contentWidth);
+						var remainingSpace = totalSpace - (numBig(new Big(lastTickDataIndex).mul(groupSize)) + halfGroupSize);
 						if(remainingSpace < halfGroupSize){
 							/* 剩余空间不足，只绘制边界刻度 */
 							renderXTick(dotCount - 1, area);
@@ -709,11 +755,13 @@
 						axisYLabelOffset = (ifShowAxisYLeft? -1: 1) * (config.axisTickLineLength + config.axisYLabelOffset);
 
 					/* 绘制Y轴刻度 */
-					var axisYAmountInterval = (_sketch.data.extended.amountCeiling - _sketch.data.extended.amountFloor) / (config.axisYMidTickQuota + 1);
-					var axisYHeightInterval = axisYAmountInterval / _sketch.chart.amountHeightRatio;
+					var axisYAmountInterval = numBig(new Big(_sketch.data.extended.amountCeiling - _sketch.data.extended.amountFloor).div(config.axisYMidTickQuota + 1));
+
+					var b = new Big(axisYAmountInterval);
+					var axisYHeightInterval = numBig(b.div(_sketch.chart.amountHeightRatio));
 					for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
-						var amount = _sketch.data.extended.amountFloor + i * axisYAmountInterval,
-							tickOffset = (config.axisYMidTickQuota + 1 - i) * axisYHeightInterval;
+						var amount = _sketch.data.extended.amountFloor + numBig(b.mul(i)),
+							tickOffset = numBig(new Big(config.axisYMidTickQuota + 1 - i).mul(axisYHeightInterval));
 						var tickY = yTop_axisY + Math.round(tickOffset);
 
 						/* 绘制网格横线, 最后（自上而下）一条网格横线和坐标轴重合时不绘制 */
@@ -779,8 +827,8 @@
 						data = dataParser? dataParser(data, i): data;
 
 						var amountVariation = _sketch.data.extended.amountCeiling - data.amount;
-						var height = amountVariation / _sketch.chart.amountHeightRatio;
-						dotX = minX + Math.round(i * (config.dotGap + 1));/* 保留两位小数 */
+						var height = numBig(new Big(amountVariation).div(_sketch.chart.amountHeightRatio));
+						dotX = minX + roundBig(new Big(config.dotGap + 1).mul(i));/* 保留两位小数 */
 						dotY = yTop_axisY + Math.floor(height);
 						dots.push([dotX, dotY]);
 					}
@@ -879,7 +927,7 @@
 					var text4Buyer = config.enclosedAreaBelongingText4Buyer;
 					if(null != text4Buyer && "" != (text4Buyer = String(text4Buyer).trim())){
 						ctx.beginPath();
-						var x = (buyerAreaXSection.min + buyerAreaXSection.max) / 2;
+						var x = numBig(new Big(buyerAreaXSection.min + buyerAreaXSection.max).div(2));
 						ctx.fillText(text4Buyer, x, config.paddingTop + 20);
 						ctx.stroke();
 					}
@@ -887,7 +935,7 @@
 					var text4Seller = config.enclosedAreaBelongingText4Seller;
 					if(null != text4Seller && "" != (text4Seller = String(text4Seller).trim())){
 						ctx.beginPath();
-						var x = (sellerAreaXSection.min + sellerAreaXSection.max) / 2;
+						var x = numBig(new Big(sellerAreaXSection.min + sellerAreaXSection.max).div(2));
 						ctx.fillText(text4Seller, x, config.paddingTop + 20);
 						ctx.stroke();
 					}
