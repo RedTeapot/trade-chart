@@ -16,6 +16,19 @@
 		return Math.ceil(numBig(big));
 	};
 
+	/**
+	 * @typedef IntentionData
+	 * @type {Object}
+	 *
+	 * @property {Number} price 价格
+	 * @property {Number} amount 数量
+	 */
+
+	/**
+	 * @typedef IntentionList
+	 * @type {{buy: IntentionData[], sale: IntentionData[]}}
+	 */
+
 	/** 默认图形绘制选项 */
 	var defaultChartConfig = {
 		width: "100%",/* 整体图形宽度 */
@@ -154,6 +167,7 @@
 	 */
 	var calcMaxDotCount = function(canvasObj, config){
 		config = util.cloneObject(config, true);
+		config = util.setDftValue(config, defaultChartConfig);
 
 		/** 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
@@ -240,8 +254,8 @@
 		if(b.eq(dataSketch.extended.amountCeiling))
 			dataSketch.extended.amountCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
-		chartSketch.amountHeightRatio = numBig(new Big(dataSketch.extended.amountCeiling - dataSketch.extended.amountFloor).div(chartSketch.contentHeight));
-		chartSketch.amountHeightRatio = Math.max(chartSketch.amountHeightRatio, 1);
+		b = new Big(dataSketch.extended.amountCeiling - dataSketch.extended.amountFloor).div(chartSketch.contentHeight);
+		chartSketch.amountHeightRatio = b.eq(0)? 1: numBig(b);
 
 		return {data: dataSketch, chart: chartSketch};
 	};

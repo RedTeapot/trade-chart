@@ -16,6 +16,23 @@
 		return Math.ceil(numBig(big));
 	};
 
+	/**
+	 * @typedef KData
+	 * @type {Object}
+	 *
+	 * @property {String} time 时间
+	 * @property {Number} openPrice 开盘价
+	 * @property {Number} highPrice 最高价
+	 * @property {Number} lowPrice 最低价
+	 * @property {Number} closePrice 收盘价
+	 * @property {Number} volume 成交量
+	 *
+	 * @property {Number} MA5 MA5指标
+	 * @property {Number} MA10 MA10指标
+	 * @property {Number} MA20 MA20指标
+	 * @property {Number} MA30 MA30指标
+	 */
+
 	/** 默认图形绘制选项 */
 	var defaultChartConfig = {
 		width: "100%",/* 整体图形宽度 */
@@ -81,9 +98,9 @@
 		showVerticalGridLine: true,/** 是否绘制网格横线 */
 		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 
-		appreciatedColor: "red",/** 收盘价大于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
-		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
-		keepedColor: "white",/** 收盘价等于开盘价时的绘制蜡烛和线时用的画笔和油漆桶颜色 */
+		appreciatedColor: "red",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		keepedColor: "white",/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 
 		coordinateBackground: null,/** 坐标系围成的矩形区域的背景色 */
 
@@ -94,6 +111,8 @@
 		volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYVolumeFloor: null, /** 纵坐标最小刻度, 为null时自动 */
 		volumeColor: "orange", /** 量图颜色（柱状图）*/
+		appreciatedVolumeColor: "orange",/** 收盘价大于开盘价时，绘制量图用的画笔或油漆桶颜色 */
+		depreciatedVolumeColor: "orange",/** 收盘价小于开盘价时，绘制量图用的画笔或油漆桶颜色 */
 
 		showMAArr: [5, 10, 20, 30], /** 要显示的MA线 */
 		MAColorArr: ["orange", "blue", "purple", "black"], /** 每条MA线对应的颜色 */
@@ -148,6 +167,7 @@
 	 */
 	var calcMaxGroupCount = function(canvasObj, config){
 		config = util.cloneObject(config, true);
+		config = util.setDftValue(config, defaultChartConfig);
 
 		/** 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
@@ -281,10 +301,10 @@
 		if(b.eq(dataSketch.extended.volumeCeiling))
 			dataSketch.extended.volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
-		chartSketch.priceHeightRatio = numBig(new Big(dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor).div(Math.max(chartSketch.contentHeight, 1)));
-		chartSketch.priceHeightRatio = Math.max(chartSketch.priceHeightRatio, 1);
-		chartSketch.volumeHeightRatio = numBig(new Big(dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1)));
-		chartSketch.volumeHeightRatio = Math.max(chartSketch.volumeHeightRatio, 1);
+		b = new Big(dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor).div(Math.max(chartSketch.contentHeight, 1));
+		chartSketch.priceHeightRatio = b.eq(0)? 1: numBig(b);
+		b = new Big(dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1));
+		chartSketch.volumeHeightRatio = b.eq(0)? 1: numBig(b);
 
 		return {data: dataSketch, chart: chartSketch};
 	};
@@ -873,29 +893,26 @@
 					var lineYBottom = lineYTop + Math.floor(getHeight(data.highPrice, data.lowPrice));
 					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
 						lineYBottom += 1;
-					ctx.beginPath();
 					if(config.groupLineWidth > 1){
 						ctx.strokeWidth = 0;
-						ctx.rect(lineX, lineYTop, config.groupLineWidth, Math.abs(lineYBottom - lineYTop));
-						ctx.fill();
+						ctx.fillRect(lineX, lineYTop, config.groupLineWidth, Math.abs(lineYBottom - lineYTop));
 					}else{
 						ctx.strokeWidth = 1;
+
+						ctx.beginPath();
 						ctx.moveTo(lineX + 0.5, lineYTop + 0.5);
 						ctx.lineTo(lineX + 0.5, lineYBottom + 0.5);
 						ctx.stroke();
 					}
 
 					/* 绘制蜡烛 */
-					ctx.beginPath();
 					var barX = x,
 						barY = Math.floor(yTop_axisY + getHeight(maxBarPrice)) + 0.5;
 					var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
 					if(0 == barHeight)
 						barHeight = 1;
-					ctx.beginPath();
 					ctx.strokeWidth = 0;
-					ctx.rect(barX, barY, config.groupBarWidth, barHeight);
-					ctx.fill();
+					ctx.fillRect(barX, barY, config.groupBarWidth, barHeight);
 
 					if(typeof callback == "function")
 						callback(data, i, lineX, barX);
@@ -903,6 +920,10 @@
 
 				var maDots = [];
 				var f = function(data, i, lineX, barX){
+					var isAppreciated = data.closePrice > data.openPrice,
+						isDepreciated = data.closePrice < data.openPrice,
+						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
+
 					/* 整理MA线数据 */
 					config.showMAArr.forEach(function(num, k){
 						if(maDots[k] == null)
@@ -920,12 +941,11 @@
 					/* 绘制量图 */
 					if(config.showVolume){
 						ctx.save();
-						ctx.fillStyle = config.volumeColor;
+						ctx.strokeWidth = 0;
+						ctx.fillStyle = isAppreciated? config.appreciatedVolumeColor: (isKeeped? config.volumeColor: config.depreciatedVolumeColor);
 
 						var volumeHeight = floorBig(new Big(data.volume).div(_sketch.chart.volumeHeightRatio));
-						ctx.strokeWidth = 0;
-						ctx.rect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
-						ctx.fill();
+						ctx.fillRect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
 						ctx.restore();
 					}
 				};

@@ -16,6 +16,18 @@
 		return Math.ceil(numBig(big));
 	};
 
+	/**
+	 * @typedef TrendData
+	 * @type {Object}
+	 *
+	 * @property {String} time 时间
+	 * @property {Number} price 价格
+	 * @property {Number} avgPrice 均价
+	 * @property {Number} openPrice 开盘价
+	 * @property {Number} closePrice 收盘价
+	 * @property {Number} volume 成交量
+	 */
+
 	/** 默认图形绘制选项 */
 	var defaultChartConfig = {
 		width: "100%",/* 整体图形宽度 */
@@ -92,13 +104,15 @@
 		enclosedAreaBackground: null,/** 折线与X轴围绕而成的封闭区域的背景色 */
 
 		showVolume: false,  /** 是否显示量图 */
+		volumeWidth: 3, /** 量图每个柱状图的宽度。最好为奇数，从而使得线可以正好在正中间*/
 		volumeAreaRatio: 0.33, /** 量图区域所占比例 0~1 */
 		volumeMarginTop: 15,/** 量图区的顶部外边距 （即与图形区的间距）*/
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 		volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYVolumeFloor: null, /** 纵坐标最小刻度, 为null时自动 */
 		volumeColor: "orange", /** 量图颜色（柱状图）, 可以为数组*/
-		volumeWidth: 3, /** 量图每个柱状图的宽度。最好为奇数，从而使得线可以正好在正中间*/
+		appreciatedVolumeColor: "orange",/** 收盘价大于开盘价时，绘制量图用的画笔或油漆桶颜色 */
+		depreciatedVolumeColor: "orange",/** 收盘价小于开盘价时，绘制量图用的画笔或油漆桶颜色 */
 
 		showAvgPriceLine: false, /** 是否显示均价 */
 		avgPriceLineWidth: 1, /** 均线线宽 */
@@ -180,6 +194,7 @@
 	 */
 	var calcMaxDotCount = function(canvasObj, config){
 		config = util.cloneObject(config, true);
+		config = util.setDftValue(config, defaultChartConfig);
 
 		/** 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
@@ -225,15 +240,13 @@
 			/* 数据格式转换 */
 			d = dataParser? dataParser(d, i, datas): d;
 
-			if(d.avgPrice != null){
-				dataSketch.origin.max = Math.max(+d.price, +d.avgPrice, dataSketch.origin.max);
-				dataSketch.origin.min = Math.min(+d.price, +d.avgPrice, dataSketch.origin.min);
-			}else{
-				if(+d.price > dataSketch.origin.max)
-					dataSketch.origin.max = +d.price;
-				if(+d.price < dataSketch.origin.min)
-					dataSketch.origin.min = +d.price;
-			}
+			var avgPrice = d.avgPrice || 0,
+				openPrice = d.openPrice || 0,
+				closePrice = d.closePrice || 0;
+
+			dataSketch.origin.min = Math.min(+d.price, +avgPrice, +openPrice, +closePrice, dataSketch.origin.min);
+			dataSketch.origin.max = Math.max(+d.price, +avgPrice, +openPrice, +closePrice, dataSketch.origin.max);
+
 			if(+d.volume > dataSketch.origin.maxVolume)
 				dataSketch.origin.maxVolume = +d.volume;
 			if(+d.volume < dataSketch.origin.minVolume)
@@ -301,10 +314,10 @@
 		if(b.eq(dataSketch.extended.volumeCeiling))
 			dataSketch.extended.volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
-		chartSketch.priceHeightRatio = numBig(new Big(dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor).div(Math.max(chartSketch.contentHeight, 1)));
-		chartSketch.priceHeightRatio = Math.max(chartSketch.priceHeightRatio, 1);
-		chartSketch.volumeHeightRatio = numBig(new Big(dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1)));
-		chartSketch.volumeHeightRatio = Math.max(chartSketch.volumeHeightRatio, 1);
+		b = new Big(dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor).div(Math.max(chartSketch.contentHeight, 1));
+		chartSketch.priceHeightRatio = b.eq(0)? 1: numBig(b);
+		b = new Big(dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1));
+		chartSketch.volumeHeightRatio = b.eq(0)? 1: numBig(b);
 
 		return {data: dataSketch, chart: chartSketch};
 	};
@@ -900,9 +913,19 @@
 					if(config.showVolume){
 						ctx.save();
 
+						var isOpenPriceEmpty = null == data.openPrice || "" == String(data.openPrice).trim(),
+							isClosePriceEmpty = null == data.closePrice || "" == String(data.closePrice).trim();
+						var isOpenPriceValid = !isOpenPriceEmpty && !isNaN(data.openPrice = Number(data.openPrice)),
+							isClosePriceValid = !isClosePriceEmpty && !isNaN(data.closePrice = Number(data.closePrice));
+						var isKeeped = !isOpenPriceValid || !isClosePriceValid || Math.abs(+data.closePrice - +data.openPrice) < 2e-7,
+							isAppreciated = !isKeeped && (data.closePrice > data.openPrice),
+							isDepreciated = !isKeeped && (data.closePrice < data.openPrice);
+
 						var volumeColor = config.volumeColor;
 						if(Array.isArray(volumeColor))
 							volumeColor = volumeColor[i % volumeColor.length];
+						else
+							volumeColor = isKeeped? config.volumeColor: (isAppreciated? config.appreciatedVolumeColor: config.depreciatedVolumeColor);
 						ctx.fillStyle = volumeColor;
 						ctx.strokeWidth = 0;
 
@@ -910,10 +933,7 @@
 						var volumeX = Math.floor(dotX - halfVolumeWidth),
 							volumeY = Math.floor(y_volume_axisX);
 
-						ctx.beginPath();
-						ctx.rect(volumeX, volumeY - volumeHeight, volumeWidth, volumeHeight);
-						ctx.fill();
-
+						ctx.fillRect(volumeX, volumeY - volumeHeight, volumeWidth, volumeHeight);
 						ctx.restore();
 					}
 				}
