@@ -57,7 +57,7 @@
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
-		axisXLabelGenerator: function(convertedData, index){/* 横坐标标签文字的输出方法 */
+		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/* 横坐标标签文字的输出方法 */
 			return convertedData.price;
 		},
 
@@ -686,7 +686,7 @@
 						if(i < 0 || i >= dotCount)
 							return;
 
-						var data = dataParser? dataParser(datas[area][i], i): datas[area][i];
+						var data = dataParser? dataParser(datas[area][i], i, datas[area]): datas[area][i];
 						var minX = "buyer" == area? buyerAreaXSection.min: sellerAreaXSection.min;
 						var tickX = minX + roundBig(new Big(config.dotGap + 1).mul(i));
 
@@ -712,7 +712,13 @@
 						ctx.moveTo(tickX, y_axisX);
 						ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
 
-						var label = config.axisXLabelGenerator(data, i);
+						var previousData = i == 0? null: datas[area][i - 1],
+							nextData = datas[area][i + 1];
+						if(null != previousData && dataParser)
+							previousData = dataParser(previousData, i - 1, datas[area]);
+						if(null != nextData && dataParser)
+							nextData = dataParser(nextData, i + 1, datas[area]);
+						var label = config.axisXLabelGenerator(data, i, previousData, nextData);
 						ctx.fillText(label, tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
 						ctx.stroke();
 						ctx.restore();

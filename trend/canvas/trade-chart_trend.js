@@ -56,7 +56,7 @@
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
-		axisXLabelGenerator: function(convertedData, index){/* 横坐标标签文字的输出方法 */
+		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/* 横坐标标签文字的输出方法 */
 			return convertedData.time;
 		},
 
@@ -684,7 +684,15 @@
 
 						if(arguments.length < 2){
 							var data = dataParser? dataParser(datas[i], i, datas): datas[i];
-							label = config.axisXLabelGenerator(data, i);
+
+							var previousData = i == 0? null: datas[i - 1],
+								nextData = datas[i + 1];
+							if(null != previousData && dataParser)
+								previousData = dataParser(previousData, i - 1, datas);
+							if(null != nextData && dataParser)
+								nextData = dataParser(nextData, i + 1, datas);
+
+							label = config.axisXLabelGenerator(data, i, previousData, nextData);
 						}
 
 						var x = numBig(new Big(config.dotGap + 1).mul(i));
