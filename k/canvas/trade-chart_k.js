@@ -57,6 +57,9 @@
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定以何种方式绘制最后一个刻度：只绘制边界刻度，还是边界刻度和最后一个刻度都绘制） */
+		axisXLabelGenerator: function(convertedData, index){/* 横坐标标签文字的输出方法 */
+			return convertedData.time;
+		},
 
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
@@ -698,8 +701,10 @@
 							ctx.moveTo(tickX, y_volume_axisX);
 							ctx.lineTo(tickX, y_volume_axisX + config.axisTickLineLength);
 						}
+
 						/* 绘制坐标取值 */
-						ctx.fillText(data.time, tickX, (config.showVolume? y_volume_axisX: y_axisX) + config.axisTickLineLength + config.axisXLabelOffset);
+						var label = config.axisXLabelGenerator(data, i);
+						ctx.fillText(label, tickX, (config.showVolume? y_volume_axisX: y_axisX) + config.axisTickLineLength + config.axisXLabelOffset);
 						ctx.stroke();
 
 						ctx.restore();

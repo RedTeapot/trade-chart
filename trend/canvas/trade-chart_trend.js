@@ -56,6 +56,9 @@
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/* 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
+		axisXLabelGenerator: function(convertedData, index){/* 横坐标标签文字的输出方法 */
+			return convertedData.time;
+		},
 
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
@@ -673,7 +676,7 @@
 					/**
 					 * 根据提供的点的索引位置绘制刻度
 					 * @param {Integer} i 数据的索引位置
-					 * @param {String} [label] 刻度文本。缺省时，将显示数据的time字段
+					 * @param {String} [label] 刻度文本。缺省时，将使用axisXLabelGenerator自动生成（默认为time字段）
 					 */
 					var renderXTickByDataIndex = function(i, label){
 						if(i < 0 || i >= dotCount)
@@ -681,7 +684,7 @@
 
 						if(arguments.length < 2){
 							var data = dataParser? dataParser(datas[i], i, datas): datas[i];
-							label = data.time;
+							label = config.axisXLabelGenerator(data, i);
 						}
 
 						var x = numBig(new Big(config.dotGap + 1).mul(i));
