@@ -53,6 +53,8 @@
 		axisLabelColor: null,/** 坐标标签颜色 */
 		axisLineColor: null,/** 坐标轴颜色 */
 
+		showAxisXLine: true,/* 是否绘制横坐标轴 */
+		showAxisXLabel: true,/* 是否绘制横坐标刻度值 */
 		axisXTickOffset: 5,/* 横坐标刻度距离原点的位移 */
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
@@ -61,6 +63,8 @@
 			return convertedData.price;
 		},
 
+		showAxisYLine: true,/* 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/* 是否绘制纵坐标刻度值 */
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
@@ -671,10 +675,12 @@
 
 				/* 绘制X轴 */
 				;(function(){
-					ctx.beginPath();
-					ctx.moveTo(xLeft_axisX, y_axisX);
-					ctx.lineTo(xRight_axisX, y_axisX);
-					ctx.stroke();
+					if(config.showAxisXLine){
+						ctx.beginPath();
+						ctx.moveTo(xLeft_axisX, y_axisX);
+						ctx.lineTo(xRight_axisX, y_axisX);
+						ctx.stroke();
+					}
 
 					/**
 					 * 根据提供的点的索引位置和区域信息绘制刻度
@@ -708,19 +714,23 @@
 						ctx.textBaseline = "top";
 
 						/* 绘制刻度线 */
-						ctx.beginPath();
-						ctx.moveTo(tickX, y_axisX);
-						ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
+						if(config.showAxisXLine && config.showAxisXLabel){
+							ctx.beginPath();
+							ctx.moveTo(tickX, y_axisX);
+							ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
+							ctx.stroke();
+						}
+						if(config.showAxisXLabel){
+							var previousData = i == 0? null: datas[area][i - 1],
+								nextData = datas[area][i + 1];
+							if(null != previousData && dataParser)
+								previousData = dataParser(previousData, i - 1, datas[area]);
+							if(null != nextData && dataParser)
+								nextData = dataParser(nextData, i + 1, datas[area]);
+							var label = config.axisXLabelGenerator(data, i, previousData, nextData);
+							ctx.fillText(label, tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
+						}
 
-						var previousData = i == 0? null: datas[area][i - 1],
-							nextData = datas[area][i + 1];
-						if(null != previousData && dataParser)
-							previousData = dataParser(previousData, i - 1, datas[area]);
-						if(null != nextData && dataParser)
-							nextData = dataParser(nextData, i + 1, datas[area]);
-						var label = config.axisXLabelGenerator(data, i, previousData, nextData);
-						ctx.fillText(label, tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
-						ctx.stroke();
 						ctx.restore();
 					};
 
@@ -766,11 +776,13 @@
 				;(function(){
 					ctx.save();
 
-					/* 绘制Y轴坐标线 */
-					ctx.beginPath();
-					ctx.moveTo(x_axisY, yTop_axisY);
-					ctx.lineTo(x_axisY, yBottom_axisY);
-					ctx.stroke();
+					if(config.showAxisYLine){
+						/* 绘制Y轴坐标线 */
+						ctx.beginPath();
+						ctx.moveTo(x_axisY, yTop_axisY);
+						ctx.lineTo(x_axisY, yBottom_axisY);
+						ctx.stroke();
+					}
 
 					ctx.textAlign = ifShowAxisYLeft? "end": "start";
 					ctx.textBaseline = "middle";
@@ -794,6 +806,7 @@
 							ctx.setLineDash && ctx.setLineDash(config.gridLineDash? config.gridLineDash: [1]);
 							ctx.strokeStyle = config.horizontalGridLineColor;
 
+
 							ctx.beginPath();
 							ctx.moveTo(x_axisY, tickY);
 							ctx.lineTo(x_axisY + Math.floor(_sketch.chart.width), tickY);
@@ -802,12 +815,16 @@
 						}
 
 						/* 绘制刻度线 */
-						ctx.beginPath();
-						ctx.moveTo(x_axisY, tickY);
-						ctx.lineTo(x_axisY + axisTickLineOffset, tickY);
-						ctx.stroke();
-						var format = config.axisYFormatter || util.formatMoney;
-						ctx.fillText(format(amount, config), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
+						if(config.showAxisYLine && config.showAxisYLabel){
+							ctx.beginPath();
+							ctx.moveTo(x_axisY, tickY);
+							ctx.lineTo(x_axisY + axisTickLineOffset, tickY);
+							ctx.stroke();
+						}
+						if(config.showAxisYLabel){
+							var format = config.axisYFormatter || util.formatMoney;
+							ctx.fillText(format(amount, config), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
+						}
 					}
 					ctx.restore();
 				})();

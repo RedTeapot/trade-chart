@@ -52,6 +52,8 @@
 		axisLabelColor: null,/** 坐标标签颜色 */
 		axisLineColor: null,/** 坐标轴颜色 */
 
+		showAxisXLine: true,/* 是否绘制横坐标轴 */
+		showAxisXLabel: true,/* 是否绘制横坐标刻度值 */
 		axisXTickOffset: 5,/* 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
@@ -60,6 +62,8 @@
 			return convertedData.time;
 		},
 
+		showAxisYLine: true,/* 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/* 是否绘制纵坐标刻度值 */
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
@@ -112,7 +116,7 @@
 		volumeMarginTop: 15,/** 量图区的顶部外边距 （即与图形区的间距）*/
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 		volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
-		axisYVolumeFloor: null, /** 纵坐标最小刻度, 为null时自动 */
+		volumeAxisYFloor: null, /** 纵坐标最小刻度, 为null时自动 */
 		volumeColor: "orange", /** 量图颜色（柱状图）, 可以为数组*/
 		appreciatedVolumeColor: "orange",/** 收盘价大于开盘价时，绘制量图用的画笔或油漆桶颜色 */
 		depreciatedVolumeColor: "orange",/** 收盘价小于开盘价时，绘制量图用的画笔或油漆桶颜色 */
@@ -304,8 +308,8 @@
 
 		/* 确定量图Y轴最小值 */
 		b = new Big(dataSketch.origin.avgVolumeVariation).div(2);
-		if(null != config.axisYVolumeFloor){
-			dataSketch.extended.volumeFloor = Number(config.axisYVolumeFloor);
+		if(null != config.volumeAxisYFloor){
+			dataSketch.extended.volumeFloor = Number(config.volumeAxisYFloor);
 		}else
 			dataSketch.extended.volumeFloor = dataSketch.origin.minVolume - numBig(b);
 
@@ -335,6 +339,13 @@
 		/* 历史兼容，待移除 */
 		if(!!config.showTrendAll)
 			config.dotGap = "auto";
+
+		/* 历史兼容，带移除 */
+		if(!!config.axisYVolumeFloor){
+			config.volumeAxisYFloor = config.axisYVolumeFloor;
+			delete config.axisYVolumeFloor;
+		}
+
 
 		/* 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
@@ -618,18 +629,20 @@
 					ctx.textAlign = "center";
 					ctx.textBaseline = "top";
 
-					/* 绘制分时图X轴 */
-					ctx.beginPath();
-					ctx.moveTo(xLeft_axisX, y_axisX);
-					ctx.lineTo(xRight_axisX, y_axisX);
-					ctx.stroke();
-
-					/* 绘制量图X轴 */
-					if(config.showVolume){
+					if(config.showAxisXLine){
+						/* 绘制分时图X轴 */
 						ctx.beginPath();
-						ctx.moveTo(xLeft_axisX, y_volume_axisX);
-						ctx.lineTo(xRight_axisX, y_volume_axisX);
+						ctx.moveTo(xLeft_axisX, y_axisX);
+						ctx.lineTo(xRight_axisX, y_axisX);
 						ctx.stroke();
+
+						/* 绘制量图X轴 */
+						if(config.showVolume){
+							ctx.beginPath();
+							ctx.moveTo(xLeft_axisX, y_volume_axisX);
+							ctx.lineTo(xRight_axisX, y_volume_axisX);
+							ctx.stroke();
+						}
 					}
 
 					/**
@@ -660,17 +673,20 @@
 						}
 
 						/* 绘制刻度线 */
-						ctx.beginPath();
-						/* 分时图 */
-						ctx.moveTo(tickX, y_axisX);
-						ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
-						/* 量图 */
-						if(config.showVolume){
-							ctx.moveTo(tickX, y_volume_axisX);
-							ctx.lineTo(tickX, y_volume_axisX + config.axisTickLineLength);
+						if(config.showAxisXLine && config.showAxisXLabel){
+							ctx.beginPath();
+							/* 分时图 */
+							ctx.moveTo(tickX, y_axisX);
+							ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
+							/* 量图 */
+							if(config.showVolume){
+								ctx.moveTo(tickX, y_volume_axisX);
+								ctx.lineTo(tickX, y_volume_axisX + config.axisTickLineLength);
+							}
+							ctx.stroke();
 						}
-						ctx.fillText(label, tickX, config.axisTickLineLength + config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX));
-						ctx.stroke();
+						if(config.showAxisXLabel)
+							ctx.fillText(label, tickX, config.axisTickLineLength + config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX));
 					};
 
 					/**
@@ -778,18 +794,20 @@
 					ctx.textAlign = ifShowAxisYLeft? "end": "start";
 					ctx.textBaseline = "middle";
 
-					/* 绘制分时图Y轴 */
-					ctx.beginPath();
-					ctx.moveTo(x_axisY, yTop_axisY);
-					ctx.lineTo(x_axisY, yBottom_axisY);
-					ctx.stroke();
-
-					/* 绘制量图Y轴 */
-					if(config.showVolume){
+					if(config.showAxisYLine){
+						/* 绘制分时图Y轴 */
 						ctx.beginPath();
-						ctx.moveTo(x_axisY, yTop_volume_axisY);
-						ctx.lineTo(x_axisY, yBottom_volume_axisY);
+						ctx.moveTo(x_axisY, yTop_axisY);
+						ctx.lineTo(x_axisY, yBottom_axisY);
 						ctx.stroke();
+
+						/* 绘制量图Y轴 */
+						if(config.showVolume){
+							ctx.beginPath();
+							ctx.moveTo(x_axisY, yTop_volume_axisY);
+							ctx.lineTo(x_axisY, yBottom_volume_axisY);
+							ctx.stroke();
+						}
 					}
 
 					var axisTickLineOffset = (ifShowAxisYLeft? -1: 1) * config.axisTickLineLength,
@@ -815,12 +833,16 @@
 						}
 
 						/* 绘制刻度线 */
-						ctx.beginPath();
-						ctx.moveTo(x_axisY, yTop_axisY + tickY);
-						ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
-						ctx.stroke();
-						var format = config.axisYFormatter || util.formatMoney;
-						ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + config.axisYLabelVerticalOffset);
+						if(config.showAxisYLine && config.showAxisYLabel){
+							ctx.beginPath();
+							ctx.moveTo(x_axisY, yTop_axisY + tickY);
+							ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
+							ctx.stroke();
+						}
+						if(config.showAxisYLabel){
+							var format = config.axisYFormatter || util.formatMoney;
+							ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + config.axisYLabelVerticalOffset);
+						}
 					}
 					/* 量图 */
 					if(config.showVolume){
@@ -846,19 +868,25 @@
 								}
 
 								/* 绘制刻度线 */
-								ctx.beginPath();
-								ctx.moveTo(x_axisY, tickY);
-								ctx.lineTo(x_axisY + axisTickLineOffset, tickY);
-								ctx.stroke();
-								ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
+								if(config.showAxisYLine && config.showAxisYLabel){
+									ctx.beginPath();
+									ctx.moveTo(x_axisY, tickY);
+									ctx.lineTo(x_axisY + axisTickLineOffset, tickY);
+									ctx.stroke();
+								}
+								if(config.showAxisYLabel)
+									ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
 							}
 						}else{
 							/* 绘制刻度线 */
-							ctx.beginPath();
-							ctx.moveTo(x_axisY, yBottom_volume_axisY);
-							ctx.lineTo(x_axisY + axisTickLineOffset, yBottom_volume_axisY);
-							ctx.stroke();
-							ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
+							if(config.showAxisYLine && config.showAxisYLabel){
+								ctx.beginPath();
+								ctx.moveTo(x_axisY, yBottom_volume_axisY);
+								ctx.lineTo(x_axisY + axisTickLineOffset, yBottom_volume_axisY);
+								ctx.stroke();
+							}
+							if(config.showAxisYLabel)
+								ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
 						}
 					}
 

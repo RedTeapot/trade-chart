@@ -53,6 +53,8 @@
 		axisLabelColor: null,/** 坐标标签颜色 */
 		axisLineColor: null,/** 坐标轴颜色 */
 
+		showAxisXLine: true,/* 是否绘制横坐标轴 */
+		showAxisXLabel: true,/* 是否绘制横坐标刻度值 */
 		axisXTickOffset: 5,/* 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
 		axisXTickOffsetFromRight: 0,/* 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/* 横坐标标签距离坐标轴刻度线的距离 */
@@ -61,6 +63,8 @@
 			return convertedData.time;
 		},
 
+		showAxisYLine: true,/* 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/* 是否绘制纵坐标刻度值 */
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
@@ -635,17 +639,19 @@
 
 				/* 绘制X轴及刻度 */
 				;(function(){
-					/* 绘制X轴坐标线 */
-					ctx.beginPath();
-					/* 蜡烛图 */
-					ctx.moveTo(xLeft_axisX, y_axisX);
-					ctx.lineTo(xRight_axisX, y_axisX);
-					/* 量图 */
-					if(config.showVolume){
-						ctx.moveTo(xLeft_axisX, y_volume_axisX);
-						ctx.lineTo(xRight_axisX, y_volume_axisX);
+					if(config.showAxisXLine){
+						/* 绘制X轴坐标线 */
+						ctx.beginPath();
+						/* 蜡烛图 */
+						ctx.moveTo(xLeft_axisX, y_axisX);
+						ctx.lineTo(xRight_axisX, y_axisX);
+						/* 量图 */
+						if(config.showVolume){
+							ctx.moveTo(xLeft_axisX, y_volume_axisX);
+							ctx.lineTo(xRight_axisX, y_volume_axisX);
+						}
+						ctx.stroke();
 					}
-					ctx.stroke();
 
 					/**
 					 * 根据提供的数据的索引位置绘制刻度
@@ -692,26 +698,30 @@
 						config.axisLineColor && (ctx.strokeStyle = config.axisLineColor);
 
 						/* 绘制刻度线 */
-						ctx.beginPath();
-						/* 蜡烛图 */
-						ctx.moveTo(tickX, y_axisX);
-						ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
-						/* 量图 */
-						if(config.showVolume){
-							ctx.moveTo(tickX, y_volume_axisX);
-							ctx.lineTo(tickX, y_volume_axisX + config.axisTickLineLength);
+						if(config.showAxisXLine && config.showAxisXLabel){
+							ctx.beginPath();
+							/* 蜡烛图 */
+							ctx.moveTo(tickX, y_axisX);
+							ctx.lineTo(tickX, y_axisX + config.axisTickLineLength);
+							/* 量图 */
+							if(config.showVolume){
+								ctx.moveTo(tickX, y_volume_axisX);
+								ctx.lineTo(tickX, y_volume_axisX + config.axisTickLineLength);
+							}
+							ctx.stroke();
 						}
 
 						/* 绘制坐标取值 */
-						var previousData = i == 0? null: datas[i - 1],
-							nextData = datas[i + 1];
-						if(null != previousData && dataParser)
-							previousData = dataParser(previousData, i - 1, datas);
-						if(null != nextData && dataParser)
-							nextData = dataParser(nextData, i + 1, datas);
-						var label = config.axisXLabelGenerator(data, i, previousData, nextData);
-						ctx.fillText(label, tickX, (config.showVolume? y_volume_axisX: y_axisX) + config.axisTickLineLength + config.axisXLabelOffset);
-						ctx.stroke();
+						if(config.showAxisXLabel){
+							var previousData = i == 0? null: datas[i - 1],
+								nextData = datas[i + 1];
+							if(null != previousData && dataParser)
+								previousData = dataParser(previousData, i - 1, datas);
+							if(null != nextData && dataParser)
+								nextData = dataParser(nextData, i + 1, datas);
+							var label = config.axisXLabelGenerator(data, i, previousData, nextData);
+							ctx.fillText(label, tickX, (config.showVolume? y_volume_axisX: y_axisX) + config.axisTickLineLength + config.axisXLabelOffset);
+						}
 
 						ctx.restore();
 					};
@@ -759,16 +769,18 @@
 					ctx.save();
 
 					/* 绘制Y轴坐标线 */
-					ctx.beginPath();
-					/* 蜡烛图 */
-					ctx.moveTo(x_axisY, yTop_axisY);
-					ctx.lineTo(x_axisY, yBottom_axisY);
-					/* 量图 */
-					if(config.showVolume){
-						ctx.moveTo(x_axisY, yTop_volume_axisY);
-						ctx.lineTo(x_axisY, yBottom_volume_axisY);
+					if(config.showAxisYLine){
+						ctx.beginPath();
+						/* 蜡烛图 */
+						ctx.moveTo(x_axisY, yTop_axisY);
+						ctx.lineTo(x_axisY, yBottom_axisY);
+						/* 量图 */
+						if(config.showVolume){
+							ctx.moveTo(x_axisY, yTop_volume_axisY);
+							ctx.lineTo(x_axisY, yBottom_volume_axisY);
+						}
+						ctx.stroke();
 					}
-					ctx.stroke();
 
 					ctx.textBaseline = "middle";
 					ctx.textAlign = ifShowAxisYLeft? "end": "start";
@@ -796,12 +808,16 @@
 						}
 
 						/* 绘制刻度线 */
-						ctx.beginPath();
-						ctx.moveTo(x_axisY, yTop_axisY + tickY);
-						ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
-						ctx.stroke();
-						var format = config.axisYFormatter || util.formatMoney;
-						ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + config.axisYLabelVerticalOffset);
+						if(config.showAxisYLine && config.showAxisYLabel){
+							ctx.beginPath();
+							ctx.moveTo(x_axisY, yTop_axisY + tickY);
+							ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
+							ctx.stroke();
+						}
+						if(config.showAxisYLabel){
+							var format = config.axisYFormatter || util.formatMoney;
+							ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + config.axisYLabelVerticalOffset);
+						}
 					}
 					/* 量图 */
 					if(config.showVolume){
@@ -827,19 +843,25 @@
 								}
 
 								/* 绘制刻度线 */
-								ctx.beginPath();
-								ctx.moveTo(x_axisY, yTop_volume_axisY + tickY);
-								ctx.lineTo(x_axisY + axisTickLineOffset, yTop_volume_axisY + tickY);
-								ctx.stroke();
-								ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, yTop_volume_axisY + tickY + config.axisYLabelVerticalOffset);
+								if(config.showAxisYLine && config.showAxisYLabel){
+									ctx.beginPath();
+									ctx.moveTo(x_axisY, yTop_volume_axisY + tickY);
+									ctx.lineTo(x_axisY + axisTickLineOffset, yTop_volume_axisY + tickY);
+									ctx.stroke();
+								}
+								if(config.showAxisYLabel)
+									ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, yTop_volume_axisY + tickY + config.axisYLabelVerticalOffset);
 							}
 						}else{
 							/* 绘制刻度线 */
-							ctx.beginPath();
-							ctx.moveTo(x_axisY, yBottom_volume_axisY);
-							ctx.lineTo(x_axisY + axisTickLineOffset, yBottom_volume_axisY);
-							ctx.stroke();
-							ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
+							if(config.showAxisYLine && config.showAxisYLabel){
+								ctx.beginPath();
+								ctx.moveTo(x_axisY, yBottom_volume_axisY);
+								ctx.lineTo(x_axisY + axisTickLineOffset, yBottom_volume_axisY);
+								ctx.stroke();
+							}
+							if(config.showAxisYLabel)
+								ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
 						}
 					}
 
