@@ -126,6 +126,12 @@
 		avgPriceLineWidth: 1, /** 均线线宽 */
 		avgPriceLineColor: "orange", /** 均线颜色 */
 
+		lastClosingPrice: null,/** 昨日收盘价 */
+		showLastClosingPriceLine: false,/** 是否显示昨日收盘价对应的线条（简称：昨日收盘线） */
+		showLastClosingPriceLine_lineWidth: 1,/** 昨日收盘线线宽 */
+		showLastClosingPriceLine_lineColor: null,/** 昨日收盘线线条颜色 */
+		showLastClosingPriceLine_lineDash: [1, 3, 3],/** 昨日收盘线线条的虚线构造方法。如果需要用实线，则用“[1]”表示 */
+
 		/**
 		 * 交易节信息（全部展示时使用）。
 		 * 数据格式：
@@ -278,6 +284,12 @@
 		dataSketch.origin.avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
 		dataSketch.origin.avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
 
+		var lastClosingPrice = config.lastClosingPrice;
+		if(null != lastClosingPrice)
+			lastClosingPrice = Number(lastClosingPrice);
+		if(isNaN(lastClosingPrice))
+			lastClosingPrice = 0;
+
 		/* 确定Y轴最小值 */
 		if(null != config.axisYPriceFloor){
 			if(typeof config.axisYPriceFloor == "function")
@@ -286,6 +298,7 @@
 				dataSketch.extended.priceFloor = Number(config.axisYPriceFloor);
 		}else
 			dataSketch.extended.priceFloor = dataSketch.origin.min - numBig(new Big(dataSketch.origin.avgVariation).div(2));
+		dataSketch.extended.priceFloor = Math.min(dataSketch.extended.priceFloor, lastClosingPrice);
 		if(!isFinite(dataSketch.extended.priceFloor) || dataSketch.extended.priceFloor < 0)
 			dataSketch.extended.priceFloor = 0;
 
@@ -299,6 +312,7 @@
 			dataSketch.extended.priceCeiling = dataSketch.origin.max + numBig(new Big(dataSketch.origin.avgVariation).div(2));
 		if(dataSketch.extended.priceCeiling < dataSketch.origin.max)
 			dataSketch.extended.priceCeiling = dataSketch.origin.max;
+		dataSketch.extended.priceCeiling = Math.max(dataSketch.extended.priceCeiling, lastClosingPrice);
 		if(!isFinite(dataSketch.extended.priceCeiling) || dataSketch.extended.priceCeiling < 0)
 			dataSketch.extended.priceCeiling = dataSketch.extended.priceFloor;
 
@@ -716,6 +730,26 @@
 					ctx.fill();
 
 					ctx.restore();
+				}
+
+				/* 绘制昨日收盘线 */
+				if(config.showLastClosingPriceLine){
+					var lastClosingPrice = config.lastClosingPrice;
+					if(null != lastClosingPrice && !isNaN(lastClosingPrice = Number(lastClosingPrice))){
+						var y_lastClosingPriceLine = Math.floor(yTop_axisY + getHeight(lastClosingPrice)) + 0.5;
+
+						ctx.save();
+						ctx.setLineDash(config.showLastClosingPriceLine_lineDash || [1]);
+						ctx.lineWidth = config.showLastClosingPriceLine_lineWidth;
+						ctx.strokeStyle = config.showLastClosingPriceLine_lineColor;
+
+						ctx.beginPath();
+						ctx.moveTo(xLeft_axisX, y_lastClosingPriceLine);
+						ctx.lineTo(xRight_axisX, y_lastClosingPriceLine);
+						ctx.stroke();
+
+						ctx.restore();
+					}
 				}
 
 				/* 绘制均线 */
