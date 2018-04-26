@@ -313,6 +313,8 @@
 			dataSketch.extended.volumeFloor = Number(config.volumeAxisYFloor);
 		}else
 			dataSketch.extended.volumeFloor = dataSketch.origin.minVolume - numBig(b);
+		if(!isFinite(dataSketch.extended.volumeFloor) || dataSketch.extended.volumeFloor < 0)
+			dataSketch.extended.volumeFloor = 0;
 
 		/* 确定量图Y轴最大值 */
 		dataSketch.extended.volumeCeiling = dataSketch.origin.maxVolume + numBig(b);
