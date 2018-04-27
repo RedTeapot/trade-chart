@@ -73,8 +73,12 @@
 			/** price：价格；config：配置 */
 			return util.formatMoney(price, config.axisYPrecision);
 		},
-		axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
-		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
+		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+			//i: 自下而上的刻度索引。从0开始
+			//n：刻度的总个数，包括最小值和最大值
+			return 0;
+		},
+		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的横向距离 */
 		axisYPriceFloor: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(min))
 				min = 0;
@@ -118,6 +122,11 @@
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 		volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
 		volumeAxisYFloor: null, /** 纵坐标最小刻度, 为null时自动 */
+		volumeAxisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+			//i: 自下而上的刻度索引。从0开始
+			//n：刻度的总个数，包括最小值和最大值
+			return 0;
+		},
 		volumeColor: "orange", /** 量图颜色（柱状图）, 可以为数组*/
 		appreciatedVolumeColor: "orange",/** 收盘价大于开盘价时，绘制量图用的画笔或油漆桶颜色 */
 		depreciatedVolumeColor: "orange",/** 收盘价小于开盘价时，绘制量图用的画笔或油漆桶颜色 */
@@ -984,10 +993,11 @@
 					var axisTickLineOffset = sign * config.axisTickLineLength,
 						axisYLabelOffset = sign * (config.axisTickLineLength + config.axisYLabelOffset);
 
-					/* 绘制Y轴刻度 */
-					for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
+					/* 绘制Y轴刻度（自下而上） */
+					var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
+					for(var i = 0; i <= maxAxisYTickIndex; i++){
 						var price = _sketch.data.extended.priceFloor + numBig(new Big(axisYPriceInterval).mul(i)),
-							tickOffset = numBig(new Big(config.axisYMidTickQuota + 1 - i).mul(axisYHeightInterval));
+							tickOffset = numBig(new Big(maxAxisYTickIndex - i).mul(axisYHeightInterval));
 						var tickY = Math.round(tickOffset);
 
 						/* 绘制网格横线 */
@@ -1012,17 +1022,23 @@
 						}
 						if(config.showAxisYLabel){
 							var format = config.axisYFormatter || util.formatMoney;
-							ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + config.axisYLabelVerticalOffset);
+
+							var axisYLabelVerticalOffset = config.axisYLabelVerticalOffset;
+							if(typeof axisYLabelVerticalOffset == "function")
+								axisYLabelVerticalOffset = axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
+							ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + axisYLabelVerticalOffset);
 						}
 					}
 					/* 量图 */
 					if(config.showVolume){
 						var axisYVolumeInterval = numBig(new Big(_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor).div(config.volumeAxisYMidTickQuota + 1));
+						var maxVolumeAxisYTickIndex = config.volumeAxisYMidTickQuota + 1;
+
 						if(_sketch.chart.volumeHeightRatio != 0){
 							var axisYHeightIntervalAux = axisYVolumeInterval / _sketch.chart.volumeHeightRatio;
-							for(var i = 0; i <= config.volumeAxisYMidTickQuota + 1; i++){
+							for(var i = 0; i <= maxVolumeAxisYTickIndex; i++){
 								var volume = _sketch.data.extended.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i)),
-									tickOffset = numBig(new Big(config.volumeAxisYMidTickQuota + 1 - i).mul(axisYHeightIntervalAux));
+									tickOffset = numBig(new Big(maxVolumeAxisYTickIndex - i).mul(axisYHeightIntervalAux));
 								var tickY = yTop_volume_axisY + Math.round(tickOffset);
 
 								/* 绘制网格横线 */
@@ -1045,8 +1061,12 @@
 									ctx.lineTo(x_axisY + axisTickLineOffset, tickY);
 									ctx.stroke();
 								}
-								if(config.showAxisYLabel)
-									ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
+								if(config.showAxisYLabel){
+									var volumeAxisYLabelVerticalOffset = config.volumeAxisYLabelVerticalOffset;
+									if(typeof volumeAxisYLabelVerticalOffset == "function")
+										volumeAxisYLabelVerticalOffset = volumeAxisYLabelVerticalOffset(i, maxVolumeAxisYTickIndex + 1);
+									ctx.fillText(Math.floor(volume), x_axisY + axisYLabelOffset, tickY + volumeAxisYLabelVerticalOffset);
+								}
 							}
 						}else{
 							/* 绘制刻度线 */
@@ -1056,8 +1076,12 @@
 								ctx.lineTo(x_axisY + axisTickLineOffset, yBottom_volume_axisY);
 								ctx.stroke();
 							}
-							if(config.showAxisYLabel)
-								ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + config.axisYLabelVerticalOffset);
+							if(config.showAxisYLabel){
+								var volumeAxisYLabelVerticalOffset = config.volumeAxisYLabelVerticalOffset;
+								if(typeof volumeAxisYLabelVerticalOffset == "function")
+									volumeAxisYLabelVerticalOffset = volumeAxisYLabelVerticalOffset(i, maxVolumeAxisYTickIndex + 1);
+								ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + volumeAxisYLabelVerticalOffset);
+							}
 						}
 					}
 
