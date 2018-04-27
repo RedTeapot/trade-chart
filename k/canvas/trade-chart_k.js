@@ -91,6 +91,8 @@
 
 			return numBig(new Big(min).minus(new Big(avgVariation).div(2)));
 		},
+		axisYPriceFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
+		axisYPriceFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
 		axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(max))
 				max = 0;
@@ -102,6 +104,8 @@
 
 			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
 		},
+		axisYPriceCeilingLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
+		axisYPriceCeilingLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
 
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 		showHorizontalGridLine: true,/** 是否绘制网格横线 */
@@ -973,7 +977,28 @@
 							if(typeof axisYLabelVerticalOffset == "function")
 								axisYLabelVerticalOffset = axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
 
-							ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + axisYLabelVerticalOffset);
+							var drawLabel = function(){
+								ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + axisYLabelVerticalOffset);
+							};
+
+							if(i == 0){
+								ctx.save();
+								config.axisYPriceFloorLabelFont && (ctx.font = config.axisYPriceFloorLabelFont);
+								config.axisYPriceFloorLabelColor && (ctx.fillStyle = config.axisYPriceFloorLabelColor);
+
+								drawLabel();
+
+								ctx.restore();
+							}else if(i == maxAxisYTickIndex){
+								ctx.save();
+								config.axisYPriceCeilingLabelFont && (ctx.font = config.axisYPriceCeilingLabelFont);
+								config.axisYPriceCeilingLabelColor && (ctx.fillStyle = config.axisYPriceCeilingLabelColor);
+
+								drawLabel();
+
+								ctx.restore();
+							}else
+								drawLabel();
 						}
 					}
 					/* 量图 */
