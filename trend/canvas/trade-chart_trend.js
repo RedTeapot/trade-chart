@@ -90,6 +90,8 @@
 
 			return numBig(new Big(min).minus(new Big(avgVariation).div(2)));
 		},
+		axisYPriceFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
+		axisYPriceFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
 		axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(max))
 				max = 0;
@@ -101,6 +103,8 @@
 
 			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
 		},
+		axisYPriceCeilingLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
+		axisYPriceCeilingLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
 
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 		showHorizontalGridLine: true,/** 是否绘制网格横线 */
@@ -178,7 +182,7 @@
 	var sketchChart = function(config){
 		var width = config.width,
 			height = config.height;
-		
+
 		var chartSketch = {
 			width: 0,/** 图表的宽度 */
 			contentWidth: 0,/** 图表内容的宽度 */
@@ -224,7 +228,7 @@
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
 		if(/%/.test(config.height))
 			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
-		
+
 		return sketchChart(config).maxDotCount;
 	};
 
@@ -486,7 +490,7 @@
 			var list = trendChart.getDatas() || [];
 			if(dataIndex < 0 || dataIndex >= list.length)
 				return null;
-			
+
 			var d = list[dataIndex];
 			return d;
 		};
@@ -503,7 +507,7 @@
 			var dataParser = trendChart.getDataParser();
 			if(typeof dataParser == "function")
 				d = dataParser(d, dataIndex, trendChart.getDatas() || []);
-				
+
 			return d;
 		};
 
@@ -591,7 +595,7 @@
 
 			initCanvasAndConfig(canvasObj, config, datas);
 			var ctx = canvasObj.getContext("2d");
-			
+
 			var _sketch = sketch(datas, dataParser, config);
 			console.log("Trend chart sketch", JSON.stringify(_sketch));
 			console.log("Trend chart config", config);
@@ -924,7 +928,7 @@
 					}else{
 						var groupSize = config.dotGap + 1,
 							halfGroupSize = numBig(new Big(config.axisXLabelSize).div(2));
-						
+
 						var axisXTickInterval = ceilBig(new Big(config.axisXLabelSize).div(groupSize));/* 横坐标刻度之间相差的点的个数 */
 						var axisXTickCount = floorBig(new Big(dotCount).div(axisXTickInterval)),
 							lastTickDataIndex;
@@ -936,7 +940,7 @@
 
 						var totalSpace = Math.min(numBig(new Big(dotCount - 1).mul(groupSize)), _sketch.chart.contentWidth);
 						var remainingSpace = totalSpace - (numBig(new Big(lastTickDataIndex).mul(groupSize)) + halfGroupSize);
-						
+
 						// var totalSpace = _sketch.chart.contentWidth;
 						// var remainingSpace = totalSpace - (renderedTickCount * axisXTickInterval * (config.dotGap + 1)  + config.axisXLabelSize / 2);
 						if(remainingSpace < halfGroupSize){
@@ -1026,7 +1030,29 @@
 							var axisYLabelVerticalOffset = config.axisYLabelVerticalOffset;
 							if(typeof axisYLabelVerticalOffset == "function")
 								axisYLabelVerticalOffset = axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
-							ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + axisYLabelVerticalOffset);
+
+							var drawLabel = function(){
+								ctx.fillText(format(price, config), x_axisY + axisYLabelOffset, yTop_axisY + tickY + axisYLabelVerticalOffset);
+							};
+
+							if(i == 0){
+								ctx.save();
+								config.axisYPriceFloorLabelFont && (ctx.font = config.axisYPriceFloorLabelFont);
+								config.axisYPriceFloorLabelColor && (ctx.fillStyle = config.axisYPriceFloorLabelColor);
+
+								drawLabel();
+
+								ctx.restore();
+							}else if(i == maxAxisYTickIndex){
+								ctx.save();
+								config.axisYPriceCeilingLabelFont && (ctx.font = config.axisYPriceCeilingLabelFont);
+								config.axisYPriceCeilingLabelColor && (ctx.fillStyle = config.axisYPriceCeilingLabelColor);
+
+								drawLabel();
+
+								ctx.restore();
+							}else
+								drawLabel();
 						}
 					}
 					/* 量图 */
