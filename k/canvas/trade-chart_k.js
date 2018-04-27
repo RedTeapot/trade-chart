@@ -67,6 +67,14 @@
 		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYLabelPosition: "outside",/** 纵坐标标签位置。outside：外侧；inside：内侧 */
+		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
+		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
+		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
+		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+			//i: 自下而上的刻度索引。从0开始
+			//n：刻度的总个数，包括最小值和最大值
+			return 0;
+		},
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYPrecision: 2,/** 纵坐标的数字精度（仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值） */
@@ -74,12 +82,6 @@
 			/** price：价格；config：配置 */
 			return util.formatMoney(price, config.axisYPrecision);
 		},
-		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
-			//i: 自下而上的刻度索引。从0开始
-			//n：刻度的总个数，包括最小值和最大值
-			return 0;
-		},
-		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 		axisYPriceFloor: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(min))
 				min = 0;
@@ -124,9 +126,11 @@
 		volumeAreaRatio: 0.33, /** 量图区域所占比例 0~1 */
 		volumeMarginTop: 15,/** 量图区的顶部外边距 （即与图形区的间距）*/
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
-		volumeAxisYMidTickQuota: 2, /** 纵坐标刻度个数（不包括最小值和最大值） */
-		axisYVolumeFloor: null, /** 纵坐标最小刻度, 为null时自动 */
-		volumeAxisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+		volumeAxisYMidTickQuota: 2, /** 量图纵坐标刻度个数（不包括最小值和最大值） */
+		axisYVolumeFloor: null, /** 量图纵坐标最小刻度, 为null时自动 */
+		volumeAxisYLabelFont: null,/** 量图纵坐标的坐标标签字体 */
+		volumeAxisYLabelColor: null,/** 量图纵坐标的坐标标签颜色 */
+		volumeAxisYLabelVerticalOffset: function(i, n){/** 量图纵坐标标签纵向位移 */
 			//i: 自下而上的刻度索引。从0开始
 			//n：刻度的总个数，包括最小值和最大值
 			return 0;
@@ -912,6 +916,9 @@
 				;(function(){
 					ctx.save();
 
+					config.axisYLabelFont && (ctx.font = config.axisYLabelFont);
+					config.axisYLabelColor && (ctx.fillStyle = config.axisYLabelColor);
+
 					/* 绘制Y轴坐标线 */
 					if(config.showAxisYLine){
 						ctx.beginPath();
@@ -1003,6 +1010,11 @@
 					}
 					/* 量图 */
 					if(config.showVolume){
+						ctx.save();
+
+						config.volumeAxisYLabelFont && (ctx.font = config.volumeAxisYLabelFont);
+						config.volumeAxisYLabelColor && (ctx.fillStyle = config.volumeAxisYLabelColor);
+
 						var axisYVolumeInterval = numBig(new Big(_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor).div(config.volumeAxisYMidTickQuota + 1));
 						var maxVolumeAxisYTickIndex = config.volumeAxisYMidTickQuota + 1;
 
@@ -1055,6 +1067,8 @@
 								ctx.fillText(0, x_axisY + axisYLabelOffset, yBottom_volume_axisY + volumeAxisYLabelVerticalOffset);
 							}
 						}
+
+						ctx.restore();
 					}
 
 					ctx.restore();
