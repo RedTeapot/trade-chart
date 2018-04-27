@@ -67,6 +67,14 @@
 		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
 		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
 		axisYLabelPosition: "outside",/** 纵坐标标签位置。outside：外侧；inside：内侧 */
+		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
+		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
+		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
+		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+			//i: 自下而上的刻度索引。从0开始
+			//n：刻度的总个数，包括最小值和最大值
+			return 0;
+		},
 		axisYTickOffset: 0,/** 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYPrecision: 2,/** 纵坐标的数字精度 */
@@ -74,12 +82,6 @@
 			/** amount：委托量；config：配置 */
 			return util.formatMoney(amount, config.axisYPrecision);
 		},
-		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
-			//i: 自下而上的刻度索引。从0开始
-			//n：刻度的总个数，包括最小值和最大值
-			return 0;
-		},
-		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 		axisYAmountFloor: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(min))
 				min = 0;
@@ -923,6 +925,9 @@
 				/* 绘制Y轴 */
 				;(function(){
 					ctx.save();
+
+					config.axisYLabelFont && (ctx.font = config.axisYLabelFont);
+					config.axisYLabelColor && (ctx.fillStyle = config.axisYLabelColor);
 
 					if(config.showAxisYLine){
 						/* 绘制Y轴坐标线 */
