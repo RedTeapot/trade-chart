@@ -74,7 +74,11 @@
 			/** amount：委托量；config：配置 */
 			return util.formatMoney(amount, config.axisYPrecision);
 		},
-		axisYLabelVerticalOffset: 0,/** 纵坐标标签纵向位移 */
+		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+			//i: 自下而上的刻度索引。从0开始
+			//n：刻度的总个数，包括最小值和最大值
+			return 0;
+		},
 		axisYLabelOffset: 5,/* 纵坐标标签距离坐标轴刻度线的距离 */
 		axisYAmountFloor: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(min))
@@ -946,9 +950,10 @@
 
 					var b = new Big(axisYAmountInterval);
 					var axisYHeightInterval = numBig(b.div(_sketch.chart.amountHeightRatio));
-					for(var i = 0; i <= config.axisYMidTickQuota + 1; i++){
+					var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
+					for(var i = 0; i <= maxAxisYTickIndex; i++){
 						var amount = _sketch.data.extended.amountFloor + numBig(b.mul(i)),
-							tickOffset = numBig(new Big(config.axisYMidTickQuota + 1 - i).mul(axisYHeightInterval));
+							tickOffset = numBig(new Big(maxAxisYTickIndex - i).mul(axisYHeightInterval));
 						var tickY = yTop_axisY + Math.round(tickOffset);
 
 						/* 绘制网格横线, 最后（自上而下）一条网格横线和坐标轴重合时不绘制 */
@@ -974,7 +979,12 @@
 						}
 						if(config.showAxisYLabel){
 							var format = config.axisYFormatter || util.formatMoney;
-							ctx.fillText(format(amount, config), x_axisY + axisYLabelOffset, tickY + config.axisYLabelVerticalOffset);
+
+							var axisYLabelVerticalOffset = config.axisYLabelVerticalOffset;
+							if(typeof axisYLabelVerticalOffset == "function")
+								axisYLabelVerticalOffset = axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
+
+							ctx.fillText(format(amount, config), x_axisY + axisYLabelOffset, tickY + axisYLabelVerticalOffset);
 						}
 					}
 					ctx.restore();
