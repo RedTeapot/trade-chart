@@ -694,6 +694,10 @@
 				ctx.textAlign = "center";
 				ctx.textBaseline = "top";
 
+				var y_axisXTickLabel = config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX);
+				if(config.showAxisXLine)
+					y_axisXTickLabel += config.axisTickLineLength;
+
 				axisXTickList.forEach(function(tick){
 					var tickX = tick.x;
 
@@ -713,7 +717,7 @@
 
 					/* 绘制坐标取值 */
 					if(config.showAxisXLabel){
-						ctx.fillText(tick.label, tickX, (config.showVolume? y_volume_axisX: y_axisX) + config.axisTickLineLength + config.axisXLabelOffset);
+						ctx.fillText(tick.label, tickX, y_axisXTickLabel);
 					}
 				});
 

@@ -695,6 +695,10 @@
 				ctx.textAlign = "center";
 				ctx.textBaseline = "top";
 
+				var y_axisXTickLabel = config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX);
+				if(config.showAxisXLine)
+					y_axisXTickLabel += config.axisTickLineLength;
+
 				axisXTickList.forEach(function(tick){
 					var tickX = tick.x;
 
@@ -712,7 +716,7 @@
 						ctx.stroke();
 					}
 					if(config.showAxisXLabel)
-						ctx.fillText(tick.label, tickX, config.axisTickLineLength + config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX));
+						ctx.fillText(tick.label, tickX, y_axisXTickLabel);
 				});
 
 				ctx.restore();

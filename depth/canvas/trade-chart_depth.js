@@ -717,6 +717,10 @@
 				ctx.textAlign = "center";
 				ctx.textBaseline = "top";
 
+				var y_axisXTickLabel = y_axisX + config.axisXLabelOffset;
+				if(config.showAxisXLine)
+					y_axisXTickLabel += config.axisTickLineLength;
+
 				axisXTickList.forEach(function(tick){
 					var tickX = tick.x;
 
@@ -728,7 +732,7 @@
 						ctx.stroke();
 					}
 					if(config.showAxisXLabel){
-						ctx.fillText(tick.label, tickX, y_axisX + config.axisTickLineLength + config.axisXLabelOffset);
+						ctx.fillText(tick.label, tickX, y_axisXTickLabel);
 					}
 				});
 
