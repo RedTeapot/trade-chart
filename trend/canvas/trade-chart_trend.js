@@ -56,6 +56,13 @@
 		showAxisXLabel: true,/** 是否绘制横坐标刻度值 */
 		axisXTickOffset: 5,/** 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
 		axisXTickOffsetFromRight: 0,/** 最后一个横坐标刻度距离横坐标结束位置的位移 */
+		/**
+		 * 横坐标标签位置
+		 *
+		 * the-very-bottom：图形下方（无论是否绘制量图）
+		 * beneath-trend-above-volume：如果有量图，则在折线图下方，量图上方。如果没有量图，则等同于the-very-bottom
+		 */
+		axisXLabelPosition: "the-very-bottom",
 		axisXLabelOffset: 5,/** 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/** 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
 		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/* 横坐标标签文字的输出方法 */
@@ -625,7 +632,7 @@
 			var xLeft_axisX = Math.floor(config.paddingLeft) + 0.5,
 				xRight_axisX = xLeft_axisX + Math.floor(_sketch.chart.width),
 				y_axisX = Math.floor(config.paddingTop + _sketch.chart.height) + 0.5,
-				y_volume_axisX,
+				y_volume_axisX = y_axisX,
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
 				yTop_axisY = Math.floor(config.paddingTop) + 0.5,
@@ -695,7 +702,25 @@
 				ctx.textAlign = "center";
 				ctx.textBaseline = "top";
 
-				var y_axisXTickLabel = config.axisXLabelOffset + (config.showVolume? y_volume_axisX: y_axisX);
+				var tmp;
+				var axisXLabelPosition = config.axisXLabelPosition || "the-very-bottom";
+				axisXLabelPosition = String(axisXLabelPosition).trim().toLowerCase();
+				switch(axisXLabelPosition){
+				case "the-very-bottom":
+					tmp = config.showVolume? y_volume_axisX: y_axisX;
+					break;
+
+				case "beneath-trend-above-volume":
+					tmp = y_axisX;
+					break;
+
+				default:
+					console.warn("Unknown axis x label position: '" + axisXLabelPosition + "'");
+					tmp = config.showVolume? y_volume_axisX: y_axisX;
+					break;
+				}
+
+				var y_axisXTickLabel = config.axisXLabelOffset + tmp;
 				if(config.showAxisXLine)
 					y_axisXTickLabel += config.axisTickLineLength;
 
