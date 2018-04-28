@@ -69,6 +69,9 @@
 		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/* 横坐标标签文字的输出方法 */
 			return convertedData.time;
 		},
+		axisXLabelHorizontalAlign: function(i, n){/** 横坐标标签的水平对齐方式。start：左对齐；center：居中；end：右对齐 */
+			return "center";
+		},
 
 		showAxisYLine: true,/** 是否绘制纵坐标轴 */
 		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
@@ -742,7 +745,15 @@
 
 					/* 绘制坐标取值 */
 					if(config.showAxisXLabel){
+						ctx.save();
+						var axisXLabelHorizontalAlign = config.axisXLabelHorizontalAlign;
+						if(typeof axisXLabelHorizontalAlign)
+							axisXLabelHorizontalAlign = axisXLabelHorizontalAlign(i, axisXTickList.length);
+						axisXLabelHorizontalAlign && (ctx.textAlign = axisXLabelHorizontalAlign);
+
 						ctx.fillText(tick.label, tickX, y_axisXTickLabel);
+
+						ctx.restore();
 					}
 				});
 

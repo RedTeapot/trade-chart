@@ -5,7 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/trade-chart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/trade-chart.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -19,48 +18,38 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="vertical" split-proportion="0.4452871">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="242">
-                  <caret line="66" column="58" selection-start-line="66" selection-start-column="58" selection-end-line="66" selection-end-column="58" />
-                  <folding>
-                    <element signature="e#21792#23358#0" />
-                    <element signature="e#25799#27505#0" />
-                    <element signature="e#27539#36141#0" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-3">
-                  <caret line="704" lean-forward="true" selection-start-line="704" selection-end-line="704" />
-                  <folding>
-                    <element signature="e#25799#27505#0" />
-                    <element signature="e#27539#36141#0" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="70" column="8" selection-start-line="70" selection-start-column="8" selection-end-line="72" selection-end-column="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="trade-chart_k.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/k/canvas/trade-chart_k.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="825">
+              <caret line="755" column="38" selection-start-line="755" selection-start-column="38" selection-end-line="755" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="trade-chart_depth.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="463">
+              <caret line="745" column="38" selection-start-line="745" selection-start-column="38" selection-end-line="745" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>showAxisLine</find>
-      <find>axisYPosition</find>
       <find>ifShowAxisYLeft</find>
       <find>var sign</find>
       <find>var ifShow</find>
@@ -89,6 +78,8 @@
       <find>var volumeHeight</find>
       <find>axisYLabelOffset</find>
       <find>var drawAxisX</find>
+      <find>axisXLabelHorizontalAlign</find>
+      <find>var draw</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -104,9 +95,9 @@
         <option value="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
         <option value="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
         <option value="$PROJECT_DIR$/src/trade-chart.js" />
-        <option value="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" />
-        <option value="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" />
         <option value="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" />
+        <option value="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" />
+        <option value="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" />
       </list>
     </option>
   </component>
@@ -465,7 +456,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -521,6 +511,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -577,12 +568,13 @@
       <workItem from="1524820482715" duration="80000" />
       <workItem from="1524820681342" duration="393000" />
       <workItem from="1524833259580" duration="3971000" />
-      <workItem from="1524882850345" duration="3368000" />
+      <workItem from="1524882850345" duration="3671000" />
+      <workItem from="1524894477745" duration="247000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="147187000" />
+    <option name="totallyTimeSpent" value="147737000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -622,13 +614,15 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="12767">
+          <caret line="751" column="79" selection-start-line="751" selection-start-column="79" selection-end-line="751" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="16167">
           <caret line="951" lean-forward="true" selection-start-line="951" selection-end-line="951" />
-          <folding>
-            <element signature="e#21792#23358#0" />
-            <element signature="e#25799#27505#0" />
-            <element signature="e#27539#36141#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -685,35 +679,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js___jb_tmp___">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
+    <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-14356">
-          <caret line="78" column="51" selection-start-line="78" selection-start-column="51" selection-end-line="78" selection-end-column="51" />
+        <state relative-caret-position="170">
+          <caret line="70" column="8" selection-start-line="70" selection-start-column="8" selection-end-line="72" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/k/canvas/trade-chart_k.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="111" column="49" selection-start-line="133" selection-start-column="8" selection-end-line="133" selection-end-column="54" />
-          <folding>
-            <element signature="e#21915#23508#0" />
-          </folding>
+        <state relative-caret-position="825">
+          <caret line="755" column="38" selection-start-line="755" selection-start-column="38" selection-end-line="755" selection-end-column="38" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
+    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="66" column="58" selection-start-line="66" selection-start-column="58" selection-end-line="66" selection-end-column="58" />
-          <folding>
-            <element signature="e#21792#23358#0" />
-            <element signature="e#25799#27505#0" />
-            <element signature="e#27539#36141#0" />
-          </folding>
+        <state relative-caret-position="463">
+          <caret line="745" column="38" selection-start-line="745" selection-start-column="38" selection-end-line="745" selection-end-column="38" />
         </state>
       </provider>
     </entry>
