@@ -776,7 +776,7 @@
 				}
 
 				var axisTickLineOffset = sign * config.axisTickLineLength,
-					axisYLabelOffset = sign * (config.axisTickLineLength + config.axisYLabelOffset);
+					axisYLabelOffset = sign * ((config.showAxisYLine? config.axisTickLineLength: 0) + config.axisYLabelOffset);
 				var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
 
 				axisYTickList.forEach(function(tick, i){
@@ -849,7 +849,7 @@
 				}
 
 				var axisTickLineOffset = sign * config.axisTickLineLength,
-					axisYLabelOffset = sign * (config.axisTickLineLength + config.axisYLabelOffset);
+					axisYLabelOffset = sign * ((config.showAxisYLine? config.axisTickLineLength: 0) + config.axisYLabelOffset);
 				var maxVolumeAxisYTickIndex = config.volumeAxisYMidTickQuota + 1;
 
 				volumeAxisYTickList.forEach(function(tick, i){
@@ -1169,7 +1169,7 @@
 						ctx.strokeWidth = 0;
 						ctx.fillStyle = isAppreciated? config.appreciatedVolumeColor: (isKeeped? config.volumeColor: config.depreciatedVolumeColor);
 
-						var volumeHeight = floorBig(new Big(data.volume).div(_sketch.chart.volumeHeightRatio));
+						var volumeHeight = ceilBig(new Big(data.volume).div(_sketch.chart.volumeHeightRatio));
 						ctx.fillRect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
 						ctx.restore();
 					}

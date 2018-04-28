@@ -766,7 +766,7 @@
 				}
 
 				var axisTickLineOffset = sign * config.axisTickLineLength,
-					axisYLabelOffset = sign * (config.axisTickLineLength + config.axisYLabelOffset);
+					axisYLabelOffset = sign * ((config.showAxisYLine? config.axisTickLineLength: 0) + config.axisYLabelOffset);
 				var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
 
 				axisYTickList.forEach(function(tick, i){

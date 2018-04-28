@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="gn">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/trade-chart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/trade-chart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -15,61 +19,46 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6715">
-              <caret line="720" column="17" lean-forward="false" selection-start-line="704" selection-start-column="16" selection-end-line="720" selection-end-column="17" />
-              <folding>
-                <element signature="e#5784#7076#0" expanded="false" />
-                <element signature="e#7262#7697#0" expanded="false" />
-                <element signature="e#7923#12948#0" expanded="false" />
-                <element signature="e#13171#14796#0" expanded="false" />
-                <element signature="e#15089#17875#0" expanded="false" />
-                <element signature="e#20982#21158#0" expanded="false" />
-                <element signature="e#23345#25615#0" expanded="false" />
-                <element signature="e#24323#25588#0" expanded="false" />
-                <element signature="e#25691#27370#0" expanded="false" />
-                <element signature="e#27404#36006#0" expanded="false" />
-                <element signature="e#27548#32454#0" expanded="false" />
-                <element signature="e#32491#35344#0" expanded="false" />
-                <element signature="e#35429#35981#0" expanded="false" />
-                <element signature="e#36042#40713#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="trade-chart_k.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="42" column="26" lean-forward="false" selection-start-line="42" selection-start-column="26" selection-end-line="42" selection-end-column="26" />
-              <folding>
-                <element signature="e#5180#6617#0" expanded="false" />
-                <element signature="e#6805#7242#0" expanded="false" />
-                <element signature="e#7682#12456#0" expanded="false" />
-                <element signature="e#12631#13357#0" expanded="false" />
-                <element signature="e#13634#17361#0" expanded="false" />
-                <element signature="e#23576#25846#0" expanded="false" />
-                <element signature="e#24554#25819#0" expanded="false" />
-                <element signature="e#25922#27661#0" expanded="false" />
-                <element signature="e#27694#34767#0" expanded="false" />
-                <element signature="e#34190#34742#0" expanded="false" />
-                <element signature="e#34806#39028#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="vertical" split-proportion="0.4452871">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="242">
+                  <caret line="66" column="58" selection-start-line="66" selection-start-column="58" selection-end-line="66" selection-end-column="58" />
+                  <folding>
+                    <element signature="e#21792#23358#0" />
+                    <element signature="e#25799#27505#0" />
+                    <element signature="e#27539#36141#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-3">
+                  <caret line="704" lean-forward="true" selection-start-line="704" selection-end-line="704" />
+                  <folding>
+                    <element signature="e#25799#27505#0" />
+                    <element signature="e#27539#36141#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>axisXLabelGenerator</find>
-      <find>to big</find>
-      <find>axisTickLineLength</find>
       <find>showAxisLine</find>
       <find>axisYPosition</find>
       <find>ifShowAxisYLeft</find>
@@ -97,6 +86,9 @@
       <find>the-ve</find>
       <find>volumeMarginTop</find>
       <find>axisXLabelPosition</find>
+      <find>var volumeHeight</find>
+      <find>axisYLabelOffset</find>
+      <find>var drawAxisX</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -111,6 +103,10 @@
         <option value="$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
         <option value="$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
         <option value="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+        <option value="$PROJECT_DIR$/src/trade-chart.js" />
+        <option value="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" />
+        <option value="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" />
+        <option value="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" />
       </list>
     </option>
   </component>
@@ -120,24 +116,352 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths>
+      <path value="$PROJECT_DIR$/build/node_modules/ansi-colors/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ansi-gray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ansi-regex/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ansi-styles/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ansi-wrap/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/archy/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/arr-diff/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/arr-flatten/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/arr-union/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/array-differ/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/array-each/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/array-slice/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/array-union/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/array-uniq/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/array-unique/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/assign-symbols/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/atob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/balanced-match/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/base/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/base/node_modules/is-accessor-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/base/node_modules/is-data-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/base/node_modules/is-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/base/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/beeper/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/brace-expansion/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/braces/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/braces/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/buffer-crc32/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/buffer-from/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/cache-base/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/chalk/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/class-utils/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/class-utils/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/clean-css/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/clone-buffer/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/clone-stats/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/clone/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/cloneable-readable/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/cloneable-readable/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/cloneable-readable/node_modules/string_decoder/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/cloneable-readable/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/collection-visit/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/color-support/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/commander/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/component-emitter/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-map/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-stream/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-stream/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-stream/node_modules/string_decoder/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-with-sourcemaps/node_modules/source-map/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/concat-with-sourcemaps/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/copy-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/core-util-is/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/dateformat/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/debug/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/decode-uri-component/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/defaults/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/define-property/node_modules/is-accessor-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/define-property/node_modules/is-data-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/define-property/node_modules/is-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/del/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/deprecated/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/detect-file/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexer2/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexify/node_modules/end-of-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexify/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexify/node_modules/once/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexify/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexify/node_modules/string_decoder/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/duplexify/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/end-of-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/escape-string-regexp/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/expand-brackets/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/expand-brackets/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/expand-brackets/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/expand-tilde/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extend-shallow/node_modules/is-extendable/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extend/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extglob/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extglob/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extglob/node_modules/is-accessor-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extglob/node_modules/is-data-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extglob/node_modules/is-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/extglob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fancy-log/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fill-range/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fill-range/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/find-index/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/findup-sync/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fined/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/first-chunk-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/flagged-respawn/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/for-in/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/for-own/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fork-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fragment-cache/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/fs.realpath/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gaze/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/get-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glob-stream/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glob-stream/node_modules/through2/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glob-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glob-watcher/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glob2base/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/global-modules/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/global-prefix/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globby/node_modules/glob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globby/node_modules/minimatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globby/node_modules/object-assign/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globby/node_modules/pify/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globby/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globule/node_modules/glob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globule/node_modules/graceful-fs/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globule/node_modules/inherits/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globule/node_modules/minimatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/globule/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/glogg/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/graceful-fs/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-append-prepend/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-clean-css/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-concat/node_modules/clone-stats/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-concat/node_modules/clone/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-concat/node_modules/replace-ext/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-concat/node_modules/vinyl/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-concat/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-if/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-match/node_modules/minimatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-match/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-rename/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-uglify/node_modules/lodash/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-uglify/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-util/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp-zip/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulp/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/gulplog/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/has-ansi/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/has-gulplog/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/has-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/has-values/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/has-values/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/homedir-polyfill/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/inflight/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/inherits/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ini/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/interpret/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-absolute/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-accessor-descriptor/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-accessor-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-buffer/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-data-descriptor/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-data-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-descriptor/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-extendable/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-extglob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-glob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-number/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-number/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-odd/node_modules/is-number/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-odd/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-path-cwd/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-path-in-cwd/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-path-inside/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-plain-object/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-relative/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-unc-path/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-utf8/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/is-windows/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/isexe/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/isobject/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/liftoff/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._basecopy/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._basetostring/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._basevalues/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._getnative/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._isiterateecall/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._reescape/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._reevaluate/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._reinterpolate/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash._root/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.escape/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.isarguments/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.keys/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.restparam/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.template/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash.templatesettings/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lodash/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/lru-cache/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/make-error-cause/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/make-error/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/make-iterator/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/map-cache/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/map-visit/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/merge-stream/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/merge-stream/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/merge-stream/node_modules/string_decoder/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/merge-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/micromatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/minimatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/minimist/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/mixin-deep/node_modules/is-extendable/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/mixin-deep/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/mkdirp/node_modules/minimist/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/mkdirp/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ms/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/multipipe/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/nanomatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/natives/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object-assign/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object-copy/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object-copy/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object-copy/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object-visit/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object.defaults/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object.map/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/object.pick/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/once/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/orchestrator/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ordered-read-streams/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/os-homedir/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/p-map/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/parse-filepath/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/parse-passwd/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/pascalcase/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/path-is-absolute/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/path-is-inside/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/path-parse/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/path-root-regex/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/path-root/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/pify/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/pinkie-promise/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/pinkie/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/plugin-error/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/posix-character-classes/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/pretty-hrtime/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/process-nextick-args/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/read-file/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/rechoir/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/regex-not/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/remove-trailing-separator/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/repeat-element/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/repeat-string/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/replace-ext/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve-dir/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve-url/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/test/module_dir/zmodules/bbb/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/test/resolver/baz/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/test/resolver/browser_field/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/test/resolver/dot_main/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/test/resolver/dot_slash_main/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/resolve/test/resolver/incorrect_main/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ret/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/rimraf/node_modules/glob/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/rimraf/node_modules/minimatch/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/rimraf/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/safe-buffer/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/safe-regex/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/semver/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/sequencify/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/set-value/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/set-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/sigmund/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-node/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-node/node_modules/is-accessor-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-node/node_modules/is-data-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-node/node_modules/is-descriptor/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-node/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-util/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon-util/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/snapdragon/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/source-map-resolve/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/source-map-url/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/source-map/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/sparkles/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/split-string/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/static-extend/node_modules/define-property/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/static-extend/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/stream-consume/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/stream-shift/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/string_decoder/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/strip-ansi/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/strip-bom/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/supports-color/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/ternary-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/through2/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/through2/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/through2/node_modules/string_decoder/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/through2/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/tildify/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/time-stamp/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/to-object-path/node_modules/kind-of/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/to-object-path/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/to-regex-range/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/to-regex/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/typedarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/uglify-js/node_modules/source-map/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/uglify-js/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unc-path-regex/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/union-value/node_modules/extend-shallow/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/union-value/node_modules/set-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/union-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unique-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unset-value/node_modules/has-value/node_modules/isobject/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unset-value/node_modules/has-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unset-value/node_modules/has-values/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unset-value/node_modules/isarray/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/unset-value/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/urix/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/use/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/user-home/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/util-deprecate/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/v8flags/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl-fs/node_modules/clone/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl-fs/node_modules/readable-stream/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl-fs/node_modules/through2/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl-fs/node_modules/vinyl/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl-fs/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl-sourcemaps-apply/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/vinyl/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/which/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/wrappy/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/xtend/package.json" />
+      <path value="$PROJECT_DIR$/build/node_modules/yazl/package.json" />
+    </packageJsonPaths>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="264" />
     <option name="y" value="97" />
     <option name="width" value="1219" />
     <option name="height" value="792" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-      <flattenPackages />
-      <showMembers />
-      <showModules />
-      <showLibraryContents />
-      <hideEmptyPackages />
-      <abbreviatePackageNames />
-      <autoscrollToSource />
-      <autoscrollFromSource />
-      <sortByType />
-      <manualOrder />
+    <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
@@ -152,33 +476,44 @@
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="depth" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="depth" type="462c0819:PsiDirectoryNode" />
               <item name="canvas" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="k" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="k" type="462c0819:PsiDirectoryNode" />
               <item name="canvas" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="trend" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="trend" type="462c0819:PsiDirectoryNode" />
               <item name="canvas" type="462c0819:PsiDirectoryNode" />
             </path>
@@ -186,7 +521,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -212,9 +546,6 @@
         </RuleState>
       </list>
     </option>
-  </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -245,33 +576,36 @@
       <workItem from="1524734755054" duration="32083000" />
       <workItem from="1524820482715" duration="80000" />
       <workItem from="1524820681342" duration="393000" />
+      <workItem from="1524833259580" duration="3971000" />
+      <workItem from="1524882850345" duration="3368000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="139848000" />
+    <option name="totallyTimeSpent" value="147187000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17746182" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16385669" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Messages" order="7" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -284,722 +618,101 @@
     <breakpoint-manager>
       <option name="time" value="11" />
     </breakpoint-manager>
-    <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
+    <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6715">
-          <caret line="720" column="17" lean-forward="false" selection-start-line="704" selection-start-column="16" selection-end-line="720" selection-end-column="17" />
+        <state relative-caret-position="16167">
+          <caret line="951" lean-forward="true" selection-start-line="951" selection-end-line="951" />
           <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
+            <element signature="e#21792#23358#0" />
+            <element signature="e#25799#27505#0" />
+            <element signature="e#27539#36141#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
+    <entry file="file://$PROJECT_DIR$/src/trade-chart.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="714">
-          <caret line="42" column="26" lean-forward="true" selection-start-line="42" selection-start-column="26" selection-end-line="42" selection-end-column="26" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="3842">
+          <caret line="226" column="37" selection-start-line="226" selection-start-column="37" selection-end-line="226" selection-end-column="37" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6715">
-          <caret line="720" column="17" lean-forward="true" selection-start-line="704" selection-start-column="16" selection-end-line="720" selection-end-column="17" />
-          <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1054">
-          <caret line="62" column="41" lean-forward="true" selection-start-line="62" selection-start-column="11" selection-end-line="62" selection-end-column="41" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8449">
-          <caret line="901" column="59" lean-forward="false" selection-start-line="901" selection-start-column="59" selection-end-line="901" selection-end-column="59" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1513">
-          <caret line="89" column="0" lean-forward="false" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3451">
-          <caret line="355" column="81" lean-forward="false" selection-start-line="355" selection-start-column="81" selection-end-line="355" selection-end-column="81" />
-          <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8449">
-          <caret line="901" column="59" lean-forward="false" selection-start-line="901" selection-start-column="59" selection-end-line="901" selection-end-column="59" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1513">
-          <caret line="89" column="0" lean-forward="false" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8449">
-          <caret line="901" column="59" lean-forward="false" selection-start-line="901" selection-start-column="59" selection-end-line="901" selection-end-column="59" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1513">
-          <caret line="89" column="0" lean-forward="false" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8449">
-          <caret line="901" column="59" lean-forward="false" selection-start-line="901" selection-start-column="59" selection-end-line="901" selection-end-column="59" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1105">
-          <caret line="65" column="35" lean-forward="false" selection-start-line="65" selection-start-column="35" selection-end-line="65" selection-end-column="35" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14501">
-          <caret line="853" column="0" lean-forward="false" selection-start-line="853" selection-start-column="0" selection-end-line="853" selection-end-column="0" />
-          <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11135">
-          <caret line="865" column="100" lean-forward="false" selection-start-line="865" selection-start-column="100" selection-end-line="865" selection-end-column="100" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3927">
-          <caret line="384" column="47" lean-forward="false" selection-start-line="384" selection-start-column="47" selection-end-line="384" selection-end-column="47" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5984">
-          <caret line="505" column="74" lean-forward="false" selection-start-line="505" selection-start-column="57" selection-end-line="505" selection-end-column="74" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15470">
-          <caret line="910" column="11" lean-forward="false" selection-start-line="910" selection-start-column="11" selection-end-line="910" selection-end-column="11" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5984">
-          <caret line="505" column="74" lean-forward="false" selection-start-line="505" selection-start-column="57" selection-end-line="505" selection-end-column="74" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6205">
-          <caret line="518" column="54" lean-forward="false" selection-start-line="518" selection-start-column="54" selection-end-line="518" selection-end-column="54" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11900">
-          <caret line="700" column="48" lean-forward="true" selection-start-line="699" selection-start-column="20" selection-end-line="700" selection-end-column="48" />
-          <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="34" column="45" lean-forward="true" selection-start-line="34" selection-start-column="8" selection-end-line="34" selection-end-column="45" />
-          <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
     <entry file="file://$PROJECT_DIR$/k/cache.appcache" />
-    <entry file="file://$PROJECT_DIR$/trend/testCanvas.html">
+    <entry file="file://$PROJECT_DIR$/trend/testCanvas.html" />
+    <entry file="file://$PROJECT_DIR$/k/testCanvas.html" />
+    <entry file="file://$PROJECT_DIR$/trend/svg/trade-chart_tick.js" />
+    <entry file="file://$PROJECT_DIR$/trade-chart.js" />
+    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
+    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
+    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
+    <entry file="file://$PROJECT_DIR$/src/trade-chart.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="14" lean-forward="false" selection-start-line="0" selection-start-column="14" selection-end-line="0" selection-end-column="14" />
+        <state relative-caret-position="3842">
+          <caret line="226" column="37" selection-start-line="226" selection-start-column="37" selection-end-line="226" selection-end-column="37" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/k/testCanvas.html">
+    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js___jb_tmp___">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="14" lean-forward="false" selection-start-line="0" selection-start-column="14" selection-end-line="0" selection-end-column="14" />
+        <state relative-caret-position="-14356">
+          <caret line="78" column="51" selection-start-line="78" selection-start-column="51" selection-end-line="78" selection-end-column="51" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/trend/svg/trade-chart_tick.js">
+    <entry file="file://$PROJECT_DIR$/src/k/canvas/trade-chart_k.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trade-chart.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="667">
-          <caret line="210" column="7522" lean-forward="false" selection-start-line="210" selection-start-column="7518" selection-end-line="210" selection-end-column="7522" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4922">
-          <caret line="709" column="46" lean-forward="false" selection-start-line="709" selection-start-column="46" selection-end-line="709" selection-end-column="46" />
+        <state relative-caret-position="406">
+          <caret line="111" column="49" selection-start-line="133" selection-start-column="8" selection-end-line="133" selection-end-column="54" />
           <folding>
-            <element signature="e#4868#5610#0" expanded="false" />
-            <element signature="e#5817#6252#0" expanded="false" />
-            <element signature="e#6486#9514#0" expanded="false" />
-            <element signature="e#9746#10100#0" expanded="false" />
-            <element signature="e#10333#10717#0" expanded="false" />
-            <element signature="e#10932#12125#0" expanded="false" />
-            <element signature="e#12524#17552#0" expanded="false" />
-            <element signature="e#22205#23070#0" expanded="false" />
-            <element signature="e#23138#25369#0" expanded="false" />
-            <element signature="e#30068#30522#0" expanded="false" />
-            <element signature="e#30656#33304#0" expanded="false" />
-            <element signature="e#33339#35071#0" expanded="false" />
+            <element signature="e#21915#23508#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js">
+    <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6715">
-          <caret line="720" column="17" lean-forward="false" selection-start-line="704" selection-start-column="16" selection-end-line="720" selection-end-column="17" />
+        <state relative-caret-position="242">
+          <caret line="66" column="58" selection-start-line="66" selection-start-column="58" selection-end-line="66" selection-end-column="58" />
           <folding>
-            <element signature="e#5784#7076#0" expanded="false" />
-            <element signature="e#7262#7697#0" expanded="false" />
-            <element signature="e#7923#12948#0" expanded="false" />
-            <element signature="e#13171#14796#0" expanded="false" />
-            <element signature="e#15089#17875#0" expanded="false" />
-            <element signature="e#20982#21158#0" expanded="false" />
-            <element signature="e#23345#25615#0" expanded="false" />
-            <element signature="e#24323#25588#0" expanded="false" />
-            <element signature="e#25691#27370#0" expanded="false" />
-            <element signature="e#27404#36006#0" expanded="false" />
-            <element signature="e#27548#32454#0" expanded="false" />
-            <element signature="e#32491#35344#0" expanded="false" />
-            <element signature="e#35429#35981#0" expanded="false" />
-            <element signature="e#36042#40713#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="42" column="26" lean-forward="false" selection-start-line="42" selection-start-column="26" selection-end-line="42" selection-end-column="26" />
-          <folding>
-            <element signature="e#5180#6617#0" expanded="false" />
-            <element signature="e#6805#7242#0" expanded="false" />
-            <element signature="e#7682#12456#0" expanded="false" />
-            <element signature="e#12631#13357#0" expanded="false" />
-            <element signature="e#13634#17361#0" expanded="false" />
-            <element signature="e#23576#25846#0" expanded="false" />
-            <element signature="e#24554#25819#0" expanded="false" />
-            <element signature="e#25922#27661#0" expanded="false" />
-            <element signature="e#27694#34767#0" expanded="false" />
-            <element signature="e#34190#34742#0" expanded="false" />
-            <element signature="e#34806#39028#0" expanded="false" />
+            <element signature="e#21792#23358#0" />
+            <element signature="e#25799#27505#0" />
+            <element signature="e#27539#36141#0" />
           </folding>
         </state>
       </provider>
