@@ -724,7 +724,7 @@
 				if(config.showAxisXLine)
 					y_axisXTickLabel += config.axisTickLineLength;
 
-				axisXTickList.forEach(function(tick){
+				axisXTickList.forEach(function(tick, i){
 					var tickX = tick.x;
 
 					/* 绘制刻度线 */

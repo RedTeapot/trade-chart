@@ -137,7 +137,7 @@
 		volumeMarginTop: 15,/** 量图区的顶部外边距 （即与图形区的间距）*/
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 		volumeAxisYMidTickQuota: 2, /** 量图纵坐标刻度个数（不包括最小值和最大值） */
-		axisYVolumeFloor: null, /** 量图纵坐标最小刻度, 为null时自动 */
+		volumeAxisYFloor: null, /** 量图纵坐标最小刻度, 为null时自动 */
 		volumeAxisYLabelFont: null,/** 量图纵坐标的坐标标签字体 */
 		volumeAxisYLabelColor: null,/** 量图纵坐标的坐标标签颜色 */
 		volumeAxisYLabelVerticalOffset: function(i, n){/** 量图纵坐标标签纵向位移 */
@@ -321,8 +321,8 @@
 
 		/* 确定量图Y轴最小值 */
 		b = new Big(dataSketch.origin.avgVolumeVariation).div(2);
-		if(null != config.axisYVolumeFloor)
-			dataSketch.extended.volumeFloor = Number(config.axisYVolumeFloor);
+		if(null != config.volumeAxisYFloor)
+			dataSketch.extended.volumeFloor = Number(config.volumeAxisYFloor);
 		else
 			dataSketch.extended.volumeFloor = dataSketch.origin.minVolume - numBig(b);
 		if(!isFinite(dataSketch.extended.volumeFloor) || dataSketch.extended.volumeFloor < 0)
@@ -350,6 +350,10 @@
 	 * @param config {JsonObject} 渲染配置
 	 */
 	var initCanvasAndConfig = function(canvasObj, config){
+		/* 历史兼容，待移除 */
+		if(!!config.axisYVolumeFloor)
+			config.volumeAxisYFloor = config.axisYVolumeFloor;
+
 		/* 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
 			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
@@ -726,7 +730,7 @@
 				if(config.showAxisXLine)
 					y_axisXTickLabel += config.axisTickLineLength;
 
-				axisXTickList.forEach(function(tick){
+				axisXTickList.forEach(function(tick, i){
 					var tickX = tick.x;
 
 					/* 绘制刻度线 */
@@ -1034,7 +1038,9 @@
 							ctx.restore();
 						}
 
-
+						/* 汇集刻度，用于图形绘制完毕后统一绘制 */
+						var format = config.axisYFormatter || util.formatMoney;
+						axisYTickList.push({y: tickY, label: format(price, config)});
 					}
 					/* 量图 */
 					if(config.showVolume){
