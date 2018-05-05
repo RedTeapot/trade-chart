@@ -330,6 +330,8 @@
 
 		/* 确定量图Y轴最大值 */
 		dataSketch.extended.volumeCeiling = dataSketch.origin.maxVolume + numBig(b);
+		if(!isFinite(dataSketch.extended.volumeCeiling) || dataSketch.extended.volumeCeiling < 0)
+			dataSketch.extended.volumeCeiling = 0;
 
 		/* 确保最大值与最小值不同 */
 		b = new Big(dataSketch.extended.volumeFloor);
@@ -1186,7 +1188,7 @@
 						ctx.strokeWidth = 0;
 						ctx.fillStyle = isAppreciated? config.appreciatedVolumeColor: (isKeeped? config.volumeColor: config.depreciatedVolumeColor);
 
-						var volumeHeight = ceilBig(new Big(data.volume).div(_sketch.chart.volumeHeightRatio));
+						var volumeHeight = ceilBig(new Big(data.volume).minus(_sketch.data.extended.volumeFloor).div(_sketch.chart.volumeHeightRatio));
 						ctx.fillRect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
 						ctx.restore();
 					}

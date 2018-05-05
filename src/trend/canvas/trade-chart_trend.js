@@ -360,6 +360,8 @@
 
 		/* 确定量图Y轴最大值 */
 		dataSketch.extended.volumeCeiling = dataSketch.origin.maxVolume + numBig(b);
+		if(!isFinite(dataSketch.extended.volumeCeiling) || dataSketch.extended.volumeCeiling < 0)
+			dataSketch.extended.volumeCeiling = 0;
 
 		/* 确保最大值与最小值不同 */
 		b = new Big(dataSketch.extended.volumeFloor);
