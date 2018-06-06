@@ -124,6 +124,48 @@
 	};
 
 	/**
+	 * 尝试调用指定的方法
+	 * @param {Function} func 待执行的方法
+	 * @param {Object} ctx 方法执行时的this上下文
+	 * @param {Arguments} args 方法参数列表对象
+	 */
+	var try2Apply = function(func, ctx, args){
+		if(null == func || typeof func != "function")
+			return;
+
+		try{
+			return func.apply(ctx, args);
+		}catch(e){
+			console.error("Error occured while executing function: " + func.name, e, e.stack);
+			return undefined;
+		}
+	};
+
+	/**
+	 * 尝试调用指定的方法
+	 * @param {Function} func 待执行的方法
+	 * @param {Object} ctx 方法执行时的this上下文
+	 * @param {Any} args... 方法参数列表
+	 */
+	var try2Call = function(func, ctx, args){
+		if(null == func || typeof func != "function")
+			return;
+
+		try{
+			var tmp = "", index = 2;
+			for(var i = index; i < arguments.length; i++)
+				tmp += ",arguments[" + i + "]";
+
+			var rst;
+			eval("rst = func.call(ctx" + tmp + ")");
+			return rst;
+		}catch(e){
+			console.error("Error occured while executing function: " + func.name, e, e.stack);
+			return undefined;
+		}
+	};
+
+	/**
 	 * 解析给定的参数将其以数字形式返回
 	 * @param {Any} tar 要解析的参数
 	 * @param {Number} [dftValue] 如果要解析的参数不是一个合法的数字时，要返回的默认数字
@@ -224,6 +266,8 @@
 		setAttributes: setAttributes,
 		pixelRatio: pixelRatio,
 		isEmptyString: isEmptyString,
+		try2Call: try2Call,
+		try2Apply: try2Apply,
 		parseAsNumber: parseAsNumber,
 	};
 	/* big.js v3.1.3 https://github.com/MikeMcl/big.js/LICENCE */

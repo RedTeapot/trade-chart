@@ -157,6 +157,34 @@
 	};
 
 	/**
+	 * 使用给定的配置合并默认配置，并使用合并结果执行给定的动作
+	 * @param {Object} config 要合并的配置
+	 * @param {Function} callback 要执行的动作
+	 */
+	var mergeDefaultChartConfigAndDo = (function(){
+		var tmp = util.setDftValue(null, defaultChartConfig);
+
+		var reset = function(){
+			for(var p in tmp){
+				if(p in defaultChartConfig)
+					tmp[p] = defaultChartConfig[p];
+				else
+					delete tmp[p];
+			}
+		};
+
+		return function(config, callback){
+			reset();
+			if(null != config && typeof config == "object")
+				for(var p in config)
+					tmp[p] = config[p];
+
+			util.try2Call(callback, null, tmp);
+			reset();
+		};
+	})();
+
+	/**
 	 * 根据给定的配置信息计算绘制所需要的图形信息
 	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
 	 * @param {JsonObject} config 渲染配置
@@ -201,16 +229,19 @@
 	 * @param {JsonObject} config 渲染配置
 	 */
 	var calcMaxGroupCount = function(canvasObj, config){
-		config = util.cloneObject(config, true);
-		config = util.setDftValue(config, defaultChartConfig);
+		var maxGroupCount = 0;
 
-		/** 百分比尺寸自动转换 */
-		if(/%/.test(config.width))
-			config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
-		if(/%/.test(config.height))
-			config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
+		mergeDefaultChartConfigAndDo(config, function(mergedConfig){
+			/** 百分比尺寸自动转换 */
+			if(/%/.test(mergedConfig.width))
+				mergedConfig.width = canvasObj.parentElement.clientWidth * parseInt(mergedConfig.width.replace(/%/, "")) / 100;
+			if(/%/.test(mergedConfig.height))
+				mergedConfig.height = canvasObj.parentElement.clientHeight * parseInt(mergedConfig.height.replace(/%/, "")) / 100;
 
-		return sketchChart(config).maxGroupCount;
+			maxGroupCount = sketchChart(mergedConfig).maxGroupCount;
+		});
+
+		return maxGroupCount;
 	};
 
 	/**
@@ -593,10 +624,7 @@
 		 * @param config {JsonObject} 渲染配置
 		 * @returns {RenderedKChart} 绘制的K线图
 		 */
-		this.render = function(canvasObj, config){
-			config = util.cloneObject(config, true);
-			config = util.setDftValue(config, defaultChartConfig);
-
+		var doRender = function(canvasObj, config){
 			if(config.groupBarWidth < config.groupLineWidth + 2)
 				throw new Error("Bar width should be bigger than group line width plus 2.");
 
@@ -1246,6 +1274,23 @@
 			Object.freeze && Object.freeze(renderMetadata);
 
 			return new RenderedKChart(this, _sketch, config, renderMetadata);
+		};
+
+		/**
+		 * 渲染图形，并呈现至指定的画布中
+		 * @param domContainerObj {HTMLCanvasElement} 画布
+		 * @param config {JsonObject} 渲染配置
+		 * @returns {RenderedKChart} 绘制的K线图
+		 */
+		this.render = function(canvasObj, config){
+			var self = this;
+
+			var rst = null;
+			mergeDefaultChartConfigAndDo(config, function(mergedConfig){
+				rst = util.try2Call(doRender, self, canvasObj, mergedConfig);
+			});
+
+			return rst;
 		};
 
 		/**
