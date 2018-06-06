@@ -1163,7 +1163,7 @@
 			};
 			Object.freeze && Object.freeze(renderMetadata);
 
-			return new RenderedDepthChart(this, _sketch, config, renderMetadata, sellerAreaHorizontalOffset);
+			return new RenderedDepthChart(this, _sketch, util.cloneObject(config), renderMetadata, sellerAreaHorizontalOffset);
 		};
 
 		/**

@@ -1327,7 +1327,7 @@
 			};
 			Object.freeze && Object.freeze(renderMetadata);
 
-			return new RenderedTrendChart(this, _sketch, config, renderMetadata);
+			return new RenderedTrendChart(this, _sketch, util.cloneObject(config), renderMetadata);
 		};
 
 		/**

@@ -1273,7 +1273,7 @@
 			};
 			Object.freeze && Object.freeze(renderMetadata);
 
-			return new RenderedKChart(this, _sketch, config, renderMetadata);
+			return new RenderedKChart(this, _sketch, util.cloneObject(config), renderMetadata);
 		};
 
 		/**
