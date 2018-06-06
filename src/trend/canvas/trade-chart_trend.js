@@ -266,12 +266,12 @@
 
 		mergeDefaultChartConfigAndDo(config, function(mergedConfig){
 			/** 百分比尺寸自动转换 */
-			if(/%/.test(config.width))
-				config.width = canvasObj.parentElement.clientWidth * parseInt(config.width.replace(/%/, "")) / 100;
-			if(/%/.test(config.height))
-				config.height = canvasObj.parentElement.clientHeight * parseInt(config.height.replace(/%/, "")) / 100;
+			if(/%/.test(mergedConfig.width))
+				mergedConfig.width = canvasObj.parentElement.clientWidth * parseInt(mergedConfig.width.replace(/%/, "")) / 100;
+			if(/%/.test(mergedConfig.height))
+				mergedConfig.height = canvasObj.parentElement.clientHeight * parseInt(mergedConfig.height.replace(/%/, "")) / 100;
 
-			maxDotCount = sketchChart(config).maxDotCount;
+			maxDotCount = sketchChart(mergedConfig).maxDotCount;
 		});
 
 		return maxDotCount;
