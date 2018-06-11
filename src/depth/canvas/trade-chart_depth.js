@@ -83,7 +83,7 @@
 		axisYPrecision: 2,/** 纵坐标的数字精度 */
 		axisYFormatter: function(amount, config){/** 纵坐标数字格式化方法 */
 			/** amount：委托量；config：配置 */
-			return util.formatMoney(amount, config.axisYPrecision);
+			return util.formatMoney(+amount, config.axisYPrecision);
 		},
 		axisYAmountFloor: function(min, max, avgVariation, maxVariation){
 			if(!isFinite(min))
@@ -252,7 +252,7 @@
 		}, chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
-		var previous = {amount: 0};
+		var previousAmount = 0;
 		var variationSum = 0;
 		datas = (datas.buyer || []).concat(datas.seller || []);
 		for(var i = 0; i < datas.length; i++){
@@ -265,14 +265,14 @@
 			if(+d.amount < dataSketch.origin.minAmount)
 				dataSketch.origin.minAmount = +d.amount;
 
-			var variation = Math.abs(+d.amount - +previous.amount);
+			var variation = Math.abs(+d.amount - previousAmount);
 
 			/* 确定更大的变动幅度 */
 			if(variation > dataSketch.origin.maxAmountVariation)
 				dataSketch.origin.maxAmountVariation = variation;
 
 			variationSum += variation;
-			previous = d;
+			previousAmount = +d.amount;
 		}
 		var len = datas.length;
 		dataSketch.origin.avgAmountVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
@@ -559,7 +559,7 @@
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + roundBig(new Big(dataPosition.dataIndex).mul(config.dotGap + 1)) + ("seller" == dataPosition.area? sellerAreaHorizontalOffset: 0);
-			obj.y = minY + roundBig(new Big(Math.abs(sketch.data.extended.amountCeiling - data.amount)).div(sketch.chart.amountHeightRatio));
+			obj.y = minY + roundBig(new Big(Math.abs(sketch.data.extended.amountCeiling - +data.amount)).div(sketch.chart.amountHeightRatio));
 
 			return obj;
 		};
@@ -702,13 +702,13 @@
 				datas.buyer.sort(function(a, b){
 					a = dataParser? dataParser(a): a;
 					b = dataParser? dataParser(b): b;
-					return a.price > b.price? 1: -1;
+					return +a.price > +b.price? 1: -1;
 				});
 			if(Array.isArray(datas.seller))
 				datas.seller.sort(function(a, b){
 					a = dataParser? dataParser(a): a;
 					b = dataParser? dataParser(b): b;
-					return a.price > b.price? 1: -1;
+					return +a.price > +b.price? 1: -1;
 				});
 
 			/**
@@ -1029,7 +1029,7 @@
 						/* 数据格式转换 */
 						data = dataParser? dataParser(data, i): data;
 
-						var amountVariation = _sketch.data.extended.amountCeiling - data.amount;
+						var amountVariation = _sketch.data.extended.amountCeiling - +data.amount;
 						var height = numBig(new Big(amountVariation).div(_sketch.chart.amountHeightRatio));
 						dotX = minX + roundBig(new Big(config.dotGap + 1).mul(i));/* 保留两位小数 */
 						dotY = yTop_axisY + Math.floor(height);

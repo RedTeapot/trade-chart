@@ -279,7 +279,7 @@
 		}, chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
-		var previous = {volume: 0};
+		var previousVolume = 0;
 		var variationSum = 0, volumeVariationSum = 0;
 		for(var i = 0; i < datas.length && i < chartSketch.maxGroupCount; i++){
 			var d = datas[i];
@@ -305,7 +305,7 @@
 				dataSketch.origin.minVolume = +d.volume;
 
 			var variation = Math.abs(max - min);
-			var volumeVariation = Math.abs(+d.volume - +previous.volume);
+			var volumeVariation = Math.abs(+d.volume - +previousVolume);
 
 			/* 确定更大的价格变动幅度 */
 			if(variation > dataSketch.origin.maxVariation)
@@ -316,7 +316,7 @@
 			variationSum += variation;
 			volumeVariationSum += volumeVariation;
 
-			previous.volume = d.volume;
+			previousVolume = d.volume;
 		}
 		var len = datas.length;
 		dataSketch.origin.avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
