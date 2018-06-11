@@ -288,12 +288,13 @@
 
 			var max = Math.max(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice),
 				min = Math.min(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice);
-			config.showMAArr.forEach(function(num){
+			for(var j = 0; j < config.showMAArr.length; j++){
+				var num = config.showMAArr[j];
 				if(d["MA"+num] != null){
-					max =  Math.max(+d["MA"+num], max);
-					min =  Math.min(+d["MA"+num], min);
+					max = Math.max(+d["MA"+num], max);
+					min = Math.min(+d["MA"+num], min);
 				}
-			});
+			}
 			if(max > dataSketch.origin.max)
 				dataSketch.origin.max = max;
 			if(min < dataSketch.origin.min)
@@ -1197,7 +1198,8 @@
 						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
 
 					/* 整理MA线数据 */
-					config.showMAArr.forEach(function(num, k){
+					for(var k = 0; k < config.showMAArr.length; k++){
+						var num = config.showMAArr[k];
 						if(maDots[k] == null)
 							maDots[k] = [];
 
@@ -1208,7 +1210,7 @@
 						var dotX = lineX + floorBig(new Big(config.groupLineWidth + 1).div(2)),
 							dotY = Math.floor(yTop_axisY + getHeight(d));
 						maDots[k].push([dotX, dotY]);
-					});
+					}
 
 					/* 绘制量图 */
 					if(config.showVolume){
@@ -1238,12 +1240,10 @@
 
 					ctx.beginPath();
 					ctx.moveTo(maDots[i][0][0], maDots[i][0][1]);
-					maDots[i].forEach(function(MADot, k){
-						if(k == 0)
-							return;
-
+					for(var k = 1; k < maDots[i].length; k++){
+						var MADot = maDots[i];
 						ctx.lineTo(MADot[0], MADot[1]);
-					});
+					}
 					ctx.stroke();
 
 					var labelText = "MA" + num;
