@@ -232,24 +232,23 @@
 
 	/**
 	 * 扫描提供的数据，生成绘制所需的元数据
-	 * @param {Array#JsonObject} datas 数据数组
+	 * @param {Object[]} datas 数据数组
 	 * @param {Function} dataParser 数据转换方法
-	 * @param {JsonObject} config 渲染配置
-	 * @returns {JsonObject} 元数据集合
+	 * @param {Object} config 渲染配置
+	 * @returns {Object} 元数据集合
 	 */
 	var sketch = function(datas, dataParser, config){
-		var dataSketch = {
-			origin: {
-				maxAmount: -Infinity,/* 最大委托量 */
-				minAmount: Infinity,/* 最小委托量 */
-				avgAmountVariation: 0,/* 委托量的平均变动幅度 */
-				maxAmountVariation: 0,/* 委托量的最大变动幅度 */
-			},
-			extended: {
-				amountCeiling: 0,/* 坐标中委托量的最大值 */
-				amountFloor: 0,/* 坐标中委托量的最小值 */
-			}
-		}, chartSketch = sketchChart(config);
+		var dataSketch_origin_maxAmount = -Infinity,/* 最大委托量 */
+			dataSketch_origin_minAmount = Infinity,/* 最小委托量 */
+			dataSketch_origin_avgAmountVariation = 0,/* 委托量的平均变动幅度 */
+			dataSketch_origin_maxAmountVariation = 0;/* 委托量的最大变动幅度 */
+
+		var extendedData = {
+			amountCeiling: 0,/* 坐标中委托量的最大值 */
+			amountFloor: 0,/* 坐标中委托量的最小值 */
+		};
+
+		var chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
 		var previousAmount = 0;
@@ -260,56 +259,56 @@
 			/* 数据格式转换 */
 			d = dataParser? dataParser(d, i): d;
 
-			if(+d.amount > dataSketch.origin.maxAmount)
-				dataSketch.origin.maxAmount = +d.amount;
-			if(+d.amount < dataSketch.origin.minAmount)
-				dataSketch.origin.minAmount = +d.amount;
+			if(+d.amount > dataSketch_origin_maxAmount)
+				dataSketch_origin_maxAmount = +d.amount;
+			if(+d.amount < dataSketch_origin_minAmount)
+				dataSketch_origin_minAmount = +d.amount;
 
 			var variation = Math.abs(+d.amount - previousAmount);
 
 			/* 确定更大的变动幅度 */
-			if(variation > dataSketch.origin.maxAmountVariation)
-				dataSketch.origin.maxAmountVariation = variation;
+			if(variation > dataSketch_origin_maxAmountVariation)
+				dataSketch_origin_maxAmountVariation = variation;
 
 			variationSum += variation;
 			previousAmount = +d.amount;
 		}
 		var len = datas.length;
-		dataSketch.origin.avgAmountVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
+		dataSketch_origin_avgAmountVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
 
 		/* 确定Y轴最小值 */
 		if(null != config.axisYAmountFloor){
 			if(typeof config.axisYAmountFloor == "function")
-				dataSketch.extended.amountFloor = config.axisYAmountFloor(dataSketch.origin.minAmount, dataSketch.origin.maxAmount, dataSketch.origin.avgAmountVariation, dataSketch.origin.maxAmountVariation);
+				extendedData.amountFloor = config.axisYAmountFloor(dataSketch_origin_minAmount, dataSketch_origin_maxAmount, dataSketch_origin_avgAmountVariation, dataSketch_origin_maxAmountVariation);
 			else
-				dataSketch.extended.amountFloor = Number(config.axisYAmountFloor);
+				extendedData.amountFloor = Number(config.axisYAmountFloor);
 		}else
-			dataSketch.extended.amountFloor = dataSketch.origin.minAmount - numBig(new Big(dataSketch.origin.avgAmountVariation).div(2));
-		if(!isFinite(dataSketch.extended.amountFloor) || dataSketch.extended.amountFloor < 0)
-			dataSketch.extended.amountFloor = 0;
+			extendedData.amountFloor = dataSketch_origin_minAmount - numBig(new Big(dataSketch_origin_avgAmountVariation).div(2));
+		if(!isFinite(extendedData.amountFloor) || extendedData.amountFloor < 0)
+			extendedData.amountFloor = 0;
 
 		/* 确定Y轴最大值 */
 		if(null != config.axisYAmountCeiling){
 			if(typeof config.axisYAmountCeiling == "function")
-				dataSketch.extended.amountCeiling = config.axisYAmountCeiling(dataSketch.origin.minAmount, dataSketch.origin.maxAmount, dataSketch.origin.avgAmountVariation, dataSketch.origin.maxAmountVariation);
+				extendedData.amountCeiling = config.axisYAmountCeiling(dataSketch_origin_minAmount, dataSketch_origin_maxAmount, dataSketch_origin_avgAmountVariation, dataSketch_origin_maxAmountVariation);
 			else
-				dataSketch.extended.amountCeiling = Number(config.axisYAmountCeiling);
+				extendedData.amountCeiling = Number(config.axisYAmountCeiling);
 		}else
-			dataSketch.extended.amountCeiling = dataSketch.origin.maxAmount + numBig(new Big(dataSketch.origin.avgAmountVariation).div(2));
-		if(dataSketch.extended.amountCeiling < dataSketch.origin.maxAmount)
-			dataSketch.extended.amountCeiling = dataSketch.origin.maxAmount;
-		if(!isFinite(dataSketch.extended.amountCeiling) || dataSketch.extended.amountCeiling < 0)
-			dataSketch.extended.amountCeiling = dataSketch.extended.amountFloor;
+			extendedData.amountCeiling = dataSketch_origin_maxAmount + numBig(new Big(dataSketch_origin_avgAmountVariation).div(2));
+		if(extendedData.amountCeiling < dataSketch_origin_maxAmount)
+			extendedData.amountCeiling = dataSketch_origin_maxAmount;
+		if(!isFinite(extendedData.amountCeiling) || extendedData.amountCeiling < 0)
+			extendedData.amountCeiling = extendedData.amountFloor;
 
 		/* 确保最大值与最小值不同 */
-		var b = new Big(dataSketch.extended.amountFloor);
-		if(b.eq(dataSketch.extended.amountCeiling))
-			dataSketch.extended.amountCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+		var b = new Big(extendedData.amountFloor);
+		if(b.eq(extendedData.amountCeiling))
+			extendedData.amountCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
-		b = new Big(dataSketch.extended.amountCeiling - dataSketch.extended.amountFloor).div(chartSketch.contentHeight);
+		b = new Big(extendedData.amountCeiling - extendedData.amountFloor).div(chartSketch.contentHeight);
 		chartSketch.amountHeightRatio = b.eq(0)? 1: numBig(b);
 
-		return {data: dataSketch, chart: chartSketch};
+		return {extendedData: extendedData, chart: chartSketch};
 	};
 
 	/**
@@ -559,7 +558,7 @@
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + roundBig(new Big(dataPosition.dataIndex).mul(config.dotGap + 1)) + ("seller" == dataPosition.area? sellerAreaHorizontalOffset: 0);
-			obj.y = minY + roundBig(new Big(Math.abs(sketch.data.extended.amountCeiling - +data.amount)).div(sketch.chart.amountHeightRatio));
+			obj.y = minY + roundBig(new Big(Math.abs(sketch.extendedData.amountCeiling - +data.amount)).div(sketch.chart.amountHeightRatio));
 
 			return obj;
 		};
@@ -961,13 +960,13 @@
 					}
 
 					/* 绘制Y轴刻度 */
-					var axisYAmountInterval = numBig(new Big(_sketch.data.extended.amountCeiling - _sketch.data.extended.amountFloor).div(config.axisYMidTickQuota + 1));
+					var axisYAmountInterval = numBig(new Big(_sketch.extendedData.amountCeiling - _sketch.extendedData.amountFloor).div(config.axisYMidTickQuota + 1));
 
 					var b = new Big(axisYAmountInterval);
 					var axisYHeightInterval = numBig(b.div(_sketch.chart.amountHeightRatio));
 					var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
 					for(var i = 0; i <= maxAxisYTickIndex; i++){
-						var amount = _sketch.data.extended.amountFloor + numBig(b.mul(i)),
+						var amount = _sketch.extendedData.amountFloor + numBig(b.mul(i)),
 							tickOffset = numBig(new Big(maxAxisYTickIndex - i).mul(axisYHeightInterval));
 						var tickY = yTop_axisY + Math.round(tickOffset);
 
@@ -1029,7 +1028,7 @@
 						/* 数据格式转换 */
 						data = dataParser? dataParser(data, i): data;
 
-						var amountVariation = _sketch.data.extended.amountCeiling - +data.amount;
+						var amountVariation = _sketch.extendedData.amountCeiling - +data.amount;
 						var height = numBig(new Big(amountVariation).div(_sketch.chart.amountHeightRatio));
 						dotX = minX + roundBig(new Big(config.dotGap + 1).mul(i));/* 保留两位小数 */
 						dotY = yTop_axisY + Math.floor(height);

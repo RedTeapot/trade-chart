@@ -253,30 +253,27 @@
 
 	/**
 	 * 扫描提供的数据，生成绘制所需的元数据
-	 * @param datas {JsonArray} 数据数组
-	 * @param dataParser {Function} 数据转换方法
-	 * @param config {JsonObject} 渲染配置
-	 * @return {JsonObject} 元数据集合
+	 * @param {Object[]} datas 数据数组
+	 * @param {Function} dataParser 数据转换方法
+	 * @param {Object} config 渲染配置
+	 * @returns {Object} 元数据集合
 	 */
 	var sketch = function(datas, dataParser, config){
-		var dataSketch = {
-			origin: {
-				max: -Infinity,/* 最大价格 */
-				min: Infinity,/* 最小价格 */
-				avgVariation: 0,/* 价格的平均变动幅度 */
-				maxVariation: 0,/* 价格的最大变动幅度 */
-				maxVolume: -Infinity,/* 最大交易量 */
-				minVolume: Infinity,/* 最小交易量 */
-				avgVolumeVariation: 0,/* 交易量的平均变动幅度 */
-				maxVolumeVariation: 0/* 交易量的最大变动幅度 */
-			},
-			extended: {
-				priceCeiling: 0,/* 坐标中价格的最大值 */
-				priceFloor: 0,/* 坐标中价格的最小值 */
-				volumeCeiling: 0,/* 坐标中成交量的最大值 */
-				volumeFloor: 0/* 坐标中成交量的最小值 */
-			}
-		}, chartSketch = sketchChart(config);
+		var dataSketch_origin_max = -Infinity,/* 最大价格 */
+			dataSketch_origin_min = Infinity,/* 最小价格 */
+			dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */
+			dataSketch_origin_maxVariation = 0,/* 价格的最大变动幅度 */
+			dataSketch_origin_maxVolume = -Infinity,/* 最大交易量 */
+			dataSketch_origin_minVolume = Infinity,/* 最小交易量 */
+			dataSketch_origin_avgVolumeVariation = 0,/* 交易量的平均变动幅度 */
+			dataSketch_origin_maxVolumeVariation = 0,/* 交易量的最大变动幅度 */
+
+			dataSketch_extended_priceCeiling = 0,/* 坐标中价格的最大值 */
+			dataSketch_extended_priceFloor = 0,/* 坐标中价格的最小值 */
+			dataSketch_extended_volumeCeiling = 0,/* 坐标中成交量的最大值 */
+			dataSketch_extended_volumeFloor = 0;/* 坐标中成交量的最小值 */
+
+		var chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
 		var previousVolume = 0;
@@ -295,23 +292,23 @@
 					min = Math.min(+d["MA"+num], min);
 				}
 			}
-			if(max > dataSketch.origin.max)
-				dataSketch.origin.max = max;
-			if(min < dataSketch.origin.min)
-				dataSketch.origin.min = min;
-			if(+d.volume > dataSketch.origin.maxVolume)
-				dataSketch.origin.maxVolume = +d.volume;
-			if(+d.volume < dataSketch.origin.minVolume)
-				dataSketch.origin.minVolume = +d.volume;
+			if(max > dataSketch_origin_max)
+				dataSketch_origin_max = max;
+			if(min < dataSketch_origin_min)
+				dataSketch_origin_min = min;
+			if(+d.volume > dataSketch_origin_maxVolume)
+				dataSketch_origin_maxVolume = +d.volume;
+			if(+d.volume < dataSketch_origin_minVolume)
+				dataSketch_origin_minVolume = +d.volume;
 
 			var variation = Math.abs(max - min);
 			var volumeVariation = Math.abs(+d.volume - +previousVolume);
 
 			/* 确定更大的价格变动幅度 */
-			if(variation > dataSketch.origin.maxVariation)
-				dataSketch.origin.maxVariation = variation;
-			if(volumeVariation > dataSketch.origin.maxVolumeVariation)
-				dataSketch.origin.maxVolumeVariation = volumeVariation;
+			if(variation > dataSketch_origin_maxVariation)
+				dataSketch_origin_maxVariation = variation;
+			if(volumeVariation > dataSketch_origin_maxVolumeVariation)
+				dataSketch_origin_maxVolumeVariation = volumeVariation;
 
 			variationSum += variation;
 			volumeVariationSum += volumeVariation;
@@ -319,63 +316,69 @@
 			previousVolume = d.volume;
 		}
 		var len = datas.length;
-		dataSketch.origin.avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
-		dataSketch.origin.avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
+		dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
+		dataSketch_origin_avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
 
 		/* 确定Y轴最小值 */
 		if(null != config.axisYPriceFloor){
 			if(typeof config.axisYPriceFloor == "function")
-				dataSketch.extended.priceFloor = config.axisYPriceFloor(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
+				dataSketch_extended_priceFloor = config.axisYPriceFloor(dataSketch_origin_min, dataSketch_origin_max, dataSketch_origin_avgVariation, dataSketch_origin_maxVariation);
 			else
-				dataSketch.extended.priceFloor = Number(config.axisYPriceFloor);
+				dataSketch_extended_priceFloor = Number(config.axisYPriceFloor);
 		}else
-			dataSketch.extended.priceFloor = dataSketch.origin.min - numBig(new Big(dataSketch.origin.avgVariation).div(2));
-		if(!isFinite(dataSketch.extended.priceFloor) || dataSketch.extended.priceFloor < 0)
-			dataSketch.extended.priceFloor = 0;
+			dataSketch_extended_priceFloor = dataSketch_origin_min - numBig(new Big(dataSketch_origin_avgVariation).div(2));
+		if(!isFinite(dataSketch_extended_priceFloor) || dataSketch_extended_priceFloor < 0)
+			dataSketch_extended_priceFloor = 0;
 
 		/* 确定Y轴最大值 */
 		if(null != config.axisYPriceCeiling){
 			if(typeof config.axisYPriceCeiling == "function")
-				dataSketch.extended.priceCeiling = config.axisYPriceCeiling(dataSketch.origin.min, dataSketch.origin.max, dataSketch.origin.avgVariation, dataSketch.origin.maxVariation);
+				dataSketch_extended_priceCeiling = config.axisYPriceCeiling(dataSketch_origin_min, dataSketch_origin_max, dataSketch_origin_avgVariation, dataSketch_origin_maxVariation);
 			else
-				dataSketch.extended.priceCeiling = Number(config.axisYPriceCeiling);
+				dataSketch_extended_priceCeiling = Number(config.axisYPriceCeiling);
 		}else
-			dataSketch.extended.priceCeiling = dataSketch.origin.max + numBig(new Big(dataSketch.origin.avgVariation).div(2));
-		if(dataSketch.extended.priceCeiling < dataSketch.origin.max)
-			dataSketch.extended.priceCeiling = dataSketch.origin.max;
-		if(!isFinite(dataSketch.extended.priceCeiling) || dataSketch.extended.priceCeiling < 0)
-			dataSketch.extended.priceCeiling = dataSketch.extended.priceFloor;
+			dataSketch_extended_priceCeiling = dataSketch_origin_max + numBig(new Big(dataSketch_origin_avgVariation).div(2));
+		if(dataSketch_extended_priceCeiling < dataSketch_origin_max)
+			dataSketch_extended_priceCeiling = dataSketch_origin_max;
+		if(!isFinite(dataSketch_extended_priceCeiling) || dataSketch_extended_priceCeiling < 0)
+			dataSketch_extended_priceCeiling = dataSketch_extended_priceFloor;
 
 		/* 确保最大值与最小值不同 */
-		var b = new Big(dataSketch.extended.priceFloor);
-		if(b.eq(dataSketch.extended.priceCeiling))
-			dataSketch.extended.priceCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+		var b = new Big(dataSketch_extended_priceFloor);
+		if(b.eq(dataSketch_extended_priceCeiling))
+			dataSketch_extended_priceCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
 		/* 确定量图Y轴最小值 */
-		b = new Big(dataSketch.origin.avgVolumeVariation).div(2);
+		b = new Big(dataSketch_origin_avgVolumeVariation).div(2);
 		if(null != config.volumeAxisYFloor)
-			dataSketch.extended.volumeFloor = Number(config.volumeAxisYFloor);
+			dataSketch_extended_volumeFloor = Number(config.volumeAxisYFloor);
 		else
-			dataSketch.extended.volumeFloor = dataSketch.origin.minVolume - numBig(b);
-		if(!isFinite(dataSketch.extended.volumeFloor) || dataSketch.extended.volumeFloor < 0)
-			dataSketch.extended.volumeFloor = 0;
+			dataSketch_extended_volumeFloor = dataSketch_origin_minVolume - numBig(b);
+		if(!isFinite(dataSketch_extended_volumeFloor) || dataSketch_extended_volumeFloor < 0)
+			dataSketch_extended_volumeFloor = 0;
 
 		/* 确定量图Y轴最大值 */
-		dataSketch.extended.volumeCeiling = dataSketch.origin.maxVolume + numBig(b);
-		if(!isFinite(dataSketch.extended.volumeCeiling) || dataSketch.extended.volumeCeiling < 0)
-			dataSketch.extended.volumeCeiling = 0;
+		dataSketch_extended_volumeCeiling = dataSketch_origin_maxVolume + numBig(b);
+		if(!isFinite(dataSketch_extended_volumeCeiling) || dataSketch_extended_volumeCeiling < 0)
+			dataSketch_extended_volumeCeiling = 0;
 
 		/* 确保最大值与最小值不同 */
-		b = new Big(dataSketch.extended.volumeFloor);
-		if(b.eq(dataSketch.extended.volumeCeiling))
-			dataSketch.extended.volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+		b = new Big(dataSketch_extended_volumeFloor);
+		if(b.eq(dataSketch_extended_volumeCeiling))
+			dataSketch_extended_volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
-		b = new Big(dataSketch.extended.priceCeiling - dataSketch.extended.priceFloor).div(Math.max(chartSketch.contentHeight, 1));
+		b = new Big(dataSketch_extended_priceCeiling - dataSketch_extended_priceFloor).div(Math.max(chartSketch.contentHeight, 1));
 		chartSketch.priceHeightRatio = b.eq(0)? 1: numBig(b);
-		b = new Big(dataSketch.extended.volumeCeiling - dataSketch.extended.volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1));
+		b = new Big(dataSketch_extended_volumeCeiling - dataSketch_extended_volumeFloor).div(Math.max(chartSketch.volumeContentHeight, 1));
 		chartSketch.volumeHeightRatio = b.eq(0)? 1: numBig(b);
 
-		return {data: dataSketch, chart: chartSketch};
+		var extendedData = {
+			priceCeiling: dataSketch_extended_priceCeiling,
+			priceFloor: dataSketch_extended_priceFloor,
+			volumeCeiling: dataSketch_extended_volumeCeiling,
+			volumeFloor: dataSketch_extended_volumeFloor
+		};
+		return {extendedData: extendedData, chart: chartSketch};
 	};
 
 	/**
@@ -650,7 +653,7 @@
 			/** 横坐标刻度个数 */
 			var axisXTickCount = floorBig(new Big(groupCount).div(axisXTickInterval));
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYPriceInterval = numBig(new Big(_sketch.data.extended.priceCeiling - _sketch.data.extended.priceFloor).div(config.axisYMidTickQuota + 1));
+			var axisYPriceInterval = numBig(new Big(_sketch.extendedData.priceCeiling - _sketch.extendedData.priceFloor).div(config.axisYMidTickQuota + 1));
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
 			var axisYHeightInterval = numBig(new Big(axisYPriceInterval).div(_sketch.chart.priceHeightRatio));
 
@@ -685,12 +688,12 @@
 			/**
 			 * 获取指定价钱对应的物理高度
 			 * @param {Number} price1 价钱1
-			 * @param {Number} [price2=_sketch.data.extended.priceCeiling] 价钱2
+			 * @param {Number} [price2=_sketch.extendedData.priceCeiling] 价钱2
 			 * @returns {Number} 物理高度
 			 */
 			var getHeight = function(price1, price2){
 				if(arguments.length < 2)
-					price2 = _sketch.data.extended.priceCeiling;
+					price2 = _sketch.extendedData.priceCeiling;
 
 				return numBig(new Big(Math.abs(price2 - price1)).div(_sketch.chart.priceHeightRatio));
 			};
@@ -1052,7 +1055,7 @@
 					/* 绘制Y轴刻度（自下而上） */
 					var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
 					for(var i = 0; i <= maxAxisYTickIndex; i++){
-						var price = _sketch.data.extended.priceFloor + numBig(new Big(axisYPriceInterval).mul(i)),
+						var price = _sketch.extendedData.priceFloor + numBig(new Big(axisYPriceInterval).mul(i)),
 							tickOffset = numBig(new Big(axisYHeightInterval).mul(maxAxisYTickIndex - i));
 						var tickY = Math.round(tickOffset);
 
@@ -1075,13 +1078,13 @@
 					}
 					/* 量图 */
 					if(config.showVolume){
-						var axisYVolumeInterval = numBig(new Big(_sketch.data.extended.volumeCeiling - _sketch.data.extended.volumeFloor).div(config.volumeAxisYMidTickQuota + 1));
+						var axisYVolumeInterval = numBig(new Big(_sketch.extendedData.volumeCeiling - _sketch.extendedData.volumeFloor).div(config.volumeAxisYMidTickQuota + 1));
 						var maxVolumeAxisYTickIndex = config.volumeAxisYMidTickQuota + 1;
 
 						if(_sketch.chart.volumeHeightRatio != 0){
 							var axisYHeightIntervalAux = numBig(new Big(axisYVolumeInterval).div(_sketch.chart.volumeHeightRatio));
 							for(var i = 0; i <= maxVolumeAxisYTickIndex; i++){
-								var volume = _sketch.data.extended.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i)),
+								var volume = _sketch.extendedData.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i)),
 									tickOffset = numBig(new Big(axisYHeightIntervalAux).mul(maxVolumeAxisYTickIndex - i));
 								var tickY = Math.round(tickOffset);
 
@@ -1218,7 +1221,7 @@
 						ctx.strokeWidth = 0;
 						ctx.fillStyle = isAppreciated? config.appreciatedVolumeColor: (isKeeped? config.volumeColor: config.depreciatedVolumeColor);
 
-						var volumeHeight = ceilBig(new Big(data.volume).minus(_sketch.data.extended.volumeFloor).div(_sketch.chart.volumeHeightRatio));
+						var volumeHeight = ceilBig(new Big(data.volume).minus(_sketch.extendedData.volumeFloor).div(_sketch.chart.volumeHeightRatio));
 						ctx.fillRect(barX, Math.floor(y_volume_axisX - volumeHeight), config.groupBarWidth, volumeHeight);
 						ctx.restore();
 					}
