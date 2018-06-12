@@ -640,6 +640,8 @@
 			var ctx = canvasObj.getContext("2d");
 
 			var _sketch = sketch(datas, dataParser, config);
+			// console.log("Trend chart sketch", JSON.stringify(_sketch));
+			// console.log("Trend chart config", config);
 
 			/** 绘制的数据个数 */
 			var dotCount = Math.min(_sketch.chart.maxDotCount, datas.length);

@@ -655,6 +655,7 @@
 			var ctx = canvasObj.getContext("2d");
 
 			var _sketch = sketch(datas, dataParser, config);
+			// console.log("Depth chart sketch: " + JSON.stringify(_sketch));
 
 			/** 买方区域的起止横轴坐标 */
 			var buyerAreaXSection = getBuyerAreaXSection(config, _sketch, datas.buyer),
@@ -671,11 +672,11 @@
 			/** 横坐标刻度之间相差的点的个数 */
 			var axisXTickInterval = ceilBig(new Big(config.axisXLabelSize).div(config.dotGap + 1));
 
-			console.log("Depth chart buyer area x section: " + JSON.stringify(buyerAreaXSection));
-			console.log("Depth chart buyer area dot count: " + buyerAreaDotCount);
-			console.log("Depth chart seller area x section: " + JSON.stringify(sellerAreaXSection));
-			console.log("Depth chart seller area dot count: " + sellerAreaDotCount);
-			console.log("Depth chart x tick interval: " + axisXTickInterval);
+			// console.log("Depth chart buyer area x section: " + JSON.stringify(buyerAreaXSection));
+			// console.log("Depth chart buyer area dot count: " + buyerAreaDotCount);
+			// console.log("Depth chart seller area x section: " + JSON.stringify(sellerAreaXSection));
+			// console.log("Depth chart seller area dot count: " + sellerAreaDotCount);
+			// console.log("Depth chart x tick interval: " + axisXTickInterval);
 
 			var axisYPosition = String(config.axisYPosition).toLowerCase();
 			var ifShowAxisYLeft = "left" == axisYPosition,

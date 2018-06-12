@@ -636,6 +636,8 @@
 			var ctx = canvasObj.getContext("2d");
 
 			var _sketch = sketch(datas, dataParser, config);
+			// console.log("K chart sketch", _sketch);
+			// console.log("K chart config", config);
 
 			/** 蜡烛一半的宽度 */
 			var halfGroupBarWidth = calcHalfGroupBarWidth(config);
