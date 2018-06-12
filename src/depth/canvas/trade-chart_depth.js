@@ -655,7 +655,6 @@
 			var ctx = canvasObj.getContext("2d");
 
 			var _sketch = sketch(datas, dataParser, config);
-			console.log("Depth chart sketch: " + JSON.stringify(_sketch));
 
 			/** 买方区域的起止横轴坐标 */
 			var buyerAreaXSection = getBuyerAreaXSection(config, _sketch, datas.buyer),
