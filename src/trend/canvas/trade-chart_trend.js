@@ -576,7 +576,7 @@
 
 			var obj = {x: 0, y: 0};
 			obj.x = minX + roundBig(new Big(dataIndex).mul(config.dotGap + 1));
-			obj.y = minY + roundBig(new Big(Math.abs(sketch.data.extended.priceCeiling - data.price)).div(sketch.chart.priceHeightRatio));
+			obj.y = minY + roundBig(new Big(Math.abs(sketch.extendedData.priceCeiling - data.price)).div(sketch.chart.priceHeightRatio));
 
 			return obj;
 		};
