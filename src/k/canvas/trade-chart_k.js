@@ -1183,15 +1183,14 @@
 
 					/* 绘制蜡烛 */
 					var barX = x,
-						barY = Math.floor(yTop_axisY + getHeight(maxBarPrice)) + 0.5;
+						barY = Math.floor(yTop_axisY + getHeight(maxBarPrice));
 					var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
 					if(0 == barHeight)
 						barHeight = 1;
 					ctx.strokeWidth = 0;
 					ctx.fillRect(barX, barY, config.groupBarWidth, barHeight);
 
-					if(typeof callback == "function")
-						callback(data, i, lineX, barX);
+					util.try2Call(callback, null, data, i, lineX, barX);
 				};
 
 				var maDots = [];
@@ -1208,7 +1207,7 @@
 
 						var d = data["MA" + num];
 						if(null == d)
-							return;
+							continue;
 
 						var dotX = lineX + floorBig(new Big(config.groupLineWidth + 1).div(2)),
 							dotY = Math.floor(yTop_axisY + getHeight(d));
