@@ -1193,7 +1193,7 @@
 					util.try2Call(callback, null, data, i, lineX, barX);
 				};
 
-				var maDots = [];
+				var maDots = {};
 				var f = function(data, i, lineX, barX){
 					var isAppreciated = data.closePrice > data.openPrice,
 						isDepreciated = data.closePrice < data.openPrice,
@@ -1202,8 +1202,8 @@
 					/* 整理MA线数据 */
 					for(var k = 0; k < config.showMAArr.length; k++){
 						var num = config.showMAArr[k];
-						if(maDots[k] == null)
-							maDots[k] = [];
+						if(maDots[num] == null)
+							maDots[num] = [];
 
 						var d = data["MA" + num];
 						if(null == d)
@@ -1211,7 +1211,7 @@
 
 						var dotX = lineX + floorBig(new Big(config.groupLineWidth + 1).div(2)),
 							dotY = Math.floor(yTop_axisY + getHeight(d));
-						maDots[k].push([dotX, dotY]);
+						maDots[num].push([dotX, dotY]);
 					}
 
 					/* 绘制量图 */
@@ -1234,16 +1234,16 @@
 				ctx.textAlign = ifShowAxisYLeft? "start": "end";
 				ctx.textBaseline = "top";
 				config.showMAArr.forEach(function(num, i){
-					if(!Array.isArray(maDots[i]) || maDots[i].length == 0)
+					if(!Array.isArray(maDots[num]) || maDots[num].length == 0)
 						return;
 
 					ctx.strokeStyle = config.MAColorArr[i];
 					ctx.fillStyle = config.MAColorArr[i];
 
 					ctx.beginPath();
-					ctx.moveTo(maDots[i][0][0], maDots[i][0][1]);
-					for(var k = 1; k < maDots[i].length; k++){
-						var MADot = maDots[i];
+					ctx.moveTo(maDots[num][0][0], maDots[num][0][1]);
+					for(var k = 1; k < maDots[num].length; k++){
+						var MADot = maDots[num][k];
 						ctx.lineTo(MADot[0], MADot[1]);
 					}
 					ctx.stroke();
