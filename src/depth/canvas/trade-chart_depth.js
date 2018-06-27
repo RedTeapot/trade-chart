@@ -58,7 +58,7 @@
 		axisXTickOffset: 5,/** 横坐标刻度距离原点的位移 */
 		axisXTickOffsetFromRight: 0,/** 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/** 横坐标标签距离坐标轴刻度线的距离 */
-		axisXLabelSize: 55,/** 横坐标标签文字的长度（用于决定如何绘制边界刻度) */
+		axisXLabelSize: 55,/** 横坐标标签文字的长度（取值大小影响如何绘制边界刻度) */
 		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/* 横坐标标签文字的输出方法 */
 			return convertedData.price;
 		},
@@ -216,7 +216,6 @@
 	 */
 	var calcMaxDotCount = function(canvasObj, config){
 		var maxDotCount = 0;
-
 		mergeDefaultChartConfigAndDo(config, function(mergedConfig){
 			/** 百分比尺寸自动转换 */
 			if(/%/.test(mergedConfig.width))
@@ -313,41 +312,33 @@
 
 	/**
 	 * 获取买方区域的横坐标起止坐标（起止坐标上也可以绘图，亦即闭区间）
-	 * @param {JsonObject} config 渲染配置
-	 * @param {JsonObject} sketch 数据和图形的扫描分析结果
-	 * @param {Array#JsonObject} [datas] 买方数据
+	 * @param {Object} config 渲染配置
+	 * @param {Object} sketch 数据和图形的扫描分析结果
 	 */
-	var getBuyerAreaXSection = function(config, sketch, datas){
+	var getBuyerAreaXSection = function(config, sketch){
 		var minX = Math.floor(config.paddingLeft + config.axisXTickOffset) + 0.5;
 		var maxX = minX + Math.floor(sketch.chart.contentWidth - 1);/* -1是因为minX占据了1个像素，其上也可以绘制。下同 */
-
-		if(arguments.length >= 3)
-			maxX = minX + Math.floor(numBig(new Big(config.dotGap).mul(Math.max(datas.length - 1, 0))) + datas.length - 1);
 
 		return {min: minX, max: maxX};
 	};
 
 	/**
 	 * 获取卖方区域的横坐标起止坐标（起止坐标上也可以绘图，亦即闭区间）
-	 * @param {JsonObject} config 渲染配置
-	 * @param {JsonObject} sketch 数据和图形的扫描分析结果
-	 * @param {Array#JsonObject} [datas] 买方数据
+	 * @param {Object} config 渲染配置
+	 * @param {Object} sketch 数据和图形的扫描分析结果
 	 */
-	var getSellerAreaXSection = function(config, sketch, datas){
+	var getSellerAreaXSection = function(config, sketch){
 		var maxX = Math.floor(config.width - 1 - config.paddingRight - config.axisXTickOffsetFromRight) + 0.5;
 		var minX = maxX - Math.floor(sketch.chart.contentWidth - 1);/* -1是因为maxX占据了1个像素，其上也可以绘制。下同 */
-
-		if(arguments.length >= 3)
-			minX = maxX - Math.floor(numBig(new Big( config.dotGap).mul(Math.max(datas.length - 1, 0))) + datas.length - 1);
 
 		return {min: minX, max: maxX};
 	};
 
 	/**
 	 * 初始化画布（设置宽高、伸缩比例等）
-	 * @param domContainerObj {HTMLCanvasElement} 画布
-	 * @param config {JsonObject} 渲染配置
-	 * @param {JsonObject} datas 数据
+	 * @param {HTMLCanvasElement} canvasObj 画布
+	 * @param {Object} config 渲染配置
+	 * @param {{buyer: Object[], seller: Object[]}} datas 数据
 	 */
 	var initCanvasAndConfig = function(canvasObj, config, datas){
 		/* 百分比尺寸自动转换 */
@@ -436,7 +427,7 @@
 		 * @returns {Boolean}
 		 */
 		this.isInBuyerArea = function(x){
-			var t = getBuyerAreaXSection(config, sketch, depthChart.getDatas().buyer);
+			var t = getBuyerAreaXSection(config, sketch);
 			return x >= t.min && x <= t.max;
 		};
 
@@ -448,18 +439,18 @@
 		 * @returns {Boolean}
 		 */
 		this.isInSellerArea = function(x){
-			var t = getSellerAreaXSection(config, sketch, depthChart.getDatas().seller);
+			var t = getSellerAreaXSection(config, sketch);
 			return x >= t.min && x <= t.max;
 		};
 
 		/**
 		 * 获取指定的相对横坐标对应的数据的位置信息
 		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布Canvas的左上角
-		 * @returns {JsonObject} 数据的位置信息。如：{dataIndex: [数据（在卖方或卖方的数组中的）索引], area: [数据隶属的区域（买方：buyer；卖方：seller）]}
+		 * @returns {null|{dataIndex: Number, area: String}} 数据的位置信息。如：{dataIndex: [数据（在卖方或卖方的数组中的）索引], area: [数据隶属的区域（买方：buyer；卖方：seller）]}
 		 */
 		this.getDataPosition = function(x){
-			var buyerAreaXSection = getBuyerAreaXSection(config, sketch, depthChart.getDatas().buyer),
-				sellerAreaXSection = getSellerAreaXSection(config, sketch, depthChart.getDatas().seller);
+			var buyerAreaXSection = getBuyerAreaXSection(config, sketch),
+				sellerAreaXSection = getSellerAreaXSection(config, sketch);
 
 			var isInBuyerArea = this.isInBuyerArea(x),
 				isInSellerArea = this.isInSellerArea(x);
@@ -515,8 +506,7 @@
 			if(dataIndex < 0 || dataIndex >= list.length)
 				return null;
 
-			var d = list[dataIndex];
-			return d;
+			return list[dataIndex];
 		};
 
 		/**
@@ -539,7 +529,7 @@
 		/**
 		 * 获取指定的相对横坐标对应的数据在画布上的坐标位置
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 * @returns {JsonObject} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
+		 * @returns {Object} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
 		 */
 		this.getCoordinate = function(x){
 			var dataPosition = this.getDataPosition(x);
@@ -643,6 +633,15 @@
 			return dataParser;
 		};
 
+		/**
+		 * 将数据按照价格升序排序
+		 * @returns {number}
+		 */
+		var sortAsAscByPrice = function(a, b){
+			a = dataParser? dataParser(a): a;
+			b = dataParser? dataParser(b): b;
+			return +a.price > +b.price? 1: -1;
+		};
 
 		/**
 		 * 渲染图形，并呈现至指定的画布中
@@ -654,14 +653,24 @@
 			initCanvasAndConfig(canvasObj, config, datas);
 			var ctx = canvasObj.getContext("2d");
 
-			var _sketch = sketch(datas, dataParser, config);
-			// console.log("Depth chart sketch: " + JSON.stringify(_sketch));
+			var maxDotCount = sketchChart(config).maxDotCount;
 
-			/** 买方区域的起止横轴坐标 */
-			var buyerAreaXSection = getBuyerAreaXSection(config, _sketch, datas.buyer),
+			/* 数据排序 */
+			if(Array.isArray(datas.buyer))
+				datas.buyer.sort(sortAsAscByPrice);
+			if(Array.isArray(datas.seller))
+				datas.seller.sort(sortAsAscByPrice);
+			/* 数据裁剪 */
+			datas.buyer = datas.buyer.slice(buyerAreaDotCount, datas.buyer.length);
+			datas.seller = datas.seller.slice(0, sellerAreaDotCount);
+
+			var _sketch = sketch(datas, dataParser, config);
+
+			var /** 买方区域的起止横轴坐标 */
+				buyerAreaXSection = getBuyerAreaXSection(config, _sketch),
 
 				/** 卖方区域的起止横轴坐标 */
-				sellerAreaXSection = getSellerAreaXSection(config, _sketch, datas.seller),
+				sellerAreaXSection = getSellerAreaXSection(config, _sketch),
 
 				/** 买方区域中要呈现的点的个数 */
 				buyerAreaDotCount = Math.min(_sketch.chart.maxDotCount, datas.buyer.length),
@@ -669,14 +678,11 @@
 				/** 卖方区域中要呈现的点的个数 */
 				sellerAreaDotCount = Math.min(_sketch.chart.maxDotCount, datas.seller.length);
 
-			/** 横坐标刻度之间相差的点的个数 */
-			var axisXTickInterval = ceilBig(new Big(config.axisXLabelSize).div(config.dotGap + 1));
-
+			// console.log("Depth chart sketch: " + JSON.stringify(_sketch));
 			// console.log("Depth chart buyer area x section: " + JSON.stringify(buyerAreaXSection));
 			// console.log("Depth chart buyer area dot count: " + buyerAreaDotCount);
 			// console.log("Depth chart seller area x section: " + JSON.stringify(sellerAreaXSection));
 			// console.log("Depth chart seller area dot count: " + sellerAreaDotCount);
-			// console.log("Depth chart x tick interval: " + axisXTickInterval);
 
 			var axisYPosition = String(config.axisYPosition).toLowerCase();
 			var ifShowAxisYLeft = "left" == axisYPosition,
@@ -695,20 +701,6 @@
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
 				yTop_axisY = Math.floor(config.paddingTop) + 0.5,
 				yBottom_axisY = y_axisX;
-
-			/* 数据排序 */
-			if(Array.isArray(datas.buyer))
-				datas.buyer.sort(function(a, b){
-					a = dataParser? dataParser(a): a;
-					b = dataParser? dataParser(b): b;
-					return +a.price > +b.price? 1: -1;
-				});
-			if(Array.isArray(datas.seller))
-				datas.seller.sort(function(a, b){
-					a = dataParser? dataParser(a): a;
-					b = dataParser? dataParser(b): b;
-					return +a.price > +b.price? 1: -1;
-				});
 
 			/**
 			 * @typedef {Object} XTick
@@ -752,7 +744,8 @@
 				if(config.showAxisXLine)
 					y_axisXTickLabel += config.axisTickLineLength;
 
-				axisXTickList.forEach(function(tick, i){
+				for(var i = 0; i < axisXTickList.length; i++){
+					var tick = axisXTickList[i];
 					var tickX = tick.x;
 
 					/* 绘制刻度线 */
@@ -773,7 +766,7 @@
 
 						ctx.restore();
 					}
-				});
+				}
 
 				ctx.restore();
 			};
@@ -808,7 +801,8 @@
 					axisYLabelOffset = sign * ((config.showAxisYLine? config.axisTickLineLength: 0) + config.axisYLabelOffset);
 				var maxAxisYTickIndex = config.axisYMidTickQuota + 1;
 
-				axisYTickList.forEach(function(tick, i){
+				for(var i = 0; i < axisYTickList.length; i++){
+					var tick = axisYTickList[i];
 					var tickY = tick.y;
 
 					/* 绘制刻度线 */
@@ -846,7 +840,7 @@
 						}else
 							drawLabel();
 					}
-				});
+				}
 
 				ctx.restore();
 			};
@@ -880,8 +874,7 @@
 
 						var data = dataParser? dataParser(datas[area][i], i, datas[area]): datas[area][i];
 						var minX = "buyer" == area? buyerAreaXSection.min: sellerAreaXSection.min;
-						var tickX = minX + roundBig(new Big(config.dotGap + 1).mul(i));
-
+						var tickX = minX + numBig(new Big(config.dotGap + 1).mul(i));
 						/* 绘制网格竖线 */
 						if(ifShowVerticalGridLine){
 							ctx.save();
@@ -908,6 +901,7 @@
 								nextData = dataParser(nextData, i + 1, datas[area]);
 							return config.axisXLabelGenerator(data, i, previousData, nextData);
 						})();
+
 						axisXTickList.push({x: tickX, label: label});
 					};
 
@@ -916,31 +910,24 @@
 					 * @param {StringEnum} area 买方或卖方区域标识。buyer：买方区域；seller：卖方区域
 					 */
 					var renderAreaTick = function(area){
-						var groupSize = config.dotGap + 1,
-							halfGroupSize = numBig(new Big(config.axisXLabelSize).div(2)),
-							dotCount = Math.min(_sketch.chart.maxDotCount, datas[area].length);
+						var groupSize = Math.max(config.axisXLabelSize, config.dotGap + 1),
+							halfLabelSize = floorBig(new Big(config.axisXLabelSize + 1).div(2)),
+							dotCount = area == "buyer"? buyerAreaDotCount: sellerAreaDotCount;
 
-						var i = 0, axisXTickCount = floorBig(new Big(dotCount).div(axisXTickInterval));
+						if(dotCount <= 0)
+							return;
 
-						var b = new Big(axisXTickInterval);
-						for(; i < axisXTickCount; i++)
-							renderXTick(numBig(b.mul(i)), area);
-						var lastTickDataIndex = roundBig(b.mul(i));
+						var availableTotalSpace = _sketch.chart.contentWidth,
+							usingSpace = numBig(new Big(dotCount - 1).mul(config.dotGap + 1)) + 1;
+						var tickAreaSpace = Math.min(availableTotalSpace, usingSpace);
 
-						var totalSpace = Math.min(numBig(new Big(dotCount - 1).mul(config.dotGap + 1)), _sketch.chart.contentWidth);
-						var remainingSpace = totalSpace - (numBig(new Big(lastTickDataIndex).mul(groupSize)) + halfGroupSize);
-						if(remainingSpace < halfGroupSize){
-							/* 剩余空间不足，只绘制边界刻度 */
-							renderXTick(dotCount - 1, area);
-						}else{
-							var k = dotCount - 1,
-								j = Math.min(lastTickDataIndex, k);
-
-							/* 绘制最后一个刻度和边界刻度 */
-							renderXTick(j, area);
-							if(j != k)
-								renderXTick(k, area);
+						var axisXTickInterval = ceilBig(new Big(groupSize).div(config.dotGap + 1));
+						var axisXTickCount = floorBig(new Big(tickAreaSpace).div(axisXTickInterval));
+						for(var i = 0; i < axisXTickCount; i++){
+							renderXTick(i * axisXTickInterval, area);
 						}
+						if((axisXTickCount - 1) * axisXTickInterval != dotCount - 1)
+							renderXTick(dotCount - 1, area);
 					};
 
 					/* 绘制买方区域X轴刻度（买方区域在左侧） */
