@@ -1030,16 +1030,16 @@
 				/* 第一个点和最后一个点是X轴的起始点和终止点。中间部分是折线点 */
 				buyerDots = buyerDots.concat(getDots("buyer"));
 				if(buyerDots.length > 0){
-					buyerDots.unshift([buyerAreaXSection.min, y_axisX]);
-					buyerDots.push([buyerDots[buyerDots.length - 1][0], y_axisX]);
+					buyerDots.unshift([buyerAreaXSection.min, y_axisX - 1]);
+					buyerDots.push([buyerDots[buyerDots.length - 1][0], y_axisX - 1]);
 				}
 				/* 确定卖方区域折线点 */
 				var sellerDots = [];
 				/* 第一个点和最后一个点是X轴的起始点和终止点。中间部分是折线点 */
 				sellerDots = sellerDots.concat(getDots("seller"));
 				if(sellerDots.length > 0){
-					sellerDots.unshift([sellerAreaXSection.min, y_axisX]);
-					sellerDots.push([sellerDots[sellerDots.length - 1][0], y_axisX]);
+					sellerDots.unshift([sellerAreaXSection.min, y_axisX - 1]);
+					sellerDots.push([sellerDots[sellerDots.length - 1][0], y_axisX - 1]);
 
 					/* 卖方区域需向右对齐（最后一条数据在图形的最右侧） */
 					sellerAreaHorizontalOffset = Math.floor(sellerAreaXSection.max - sellerDots[sellerDots.length - 1][0]);
