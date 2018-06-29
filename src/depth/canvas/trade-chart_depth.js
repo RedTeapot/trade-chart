@@ -862,6 +862,9 @@
 						ctx.stroke();
 					}
 
+					/* 上一个绘制的横坐标刻度对应的数据索引 */
+					var previousXTickDataIndex = null;
+
 					/**
 					 * 根据提供的点的索引位置和区域信息绘制刻度
 					 * @param {Integer} i 点的索引位置（相对于特定的买方数据，或卖方数据）
@@ -893,16 +896,17 @@
 							if(!config.showAxisXLabel)
 								return "";
 
-							var previousData = i == 0? null: datas[area][i - 1],
-								nextData = datas[area][i + 1];
+							var previousData = null;
+							if(null != previousXTickDataIndex && previousXTickDataIndex >=0 && previousXTickDataIndex < datas[area].length)
+								previousData = datas[area][previousXTickDataIndex];
 							if(null != previousData && dataParser)
-								previousData = dataParser(previousData, i - 1, datas[area]);
-							if(null != nextData && dataParser)
-								nextData = dataParser(nextData, i + 1, datas[area]);
-							return config.axisXLabelGenerator(data, i, previousData, nextData);
-						})();
+								previousData = dataParser(previousData, previousXTickDataIndex, datas[area]);
 
+							return config.axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
+						})();
 						axisXTickList.push({x: tickX, label: label});
+
+						previousXTickDataIndex = i;
 					};
 
 					/**

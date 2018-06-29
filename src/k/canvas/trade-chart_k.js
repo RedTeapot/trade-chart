@@ -945,6 +945,9 @@
 						ctx.stroke();
 					}
 
+					/* 上一个绘制的横坐标刻度对应的数据索引 */
+					var previousXTickDataIndex = null;
+
 					/**
 					 * 根据提供的数据的索引位置绘制刻度
 					 * @param {Integer} i 数据的索引位置
@@ -987,15 +990,17 @@
 							if(!config.showAxisXLabel)
 								return "";
 
-							var previousData = i == 0? null: datas[i - 1],
-								nextData = datas[i + 1];
+							var previousData = null;
+							if(null != previousXTickDataIndex && previousXTickDataIndex >=0 && previousXTickDataIndex < datas.length)
+								previousData = datas[previousXTickDataIndex];
 							if(null != previousData && dataParser)
-								previousData = dataParser(previousData, i - 1, datas);
-							if(null != nextData && dataParser)
-								nextData = dataParser(nextData, i + 1, datas);
-							return config.axisXLabelGenerator(data, i, previousData, nextData);
+								previousData = dataParser(previousData, previousXTickDataIndex, datas);
+
+							return config.axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 						})();
 						axisXTickList.push({x: tickX, label: label});
+
+						previousXTickDataIndex = i;
 					};
 
 					/* 赋值：从右向左绘制的表现效果太差（数据量不足一屏时，靠右显示） */
@@ -1009,15 +1014,13 @@
 
 						var b = new Big(axisXTickInterval);
 						for(var i = 0; i <= axisXTickCount - 1; i++){
-							var k = roundBig(b.mul(i));
-							renderXTick(k, true);
+							renderXTick(roundBig(b.mul(i)), true);
 						}
 						lastTickDataIndex = Math.min(roundBig(b.mul(i)), groupCount - 1);
 					}else{/* 从右向左 */
 						edgeTickDataIndex = 0;
 						for(var i = groupCount - 1, j = 0; i >= 0, j <= axisXTickCount - 1; i -= axisXTickInterval, j++){
-							var k = Math.round(i);
-							renderXTick(k, true);
+							renderXTick(Math.round(i), true);
 						}
 						lastTickDataIndex = Math.max(Math.round(i), 0);
 					}

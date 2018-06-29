@@ -971,6 +971,9 @@
 						axisXTickList.push({x: tickX, label: label});
 					};
 
+					/* 上一个绘制的横坐标刻度对应的数据索引 */
+					var previousXTickDataIndex = null;
+
 					/**
 					 * 根据提供的点的索引位置绘制刻度
 					 * @param {Integer} i 数据的索引位置
@@ -983,15 +986,15 @@
 						if(arguments.length < 2){
 							var data = dataParser? dataParser(datas[i], i, datas): datas[i];
 
-							var previousData = i == 0? null: datas[i - 1],
-								nextData = datas[i + 1];
+							var previousData = null;
+							if(null != previousXTickDataIndex && previousXTickDataIndex >=0 && previousXTickDataIndex < datas.length)
+								previousData = datas[previousXTickDataIndex];
 							if(null != previousData && dataParser)
-								previousData = dataParser(previousData, i - 1, datas);
-							if(null != nextData && dataParser)
-								nextData = dataParser(nextData, i + 1, datas);
+								previousData = dataParser(previousData, previousXTickDataIndex, datas);
 
-							label = config.axisXLabelGenerator(data, i, previousData, nextData);
+							label = config.axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 						}
+						previousXTickDataIndex = i;
 
 						var x = numBig(new Big(config.dotGap + 1).mul(i));
 						return renderXTick(label, x);
