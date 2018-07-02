@@ -258,6 +258,9 @@
 			/* 数据格式转换 */
 			d = dataParser? dataParser(d, i): d;
 
+			if(i == 0)
+				previousAmount = +d.amount;
+
 			if(+d.amount > dataSketch_origin_maxAmount)
 				dataSketch_origin_maxAmount = +d.amount;
 			if(+d.amount < dataSketch_origin_minAmount)
@@ -393,6 +396,14 @@
 		};
 
 		/**
+		 * 获取数据和图形的扫描分析结果
+		 * @returns {Object}
+		 */
+		this.getSketch = function(){
+			return sketch;
+		};
+
+		/**
 		 * 获取渲染时使用的基准数据
 		 */
 		this.getRenderMetadata = function(){
@@ -494,6 +505,26 @@
 				count4Seller = Math.min(this.getSellerDotCount(), datas4Seller.length);
 
 			return {buyer: datas4Buyer.slice(0, count4Buyer), seller: datas4Seller.slice(0, count4Seller)};
+		};
+
+		/**
+		 * 获取被渲染的转换后的数据列表
+		 */
+		this.getRenderingConvertedDatas = function(){
+			var originalDatas = this.getRenderingOriginalDatas();
+			var datas = {buyer: originalDatas.buyer, seller: originalDatas.seller};
+
+			var dataParser = depthChart.getDataParser();
+			if(typeof dataParser == "function"){
+				datas.buyer = originalDatas.buyer.map(function(d, dataIndex){
+					return dataParser(d, dataIndex);
+				});
+				datas.seller = originalDatas.seller.map(function(d, dataIndex){
+					return dataParser(d, dataIndex);
+				});
+			}
+
+			return datas;
 		};
 
 		/**

@@ -17,8 +17,7 @@
 	};
 
 	/**
-	 * @typedef TrendData
-	 * @type {Object}
+	 * @typedef {Object} TrendData
 	 *
 	 * @property {String} time 时间
 	 * @property {Number} price 价格
@@ -303,6 +302,7 @@
 		var chartSketch = sketchChart(config);
 
 		/* 数据概览扫描 */
+		var lastClosingPrice = util.parseAsNumber(config.lastClosingPrice, 0);
 		var previous = {price: 0, volume: 0};
 		var variationSum = 0, volumeVariationSum = 0;
 		for(var i = 0; i < datas.length && i < chartSketch.maxDotCount; i++){
@@ -314,6 +314,11 @@
 			var avgPrice = util.parseAsNumber(d.avgPrice, price),
 				openPrice = util.parseAsNumber(d.openPrice, price),
 				closePrice = util.parseAsNumber(d.closePrice, price);
+
+			if(i == 0){
+				previous = d;
+				lastClosingPrice = util.parseAsNumber(price, 0);
+			}
 
 			dataSketch_origin_min = Math.min(price, avgPrice, openPrice, closePrice, dataSketch_origin_min);
 			dataSketch_origin_max = Math.max(price, avgPrice, openPrice, closePrice, dataSketch_origin_max);
@@ -340,12 +345,6 @@
 		var len = datas.length;
 		dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
 		dataSketch_origin_avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
-
-		var lastClosingPrice = config.lastClosingPrice;
-		if(null != lastClosingPrice)
-			lastClosingPrice = Number(lastClosingPrice);
-		if(isNaN(lastClosingPrice))
-			lastClosingPrice = 0;
 
 		/* 确定Y轴最小值 */
 		if(null != config.axisYPriceFloor){
@@ -407,9 +406,9 @@
 
 	/**
 	 * 初始化画布（设置宽高、伸缩比例等）
-	 * @param domContainerObj {HTMLCanvasElement} 画布
-	 * @param config {JsonObject} 渲染配置
-	 * @param {Array#JsonObject} datas 数据数组
+	 * @param {HTMLCanvasElement} domContainerObj 画布
+	 * @param {Object} config 渲染配置
+	 * @param {Object[]} datas 数据数组
 	 */
 	var initCanvasAndConfig = function(canvasObj, config, datas){
 		/* 历史兼容，待移除 */
@@ -421,7 +420,6 @@
 			config.volumeAxisYFloor = config.axisYVolumeFloor;
 			delete config.axisYVolumeFloor;
 		}
-
 
 		/* 百分比尺寸自动转换 */
 		if(/%/.test(config.width))
@@ -464,9 +462,9 @@
 	 * @constructor
 	 * 已完成渲染的分时图
 	 * @param {TrendChart} trendChart 分时图实例
-	 * @param {JsonObject} sketch 数据和图形的扫描分析结果
-	 * @param {JsonObject} config 渲染配置
-	 * @param {JsonObject} renderMetadata 渲染时使用的基准数据
+	 * @param {Object} sketch 数据和图形的扫描分析结果
+	 * @param {Object} config 渲染配置
+	 * @param {Object} renderMetadata 渲染时使用的基准数据
 	 */
 	var RenderedTrendChart = function(trendChart, sketch, config, renderMetadata){
 		if(!(trendChart instanceof TrendChart))
@@ -477,6 +475,14 @@
 		 */
 		this.getConfig = function(){
 			return config;
+		};
+
+		/**
+		 * 获取数据和图形的扫描分析结果
+		 * @returns {Object}
+		 */
+		this.getSketch = function(){
+			return sketch;
 		};
 
 		/**
@@ -495,13 +501,29 @@
 		};
 
 		/**
-		 * 获取能够被渲染的原始数据列表
+		 * 获取被渲染的原始数据列表
 		 */
 		this.getRenderingOriginalDatas = function(){
 			var datas = trendChart.getDatas() || [];
 			var count = Math.min(this.getDotCount(), datas.length);
 
 			return datas.slice(0, count);
+		};
+
+		/**
+		 * 获取被渲染的转换后的数据列表
+		 */
+		this.getRenderingConvertedDatas = function(){
+			var originalDatas = this.getRenderingOriginalDatas();
+			var datas = originalDatas;
+
+			var dataParser = trendChart.getDataParser();
+			if(typeof dataParser == "function")
+				datas = originalDatas.map(function(d, dataIndex){
+					return dataParser(d, dataIndex, originalDatas || []);
+				});
+
+			return datas;
 		};
 
 		/**

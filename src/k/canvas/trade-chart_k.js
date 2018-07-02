@@ -283,6 +283,9 @@
 			/* 数据格式转换 */
 			d = dataParser? dataParser(d, i, datas): d;
 
+			if(i == 0)
+				previousVolume = +d.volume;
+
 			var max = Math.max(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice),
 				min = Math.min(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice);
 			for(var j = 0; j < config.showMAArr.length; j++){
@@ -313,7 +316,7 @@
 			variationSum += variation;
 			volumeVariationSum += volumeVariation;
 
-			previousVolume = d.volume;
+			previousVolume = +d.volume;
 		}
 		var len = datas.length;
 		dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
@@ -383,8 +386,8 @@
 
 	/**
 	 * 初始化画布（设置宽高、伸缩比例等）
-	 * @param domContainerObj {HTMLCanvasElement} 画布
-	 * @param config {JsonObject} 渲染配置
+	 * @param {HTMLCanvasElement} canvasObj 画布
+	 * @param {Object} config 渲染配置
 	 */
 	var initCanvasAndConfig = function(canvasObj, config){
 		/* 历史兼容，待移除 */
@@ -431,6 +434,14 @@
 		 */
 		this.getConfig = function(){
 			return config;
+		};
+
+		/**
+		 * 获取数据和图形的扫描分析结果
+		 * @returns {Object}
+		 */
+		this.getSketch = function(){
+			return sketch;
 		};
 
 		/**
@@ -485,6 +496,22 @@
 		};
 
 		/**
+		 * 获取被渲染的转换后的数据列表
+		 */
+		this.getRenderingConvertedDatas = function(){
+			var originalDatas = this.getRenderingOriginalDatas();
+			var datas = originalDatas;
+
+			var dataParser = kChart.getDataParser();
+			if(typeof dataParser == "function")
+				datas = originalDatas.map(function(d, dataIndex){
+					return dataParser(d, dataIndex, originalDatas || []);
+				});
+
+			return datas;
+		};
+
+		/**
 		 * 获取指定的相对横坐标对应的数据索引
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
@@ -531,7 +558,7 @@
 			if(null == d)
 				return d;
 
-			var dataParser = trendChart.getDataParser();
+			var dataParser = kChart.getDataParser();
 			if(typeof dataParser == "function")
 				d = dataParser(d, dataIndex, kChart.getDatas() || []);
 
