@@ -691,8 +691,14 @@
 				datas.buyer.sort(sortAsAscByPrice);
 			if(Array.isArray(datas.seller))
 				datas.seller.sort(sortAsAscByPrice);
+
+			var	/** 买方区域中要呈现的点的个数 */
+				buyerAreaDotCount = Math.min(maxDotCount, datas.buyer.length),
+				/** 卖方区域中要呈现的点的个数 */
+				sellerAreaDotCount = Math.min(maxDotCount, datas.seller.length);
+
 			/* 数据裁剪 */
-			datas.buyer = datas.buyer.slice(buyerAreaDotCount, datas.buyer.length);
+			datas.buyer = datas.buyer.slice(datas.buyer.length - buyerAreaDotCount, datas.buyer.length);
 			datas.seller = datas.seller.slice(0, sellerAreaDotCount);
 
 			var _sketch = sketch(datas, dataParser, config);
@@ -701,13 +707,7 @@
 				buyerAreaXSection = getBuyerAreaXSection(config, _sketch),
 
 				/** 卖方区域的起止横轴坐标 */
-				sellerAreaXSection = getSellerAreaXSection(config, _sketch),
-
-				/** 买方区域中要呈现的点的个数 */
-				buyerAreaDotCount = Math.min(_sketch.chart.maxDotCount, datas.buyer.length),
-
-				/** 卖方区域中要呈现的点的个数 */
-				sellerAreaDotCount = Math.min(_sketch.chart.maxDotCount, datas.seller.length);
+				sellerAreaXSection = getSellerAreaXSection(config, _sketch);
 
 			// console.log("Depth chart sketch: " + JSON.stringify(_sketch));
 			// console.log("Depth chart buyer area x section: " + JSON.stringify(buyerAreaXSection));

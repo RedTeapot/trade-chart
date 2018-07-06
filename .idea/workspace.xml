@@ -4,8 +4,6 @@
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="gn">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -22,26 +20,26 @@
       <file leaf-file-name="trade-chart_k.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/k/canvas/trade-chart_k.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="301" column="38" lean-forward="true" selection-start-line="301" selection-start-column="38" selection-end-line="301" selection-end-column="38" />
+            <state relative-caret-position="5117">
+              <caret line="301" column="38" selection-start-line="301" selection-start-column="38" selection-end-line="301" selection-end-column="38" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="trade-chart_depth.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="trade-chart_depth.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="463">
-              <caret line="261" column="42" selection-start-line="261" selection-start-column="42" selection-end-line="261" selection-end-column="42" />
+            <state relative-caret-position="496">
+              <caret line="702" lean-forward="true" selection-start-line="702" selection-end-line="702" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="276">
-              <caret line="402" lean-forward="true" selection-start-line="402" selection-end-line="402" />
+            <state relative-caret-position="582">
+              <caret line="420" column="39" lean-forward="true" selection-start-line="420" selection-start-column="39" selection-end-line="420" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -49,7 +47,7 @@
       <file leaf-file-name="trade-chart.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/trade-chart.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
+            <state relative-caret-position="3247">
               <caret line="191" column="21" selection-start-line="191" selection-start-column="8" selection-end-line="191" selection-end-column="21" />
             </state>
           </provider>
@@ -59,7 +57,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>extend</find>
       <find>console.debug</find>
       <find>console.log</find>
       <find>extended</find>
@@ -78,7 +75,6 @@
       <find>gridLineDash</find>
       <find>renderXTick</find>
       <find>dataParser</find>
-      <find>axisXLabelGenerator</find>
       <find>getRenderring</find>
       <find>[]</find>
       <find>trend chart</find>
@@ -89,6 +85,8 @@
       <find>axisYPriceFloor</find>
       <find>lastClosingPrice</find>
       <find>console</find>
+      <find>buyerAreaDotCount</find>
+      <find>axisXLabelGenerator</find>
     </findStrings>
     <replaceStrings>
       <replace>_extended_</replace>
@@ -114,9 +112,9 @@
         <option value="$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
         <option value="$PROJECT_DIR$/trade-chart.1.0.0B1-201805051710.min.js" />
         <option value="$PROJECT_DIR$/src/trade-chart.js" />
-        <option value="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" />
         <option value="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" />
         <option value="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" />
+        <option value="$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js" />
       </list>
     </option>
   </component>
@@ -611,12 +609,13 @@
       <workItem from="1530065135872" duration="288000" />
       <workItem from="1530070125476" duration="16097000" />
       <workItem from="1530236389127" duration="3371000" />
-      <workItem from="1530510101903" duration="4044000" />
+      <workItem from="1530510101903" duration="4644000" />
+      <workItem from="1530842506555" duration="1831000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="195788000" />
+    <option name="totallyTimeSpent" value="198219000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -626,12 +625,12 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -743,31 +742,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="261" column="42" selection-start-line="261" selection-start-column="42" selection-end-line="261" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/k/canvas/trade-chart_k.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="301" column="38" lean-forward="true" selection-start-line="301" selection-start-column="38" selection-end-line="301" selection-end-column="38" />
+        <state relative-caret-position="5117">
+          <caret line="301" column="38" selection-start-line="301" selection-start-column="38" selection-end-line="301" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/trade-chart.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
+        <state relative-caret-position="3247">
           <caret line="191" column="21" selection-start-line="191" selection-start-column="8" selection-end-line="191" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="276">
-          <caret line="402" lean-forward="true" selection-start-line="402" selection-end-line="402" />
+        <state relative-caret-position="582">
+          <caret line="420" column="39" lean-forward="true" selection-start-line="420" selection-start-column="39" selection-end-line="420" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/depth/canvas/trade-chart_depth.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="702" lean-forward="true" selection-start-line="702" selection-end-line="702" />
         </state>
       </provider>
     </entry>
