@@ -85,7 +85,7 @@
 		},
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
-		axisYPrecision: 2,/** 纵坐标的数字精度 */
+		axisYPrecision: "auto",/** 纵坐标的数字精度。auto：根据给定的数据自动检测 */
 		axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
 			/** price：价格；config：配置 */
 			return util.formatMoney(price, config.axisYPrecision);
@@ -137,7 +137,7 @@
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 		volumeAxisYMidTickQuota: 2, /** 量图纵坐标刻度个数（不包括最小值和最大值） */
 		volumeAxisYFloor: null, /** 量图纵坐标最小刻度, 为null时自动 */
-		volumeAxisYPrecision: 2,/** 量图纵坐标的数字精度 */
+		volumeAxisYPrecision: "auto",/** 量图纵坐标的数字精度。auto：根据给定的数据自动检测 */
 		volumeAxisYFormatter: function(volume, config){/** 量图纵坐标数字格式化方法 */
 			/** volume：数量；config：配置 */
 			return util.formatMoney(volume, config.volumeAxisYPrecision);
@@ -282,6 +282,19 @@
 	};
 
 	/**
+	 * 从给定的数字中获取该数字所使用的精度
+	 * @param {Integer} num 数字精度
+	 */
+	var getPrecision = function(num){
+		var tmp = String(num);
+		var lastDotIndex = tmp.lastIndexOf(".");
+		if(-1 == lastDotIndex)
+			return 0;
+
+		return tmp.substring(lastDotIndex + 1).length;
+	};
+
+	/**
 	 * 扫描提供的数据，生成绘制所需的元数据
 	 * @param {Object[]} datas 数据数组
 	 * @param {Function} dataParser 数据转换方法
@@ -301,8 +314,11 @@
 		var extendedData = {
 			priceCeiling: 0,/* 坐标中价格的最大值 */
 			priceFloor: 0,/* 坐标中价格的最小值 */
+			pricePrecision: 0,/* 坐标中价格的精度 */
+
 			volumeCeiling: 0,/* 坐标中成交量的最大值 */
-			volumeFloor: 0/* 坐标中成交量的最小值 */
+			volumeFloor: 0,/* 坐标中成交量的最小值 */
+			volumePrecision: 0/* 坐标中成交量的精度 */
 		};
 		var chartSketch = sketchChart(config);
 
@@ -310,6 +326,7 @@
 		var lastClosingPrice = util.parseAsNumber(config.lastClosingPrice, 0);
 		var previous = {price: 0, volume: 0};
 		var variationSum = 0, volumeVariationSum = 0;
+		var axisYPrecision = 0, volumeAxisYPrecision = 0;
 		for(var i = 0; i < datas.length && i < chartSketch.maxDotCount; i++){
 			var d = datas[i];
 			/* 数据格式转换 */
@@ -333,8 +350,8 @@
 			if(+d.volume < dataSketch_origin_minVolume)
 				dataSketch_origin_minVolume = +d.volume;
 
-			var variation = Math.abs(price - +previous.price);
-			var volumeVariation = Math.abs(+d.volume - +previous.volume);
+			var variation = Math.abs(price - +previous.price),
+				volumeVariation = Math.abs(+d.volume - +previous.volume);
 
 			/* 确定更大的变动幅度 */
 			if(variation > dataSketch_origin_maxVariation)
@@ -344,6 +361,12 @@
 
 			variationSum += variation;
 			volumeVariationSum += volumeVariation;
+
+			/* 数据精度确定 */
+			[price, avgPrice, openPrice, closePrice].forEach(function(digit){
+				extendedData.pricePrecision = Math.max(extendedData.pricePrecision, getPrecision(digit));
+			});
+			extendedData.volumePrecision = Math.max(extendedData.volumePrecision, getPrecision(d.volume));
 
 			previous = d;
 		}
@@ -667,6 +690,11 @@
 			var ctx = canvasObj.getContext("2d");
 
 			var _sketch = sketch(datas, dataParser, config);
+			if("auto" == String(config.axisYPrecision).toLowerCase())
+				config.axisYPrecision = _sketch.extendedData.pricePrecision + 1;
+			if("auto" == String(config.volumeAxisYPrecision).toLowerCase())
+				config.volumeAxisYPrecision = _sketch.extendedData.volumePrecision + 1;
+
 			// console.log("Trend chart sketch", JSON.stringify(_sketch));
 			// console.log("Trend chart config", config);
 
@@ -1148,13 +1176,14 @@
 
 						if(_sketch.chart.volumeHeightRatio != 0){
 							var axisYHeightIntervalAux = axisYVolumeInterval / _sketch.chart.volumeHeightRatio;
+							var previousVolume = null;
 							for(var i = 0; i <= maxVolumeAxisYTickIndex; i++){
 								var volume = _sketch.extendedData.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i));
-								var format = config.volumeAxisYFormatter || util.formatMoney;
-								volume = Number(format(volume, config));
-								if(i > 0 && volumeAxisYTickList.length > 0 && volume <= volumeAxisYTickList[volumeAxisYTickList.length - 1].label)
+								volume = (config.volumeAxisYFormatter || util.formatMoney)(volume, config);
+								if(volume == previousVolume)
 									continue;
 
+								previousVolume = volume;
 								var tickOffset = numBig(new Big(maxVolumeAxisYTickIndex - i).mul(axisYHeightIntervalAux));
 								var tickY = yTop_volume_axisY + Math.round(tickOffset);
 
