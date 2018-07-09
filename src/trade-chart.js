@@ -32,20 +32,24 @@
 	
 	/**
 	 * 格式化钱数字
-	 * @param amount {Number} 金额
-	 * @param precision {Integer} 精度。默认2位
+	 * @param {Number} amount 金额
+	 * @param {Integer} precision 精度。默认2位
 	 */
-	var formatMoney = function(amount, precision){
-		if(arguments.length < 2)
-			precision = 2;
-		
-		if(amount >= 10000)
-			return (amount / 10000).toFixed(precision).replace(/(\.[^0])0+/, "$1") + "万";
-		if(amount >= 100000000)
-			return (amount / 100000000).toFixed(precision).replace(/(\.[^0])0+/, "$1") + "亿";
-		
-		return amount.toFixed(precision).replace(/(\.[^0])0+/, "$1");
-	};
+	var formatMoney = (function(){
+		var arr = [[1000, "K"], [1000000, "M"], [1000000000, "G"]];
+
+		return function(amount, precision){
+			if(arguments.length < 2)
+				precision = 2;
+
+			for(var i = 0; i < arr.length; i++){
+				if(amount >= arr[i][0])
+					return (amount / arr[i][0]).toFixed(precision).replace(/(\.[^0])0+/, "$1") + arr[i][1];
+			}
+
+			return amount.toFixed(precision).replace(/(\.[^0])0+/, "$1");
+		};
+	})();
 	
 	/**
 	 * 克隆对象
