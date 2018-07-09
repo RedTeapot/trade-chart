@@ -137,6 +137,11 @@
 		volumeAxisYTickOffset: 0, /** 量图纵坐标刻度距离原点的位移 */
 		volumeAxisYMidTickQuota: 2, /** 量图纵坐标刻度个数（不包括最小值和最大值） */
 		volumeAxisYFloor: null, /** 量图纵坐标最小刻度, 为null时自动 */
+		volumeAxisYPrecision: 2,/** 量图纵坐标的数字精度 */
+		volumeAxisYFormatter: function(volume, config){/** 量图纵坐标数字格式化方法 */
+			/** volume：数量；config：配置 */
+			return util.formatMoney(volume, config.volumeAxisYPrecision);
+		},
 		volumeAxisYLabelFont: null,/** 量图纵坐标的坐标标签字体 */
 		volumeAxisYLabelColor: null,/** 量图纵坐标的坐标标签颜色 */
 		volumeAxisYLabelVerticalOffset: function(i, n){/** 量图纵坐标标签纵向位移 */
@@ -1144,8 +1149,13 @@
 						if(_sketch.chart.volumeHeightRatio != 0){
 							var axisYHeightIntervalAux = axisYVolumeInterval / _sketch.chart.volumeHeightRatio;
 							for(var i = 0; i <= maxVolumeAxisYTickIndex; i++){
-								var volume = _sketch.extendedData.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i)),
-									tickOffset = numBig(new Big(maxVolumeAxisYTickIndex - i).mul(axisYHeightIntervalAux));
+								var volume = _sketch.extendedData.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i));
+								var format = config.volumeAxisYFormatter || util.formatMoney;
+								volume = Number(format(volume, config));
+								if(i > 0 && volumeAxisYTickList.length > 0 && volume <= volumeAxisYTickList[volumeAxisYTickList.length - 1].label)
+									continue;
+
+								var tickOffset = numBig(new Big(maxVolumeAxisYTickIndex - i).mul(axisYHeightIntervalAux));
 								var tickY = yTop_volume_axisY + Math.round(tickOffset);
 
 								/* 绘制网格横线 */
@@ -1162,7 +1172,7 @@
 								}
 
 								/* 汇集刻度，用于图形绘制完毕后统一绘制 */
-								volumeAxisYTickList.push({y: tickY, label: Math.floor(volume)});
+								volumeAxisYTickList.push({y: tickY, label: volume});
 							}
 						}else{
 							/* 汇集刻度，用于图形绘制完毕后统一绘制 */
