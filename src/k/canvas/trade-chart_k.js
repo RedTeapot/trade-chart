@@ -494,25 +494,13 @@
 		 */
 		var getMinX = function(){
 			return Math.floor(config.paddingLeft + config.axisXTickOffset);
-
-			// var ifShowAxisYLeft = "left" == String(config.axisYPosition).toLowerCase();
-			// var t = config.paddingLeft;
-			//
-			// if(ifShowAxisYLeft)
-			// 	return Math.floor(t + config.axisXTickOffset);
-			// else
-			// 	return Math.floor(t);
 		};
 
 		/**
 		 * 获取图形正文区域的最大横坐标值
 		 */
 		var getMaxX = function(){
-			return Math.floor(config.width - config.paddingRight);
-
-			// var ifShowAxisYLeft = "left" == String(config.axisYPosition).toLowerCase();
-			// var x = Math.floor(config.width - config.paddingRight);
-			// return ifShowAxisYLeft? x: (x - config.axisXTickOffset);
+			return Math.floor(config.width - config.paddingRight - config.axisXTickOffsetFromRight);
 		};
 
 		/**
@@ -558,8 +546,13 @@
 			}
 
 			var tmpX = x - minX;
+			var groupSize = config.groupBarWidth + config.groupGap;
 
-			var index = ceilBig(new Big(tmpX).div(Math.floor(config.groupBarWidth + config.groupGap))) - 1;
+			var tmp = new Big(tmpX).div(groupSize);
+			var index = floorBig(tmp);
+			if(tmp.mod(1).gte(0.5))
+				index += 1;
+
 			if(index < 0 || index >= groupCount)
 				return -1;
 
@@ -599,7 +592,7 @@
 		 * 获取指定的相对横坐标对应的数据在画布上的坐标位置（左侧位置）
 		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @param {StringEnum} [position=left] 返回的坐标的横坐标位置。left：左侧位置；center：中间位置
-		 * @returns {JsonObject} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
+		 * @returns {{x: {Integer}, y: {Integer}}} 坐标位置。如果没有数据与之对应，则返回null。
 		 */
 		this.getCoordinate = function(x, position){
 			var dataIndex = this.getDataIndex(x);
@@ -616,15 +609,6 @@
 			var obj = {x: 0, y: -1};/** 纵坐标不确定 */
 			var minX = getMinX();
 			obj.x = minX + dataIndex * groupSize;
-
-			// if(ifShowAxisYLeft){
-			// 	var minX = getMinX();
-			// 	obj.x = minX + dataIndex * groupSize;
-			// }else{
-			// 	var maxX = getMaxX(),
-			// 		groupCount = this.getGroupCount();
-			// 	obj.x = maxX - (groupCount - 1 - dataIndex) * groupSize;
-			// }
 
 			if("left" == position)
 				obj.x -= calcHalfGroupBarWidth(config);
