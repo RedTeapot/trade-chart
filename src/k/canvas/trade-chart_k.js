@@ -316,8 +316,9 @@
 				min = Math.min(+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice);
 			for(var j = 0; j < config.showMAArr.length; j++){
 				var num = config.showMAArr[j];
-				var tmp = +d["MA"+num];
-				if(tmp != null){
+				var tmp = d["MA"+num];
+				if(!util.isEmptyString(tmp)){
+					tmp = +tmp;
 					max = Math.max(tmp, max);
 					min = Math.min(tmp, min);
 				}
@@ -357,6 +358,7 @@
 				dataSketch_extended_priceFloor = Number(config.axisYPriceFloor);
 		}else
 			dataSketch_extended_priceFloor = dataSketch_origin_min - numBig(new Big(dataSketch_origin_avgVariation).div(2));
+
 		if(!isFinite(dataSketch_extended_priceFloor) || dataSketch_extended_priceFloor < 0)
 			dataSketch_extended_priceFloor = 0;
 
