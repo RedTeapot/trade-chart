@@ -534,7 +534,7 @@
 		/**
 		 * 获取指定的相对横坐标对应的数据索引
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果没有数据与之对应，则返回-1
+		 * @reutrn {Integer} 相对横坐标对应的数据索引。如果位置在区域左侧，则返回0；如果在区域右侧，则返回最后一条数据的索引。如果数据区域中没有任何数据，则返回-1
 		 */
 		this.getDataIndex = function(x){
 			var groupCount = this.getGroupCount();
@@ -555,8 +555,14 @@
 			if(tmp.mod(1).gte(0.5))
 				index += 1;
 
-			if(index < 0 || index >= groupCount)
-				return -1;
+			if(index < 0)
+				index = 0;
+			else if(index >= groupCount){
+				if(groupCount > 0)
+					index = groupCount - 1;
+				else
+					index = -1;
+			}
 
 			return index;
 		};
