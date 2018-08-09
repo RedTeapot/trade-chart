@@ -640,7 +640,7 @@
 
 		/**
 		 * 设置数据源
-		 * @param _datas {JsonArray} 数据源
+		 * @param _datas {Object[]} 数据源
 		 */
 		this.setDatas = function(_datas){
 			datas = _datas;
@@ -673,8 +673,8 @@
 
 		/**
 		 * 渲染图形，并呈现至指定的画布中
-		 * @param domContainerObj {HTMLCanvasElement} 画布
-		 * @param config {JsonObject} 渲染配置
+		 * @param canvasObj {HTMLCanvasElement} 画布
+		 * @param config {Object} 渲染配置
 		 * @returns {RenderedKChart} 绘制的K线图
 		 */
 		var doRender = function(canvasObj, config){

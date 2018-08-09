@@ -263,7 +263,7 @@
 	/**
 	 * 根据给定的配置信息和画布元素，计算最多可以绘制的数据个数
 	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
-	 * @param {JsonObject} config 渲染配置
+	 * @param {Object} config 渲染配置
 	 */
 	var calcMaxDotCount = function(canvasObj, config){
 		var maxDotCount = 0;
@@ -274,6 +274,21 @@
 				mergedConfig.width = canvasObj.parentElement.clientWidth * parseInt(mergedConfig.width.replace(/%/, "")) / 100;
 			if(/%/.test(mergedConfig.height))
 				mergedConfig.height = canvasObj.parentElement.clientHeight * parseInt(mergedConfig.height.replace(/%/, "")) / 100;
+
+			/**
+			 * 点之间的间隔自动调整
+			 * 如果点之间的间隔为auto，则在数据量最大的情况下，点与点之间的间隔将为0。
+			 * 由于该方法不便于要求调用端提供数据，因此将“武断”地返回间隔为0情况下可绘制的最大数据量，即为可绘制区域的宽度（根据render方法的间隔自动调整方法得出）
+			 */
+			if("auto" == String(mergedConfig.dotGap).toLowerCase()){
+				mergedConfig.dotGap = 0;
+			}
+
+			var maxVolumeWidth = floorBig(new Big(config.dotGap + 1).div(2)) * 2 + 1;
+			if(config.volumeWidth > maxVolumeWidth){
+				console.warn("Configured volume width(" + config.volumeWidth + ") is too big, auto adjust to " + maxVolumeWidth);
+				config.volumeWidth = maxVolumeWidth;
+			}
 
 			maxDotCount = sketchChart(mergedConfig).maxDotCount;
 		});
@@ -434,7 +449,7 @@
 
 	/**
 	 * 初始化画布（设置宽高、伸缩比例等）
-	 * @param {HTMLCanvasElement} domContainerObj 画布
+	 * @param {HTMLCanvasElement} canvasObj 画布
 	 * @param {Object} config 渲染配置
 	 * @param {Object[]} datas 数据数组
 	 */
@@ -617,7 +632,7 @@
 		/**
 		 * 获取指定的相对横坐标对应的数据在画布上的坐标位置
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 * @return {JsonObject} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
+		 * @return {Object} 坐标位置，形如：{x: <x>, y: <y>}。如果没有数据与之对应，则返回null。
 		 */
 		this.getCoordinate = function(x){
 			var dataIndex = this.getDataIndex(x);
@@ -655,7 +670,7 @@
 
 		/**
 		 * 设置数据源
-		 * @param {Array#JsonObject} _datas 数据源
+		 * @param {Object[]} _datas 数据源
 		 */
 		this.setDatas = function(_datas){
 			datas = _datas;
@@ -688,8 +703,8 @@
 
 		/**
 		 * 渲染图形，并呈现至指定的画布中
-		 * @param {HTMLCanvasElement} domContainerObj 画布
-		 * @param {JsonObject} config 渲染配置
+		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {Object} config 渲染配置
 		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		var doRender = function(canvasObj, config){
@@ -1401,8 +1416,8 @@
 
 		/**
 		 * 渲染图形，并呈现至指定的画布中
-		 * @param {HTMLCanvasElement} domContainerObj 画布
-		 * @param {JsonObject} config 渲染配置
+		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {Object} config 渲染配置
 		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.render = function(canvasObj, config){
@@ -1419,7 +1434,7 @@
 		/**
 		 * 渲染图形，并呈现至指定的DOM容器中
 		 * @param domContainerObj {HTMLElement} DOM容器
-		 * @param config {JsonObject} 渲染配置
+		 * @param config {Object} 渲染配置
 		 * @return {RenderedTrendChart} 绘制的分时图
 		 */
 		this.renderAt = function(domContainerObj, config){

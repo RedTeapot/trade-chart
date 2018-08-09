@@ -18,13 +18,8 @@
 	 * 默认的，作用于主图和子图的全局配置项
 	 * @type {Object<String, *>}
 	 */
-	var defaultGlobalChartConfig = {
+	var defaultConfig = {
 		width: "100%",/** 图表整体宽度 */
-
-		paddingTop: 20,/** 图表内边距 - 上侧 */
-		paddingBottom: 20,/** 图表内边距 - 下侧 */
-		paddingLeft: 60,/** 图表内边距 - 左侧 */
-		paddingRight: 20,/** 图表内边距 - 右侧 */
 
 		groupLineWidth: 1,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
 		groupBarWidth: 5,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
@@ -51,12 +46,6 @@
 		axisYLabelOffset: 5,/** 纵坐标标签距离坐标轴刻度线的距离 */
 		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
 		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
-
-		showHorizontalGridLine: true,/** 是否绘制网格横线 */
-		showVerticalGridLine: true,/** 是否绘制网格横线 */
-		horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
-		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
-		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 	};
 
 
