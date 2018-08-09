@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="gn">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KChart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChart_candle.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChart_candle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChart_volume.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChart_volume.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -24,8 +19,8 @@
       <file leaf-file-name="trade-chart_trend.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="282" column="68" lean-forward="true" selection-start-line="282" selection-start-column="68" selection-end-line="282" selection-end-column="68" />
+            <state relative-caret-position="714">
+              <caret line="286" column="62" selection-start-line="286" selection-start-column="50" selection-end-line="286" selection-end-column="62" />
               <folding>
                 <element signature="e#671#5506#0" />
                 <element signature="e#9201#14688#0" />
@@ -615,12 +610,12 @@
       <workItem from="1532694246507" duration="865000" />
       <workItem from="1532911257602" duration="37000" />
       <workItem from="1533195257890" duration="247000" />
-      <workItem from="1533785210037" duration="882000" />
+      <workItem from="1533785210037" duration="1524000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="225049000" />
+    <option name="totallyTimeSpent" value="225691000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -770,8 +765,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/trend/canvas/trade-chart_trend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="282" column="68" lean-forward="true" selection-start-line="282" selection-start-column="68" selection-end-line="282" selection-end-column="68" />
+        <state relative-caret-position="714">
+          <caret line="286" column="62" selection-start-line="286" selection-start-column="50" selection-end-line="286" selection-end-column="62" />
           <folding>
             <element signature="e#671#5506#0" />
             <element signature="e#9201#14688#0" />

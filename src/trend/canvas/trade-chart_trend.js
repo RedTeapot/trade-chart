@@ -284,7 +284,7 @@
 				mergedConfig.dotGap = 0;
 			}
 
-			var maxVolumeWidth = floorBig(new Big(config.dotGap + 1).div(2)) * 2 + 1;
+			var maxVolumeWidth = floorBig(new Big(mergedConfig.dotGap + 1).div(2)) * 2 + 1;
 			if(config.volumeWidth > maxVolumeWidth){
 				console.warn("Configured volume width(" + config.volumeWidth + ") is too big, auto adjust to " + maxVolumeWidth);
 				config.volumeWidth = maxVolumeWidth;
