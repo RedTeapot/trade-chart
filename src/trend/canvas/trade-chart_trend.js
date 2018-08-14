@@ -287,7 +287,7 @@
 			var maxVolumeWidth = floorBig(new Big(mergedConfig.dotGap + 1).div(2)) * 2 + 1;
 			if(config.volumeWidth > maxVolumeWidth){
 				console.warn("Configured volume width(" + config.volumeWidth + ") is too big, auto adjust to " + maxVolumeWidth);
-				config.volumeWidth = maxVolumeWidth;
+				mergedConfig.volumeWidth = maxVolumeWidth;
 			}
 
 			maxDotCount = sketchChart(mergedConfig).maxDotCount;
