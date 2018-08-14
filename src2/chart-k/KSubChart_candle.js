@@ -2,20 +2,11 @@
 	var TradeChart2 = window.TradeChart2;
 	var KChart = TradeChart2.chart.KChart;
 	var KSubChart = KChart.KSubChart,
-		RenderedKSubChart = KChart.RenderedKSubChart;
+		KSubChartRenderResult = KChart.KSubChartRenderResult;
 	var util = TradeChart2.util;
 
 	var numBig = function(big){
 		return Number(big.toString());
-	};
-	var roundBig = function(big){
-		return Math.round(numBig(big));
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
-	var ceilBig = function(big){
-		return Math.ceil(numBig(big));
 	};
 
 

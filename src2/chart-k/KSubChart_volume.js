@@ -2,7 +2,7 @@
 	var TradeChart2 = window.TradeChart2;
 	var KChart = TradeChart2.chart.KChart;
 	var KSubChart = KChart.KSubChart,
-		RenderedKSubChart = KChart.RenderedKSubChart;
+		KSubChartRenderResult = KChart.KSubChartRenderResult;
 	var util = TradeChart2.util;
 
 	var numBig = function(big){
