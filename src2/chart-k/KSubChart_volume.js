@@ -8,15 +8,6 @@
 	var numBig = function(big){
 		return Number(big.toString());
 	};
-	var roundBig = function(big){
-		return Math.round(numBig(big));
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
-	var ceilBig = function(big){
-		return Math.ceil(numBig(big));
-	};
 
 
 	/**
@@ -28,8 +19,6 @@
 
 		paddingTop: 20,/** 图表内边距 - 上侧 */
 		paddingBottom: 20,/** 图表内边距 - 下侧 */
-		paddingLeft: 60,/** 图表内边距 - 左侧 */
-		paddingRight: 20,/** 图表内边距 - 右侧 */
 
 		showAxisXLine: true,/** 是否绘制横坐标轴 */
 		showAxisXLabel: true,/** 是否绘制横坐标刻度值 */
@@ -88,14 +77,26 @@
 
 	/**
 	 * @constructor
-	 * 完成绘制了的成交量子图
+	 * K线图子图：蜡烛图
+	 * @param {KChart} kChart 附加该子图的K线图
 	 */
-	var RenderedKSubChart_volume = function(){
-		//TODO
-	};
+	var VolumeChart = function(kChart){
+		KSubChart.call(this, kChart, KChart.KSubChartTypes.VOLUME);
 
-	var VolumeChart = function(){
-		KSubChart.call(this, "volume");
+		/**
+		 * 从给定的配置集合中获取指定名称的配置项取值。
+		 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
+		 * 如果全局的配置中也不存在，则返回undefined
+		 *
+		 * @param {String} name 配置项名称
+		 * @param {Object} config 配置项集合
+		 */
+		var getConfigItem = function(name, config){
+			if(name in config)
+				return config[name];
+
+			return kChart.getConfigItem(name);
+		};
 
 		/**
 		 * @override
@@ -107,7 +108,7 @@
 		 */
 		this.render = function(canvasObj, config){
 			//TODO
-			return new RenderedKSubChart_volume();
+			return new KSubChartRenderResult(this, config);
 		};
 	};
 	VolumeChart.prototype = Object.create(KSubChart.prototype);

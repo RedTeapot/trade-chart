@@ -28,8 +28,6 @@
 
 		paddingTop: 20,/** 图表内边距 - 上侧 */
 		paddingBottom: 20,/** 图表内边距 - 下侧 */
-		paddingLeft: 60,/** 图表内边距 - 左侧 */
-		paddingRight: 20,/** 图表内边距 - 右侧 */
 
 		showAxisXLine: true,/** 是否绘制横坐标轴 */
 		showAxisXLabel: true,/** 是否绘制横坐标刻度值 */
@@ -88,14 +86,26 @@
 
 	/**
 	 * @constructor
-	 * 完成绘制了的蜡烛子图
+	 * K线图子图：蜡烛图
+	 * @param {KChart} kChart 附加该子图的K线图
 	 */
-	var RenderedKSubChart_candle = function(){
-		//TODO
-	};
+	var CandleChart = function(kChart){
+		KSubChart.call(this, kChart, KChart.KSubChartTypes.CANDLE);
 
-	var CandleChart = function(){
-		KSubChart.call(this, "candle");
+		/**
+		 * 从给定的配置集合中获取指定名称的配置项取值。
+		 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
+		 * 如果全局的配置中也不存在，则返回undefined
+		 *
+		 * @param {String} name 配置项名称
+		 * @param {Object} config 配置项集合
+		 */
+		var getConfigItem = function(name, config){
+			if(name in config)
+				return config[name];
+
+			return kChart.getConfigItem(name);
+		};
 
 		/**
 		 * @override
@@ -103,11 +113,11 @@
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @param {Object} config 渲染配置
-		 * @returns {RenderedKChart} 绘制的K线图
+		 * @returns {KSubChartRenderResult} K线子图绘制结果
 		 */
 		this.render = function(canvasObj, config){
 			//TODO
-			return new RenderedKSubChart_candle();
+			return new KSubChartRenderResult(this, config);
 		};
 	};
 	CandleChart.prototype = Object.create(KSubChart.prototype);

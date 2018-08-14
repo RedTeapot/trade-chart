@@ -2,17 +2,6 @@
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
 
-	/**
-	 * @typedef KData
-	 * @type {Object}
-	 *
-	 * @property {String} time 时间
-	 * @property {Number} openPrice 开盘价
-	 * @property {Number} highPrice 最高价
-	 * @property {Number} lowPrice 最低价
-	 * @property {Number} closePrice 收盘价
-	 */
-
 
 	/**
 	 * 默认的，作用于主图和子图的全局配置项
@@ -20,6 +9,9 @@
 	 */
 	var defaultConfig = {
 		width: "100%",/** 图表整体宽度 */
+
+		paddingLeft: 60,/** 图表内边距 - 左侧 */
+		paddingRight: 20,/** 图表内边距 - 右侧 */
 
 		groupLineWidth: 1,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
 		groupBarWidth: 5,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
@@ -48,45 +40,6 @@
 		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
 	};
 
-
-	/**
-	 * @constructor
-	 * 绘制的K线子图
-	 */
-	var RenderedKSubChart = function(){
-		/**
-		 * 获取渲染用到的配置数据
-		 */
-		this.getConfig = function(){
-			console.error("Not implemented.");
-		};
-	};
-
-	/**
-	 * @constructor
-	 * K线子图
-	 * @param {String} type 子图类型。如：volume - 量图；ma - MA指标图
-	 */
-	var KSubChart = function(type){
-		/**
-		 * 获取该子图的子图类型
-		 * @returns {String}
-		 */
-		this.getType = function(){
-			return type;
-		};
-
-		/**
-		 * 渲染图形，并呈现至指定的画布中
-		 * @param {HTMLCanvasElement} canvasObj 画布
-		 * @param {Object} config 渲染配置
-		 * @returns {RenderedKSubChart} 绘制的K线子图
-		 */
-		this.render = function(canvasObj, config){
-			console.warn("Not implemented for k sub chart: " + this.getType());
-		};
-	};
-
 	/**
 	 * @constructor
 	 * K线图（OHLC图）
@@ -94,8 +47,11 @@
 	var KChart = function(){
 		TradeChart2.apply(this, arguments);
 
+		/** 绘制配置 */
+		var config = {};
+
 		/** 数据数组 */
-		var datas;
+		var dataList;
 
 		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
 		var dataParser;
@@ -103,21 +59,54 @@
 		/** 附加的K线子图列表 */
 		var attachedKSubCharts = [];
 
+		/**
+		 * 设置绘制配置
+		 * @param {Object} _config 图形绘制配置
+		 */
+		this.setConfig = function(_config){
+			if(null != _config && typeof _config == "object")
+				for(var p in _config)
+					config[p] = _config[p];
+
+			return this;
+		};
+
+		/**
+		 * 获取图形绘制配置
+		 * @returns {*}
+		 */
+		this.getConfig = function(){
+			return config;
+		};
+
+		/**
+		 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
+		 * @param {String} name 配置项名称
+		 * @returns {*}
+		 */
+		this.getConfigItem = function(name){
+			if(name in config)
+				return config[name];
+			else if(name in defaultConfig)
+				return defaultConfig[name];
+			else
+				return undefined;
+		};
 
 		/**
 		 * 设置数据源
 		 * @param _datas {KData[]} 数据源
 		 */
-		this.setDatas = function(_datas){
-			datas = _datas;
+		this.setDataList = function(_datas){
+			dataList = _datas;
 			return this;
 		};
 
 		/**
 		 * 获取设置的数据源
 		 */
-		this.getDatas = function(){
-			return datas;
+		this.getDataList = function(){
+			return dataList;
 		};
 
 		/**
@@ -138,21 +127,21 @@
 		};
 
 		/**
-		 * 附加子图
-		 * @param {KSubChart} subChart 要附加的子图
+		 * 为该K线图创建指定类型的子图
+		 * @param {KSubChartTypes} subChartType 要创建的K线子图类型
 		 */
-		this.attachSubChart = function(subChart){
-			if(attachedKSubCharts.indexOf(subChart) == -1)
-				attachedKSubCharts.push(subChart);
+		this.newSubChart = function(subChartType){
+			var kSubChart = new KSubChart(this, subChartType);
+			attachedKSubCharts.push(kSubChart);
 
-			return this;
+			return kSubChart;
 		};
 
 		/**
 		 * 移除子图
 		 * @param {KSubChart} subChart 要移除的子图
 		 */
-		this.detachSubChart = function(subChart){
+		this.removeSubChart = function(subChart){
 			var index = attachedKSubCharts.indexOf(subChart);
 			if(index != -1)
 				attachedKSubCharts.splice(index, 1);
@@ -161,9 +150,6 @@
 		};
 	};
 	KChart.prototype = Object.create(TradeChart2.prototype);
-
-	KChart.KSubChart = KSubChart;
-	KChart.RenderedKSubChart = RenderedKSubChart;
 
 	/**
 	 * 子图图表类集合

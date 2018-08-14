@@ -191,8 +191,7 @@
 
 	/**
 	 * 根据给定的配置信息计算绘制所需要的图形信息
-	 * @param {HTMLCanvasElement} canvasObj Canvas DOM元素
-	 * @param {JsonObject} config 渲染配置
+	 * @param {Object} config 渲染配置
 	 */
 	var sketchChart = function(config){
 		var width = config.width,
