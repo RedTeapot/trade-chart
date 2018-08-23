@@ -6,15 +6,20 @@
 		console.warn("Object: " + attachName + " exists already.");
 		return;
 	}
-	
+
 	/**
-	 * 创建svg元素
-	 * @param tag {String} 标签名称
+	 * 定义只读属性
+	 * @param {Object} obj 目标对象
+	 * @param {String} name 要定义的属性名称
+	 * @param {*} value 要定义的取值
 	 */
-	var createSvgElement = function(tag){
-		return document.createElementNS("http://www.w3.org/2000/svg", tag);
+	var defineReadonlyProperty = function(obj, name, value){
+		if(name in obj)
+			return;
+
+		Object.defineProperty(obj, name, {value: value, configurable: false, writable: false});
 	};
-	
+
 	/**
 	 * 设定参数默认值
 	 */
@@ -47,7 +52,7 @@
 					return (amount / arr[i][0]).toFixed(precision).replace(/(\.[^0])0+/, "$1") + arr[i][1];
 			}
 
-			return amount.toFixed(precision).replace(/(\.[^0])0+/, "$1");
+			return amount.toFixed(precision).replace(/(\.[^0])0+$/, "$1");
 		};
 	})();
 	
@@ -288,16 +293,15 @@
 			return this;
 		};
 	};
-	
-	Object.defineProperty(CommonTradeChart, "LinearGradient", {value: LinearGradient, configurable: false, writable: false});
-	
+
+	defineReadonlyProperty(CommonTradeChart, "LinearGradient", LinearGradient);
+
 	/**
 	 * 工具集合
 	 */
 	var util = {
 		setDftValue: setDftValue,
 		cloneObject: cloneObject,
-		createSvgElement: createSvgElement,
 		formatMoney: formatMoney,
 		setAttributes: setAttributes,
 		pixelRatio: pixelRatio,
@@ -315,19 +319,19 @@
 	 * 图表类集合
 	 */
 	var charts = {};
-	Object.defineProperty(CommonTradeChart, "chart", {value: charts, configurable: false, writable: false});
+	defineReadonlyProperty(CommonTradeChart, "chart", charts);
 	
 	/**
 	 * 图表定义
 	 * @param name {String} 图表名称
-	 * @param obj {Any} 图表实现
+	 * @param obj {*} 图表实现
 	 */
-	Object.defineProperty(CommonTradeChart, "defineChart", {value: function(name, obj){
+	defineReadonlyProperty(CommonTradeChart, "defineChart", function(name, obj){
 		if(name in charts)
 			throw new Error("Chart of name: " + name + " exists already.");
-		
+
 		charts[name] = obj;
-	}, configurable: false, writable: false});
-	
+	});
+
 	attachContext[attachName] = CommonTradeChart;
 })();

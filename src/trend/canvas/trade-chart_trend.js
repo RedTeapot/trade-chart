@@ -1188,7 +1188,7 @@
 						}
 
 						/* 汇集刻度，用于图形绘制完毕后统一绘制 */
-						var format = config.axisYFormatter || util.formatMoney;
+						var format = config.axisYFormatter || defaultChartConfig.axisYFormatter;
 						axisYTickList.push({y: tickY, label: format(price, config)});
 					}
 					/* 量图 */
@@ -1201,7 +1201,7 @@
 							var previousVolume = null;
 							for(var i = 0; i <= maxVolumeAxisYTickIndex; i++){
 								var volume = _sketch.extendedData.volumeFloor + numBig(new Big(axisYVolumeInterval).mul(i));
-								volume = (config.volumeAxisYFormatter || util.formatMoney)(volume, config);
+								volume = (config.volumeAxisYFormatter || defaultChartConfig.volumeAxisYFormatter)(volume, config);
 								if(volume == previousVolume)
 									continue;
 

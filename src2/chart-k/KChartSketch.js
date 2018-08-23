@@ -146,11 +146,13 @@
 	KChartSketch.sketchByConfig = function(config){
 		var chartSketch = new KChartSketch();
 
-		chartSketch.setWidth(Math.floor(config.width - config.paddingLeft - config.paddingRight));
-		chartSketch.setHeight(Math.floor(config.height - config.paddingTop - config.paddingBottom));
-		chartSketch.setContentWidth(Math.floor(chartSketch.getWidth() - config.axisXTickOffset - config.axisXTickOffsetFromRight));
-		chartSketch.setContentHeight(Math.floor(chartSketch.getHeight() - config.axisYTickOffset));
-		chartSketch.setMaxGroupCount(floorBig(new Big(chartSketch.getContentWidth()).minus(config.groupLineWidth).div(config.groupGap + config.groupBarWidth)) + 1);
+		chartSketch.setWidth(Math.floor(config.width - config.paddingLeft - config.paddingRight))
+			.setHeight(Math.floor(config.height - config.paddingTop - config.paddingBottom))
+			.setContentWidth(Math.floor(chartSketch.getWidth() - config.axisXTickOffset - config.axisXTickOffsetFromRight))
+			.setContentHeight(Math.floor(chartSketch.getHeight() - config.axisYTickOffset))
+			.setMaxGroupCount(floorBig(new Big(chartSketch.getContentWidth()).minus(config.groupLineWidth).div(config.groupGap + config.groupBarWidth)) + 1);
+
+		return chartSketch;
 	};
 
 	KChart.KChartSketch = KChartSketch;

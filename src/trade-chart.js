@@ -47,7 +47,7 @@
 					return (amount / arr[i][0]).toFixed(precision).replace(/(\.[^0])0+/, "$1") + arr[i][1];
 			}
 
-			return amount.toFixed(precision).replace(/(\.[^0])0+/, "$1");
+			return amount.toFixed(precision).replace(/(\.[^0])0+$/, "$1");
 		};
 	})();
 	
