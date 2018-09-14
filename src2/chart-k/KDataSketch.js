@@ -176,58 +176,68 @@
 			dataSketch_extended_priceFloor = 0,/* 坐标中价格的最小值 */
 			dataSketch_extended_pricePrecision = 0;/* 坐标中价格的精度 */
 
-		var variationSum = 0;
-		for(var i = 0; i < dataList.length; i++){
-			var d = dataList[i];
-			if(typeof dataParser == "function")
-				d = dataParser(d, i, dataList);
-			if(null == d || typeof d != "object")
-				continue;
+		if(dataList.length == 0){
+			dataSketch_origin_max = undefined;
+			dataSketch_origin_min = undefined;
+			dataSketch_origin_avgVariation = undefined;
+			dataSketch_origin_maxVariation = undefined;
+		}else{
+			var variationSum = 0;
+			for(var i = 0; i < dataList.length; i++){
+				var d = dataList[i];
+				if(typeof dataParser == "function")
+					d = dataParser(d, i, dataList);
+				if(null == d || typeof d != "object")
+					continue;
 
-			var openPrice = +d.openPrice,
-				highPrice = +d.highPrice,
-				lowPrice = +d.lowPrice,
-				closePrice = +d.closePrice;
+				var openPrice = +d.openPrice,
+					highPrice = +d.highPrice,
+					lowPrice = +d.lowPrice,
+					closePrice = +d.closePrice;
 
-			/* 数据精度确定 */
-			dataSketch_extended_pricePrecision = Math.max(dataSketch_extended_pricePrecision, util.getPrecision(openPrice));
-			dataSketch_extended_pricePrecision = Math.max(dataSketch_extended_pricePrecision, util.getPrecision(highPrice));
-			dataSketch_extended_pricePrecision = Math.max(dataSketch_extended_pricePrecision, util.getPrecision(lowPrice));
-			dataSketch_extended_pricePrecision = Math.max(dataSketch_extended_pricePrecision, util.getPrecision(closePrice));
+				/* 数据精度确定 */
+				dataSketch_extended_pricePrecision = Math.max(
+					dataSketch_extended_pricePrecision,
+					util.getPrecision(openPrice),
+					util.getPrecision(highPrice),
+					util.getPrecision(lowPrice),
+					util.getPrecision(closePrice)
+				);
 
-			var max = Math.max(openPrice, highPrice, lowPrice, closePrice),
-				min = Math.min(openPrice, highPrice, lowPrice, closePrice);
-			if(max > dataSketch_origin_max)
-				dataSketch_origin_max = max;
-			if(min < dataSketch_origin_min)
-				dataSketch_origin_min = min;
+				var max = Math.max(openPrice, highPrice, lowPrice, closePrice),
+					min = Math.min(openPrice, highPrice, lowPrice, closePrice);
+				if(max > dataSketch_origin_max)
+					dataSketch_origin_max = max;
+				if(min < dataSketch_origin_min)
+					dataSketch_origin_min = min;
 
-			/* 确定更大的价格变动幅度 */
-			var variation = Math.abs(max - min);
-			if(variation > dataSketch_origin_maxVariation)
-				dataSketch_origin_maxVariation = variation;
+				/* 确定更大的价格变动幅度 */
+				var variation = Math.abs(max - min);
+				if(variation > dataSketch_origin_maxVariation)
+					dataSketch_origin_maxVariation = variation;
 
-			variationSum += variation;
+				variationSum += variation;
+			}
+			var len = dataList.length;
+			dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
+
+			/* 确定Y轴最小值 */
+			dataSketch_extended_priceFloor = dataSketch_origin_min - numBig(new Big(dataSketch_origin_avgVariation).div(2));
+			if(!isFinite(dataSketch_extended_priceFloor) || dataSketch_extended_priceFloor < 0)
+				dataSketch_extended_priceFloor = 0;
+
+			/* 确定Y轴最大值 */
+			dataSketch_extended_priceCeiling = dataSketch_origin_max + numBig(new Big(dataSketch_origin_avgVariation).div(2));
+			if(dataSketch_extended_priceCeiling < dataSketch_origin_max)
+				dataSketch_extended_priceCeiling = dataSketch_origin_max;
+			if(!isFinite(dataSketch_extended_priceCeiling) || dataSketch_extended_priceCeiling < 0)
+				dataSketch_extended_priceCeiling = dataSketch_extended_priceFloor;
+
+			/* 确保最大值与最小值不同 */
+			var b = new Big(dataSketch_extended_priceFloor);
+			if(b.eq(dataSketch_extended_priceCeiling))
+				dataSketch_extended_priceCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 		}
-		var len = dataList.length;
-		dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
-
-		/* 确定Y轴最小值 */
-		dataSketch_extended_priceFloor = dataSketch_origin_min - numBig(new Big(dataSketch_origin_avgVariation).div(2));
-		if(!isFinite(dataSketch_extended_priceFloor) || dataSketch_extended_priceFloor < 0)
-			dataSketch_extended_priceFloor = 0;
-
-		/* 确定Y轴最大值 */
-		dataSketch_extended_priceCeiling = dataSketch_origin_max + numBig(new Big(dataSketch_origin_avgVariation).div(2));
-		if(dataSketch_extended_priceCeiling < dataSketch_origin_max)
-			dataSketch_extended_priceCeiling = dataSketch_origin_max;
-		if(!isFinite(dataSketch_extended_priceCeiling) || dataSketch_extended_priceCeiling < 0)
-			dataSketch_extended_priceCeiling = dataSketch_extended_priceFloor;
-
-		/* 确保最大值与最小值不同 */
-		var b = new Big(dataSketch_extended_priceFloor);
-		if(b.eq(dataSketch_extended_priceCeiling))
-			dataSketch_extended_priceCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
 
 		return new KDataSketch()
 			.setMinPrice(dataSketch_origin_min)

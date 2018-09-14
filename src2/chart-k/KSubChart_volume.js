@@ -12,7 +12,7 @@
 
 	/**
 	 * 默认的，适用于“量图”子图的配置项
-	 * @type {Object<String, *>}
+	 * @type {KSubChartConfig_volume}
 	 */
 	var defaultConfig = {
 		height: 300,/** 图表整体高度 */

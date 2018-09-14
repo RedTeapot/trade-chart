@@ -1,0 +1,1 @@
+@call gulp --gulpfile gulpfile2.js concat %1

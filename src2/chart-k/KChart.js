@@ -5,7 +5,7 @@
 
 	/**
 	 * 默认的，作用于主图和子图的全局配置项
-	 * @type {Object<String, *>}
+	 * @type {KChartConfig}
 	 */
 	var defaultConfig = {
 		width: "100%",/** 图表整体宽度 */

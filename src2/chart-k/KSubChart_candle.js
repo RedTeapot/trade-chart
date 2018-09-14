@@ -12,7 +12,7 @@
 
 	/**
 	 * 默认的，适用于“蜡烛图”子图的配置项
-	 * @type {Object<String, *>}
+	 * @type {KSubChartConfig_candle}
 	 */
 	var defaultConfig = {
 		height: 300,/** 图表整体高度 */
@@ -26,10 +26,10 @@
 		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
 
 		showHorizontalGridLine: true,/** 是否绘制网格横线 */
-		showVerticalGridLine: true,/** 是否绘制网格横线 */
+		showVerticalGridLine: true,/** 是否绘制网格竖线 */
 		horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
 		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
-		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
+		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用 [1] 表示 */
 
 		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
 			//i: 自下而上的刻度索引。从0开始
@@ -67,8 +67,8 @@
 
 			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
 		},
-		axisYPriceCeilingLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
-		axisYPriceCeilingLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
+		axisYPriceCeilingLabelFont: null,/** 纵坐标最大值的坐标标签字体 */
+		axisYPriceCeilingLabelColor: null,/** 纵坐标最大值的坐标标签颜色 */
 
 		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */

@@ -838,7 +838,7 @@
 					if(config.showAxisXLabel){
 						ctx.save();
 						var axisXLabelHorizontalAlign = config.axisXLabelHorizontalAlign;
-						if(typeof axisXLabelHorizontalAlign)
+						if(typeof axisXLabelHorizontalAlign == "function")
 							axisXLabelHorizontalAlign = axisXLabelHorizontalAlign(i, axisXTickList.length);
 						axisXLabelHorizontalAlign && (ctx.textAlign = axisXLabelHorizontalAlign);
 
