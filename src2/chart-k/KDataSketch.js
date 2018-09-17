@@ -1,6 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
+	var Big = util.Big;
 	var KChart = TradeChart2.chart.KChart;
 
 	var numBig = function(big){

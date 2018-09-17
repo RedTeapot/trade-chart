@@ -1,6 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
+	var Big = util.Big;
 	var KChart = TradeChart2.chart.KChart;
 
 	var KDataSketch = KChart.KDataSketch,
@@ -45,7 +46,7 @@
 		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用 [1] 表示 */
 
-		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
+		axisYLabelVerticalOffset: function(){/** 纵坐标标签纵向位移 */
 			return 0;
 		},
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
@@ -84,8 +85,9 @@
 
 		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
-		keepedColor: "white",/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		keepedColor: "white"/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 	};
+	Object.seal && Object.seal(defaultConfig);
 
 	/**
 	 * @constructor
@@ -129,9 +131,7 @@
 				config_groupGap = getConfigItem("groupGap"),
 
 				config_paddingLeft = getConfigItem("paddingLeft"),
-				config_paddingRight = getConfigItem("paddingRight"),
 				config_paddingTop = getConfigItem("paddingTop"),
-				config_paddingBottom = getConfigItem("paddingBottom"),
 
 				config_keepedColor = getConfigItem("keepedColor"),
 				config_appreciatedColor = getConfigItem("appreciatedColor"),
@@ -194,12 +194,10 @@
 				kSubChartSketch = KSubChartSketch.sketchByConfig(config, config_height);
 
 			var axisYPosition = String(config_axisYPosition).toLowerCase();
-			var ifShowAxisYLeft = "left" == axisYPosition,
-				ifShowAxisYRight = "right" == axisYPosition;
+			var ifShowAxisYLeft = "left" === axisYPosition;
 
 			var axisYLabelPosition = String(config_axisYLabelPosition).toLowerCase();
-			var ifShowAxisYLabelOutside = "outside" == axisYLabelPosition,
-				ifShowAxisYLabelInside = "inside" == axisYLabelPosition;
+			var ifShowAxisYLabelOutside = "outside" === axisYLabelPosition;
 
 			/* 横坐标位置 */
 			var xLeft_axisX = Math.floor(config_paddingLeft) + 0.5,
@@ -301,13 +299,13 @@
 					if(config_showAxisXLabel){
 						ctx.save();
 
-						if(typeof config_axisXLabelHorizontalAlign == "function")
+						if(typeof config_axisXLabelHorizontalAlign === "function")
 							config_axisXLabelHorizontalAlign = config_axisXLabelHorizontalAlign(i, axisXTickList.length);
 						config_axisXLabelHorizontalAlign && (ctx.textAlign = config_axisXLabelHorizontalAlign);
 						ctx.fillText(tick.label, tickX, y_axisXTickLabel);
 						ctx.restore();
 					}
-				};
+				}
 
 				ctx.restore();
 			};
@@ -355,14 +353,14 @@
 						ctx.stroke();
 					}
 					if(config_showAxisYLabel){
-						if(typeof config_axisYLabelVerticalOffset == "function")
+						if(typeof config_axisYLabelVerticalOffset === "function")
 							config_axisYLabelVerticalOffset = config_axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
 
-						var drawLabel = function(){
+						var drawLabel = (function(label, tickY){
 							ctx.fillText(tick.label, x_axisY + axisYLabelOffset, yTop_axisY + tickY + config_axisYLabelVerticalOffset);
-						};
+						})(tick.label, tickY);
 
-						if(i == 0){
+						if(i === 0){
 							ctx.save();
 							config_axisYPriceFloorLabelFont && (ctx.font = config_axisYPriceFloorLabelFont);
 							config_axisYPriceFloorLabelColor && (ctx.fillStyle = config_axisYPriceFloorLabelColor);
@@ -370,7 +368,7 @@
 							drawLabel();
 
 							ctx.restore();
-						}else if(i == maxAxisYTickIndex){
+						}else if(i === maxAxisYTickIndex){
 							ctx.save();
 							config_axisYPriceCeilingLabelFont && (ctx.font = config_axisYPriceCeilingLabelFont);
 							config_axisYPriceCeilingLabelColor && (ctx.fillStyle = config_axisYPriceCeilingLabelColor);
@@ -381,20 +379,20 @@
 						}else
 							drawLabel();
 					}
-				};
+				}
 
 				ctx.restore();
 			};
 
 			/* 绘制坐标系 */
-			;(function(){
+			(function(){
 				ctx.save();
 
 				ctx.lineWidth = 1;
 				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
 
 				/* 绘制X轴 */
-				;(function(){
+				(function(){
 					/* 绘制X轴坐标线 */
 					if(config_showAxisXLine){
 						ctx.beginPath();
@@ -472,13 +470,13 @@
 					}else{
 						/* 绘制最后一个刻度和边界刻度 */
 						renderXTick(edgeTickDataIndex);
-						if(lastTickDataIndex != edgeTickDataIndex)
+						if(lastTickDataIndex !== edgeTickDataIndex)
 							renderXTick(lastTickDataIndex);
 					}
 				})();
 
 				/* 绘制Y轴 */
-				;(function(){
+				(function(){
 					/* 绘制Y轴坐标线 */
 					if(config_showAxisYLine){
 						ctx.moveTo(x_axisY, yTop_axisY);
@@ -533,7 +531,7 @@
 			})();
 
 			/* 绘制蜡烛图 */
-			;(function(){
+			(function(){
 				ctx.save();
 
 				/**
@@ -549,7 +547,6 @@
 					var x = Math.floor(xLeft_axisX + config_axisXTickOffset + numBig(new Big(groupSize).mul(i)) - halfGroupBarWidth);
 
 					var isAppreciated = data.closePrice > data.openPrice,
-						isDepreciated = data.closePrice < data.openPrice,
 						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
 					ctx.fillStyle = ctx.strokeStyle = isKeeped? config_keepedColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
 
@@ -578,7 +575,7 @@
 					var barX = x,
 						barY = Math.floor(yTop_axisY + getHeight(maxBarPrice));
 					var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
-					if(0 == barHeight)
+					if(0 === barHeight)
 						barHeight = 1;
 					ctx.strokeWidth = 0;
 					ctx.fillRect(barX, barY, config_groupBarWidth, barHeight);
@@ -588,13 +585,13 @@
 
 				/* 绘制蜡烛图及量图 */
 				for(var i = 0; i < groupCount; i++)
-					renderCandle(i, f);
+					renderCandle(i);
 
 				ctx.restore();
 			})();
 
 			/* 绘制绘制坐标系刻度 */
-			;(function(){
+			(function(){
 				drawAxisXTickList();
 				drawAxisYTickList();
 			})();

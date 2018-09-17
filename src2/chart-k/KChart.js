@@ -42,6 +42,7 @@
 		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
 		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
 	};
+	Object.seal && Object.seal(defaultConfig);
 
 	/**
 	 * @constructor
@@ -156,7 +157,15 @@
 		 * @param {KSubChartTypes} subChartType 要创建的K线子图类型
 		 */
 		this.newSubChart = function(subChartType){
-			var kSubChart = new KSubChart(this, subChartType);
+			var kSubChart;
+			switch(subChartType){
+			case KChart.KSubChartTypes.CANDLE:
+				kSubChart = new KChart.subChart.CandleChart(this);
+				break;
+
+			default:
+				throw new Error("Unknown sub chart type: " + subChartType);
+			}
 			attachedKSubCharts.push(kSubChart);
 
 			return kSubChart;
@@ -186,13 +195,16 @@
 	 * @param {String} name 图表名称
 	 * @param {Function} obj 图表实现
 	 */
-	KChart.defineSubChart = function(name, obj){
+	util.defineReadonlyProperty(KChart, "defineSubChart", function(name, obj){
 		if(name in subCharts)
 			throw new Error("Sub chart of name: " + name + " exists already.");
 
 		subCharts[name] = obj;
-	};
-	Object.defineProperty(KChart, "subChart", {value: subCharts, configurable: false, writable: false});
+	});
+	util.defineReadonlyProperty(KChart, "subChart", subCharts);
+
+	/* 暴露默认配置 */
+	util.defineReadonlyProperty(KChart, "DEFAULT_CONFIG", defaultConfig);
 
 	TradeChart2.defineChart("KChart", KChart);
 })();

@@ -302,8 +302,10 @@
 			/* 数据格式转换 */
 			d = dataParser? dataParser(d, i, datas): d;
 
+			var volume = +d.volume || 0;
+
 			if(i == 0)
-				previousVolume = +d.volume;
+				previousVolume = volume;
 
 			/* 数据精度确定 */
 			[+d.openPrice, +d.highPrice, +d.lowPrice, +d.closePrice].forEach(function(digit){
@@ -327,12 +329,12 @@
 			if(min < dataSketch_origin_min)
 				dataSketch_origin_min = min;
 			if(+d.volume > dataSketch_origin_maxVolume)
-				dataSketch_origin_maxVolume = +d.volume;
-			if(+d.volume < dataSketch_origin_minVolume)
-				dataSketch_origin_minVolume = +d.volume;
+				dataSketch_origin_maxVolume = volume;
+			if(volume < dataSketch_origin_minVolume)
+				dataSketch_origin_minVolume = volume;
 
 			var variation = Math.abs(max - min);
-			var volumeVariation = Math.abs(+d.volume - +previousVolume);
+			var volumeVariation = Math.abs(volume - +previousVolume);
 
 			/* 确定更大的价格变动幅度 */
 			if(variation > dataSketch_origin_maxVariation)
@@ -343,7 +345,7 @@
 			variationSum += variation;
 			volumeVariationSum += volumeVariation;
 
-			previousVolume = +d.volume;
+			previousVolume = volume;
 		}
 		var len = datas.length;
 		dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;

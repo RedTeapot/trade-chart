@@ -79,6 +79,23 @@
 	};
 
 	/**
+	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
+	 * @param {String} name 配置项名称
+	 * @param {KChartConfig} config 配置集合
+	 * @returns {*}
+	 */
+	var getConfigItem = function(name, config){
+		if(name in config)
+			return config[name];
+		else if(name in KChart.DEFAULT_CONFIG)
+			return KChart.DEFAULT_CONFIG[name];
+		else{
+			console.warn("Unknown configuration item: " + name);
+			return undefined;
+		}
+	};
+
+	/**
 	 * 根据给定的配置，生成素描
 	 * @param {KChartConfig} config 绘制配置
 	 * @param {Number} [width] 绘制宽度（当配置中指定的宽度为百分比字符串时使用）
@@ -87,11 +104,20 @@
 	KChartSketch.sketchByConfig = function(config, width){
 		var chartSketch = new KChartSketch();
 
-		var widthBig = new Big(width || config.width).minus(config.paddingLeft).minus(config.paddingRight);
-		var contentWidthBig = widthBig.minus(config.axisXTickOffset).minus(config.axisXTickOffsetFromRight);
+		var config_width = getConfigItem("width", config),
+			config_paddingLeft = getConfigItem("paddingLeft", config),
+			config_paddingRight = getConfigItem("paddingRight", config),
+			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
+			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config),
+			config_groupLineWidth = getConfigItem("groupLineWidth", config),
+			config_groupGap = getConfigItem("groupGap", config),
+			config_groupBarWidth = getConfigItem("groupBarWidth", config);
+
+		var widthBig = new Big(width || config_width).minus(config_paddingLeft).minus(config_paddingRight);
+		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 		chartSketch.setWidth(floorBig(widthBig))
 			.setContentWidth(floorBig(contentWidthBig))
-			.setMaxGroupCount(floorBig(contentWidthBig.minus(config.groupLineWidth).div(config.groupGap + config.groupBarWidth)) + 1);
+			.setMaxGroupCount(floorBig(contentWidthBig.minus(config_groupLineWidth).div(config_groupGap + config_groupBarWidth)) + 1);
 
 		return chartSketch;
 	};
