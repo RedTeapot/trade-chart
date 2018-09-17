@@ -80,15 +80,18 @@
 
 	/**
 	 * 根据给定的配置，生成素描
-	 * @param {Object} config 绘制配置
+	 * @param {KChartConfig} config 绘制配置
+	 * @param {Number} [width] 绘制宽度（当配置中指定的宽度为百分比字符串时使用）
 	 * @returns {KChartSketch}
 	 */
-	KChartSketch.sketchByConfig = function(config){
+	KChartSketch.sketchByConfig = function(config, width){
 		var chartSketch = new KChartSketch();
 
-		chartSketch.setWidth(Math.floor(config.width - config.paddingLeft - config.paddingRight))
-			.setContentWidth(Math.floor(chartSketch.getWidth() - config.axisXTickOffset - config.axisXTickOffsetFromRight))
-			.setMaxGroupCount(floorBig(new Big(chartSketch.getContentWidth()).minus(config.groupLineWidth).div(config.groupGap + config.groupBarWidth)) + 1);
+		var widthBig = new Big(width || config.width).minus(config.paddingLeft).minus(config.paddingRight);
+		var contentWidthBig = widthBig.minus(config.axisXTickOffset).minus(config.axisXTickOffsetFromRight);
+		chartSketch.setWidth(floorBig(widthBig))
+			.setContentWidth(floorBig(contentWidthBig))
+			.setMaxGroupCount(floorBig(contentWidthBig.minus(config.groupLineWidth).div(config.groupGap + config.groupBarWidth)) + 1);
 
 		return chartSketch;
 	};

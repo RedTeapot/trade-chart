@@ -77,6 +77,8 @@
 
 	/**
 	 * @constructor
+	 * @augments KSubChart
+	 *
 	 * K线图子图：蜡烛图
 	 * @param {KChart} kChart 附加该子图的K线图
 	 */

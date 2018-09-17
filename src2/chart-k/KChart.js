@@ -2,6 +2,9 @@
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
 
+	var floorBig = function(big){
+		return Math.floor(numBig(big));
+	};
 
 	/**
 	 * 默认的，作用于主图和子图的全局配置项
@@ -68,6 +71,10 @@
 				for(var p in _config)
 					config[p] = _config[p];
 
+			/* 错误的配置项目检查 */
+			if(config.groupBarWidth < config.groupLineWidth + 2)
+				throw new Error("K chart bar width should be greater than group line width plus 2.");
+
 			return this;
 		};
 
@@ -89,13 +96,15 @@
 				return config[name];
 			else if(name in defaultConfig)
 				return defaultConfig[name];
-			else
+			else{
+				console.warn("Unknown configuration item: " + name);
 				return undefined;
+			}
 		};
 
 		/**
 		 * 设置数据源
-		 * @param _datas {KData[]} 数据源
+		 * @param {Array<KData|Object>} _datas 数据源
 		 */
 		this.setDataList = function(_datas){
 			dataList = _datas;
@@ -104,6 +113,7 @@
 
 		/**
 		 * 获取设置的数据源
+		 * @returns {Array<KData|Object>}
 		 */
 		this.getDataList = function(){
 			return dataList;
@@ -114,6 +124,11 @@
 		 * @param parser {Function} 数据转换方法
 		 */
 		this.setDataParser = function(parser){
+			if(typeof parser != "function"){
+				console.warn("Data parser should be of type: 'Function'.");
+				return this;
+			}
+
 			dataParser = parser;
 			return this;
 		};
@@ -124,6 +139,16 @@
 		 */
 		this.getDataParser = function(){
 			return dataParser;
+		};
+
+		/**
+		 * 根据给定的配置信息计算蜡烛一半的宽度
+		 * @param {KChartConfig} [config] 绘制配置
+		 * @returns {Number}
+		 */
+		this.calcHalfGroupBarWidth = function(config){
+			config = config || this.getConfig();
+			return floorBig(new Big(config.groupBarWidth).minus(1).div(2));
 		};
 
 		/**

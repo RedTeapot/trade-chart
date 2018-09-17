@@ -85,6 +85,7 @@
 		/**
 		 * 根据给定的量差计算高度差并返回
 		 * @param {Number} amount 量差
+		 * @returns {Number}
 		 */
 		this.calculateHeight = function(amount){
 			amount = Math.abs(util.parseAsNumber(amount, 0));
@@ -97,14 +98,17 @@
 
 	/**
 	 * 根据给定的配置，生成素描
-	 * @param {Object} config 绘制配置
+	 * @param {KSubChartConfig} config 绘制配置
+	 * @param {Number} [height] 绘制高度（当配置中指定的高度为百分比字符串时使用）
 	 * @returns {KSubChartSketch}
 	 */
-	KSubChartSketch.sketchByConfig = function(config){
+	KSubChartSketch.sketchByConfig = function(config, height){
 		var chartSketch = new KSubChartSketch();
 
-		chartSketch.setHeight(Math.floor(config.height - config.paddingTop - config.paddingBottom))
-			.setContentHeight(Math.floor(chartSketch.getHeight() - config.axisYTickOffset));
+		var heightBig = new Big(height || config.height).minus(config.paddingTop).minus(config.paddingBottom);
+		var contentHeightBig = heightBig.minus(config.axisYTickOffset);
+		chartSketch.setHeight(floorBig(heightBig))
+			.setContentHeight(floorBig(contentHeightBig));
 
 		return chartSketch;
 	};
