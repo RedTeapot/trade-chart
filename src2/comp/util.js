@@ -187,14 +187,22 @@
 	};
 
 	/**
+	 * 判断给定的元素是否为一个合法的数字，或合法数字的字符串
+	 * @param {*} tar 要判断的对象
+	 */
+	var isValidNumber = function(tar){
+		var isEmpty = isEmptyString(tar, true);
+		return !isEmpty && (/^\d*(?:\.\d+)?$/.test(tar) || /^\d+\.\d*$/.test(tar));
+	};
+
+	/**
 	 * 解析给定的参数将其以数字形式返回
 	 * @param {*} tar 要解析的参数
 	 * @param {Number} [dftValue] 如果要解析的参数不是一个合法的数字时，要返回的默认数字
 	 * @returns {*}
 	 */
 	var parseAsNumber = function(tar, dftValue){
-		var isEmpty = isEmptyString(tar, true);
-		var isNumber = !isEmpty && (/^\d*(?:\.\d+)?$/.test(tar) || /^\d+\.\d*$/.test(tar));
+		var isNumber = isValidNumber(tar);
 		if(isNumber)
 			return Number(tar);
 
@@ -258,6 +266,7 @@
 		formatMoney: formatMoney,
 		setAttributes: setAttributes,
 		pixelRatio: pixelRatio,
+		isValidNumber: isValidNumber,
 		isEmptyString: isEmptyString,
 		try2Call: try2Call,
 		try2Apply: try2Apply,

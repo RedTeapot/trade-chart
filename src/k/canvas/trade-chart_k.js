@@ -290,7 +290,7 @@
 			dataSketch_extended_pricePrecision = 0,/* 坐标中价格的精度 */
 			dataSketch_extended_volumeCeiling = 0,/* 坐标中成交量的最大值 */
 			dataSketch_extended_volumeFloor = 0,/* 坐标中成交量的最小值 */
-			dataSketch_extended_volumePrecision = 0;/* 坐标中价格的精度 */
+			dataSketch_extended_volumePrecision = 0;/* 坐标中成交量的精度 */
 
 		var chartSketch = sketchChart(config);
 

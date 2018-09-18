@@ -36,11 +36,81 @@
 		KSubChart.call(this, kChart, KSubChartTypes.CANDLE);
 
 		/**
+		 * 从给定的配置集合中获取指定名称的配置项取值。
+		 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
+		 * 如果全局的配置中也不存在，则返回undefined
+		 *
+		 * @param {String} name 配置项名称
+		 */
+		var _getConfigItem = function(name, config){
+			var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
+			if(name in config)
+				return config[name];
+			else if(name in defaultConfig)
+				return defaultConfig[name];
+
+			return kChart.getConfigItem(name);
+		};
+
+		var calculateAndUpdateAxisYFloorAndCeiling = function(kDataSketch, config){
+			/* Y轴最小值 */
+			var config_axisYPriceFloor = _getConfigItem("axisYPriceFloor", config);
+			var axisYPriceFloor;
+			if(null != config_axisYPriceFloor){
+				var isFunction = typeof config_axisYPriceFloor === "function";
+				if(isFunction)
+					axisYPriceFloor = util.try2Call(config_axisYPriceFloor, null,
+						kDataSketch.getMinPrice(),
+						kDataSketch.getMaxPrice(),
+						kDataSketch.getAvgPriceVariation(),
+						kDataSketch.getMaxPriceVariation()
+					);
+				else{
+					if(!util.isValidNumber(config_axisYPriceFloor))
+						console.warn("Invalid configuration value for 'axisYPriceFloor'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
+					axisYPriceFloor = util.parseAsNumber(config_axisYPriceFloor, 0);
+				}
+
+				if(!isFinite(axisYPriceFloor) || axisYPriceFloor < 0){
+					console.warn((isFunction? "Calculated": "Specified") + " 'axisYPriceFloor': " + axisYPriceFloor + " is infinite or lte 0, auto adjust to 0.");
+					axisYPriceFloor = 0;
+				}
+				
+				kDataSketch.setPriceFloor(axisYPriceFloor);
+			}
+			axisYPriceFloor = kDataSketch.getPriceFloor();
+
+			/* Y轴最大值 */
+			var config_axisYPriceCeiling = _getConfigItem("axisYPriceCeiling", config);
+			var axisYPriceCeiling;
+			if(null != config_axisYPriceCeiling){
+				var isFunction = typeof config_axisYPriceCeiling === "function";
+				if(isFunction)
+					axisYPriceCeiling = util.try2Call(config_axisYPriceCeiling, null,
+						kDataSketch.getMinPrice(),
+						kDataSketch.getMaxPrice(),
+						kDataSketch.getAvgPriceVariation(),
+						kDataSketch.getMaxPriceVariation()
+					);
+				else{
+					if(!util.isValidNumber(config_axisYPriceCeiling))
+						console.warn("Invalid configuration value for 'axisYPriceCeiling'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
+					axisYPriceCeiling = util.parseAsNumber(axisYPriceCeiling, 0);
+				}
+
+				if(!isFinite(axisYPriceCeiling) || axisYPriceCeiling <= axisYPriceFloor)
+					console.warn((isFunction? "Calculated": "Specified") + " 'axisYPriceCeiling': " + axisYPriceCeiling + " is infinite or lte 'axisYPriceFloor'(" + axisYPriceFloor + "), auto adjust to 0.");
+				else
+					kDataSketch.setPriceCeiling(axisYPriceCeiling);
+			}
+		};
+
+		/**
 		 * @override
 		 *
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param {HTMLCanvasElement} canvasObj 画布
-		 * @param {Object} config 渲染配置
+		 * @param {KSubChartConfig_candle} config 渲染配置
 		 * @returns {KSubChartRenderResult} K线子图绘制结果
 		 */
 		this.render = function(canvasObj, config){
@@ -53,13 +123,7 @@
 			 * @param {String} name 配置项名称
 			 */
 			var getConfigItem = function(name){
-				var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
-				if(name in config)
-					return config[name];
-				else if(name in defaultConfig)
-					return defaultConfig[name];
-
-				return kChart.getConfigItem(name);
+				return _getConfigItem(name, config);
 			};
 
 			var config_width = getConfigItem("width"),
@@ -91,11 +155,13 @@
 				config_showAxisYLine = getConfigItem("showAxisYLine"),
 				config_showAxisYLabel = getConfigItem("showAxisYLabel"),
 				config_axisYPosition = getConfigItem("axisYPosition"),
+				config_axisYPrecision = getConfigItem("axisYPrecision"),
 				config_axisYFormatter = getConfigItem("axisYFormatter"),
 				config_axisYLabelPosition = getConfigItem("axisYLabelPosition"),
 				config_axisYLabelFont = getConfigItem("axisYLabelFont"),
 				config_axisYLabelColor = getConfigItem("axisYLabelColor"),
 				config_axisYLabelOffset = getConfigItem("axisYLabelOffset"),
+				config_axisYPriceFloor = getConfigItem("axisYPriceFloor"),
 				config_axisYMidTickQuota = getConfigItem("axisYMidTickQuota"),
 				config_axisYLabelVerticalOffset = getConfigItem("axisYLabelVerticalOffset"),
 				config_axisYPriceFloorLabelFont = getConfigItem("axisYPriceFloorLabelFont"),
@@ -115,6 +181,12 @@
 				config_groupBarWidth = getConfigItem("groupBarWidth"),
 				config_groupLineWidth = getConfigItem("groupLineWidth");
 
+			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
+				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
+
+			var dataList = this.getKChart().getDataList(),
+				dataParser = this.getKChart().getDataParser();
+
 			/* 百分比尺寸自动转换 */
 			if(/%/.test(config_width))
 				config_width = canvasObj.parentElement.clientWidth * parseInt(config_width.replace(/%/, "")) / 100;
@@ -123,21 +195,15 @@
 			util.setAttributes(canvasObj, {width: config_width, height: config_height});
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var dataList = this.getKChart().getDataList(),
-				dataParser = this.getKChart().getDataParser();
-
 			var kDataSketch = KDataSketch.sketchData(dataList, dataParser),
 				kChartSketch = KChartSketch.sketchByConfig(this.getKChart().getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height);
 
+			/* 使能配置 */
+			calculateAndUpdateAxisYFloorAndCeiling(kDataSketch, config);
+
 			var b = new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(Math.max(kSubChartSketch.getContentHeight(), 1));
 			kSubChartSketch.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
-
-			var axisYPosition = String(config_axisYPosition).toLowerCase();
-			var ifShowAxisYLeft = "left" === axisYPosition;
-
-			var axisYLabelPosition = String(config_axisYLabelPosition).toLowerCase();
-			var ifShowAxisYLabelOutside = "outside" === axisYLabelPosition;
 
 			/* 横坐标位置 */
 			var xLeft_axisX = Math.floor(config_paddingLeft) + 0.5,
@@ -396,7 +462,7 @@
 								return "";
 
 							var previousData = null;
-							if(null != previousXTickDataIndex && previousXTickDataIndex >=0 && previousXTickDataIndex < dataList.length)
+							if(null != previousXTickDataIndex && previousXTickDataIndex >= 0 && previousXTickDataIndex < dataList.length)
 								previousData = dataList[previousXTickDataIndex];
 							if(null != previousData && dataParser)
 								previousData = dataParser(previousData, previousXTickDataIndex, dataList);
@@ -443,6 +509,12 @@
 						ctx.stroke();
 					}
 
+					var isAxisYPrecisionAuto = "auto" == String(config_axisYPrecision).trim().toLowerCase();
+					var axisYPrecisionBak = config_axisYPrecision;
+					var ifDeclaredAxisYPrecision = "axisYPrecision" in config;
+					if(isAxisYPrecisionAuto)
+						config.axisYPrecision = kDataSketch.getPricePrecision();
+
 					/* 绘制Y轴刻度（自下而上） */
 					var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
 					for(var i = 0; i <= maxAxisYTickIndex; i++){
@@ -464,8 +536,35 @@
 						}
 
 						/* 汇集刻度，用于图形绘制完毕后统一绘制 */
-						axisYTickList.push({y: tickY, label: config_axisYFormatter(price, config)});
+						axisYTickList.push({y: tickY, price: price, label: config_axisYFormatter(price, config)});
 					}
+
+					/* 自动检测精度，规避多个刻度使用相同取值的情况 */
+					var flag = false;
+					do{
+						flag = false;
+						for(var i = 0; i < axisYTickList.length - 1; i++)
+							for(var j = i + 1; j < axisYTickList.length; j++){
+								if(axisYTickList[i].label === axisYTickList[j].label){
+									flag = true;
+									break;
+								}
+
+								if(flag)
+									break;
+							}
+
+						if(flag && config.axisYPrecision < 20){
+							config.axisYPrecision += 1;
+							for(var i = 0; i < axisYTickList.length; i++)
+								axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].price, config);
+						}
+					}while(flag);
+
+					if(ifDeclaredAxisYPrecision)
+						config.axisYPrecision = axisYPrecisionBak;
+					else
+						delete config.axisYPrecision;
 				})();
 
 				ctx.restore();

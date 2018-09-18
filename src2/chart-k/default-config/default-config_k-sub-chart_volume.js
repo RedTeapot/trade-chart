@@ -1,6 +1,11 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
+	var Big = util.Big;
+
+	var numBig = function(big){
+		return Number(big.toString());
+	};
 
 	/**
 	 * 默认的，适用于K线图“量图”子图的配置项
@@ -23,42 +28,19 @@
 		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用“[1]”表示 */
 
-		axisYLabelVerticalOffset: function(i, n){/** 纵坐标标签纵向位移 */
-			//i: 自下而上的刻度索引。从0开始
-			//n：刻度的总个数，包括最小值和最大值
+		axisYLabelVerticalOffset: function(){/** 纵坐标标签纵向位移 */
 			return 0;
 		},
-		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
 		axisYPrecision: "auto",/** 纵坐标的数字精度（仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值）。auto：根据给定的数据自动检测 */
 		axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
 			/** price：价格；config：配置 */
-			return util.formatMoney(price, config.axisYPrecision);
+			return util.formatMoney(price, config.axisYPrecision || defaultConfig.axisYPrecision || 0);
 		},
-		axisYPriceFloor: function(min, max, avgVariation, maxVariation){
-			if(!isFinite(min))
-				min = 0;
-			if(!isFinite(avgVariation))
-				avgVariation = 0;
-
-			min = Math.max(min, 0);
-			avgVariation = Math.abs(avgVariation);
-
-			return numBig(new Big(min).minus(new Big(avgVariation).div(2)));
-		},
+		axisYPriceFloor: null,
 		axisYPriceFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
 		axisYPriceFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
-		axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
-			if(!isFinite(max))
-				max = 0;
-			if(!isFinite(avgVariation))
-				avgVariation = 0;
-
-			max = Math.max(max, 0);
-			avgVariation = Math.abs(avgVariation);
-
-			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
-		},
+		axisYPriceCeiling: null,
 		axisYPriceCeilingLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
 		axisYPriceCeilingLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
 
