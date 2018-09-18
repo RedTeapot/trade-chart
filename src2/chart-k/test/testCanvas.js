@@ -49,7 +49,7 @@
 		
 		var chartCanvas = document.getElementById("chart"), detailCanvas = document.getElementById("detail");
 
-		var KChart = TradeChart2.chart.KChart;
+		var KChart = TradeChart2.KChart;
 		var kChart = new KChart().setDataParser(function(d, i){
 			var obj = {time: d[1], openPrice: d[2], closePrice: d[3], highPrice: d[4], lowPrice: d[5]};
 			if(isNaN(obj.openPrice)){
@@ -72,7 +72,7 @@
 			return obj;
 		}).setDataList(datas.slice(1)).setConfig(kChartConfig);
 
-		var subChart = kChart.newSubChart(KChart.KSubChartTypes.CANDLE);
+		var subChart = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
 		subChart.render(chartCanvas, kSubChartConfig);
 	});
 })();

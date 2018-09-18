@@ -1,7 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var KChart = TradeChart2.chart.KChart;
-	var Big = TradeChart2.util.Big;
+	var util = TradeChart2.util;
+	var Big = util.Big;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -85,10 +85,12 @@
 	 * @returns {*}
 	 */
 	var getConfigItem = function(name, config){
+		var defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
+
 		if(name in config)
 			return config[name];
-		else if(name in KChart.DEFAULT_CONFIG)
-			return KChart.DEFAULT_CONFIG[name];
+		else if(name in defaultConfig)
+			return defaultConfig[name];
 		else{
 			console.warn("Unknown configuration item: " + name);
 			return undefined;
@@ -122,5 +124,5 @@
 		return chartSketch;
 	};
 
-	KChart.KChartSketch = KChartSketch;
+	util.defineReadonlyProperty(TradeChart2, "KChartSketch", KChartSketch);
 })();

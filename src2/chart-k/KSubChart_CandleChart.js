@@ -2,14 +2,15 @@
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
 	var Big = util.Big;
-	var KChart = TradeChart2.chart.KChart;
 
-	var KDataSketch = KChart.KDataSketch,
-		KChartSketch = KChart.KChartSketch,
-		KSubChartSketch = KChart.KSubChartSketch,
+	var KDataSketch = TradeChart2.KDataSketch,
+		KChartSketch = TradeChart2.KChartSketch,
 
-		KSubChart = KChart.KSubChart,
-		KSubChartRenderResult = KChart.KSubChartRenderResult;
+		KSubChartTypes = TradeChart2.KSubChartTypes,
+		KSubChart = TradeChart2.KSubChart,
+		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
+
+		KSubChartSketch_CandleChartSketch = TradeChart2.KSubChartSketch_CandleChartSketch;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -24,71 +25,6 @@
 		return Math.floor(numBig(big));
 	};
 
-
-	/**
-	 * 默认的，适用于“蜡烛图”子图的配置项
-	 * @type {KSubChartConfig_candle}
-	 */
-	var defaultConfig = {
-		height: 300,/** 图表整体高度 */
-
-		paddingTop: 20,/** 图表内边距 - 上侧 */
-		paddingBottom: 20,/** 图表内边距 - 下侧 */
-
-		showAxisXLine: true,/** 是否绘制横坐标轴 */
-		showAxisXLabel: true,/** 是否绘制横坐标刻度值 */
-		showAxisYLine: true,/** 是否绘制纵坐标轴 */
-		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
-
-		showHorizontalGridLine: true,/** 是否绘制网格横线 */
-		showVerticalGridLine: true,/** 是否绘制网格竖线 */
-		horizontalGridLineColor: "#A0A0A0",/** 网格横线颜色 */
-		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
-		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用 [1] 表示 */
-
-		axisYLabelVerticalOffset: function(){/** 纵坐标标签纵向位移 */
-			return 0;
-		},
-		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
-		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
-		axisYPrecision: "auto",/** 纵坐标的数字精度（仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值）。auto：根据给定的数据自动检测 */
-		axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
-			/** price：价格；config：配置 */
-			return util.formatMoney(price, config.axisYPrecision);
-		},
-		axisYPriceFloor: function(min, max, avgVariation, maxVariation){
-			if(!isFinite(min))
-				min = 0;
-			if(!isFinite(avgVariation))
-				avgVariation = 0;
-
-			min = Math.max(min, 0);
-			avgVariation = Math.abs(avgVariation);
-
-			return numBig(new Big(min).minus(new Big(avgVariation).div(2)));
-		},
-		axisYPriceFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
-		axisYPriceFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
-		axisYPriceCeiling: function(min, max, avgVariation, maxVariation){
-			if(!isFinite(max))
-				max = 0;
-			if(!isFinite(avgVariation))
-				avgVariation = 0;
-
-			max = Math.max(max, 0);
-			avgVariation = Math.abs(avgVariation);
-
-			return numBig(new Big(max).plus(new Big(avgVariation).div(2)));
-		},
-		axisYPriceCeilingLabelFont: null,/** 纵坐标最大值的坐标标签字体 */
-		axisYPriceCeilingLabelColor: null,/** 纵坐标最大值的坐标标签颜色 */
-
-		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
-		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
-		keepedColor: "white"/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
-	};
-	Object.seal && Object.seal(defaultConfig);
-
 	/**
 	 * @constructor
 	 * @augments KSubChart
@@ -96,8 +32,8 @@
 	 * K线图子图：蜡烛图
 	 * @param {KChart} kChart 附加该子图的K线图
 	 */
-	var CandleChart = function(kChart){
-		KSubChart.call(this, kChart, KChart.KSubChartTypes.CANDLE);
+	var KSubChart_CandleChart = function(kChart){
+		KSubChart.call(this, kChart, KSubChartTypes.CANDLE);
 
 		/**
 		 * @override
@@ -117,6 +53,7 @@
 			 * @param {String} name 配置项名称
 			 */
 			var getConfigItem = function(name){
+				var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
 				if(name in config)
 					return config[name];
 				else if(name in defaultConfig)
@@ -191,7 +128,10 @@
 
 			var kDataSketch = KDataSketch.sketchData(dataList, dataParser),
 				kChartSketch = KChartSketch.sketchByConfig(this.getKChart().getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch.sketchByConfig(config, config_height);
+				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height);
+
+			var b = new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(Math.max(kSubChartSketch.getContentHeight(), 1));
+			kSubChartSketch.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
 
 			var axisYPosition = String(config_axisYPosition).toLowerCase();
 			var ifShowAxisYLeft = "left" === axisYPosition;
@@ -213,7 +153,7 @@
 			/* 一组数据的宽度 */
 			var groupSize = config_groupBarWidth + config_groupGap;
 			/* 蜡烛一半的宽度 */
-			var halfGroupBarWidth = this.getKChart.calcHalfGroupBarWidth();
+			var halfGroupBarWidth = this.getKChart().calcHalfGroupBarWidth();
 			/* 一组数据宽度的一半 */
 			var halfGroupSize = Math.max(numBig(new Big(groupSize).div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
 			/* 横坐标刻度之间相差的数据的个数 */
@@ -356,9 +296,9 @@
 						if(typeof config_axisYLabelVerticalOffset === "function")
 							config_axisYLabelVerticalOffset = config_axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
 
-						var drawLabel = (function(label, tickY){
+						var drawLabel = function(){
 							ctx.fillText(tick.label, x_axisY + axisYLabelOffset, yTop_axisY + tickY + config_axisYLabelVerticalOffset);
-						})(tick.label, tickY);
+						};
 
 						if(i === 0){
 							ctx.save();
@@ -390,6 +330,24 @@
 
 				ctx.lineWidth = 1;
 				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
+
+				/* 绘制坐标区域背景 */
+				if(null != config_bg){
+					ctx.save();
+					ctx.beginPath();
+
+					/* 蜡烛图 */
+					ctx.rect(xLeft_axisX, yTop_axisY, kChartSketch.getWidth(), kSubChartSketch.getHeight());
+
+					ctx.strokeWidth = 0;
+					if(config_bg instanceof TradeChart2.LinearGradient){
+						config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + kSubChartSketch.getHeight());
+					}else
+						ctx.fillStyle = config_bg;
+
+					ctx.fill();
+					ctx.restore();
+				}
 
 				/* 绘制X轴 */
 				(function(){
@@ -479,6 +437,7 @@
 				(function(){
 					/* 绘制Y轴坐标线 */
 					if(config_showAxisYLine){
+						ctx.beginPath();
 						ctx.moveTo(x_axisY, yTop_axisY);
 						ctx.lineTo(x_axisY, yBottom_axisY);
 						ctx.stroke();
@@ -508,24 +467,6 @@
 						axisYTickList.push({y: tickY, label: config_axisYFormatter(price, config)});
 					}
 				})();
-
-				/* 绘制坐标区域背景 */
-				if(null != config_bg){
-					ctx.save();
-					ctx.beginPath();
-
-					/* 蜡烛图 */
-					ctx.rect(xLeft_axisX, yTop_axisY, kChartSketch.getWidth(), kSubChartSketch.getHeight());
-
-					ctx.strokeWidth = 0;
-					if(config_bg instanceof TradeChart.LinearGradient){
-						config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + kSubChartSketch.getHeight());
-					}else
-						ctx.fillStyle = config_bg;
-
-					ctx.fill();
-					ctx.restore();
-				}
 
 				ctx.restore();
 			})();
@@ -599,7 +540,7 @@
 			return new KSubChartRenderResult(this, config);
 		};
 	};
-	CandleChart.prototype = Object.create(KSubChart.prototype);
+	KSubChart_CandleChart.prototype = Object.create(KSubChart.prototype);
 
-	KChart.defineSubChart("CandleChart", CandleChart);
+	util.defineReadonlyProperty(TradeChart2, "KSubChart_CandleChart", KSubChart_CandleChart);
 })();

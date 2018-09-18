@@ -75,17 +75,25 @@ var concatK = function(){
 	return xpipe(
 		gulp.src([
 			"KChartDataTypes.js",
+
+			"default-config/default-config_k-chart.js",
+			"default-config/default-config_k-sub-chart_candle.js",
+			"default-config/default-config_k-sub-chart_volume.js",
+
 			"KChart.js",
+
 			"KChartSketch.js",
 			"KDataSketch.js",
 
-			"KSubChartTypes.js",
 			"KSubChart.js",
+			"KSubChartTypes.js",
 			"KSubChartSketch.js",
 			"KSubChartRenderResult.js",
 
-			"KSubChart_candle.js",
-			"KSubChart_volume.js",
+			"KSubChartSketch_CandleChartSketch.js",
+
+			"KSubChart_CandleChart.js",
+			"KSubChart_VolumeChart.js",
 		].map(function(f){return "../src2/chart-k/" + f;})),
 		concat("trade-chart2_k.js"),
 		prependCopyright()
@@ -112,6 +120,8 @@ var concatAllAndSave = function(min){
 
 	var stream = merge2();
 	stream.add(gulp.src("../src2/trade-chart.js"));
+	stream.add(gulp.src("../src2/comp/util.js"));
+	stream.add(gulp.src("../src2/comp/LinearGradient.js"));
 	stream.add(concatK());
 
 	stream = xpipe(

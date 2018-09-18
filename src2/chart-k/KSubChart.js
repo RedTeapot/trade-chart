@@ -1,6 +1,6 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var KChart = TradeChart2.chart.KChart;
+	var util = TradeChart2.util;
 
 	/**
 	 * @constructor
@@ -36,5 +36,5 @@
 		};
 	};
 
-	KChart.KSubChart = KSubChart;
+	util.defineReadonlyProperty(TradeChart2, "KSubChart", KSubChart);
 })();

@@ -1,14 +1,10 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var KChart = TradeChart2.chart.KChart;
 	var util = TradeChart2.util;
 	var Big = util.Big;
 
 	var numBig = function(big){
 		return Number(big.toString());
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
 	};
 
 	/**
@@ -96,22 +92,5 @@
 		};
 	};
 
-	/**
-	 * 根据给定的配置，生成素描
-	 * @param {KSubChartConfig} config 绘制配置
-	 * @param {Number} [height] 绘制高度（当配置中指定的高度为百分比字符串时使用）
-	 * @returns {KSubChartSketch}
-	 */
-	KSubChartSketch.sketchByConfig = function(config, height){
-		var chartSketch = new KSubChartSketch();
-
-		var heightBig = new Big(height || config.height).minus(config.paddingTop).minus(config.paddingBottom);
-		var contentHeightBig = heightBig.minus(config.axisYTickOffset);
-		chartSketch.setHeight(floorBig(heightBig))
-			.setContentHeight(floorBig(contentHeightBig));
-
-		return chartSketch;
-	};
-
-	KChart.KSubChartSketch = KSubChartSketch;
+	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch", KSubChartSketch);
 })();
