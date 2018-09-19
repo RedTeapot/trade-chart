@@ -2,19 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="gn">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/gulpfile2.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/gulpfile2.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/k/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/data.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/k/testCanvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/testCanvas.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KChart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KChartDataTypes.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KChartDataTypes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/test/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/test/data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -29,20 +17,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="testCanvas.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="testCanvas.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/k/testCanvas.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1346">
-              <caret line="128" column="28" selection-start-line="128" selection-start-column="28" selection-end-line="128" selection-end-column="28" />
+            <state relative-caret-position="836">
+              <caret line="134" column="147" selection-start-line="134" selection-start-column="147" selection-end-line="134" selection-end-column="147" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="testCanvas.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="testCanvas.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
+            <state relative-caret-position="530">
+              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
             </state>
           </provider>
         </entry>
@@ -50,8 +38,8 @@
       <file leaf-file-name="testCanvas.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="126" column="25" selection-start-line="126" selection-start-column="25" selection-end-line="126" selection-end-column="25" />
+            <state relative-caret-position="561">
+              <caret line="141" column="147" selection-start-line="141" selection-start-column="147" selection-end-line="141" selection-end-column="147" />
             </state>
           </provider>
         </entry>
@@ -150,9 +138,9 @@
         <option value="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/test/data.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" />
-        <option value="$PROJECT_DIR$/src/k/testCanvas.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" />
+        <option value="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" />
+        <option value="$PROJECT_DIR$/src/k/testCanvas.js" />
       </list>
     </option>
   </component>
@@ -677,12 +665,12 @@
       <workItem from="1535020570303" duration="1767000" />
       <workItem from="1535417711262" duration="3030000" />
       <workItem from="1536904108369" duration="42119000" />
-      <workItem from="1537253488349" duration="30084000" />
+      <workItem from="1537253488349" duration="30297000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="333272000" />
+    <option name="totallyTimeSpent" value="333485000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -960,24 +948,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/k/testCanvas.js">
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1346">
-          <caret line="128" column="28" selection-start-line="128" selection-start-column="28" selection-end-line="128" selection-end-column="28" />
+        <state relative-caret-position="530">
+          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="126" column="25" selection-start-line="126" selection-start-column="25" selection-end-line="126" selection-end-column="25" />
+        <state relative-caret-position="561">
+          <caret line="141" column="147" selection-start-line="141" selection-start-column="147" selection-end-line="141" selection-end-column="147" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.html">
+    <entry file="file://$PROJECT_DIR$/src/k/testCanvas.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
+        <state relative-caret-position="836">
+          <caret line="134" column="147" selection-start-line="134" selection-start-column="147" selection-end-line="134" selection-end-column="147" />
         </state>
       </provider>
     </entry>

@@ -139,7 +139,7 @@
 
 		var KChart = TradeChart2.KChart;
 		var kChart = new KChart().setDataParser(function(d, i){
-			var obj = {time: formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.v};
+			var obj = {time: formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.a};
 			if(isNaN(obj.openPrice)){
 				console.error(d, i, obj.openPrice);
 				obj.openPrice = 0;
