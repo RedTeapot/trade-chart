@@ -11,6 +11,19 @@
 	};
 
 	/**
+	 * 验证配置并自动纠正错误的配置
+	 * @param {KChartConfig} config K线绘制配置
+	 */
+	var validateConfig = function(config){
+		/* 错误的配置项目检查 */
+		var tmp = config.groupLineWidth + 2;
+		if(config.groupBarWidth < tmp){
+			console.warn("K chart bar width should be greater than group line width plus 2. Configured bar width: " + config.groupBarWidth + ", configured line with: " + config.groupLineWidth);
+			config.groupBarWidth = tmp;
+		}
+	};
+
+	/**
 	 * @constructor
 	 * K线图（OHLC图）
 	 */
@@ -21,7 +34,7 @@
 		var config = {};
 
 		/** 数据数组 */
-		var dataList;
+		var dataList = [];
 
 		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
 		var dataParser;
@@ -34,13 +47,11 @@
 		 * @param {Object} _config 图形绘制配置
 		 */
 		this.setConfig = function(_config){
-			if(null != _config && typeof _config == "object")
+			if(null != _config && typeof _config === "object")
 				for(var p in _config)
 					config[p] = _config[p];
 
-			/* 错误的配置项目检查 */
-			if(config.groupBarWidth < config.groupLineWidth + 2)
-				throw new Error("K chart bar width should be greater than group line width plus 2.");
+			validateConfig(config);
 
 			return this;
 		};
@@ -73,9 +84,14 @@
 
 		/**
 		 * 设置数据源
-		 * @param {Array<KData|Object>} _datas 数据源
+		 * @param {Array<KData|Object>} _datas 数据源，可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
 		 */
 		this.setDataList = function(_datas){
+			if(!Array.isArray(_datas)){
+				console.warn("Supplied k data should be an array.");
+				return this;
+			}
+
 			dataList = _datas;
 			return this;
 		};
@@ -89,11 +105,38 @@
 		};
 
 		/**
-		 * 设置数据转换方法
+		 * 获取指定索引对应的被转换后的数据
+		 * @param {Number} index 要获取的数据的索引
+		 */
+		this.getConvertedData = function(index){
+			if(!util.isValidNumber(index))
+				throw new Error("Invalid index: " + index + " to retrieve converted data.");
+
+			index = util.parseAsNumber(index);
+			if(index < 0 || index > dataList.length){
+				console.warn("Out of bound access for converted data of index: " + index);
+				return null;
+			}
+
+			var data = dataList[index];
+			if(typeof dataParser === "function"){
+				try{
+					data = dataParser(data, index, dataList);
+				}catch(e){
+					console.error("Fail to convert data of index: " + index + " using supplied data parser.", data);
+					console.error(e);
+				}
+			}
+
+			return data;
+		};
+
+		/**
+		 * 设置数据转换方法，当要扫描的数据是其它格式的数据时，用于指导本插件解析数据的解析器
 		 * @param parser {Function} 数据转换方法
 		 */
 		this.setDataParser = function(parser){
-			if(typeof parser != "function"){
+			if(typeof parser !== "function"){
 				console.warn("Data parser should be of type: 'Function'.");
 				return this;
 			}
@@ -149,7 +192,7 @@
 		 */
 		this.removeSubChart = function(subChart){
 			var index = attachedKSubCharts.indexOf(subChart);
-			if(index != -1)
+			if(index !== -1)
 				attachedKSubCharts.splice(index, 1);
 
 			return this;

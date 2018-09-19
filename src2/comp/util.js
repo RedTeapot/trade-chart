@@ -68,7 +68,7 @@
 		for(var p in obj){
 			var v = obj[p];
 
-			if((typeof v == "object") && !keepType){
+			if((typeof v === "object") && !keepType){
 				newObj[p] = cloneObject(v, true);
 			}else
 				newObj[p] = v;
@@ -123,7 +123,7 @@
 		if(trim)
 			str = str.trim();
 
-		return str.length == 0;
+		return str.length === 0;
 	};
 
 	/**
@@ -133,13 +133,13 @@
 	 * @param {Arguments} args 方法参数列表对象
 	 */
 	var try2Apply = function(func, ctx, args){
-		if(null == func || typeof func != "function")
+		if(null === func || typeof func !== "function")
 			return;
 
 		try{
 			return func.apply(ctx, args);
 		}catch(e){
-			console.error("Error occured while executing function: " + func.name, e, e.stack);
+			console.error("Error occurred while executing function: " + func.name, e, e.stack);
 			return undefined;
 		}
 	};
@@ -151,25 +151,25 @@
 	 * @param {*} args... 方法参数列表
 	 */
 	var try2Call = function(func, ctx, args){
-		if(null == func || typeof func != "function")
+		if(null === func || typeof func !== "function")
 			return undefined;
 
 		try{
 			var len = arguments.length;
 
-			if(len == 1)
+			if(len === 1)
 				return func();
-			else if(len == 2)
+			else if(len === 2)
 				return func.call(ctx);
-			else if(len == 3)
+			else if(len === 3)
 				return func.call(ctx, arguments[2]);
-			else if(len == 4)
+			else if(len === 4)
 				return func.call(ctx, arguments[2], arguments[3]);
-			else if(len == 5)
+			else if(len === 5)
 				return func.call(ctx, arguments[2], arguments[3], arguments[4]);
-			else if(len == 6)
+			else if(len === 6)
 				return func.call(ctx, arguments[2], arguments[3], arguments[4], arguments[5]);
-			else if(len == 7)
+			else if(len === 7)
 				return func.call(ctx, arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
 			else{
 				var tmp = "", index = 2;
@@ -181,7 +181,7 @@
 				return rst;
 			}
 		}catch(e){
-			console.error("Error occured while executing function: " + func.name, e, e.stack);
+			console.error("Error occurred while executing function: " + func.name, e);
 			return undefined;
 		}
 	};
@@ -197,11 +197,14 @@
 
 	/**
 	 * 解析给定的参数将其以数字形式返回
-	 * @param {*} tar 要解析的参数
+	 * @param {Big|*} tar 要解析的参数
 	 * @param {Number} [dftValue] 如果要解析的参数不是一个合法的数字时，要返回的默认数字
 	 * @returns {*}
 	 */
 	var parseAsNumber = function(tar, dftValue){
+		if(tar instanceof util.Big)
+			tar = tar.toString();
+
 		var isNumber = isValidNumber(tar);
 		if(isNumber)
 			return Number(tar);
@@ -220,7 +223,7 @@
 	var getPrecision = function(num){
 		var tmp = String(num);
 		var lastDotIndex = tmp.lastIndexOf(".");
-		if(-1 == lastDotIndex)
+		if(-1 === lastDotIndex)
 			return 0;
 
 		return tmp.substring(lastDotIndex + 1).length;
@@ -241,20 +244,29 @@
 			canvasObj.style.width = width + "px";
 			canvasObj.style.height = height + "px";
 
-			canvasObj.width = pr * width;
-			canvasObj.height = pr * height;
+			setAttributes(canvasObj, {width: pr * width, height: pr * height});
 		}else{
 			canvasObj.style.width = "";
 			canvasObj.style.height = "";
 
-			canvasObj.width = width;
-			canvasObj.height = height;
+			setAttributes(canvasObj, {width: width, height: height});
 		}
 
 		var ctx = canvasObj.getContext("2d");
 		ctx.scale(pr, pr);
 
 		return ctx;
+	};
+
+	/**
+	 * 根据给定的数据计算返回对应在画布上可以清晰绘制线条的位置
+	 * @param {String|Number|Big} d 坐标位置
+	 */
+	var getLinePosition = function(d){
+		if(!isValidNumber(d))
+			throw new Error("Invalid line position: ") + d;
+
+		return Math.floor(parseAsNumber(d)) + 0.5;
 	};
 
 	/**
@@ -273,6 +285,7 @@
 		parseAsNumber: parseAsNumber,
 		getPrecision: getPrecision,
 		initCanvas: initCanvas,
+		getLinePosition: getLinePosition,
 		defineReadonlyProperty: defineReadonlyProperty
 	};
 

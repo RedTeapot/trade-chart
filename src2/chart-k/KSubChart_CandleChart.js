@@ -52,7 +52,12 @@
 			return kChart.getConfigItem(name);
 		};
 
-		var calculateAndUpdateAxisYFloorAndCeiling = function(kDataSketch, config){
+		/**
+		 * 根据给定的配置更新由扫描数据得出的数据概览，以达到使能配置项的目的
+		 * @param {KDataSketch} kDataSketch 通过扫描数据得出的数据概览
+		 * @param {Object} config 渲染配置
+		 */
+		var updateKDataSketch = function(kDataSketch, config){
 			/* Y轴最小值 */
 			var config_axisYPriceFloor = _getConfigItem("axisYPriceFloor", config);
 			var axisYPriceFloor;
@@ -106,6 +111,16 @@
 		};
 
 		/**
+		 * 根据给定的数据概览更新单纯由配置得出的图形绘制概览
+		 * @param {KSubChartSketch} kSubChartSketch 要更新的绘制概览
+		 * @param {KDataSketch} kDataSketch 数据概览
+		 */
+		var updateKSubChartSketch = function(kSubChartSketch, kDataSketch){
+			var b = new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(Math.max(kSubChartSketch.getContentHeight(), 1));
+			kSubChartSketch.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
+		};
+
+		/**
 		 * @override
 		 *
 		 * 渲染图形，并呈现至指定的画布中
@@ -114,14 +129,6 @@
 		 * @returns {KSubChartRenderResult} K线子图绘制结果
 		 */
 		this.render = function(canvasObj, config){
-
-			/**
-			 * 从给定的配置集合中获取指定名称的配置项取值。
-			 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
-			 * 如果全局的配置中也不存在，则返回undefined
-			 *
-			 * @param {String} name 配置项名称
-			 */
 			var getConfigItem = function(name){
 				return _getConfigItem(name, config);
 			};
@@ -184,46 +191,42 @@
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
-			var dataList = this.getKChart().getDataList(),
-				dataParser = this.getKChart().getDataParser();
+			var dataList = kChart.getDataList();
 
 			/* 百分比尺寸自动转换 */
 			if(/%/.test(config_width))
 				config_width = canvasObj.parentElement.clientWidth * parseInt(config_width.replace(/%/, "")) / 100;
 			if(/%/.test(config_height))
 				config_height = canvasObj.parentElement.clientHeight * parseInt(config_height.replace(/%/, "")) / 100;
-			util.setAttributes(canvasObj, {width: config_width, height: config_height});
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var kDataSketch = KDataSketch.sketchData(dataList, dataParser),
+			var kDataSketch = KDataSketch.sketchFromKChart(kChart),
 				kChartSketch = KChartSketch.sketchByConfig(this.getKChart().getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height);
 
-			/* 使能配置 */
-			calculateAndUpdateAxisYFloorAndCeiling(kDataSketch, config);
-
-			var b = new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(Math.max(kSubChartSketch.getContentHeight(), 1));
-			kSubChartSketch.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
+			/* 更新概览 */
+			updateKDataSketch(kDataSketch, config);
+			updateKSubChartSketch(kSubChartSketch, kDataSketch);
 
 			/* 横坐标位置 */
-			var xLeft_axisX = Math.floor(config_paddingLeft) + 0.5,
+			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getHeight()) + 0.5,
+				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
-				yTop_axisY = Math.floor(config_paddingTop) + 0.5,
+				yTop_axisY = util.getLinePosition(config_paddingTop),
 				yBottom_axisY = y_axisX;
 
 			/* 绘制的数据个数 */
 			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
 			/* 一组数据的宽度 */
-			var groupSize = config_groupBarWidth + config_groupGap;
+			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = this.getKChart().calcHalfGroupBarWidth();
 			/* 一组数据宽度的一半 */
-			var halfGroupSize = Math.max(numBig(new Big(groupSize).div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
+			var halfGroupSize = Math.max(numBig(groupSizeBig.div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
 			/* 横坐标刻度之间相差的数据的个数 */
-			var axisXTickInterval = ceilBig(new Big(config_axisXLabelSize).div(groupSize));
+			var axisXTickInterval = ceilBig(new Big(config_axisXLabelSize).div(groupSizeBig));
 			/* 横坐标刻度个数 */
 			var axisXTickCount = floorBig(new Big(groupCount).div(axisXTickInterval));
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
@@ -241,24 +244,12 @@
 			 * @param {Number} [price2=kDataSketch.getPriceCeiling()] 价钱2
 			 * @returns {Number} 物理高度
 			 */
-			var getHeight = function(price1, price2){
+			var calcHeight = function(price1, price2){
 				if(arguments.length < 2)
 					price2 = kDataSketch.getPriceCeiling();
 
 				return kSubChartSketch.calculateHeight(numBig(new Big(price2).minus(price1).abs()));
 			};
-
-			/**
-			 * @typedef {Object} XTick
-			 * @property {Number} x 横坐标位置
-			 * @property {String} label 横坐标标签
-			 */
-
-			/**
-			 * @typedef {Object} YTick
-			 * @property {Number} y 纵坐标位置
-			 * @property {String} label 纵坐标标签
-			 */
 
 			/**
 			 * 要绘制的横坐标刻度集合
@@ -352,7 +343,7 @@
 					var tickY = tick.y;
 
 					/* 绘制刻度线 */
-					if(config_showAxisYLine && config_showAxisYLabel){
+					if(config_showAxisYLine){
 						ctx.beginPath();
 						ctx.moveTo(x_axisY, yTop_axisY + tickY);
 						ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
@@ -370,17 +361,13 @@
 							ctx.save();
 							config_axisYPriceFloorLabelFont && (ctx.font = config_axisYPriceFloorLabelFont);
 							config_axisYPriceFloorLabelColor && (ctx.fillStyle = config_axisYPriceFloorLabelColor);
-
 							drawLabel();
-
 							ctx.restore();
 						}else if(i === maxAxisYTickIndex){
 							ctx.save();
 							config_axisYPriceCeilingLabelFont && (ctx.font = config_axisYPriceCeilingLabelFont);
 							config_axisYPriceCeilingLabelColor && (ctx.fillStyle = config_axisYPriceCeilingLabelColor);
-
 							drawLabel();
-
 							ctx.restore();
 						}else
 							drawLabel();
@@ -401,8 +388,6 @@
 				if(null != config_bg){
 					ctx.save();
 					ctx.beginPath();
-
-					/* 蜡烛图 */
 					ctx.rect(xLeft_axisX, yTop_axisY, kChartSketch.getWidth(), kSubChartSketch.getHeight());
 
 					ctx.strokeWidth = 0;
@@ -436,11 +421,9 @@
 						if(i < 0 || i >= groupCount)
 							return;
 
-						var tickX = Math.floor(xLeft_axisX + config_axisXTickOffset + i * groupSize) + 0.5;
+						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_axisX).plus(config_axisXTickOffset));
 
-						var data = dataList[i];
-						/* 数据格式转换 */
-						data = dataParser? dataParser(data, i, dataList): data;
+						var data = kChart.getConvertedData(i);
 
 						/* 绘制网格竖线 */
 						if(ifShowVerticalGridLine){
@@ -463,9 +446,7 @@
 
 							var previousData = null;
 							if(null != previousXTickDataIndex && previousXTickDataIndex >= 0 && previousXTickDataIndex < dataList.length)
-								previousData = dataList[previousXTickDataIndex];
-							if(null != previousData && dataParser)
-								previousData = dataParser(previousData, previousXTickDataIndex, dataList);
+								previousData = kChart.getConvertedData(previousXTickDataIndex);
 
 							return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 						})();
@@ -485,9 +466,8 @@
 					}
 					lastTickDataIndex = Math.min(roundBig(b.mul(i)), groupCount - 1);
 
-					b = new Big(groupSize);
-					var totalSpace = Math.min(numBig(b.mul(groupCount - 1)), kChartSketch.getContentWidth());
-					var remainingSpace = totalSpace - (numBig(b.mul(lastTickDataIndex)) - halfGroupBarWidth + halfGroupSize);
+					var totalSpace = Math.min(numBig(groupSizeBig.mul(groupCount - 1)), kChartSketch.getContentWidth());
+					var remainingSpace = totalSpace - (numBig(groupSizeBig.mul(lastTickDataIndex)) - halfGroupBarWidth + halfGroupSize);
 					if(remainingSpace < halfGroupSize){
 						/* 剩余空间不足，只绘制边界刻度 */
 						renderXTick(edgeTickDataIndex);
@@ -580,11 +560,8 @@
 				 * @param {Function} [callback] 绘制完成后执行的方法
 				 */
 				var renderCandle = function(i, callback){
-					var data = dataList[i];
-					/* 数据格式转换 */
-					data = dataParser? dataParser(data, i, dataList): data;
-
-					var x = Math.floor(xLeft_axisX + config_axisXTickOffset + numBig(new Big(groupSize).mul(i)) - halfGroupBarWidth);
+					var data = kChart.getConvertedData(i);
+					var x = Math.floor(xLeft_axisX + config_axisXTickOffset + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
 
 					var isAppreciated = data.closePrice > data.openPrice,
 						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
@@ -595,8 +572,8 @@
 
 					/* 绘制线 */
 					var lineX = x + floorBig(new Big(config_groupBarWidth).minus(config_groupLineWidth).div(2)),
-						lineYTop = Math.floor(yTop_axisY + getHeight(maxLinePrice));
-					var lineYBottom = lineYTop + Math.floor(getHeight(data.highPrice, data.lowPrice));
+						lineYTop = Math.floor(yTop_axisY + calcHeight(maxLinePrice));
+					var lineYBottom = lineYTop + Math.floor(calcHeight(data.highPrice, data.lowPrice));
 					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
 						lineYBottom += 1;
 					if(config_groupLineWidth > 1){
@@ -606,15 +583,15 @@
 						ctx.strokeWidth = 1;
 
 						ctx.beginPath();
-						ctx.moveTo(lineX + 0.5, lineYTop + 0.5);
-						ctx.lineTo(lineX + 0.5, lineYBottom + 0.5);
+						ctx.moveTo(util.getLinePosition(lineX), util.getLinePosition(lineYTop));
+						ctx.lineTo(util.getLinePosition(lineX), util.getLinePosition(lineYBottom));
 						ctx.stroke();
 					}
 
 					/* 绘制蜡烛 */
 					var barX = x,
-						barY = Math.floor(yTop_axisY + getHeight(maxBarPrice));
-					var barHeight = Math.floor(getHeight(data.openPrice, data.closePrice));
+						barY = Math.floor(yTop_axisY + calcHeight(maxBarPrice));
+					var barHeight = Math.floor(calcHeight(data.openPrice, data.closePrice));
 					if(0 === barHeight)
 						barHeight = 1;
 					ctx.strokeWidth = 0;

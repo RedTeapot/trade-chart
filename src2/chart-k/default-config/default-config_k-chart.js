@@ -38,7 +38,7 @@
 		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
 		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
 	};
-	Object.seal && Object.seal(defaultConfig);
+	Object.freeze && Object.freeze(defaultConfig);
 
 	/* 暴露默认配置 */
 	util.defineReadonlyProperty(TradeChart2, "K_DEFAULT_CONFIG", defaultConfig);

@@ -300,16 +300,14 @@
 	};
 
 	/**
-	 * 扫描给定的数据，生成素描
-	 * @param {Array<KData|Object>} dataList 要扫描的数据列表。可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
-	 * @param {KDataParser} [dataParser] 当要扫描的数据是其它格式的数据时，用于指导本插件解析数据的解析器
+	 * 扫描给定的K线图实例，根据实例中的数据生成素描
+	 * @param {KChart} kChart K线图实例
 	 * @returns {KDataSketch}
 	 */
-	KDataSketch.sketchData = function(dataList, dataParser){
+	KDataSketch.sketchFromKChart = function(kChart){
+		var dataList = kChart.getDataList();
 		if(!Array.isArray(dataList))
 			throw new Error("Invalid data list to sketch. Type of 'Array' is required.");
-		if(arguments.length > 1 && typeof dataParser != "function")
-			throw new Error("Invalid data parser to sketch data. Type of 'Function' is required.");
 
 		var dataSketch_origin_max = -Infinity,/* 最大价格 */
 			dataSketch_origin_min = Infinity,/* 最小价格 */
@@ -329,7 +327,7 @@
 			dataSketch_extended_volumeFloor = 0,/* 坐标中成交量的最小值 */
 			dataSketch_extended_volumePrecision = 0;/* 坐标中成交量的精度 */
 
-		if(dataList.length == 0){
+		if(dataList.length === 0){
 			dataSketch_origin_max = 0;
 			dataSketch_origin_min = 0;
 			dataSketch_origin_avgVariation = 0;
@@ -343,9 +341,7 @@
 			var previousVolume = 0;
 			var variationSum = 0, volumeVariationSum = 0;
 			for(var i = 0; i < dataList.length; i++){
-				var d = dataList[i];
-				if(typeof dataParser == "function")
-					d = dataParser(d, i, dataList);
+				var d = kChart.getConvertedData(i);
 				if(null == d || typeof d != "object")
 					continue;
 

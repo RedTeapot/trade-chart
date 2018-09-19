@@ -162,3 +162,15 @@
  * @property {String} depreciatedColor 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  * @property {String} keepedColor 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  */
+
+/**
+ * @typedef {Object} XTick
+ * @property {Number} x 横坐标位置
+ * @property {String} label 横坐标标签
+ */
+
+/**
+ * @typedef {Object} YTick
+ * @property {Number} y 纵坐标位置
+ * @property {String} label 纵坐标标签
+ */
