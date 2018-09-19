@@ -41,7 +41,7 @@
  */
 
 /**
- * @callback KSubChartConfig_candle~axisYPriceFloor
+ * @callback KSubChartConfig_candle~axisYAmountFloor
  * @param {Number} min 要绘制的数据集中出现的最小数值
  * @param {Number} max 要绘制的数据集中出现的最大数值
  * @param {Number} avgVariation 要绘制的数据集中数据变化幅度的平均值（以每条数据的最大数值和最小数值计算变化幅度）
@@ -49,7 +49,7 @@
  */
 
 /**
- * @callback KSubChartConfig_volume~axisYPriceFloor
+ * @callback KSubChartConfig_volume~axisYAmountFloor
  * @param {Number} min 要绘制的数据集中出现的最小数值
  * @param {Number} max 要绘制的数据集中出现的最大数值
  * @param {Number} avgVariation 要绘制的数据集中数据变化幅度的平均值（以每条数据的最大数值和最小数值计算变化幅度）
@@ -57,7 +57,7 @@
  */
 
 /**
- * @callback KSubChartConfig_candle~axisYPriceCeiling
+ * @callback KSubChartConfig_candle~axisYAmountCeiling
  * @param {Number} min 要绘制的数据集中出现的最小数值
  * @param {Number} max 要绘制的数据集中出现的最大数值
  * @param {Number} avgVariation 要绘制的数据集中数据变化幅度的平均值（以每条数据的最大数值和最小数值计算变化幅度）
@@ -65,7 +65,7 @@
  */
 
 /**
- * @callback KSubChartConfig_volume~axisYPriceCeiling
+ * @callback KSubChartConfig_volume~axisYAmountCeiling
  * @param {Number} min 要绘制的数据集中出现的最小数值
  * @param {Number} max 要绘制的数据集中出现的最大数值
  * @param {Number} avgVariation 要绘制的数据集中数据变化幅度的平均值（以每条数据的最大数值和最小数值计算变化幅度）
@@ -134,13 +134,13 @@
 /**
  * @typedef {KSubChartConfig} KSubChartConfig_candle
  *
- * @property {Number|Function} axisYPriceFloor 纵坐标最小值
- * @property {String} axisYPriceFloorLabelFont 纵坐标最小值的坐标标签字体
- * @property {String} axisYPriceFloorLabelColor 纵坐标最小值的坐标标签颜色
+ * @property {Number|Function} axisYAmountFloor 纵坐标最小值
+ * @property {String} axisYAmountFloorLabelFont 纵坐标最小值的坐标标签字体
+ * @property {String} axisYAmountFloorLabelColor 纵坐标最小值的坐标标签颜色
  *
- * @property {Number|Function} axisYPriceCeiling 纵坐标最大值
- * @property {String} axisYPriceCeilingLabelFont 纵坐标最大值的坐标标签字体
- * @property {String} axisYPriceCeilingLabelColor 纵坐标最大值的坐标标签颜色
+ * @property {Number|Function} axisYAmountCeiling 纵坐标最大值
+ * @property {String} axisYAmountCeilingLabelFont 纵坐标最大值的坐标标签字体
+ * @property {String} axisYAmountCeilingLabelColor 纵坐标最大值的坐标标签颜色
  *
  * @property {String} appreciatedColor 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  * @property {String} depreciatedColor 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
@@ -150,13 +150,13 @@
 /**
  * @typedef {KSubChartConfig} KSubChartConfig_volume
  *
- * @property {Number|Function} axisYPriceFloor 纵坐标最小值
- * @property {String} axisYPriceFloorLabelFont 纵坐标最小值的坐标标签字体
- * @property {String} axisYPriceFloorLabelColor 纵坐标最小值的坐标标签颜色
+ * @property {Number|Function} axisYAmountFloor 纵坐标最小值
+ * @property {String} axisYAmountFloorLabelFont 纵坐标最小值的坐标标签字体
+ * @property {String} axisYAmountFloorLabelColor 纵坐标最小值的坐标标签颜色
  *
- * @property {Number|Function} axisYPriceCeiling 纵坐标最大值
- * @property {String} axisYPriceCeilingLabelFont 纵坐标最大值的坐标标签字体
- * @property {String} axisYPriceCeilingLabelColor 纵坐标最大值的坐标标签颜色
+ * @property {Number|Function} axisYAmountCeiling 纵坐标最大值
+ * @property {String} axisYAmountCeilingLabelFont 纵坐标最大值的坐标标签字体
+ * @property {String} axisYAmountCeilingLabelColor 纵坐标最大值的坐标标签颜色
  *
  * @property {String} appreciatedColor 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  * @property {String} depreciatedColor 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色

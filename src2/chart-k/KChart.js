@@ -178,6 +178,10 @@
 				kSubChart = new TradeChart2.KSubChart_CandleChart(this);
 				break;
 
+			case TradeChart2.KSubChartTypes.VOLUME:
+				kSubChart = new TradeChart2.KSubChart_VolumeChart(this);
+				break;
+
 			default:
 				throw new Error("Unknown sub chart type: " + subChartType);
 			}

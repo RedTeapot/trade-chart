@@ -49,20 +49,18 @@
 	 * 根据给定的配置，生成素描
 	 * @param {KSubChartConfig_candle} config 绘制配置
 	 * @param {Number} [height] 绘制高度（当配置中指定的高度为百分比字符串时使用）
-	 * @returns {KSubChartSketch_CandleChartSketch}
+	 * @returns {KSubChartSketch_VolumeChartSketch}
 	 */
 	KSubChartSketch_VolumeChartSketch.sketchByConfig = function(config, height){
-		var chartSketch = new KSubChartSketch_CandleChartSketch();
+		var chartSketch = new KSubChartSketch_VolumeChartSketch();
 
 		var config_height = getConfigItem("height", config),
 			config_paddingTop = getConfigItem("paddingTop", config),
-			config_paddingBottom = getConfigItem("paddingBottom", config),
-			config_axisYTickOffset = getConfigItem("axisYTickOffset", config);
+			config_paddingBottom = getConfigItem("paddingBottom", config);
 
 		var heightBig = new Big(height || config_height).minus(config_paddingTop).minus(config_paddingBottom);
-		var contentHeightBig = heightBig.minus(config_axisYTickOffset);
 		chartSketch.setHeight(floorBig(heightBig))
-			.setContentHeight(floorBig(contentHeightBig));
+			.setContentHeight(floorBig(heightBig));
 
 		return chartSketch;
 	};

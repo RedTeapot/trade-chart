@@ -37,12 +37,12 @@
 			/** price：价格；config：配置 */
 			return util.formatMoney(price, config.axisYPrecision || defaultConfig.axisYPrecision || 0);
 		},
-		axisYPriceFloor: null,
-		axisYPriceFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
-		axisYPriceFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
-		axisYPriceCeiling: null,
-		axisYPriceCeilingLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
-		axisYPriceCeilingLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
+		axisYAmountFloor: null,
+		axisYAmountFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
+		axisYAmountFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
+		axisYAmountCeiling: null,
+		axisYAmountCeilingLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
+		axisYAmountCeilingLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
 
 		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */

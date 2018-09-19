@@ -59,54 +59,54 @@
 		 */
 		var updateKDataSketch = function(kDataSketch, config){
 			/* Y轴最小值 */
-			var config_axisYPriceFloor = _getConfigItem("axisYPriceFloor", config);
-			var axisYPriceFloor;
-			if(null != config_axisYPriceFloor){
-				var isFunction = typeof config_axisYPriceFloor === "function";
+			var config_axisYAmountFloor = _getConfigItem("axisYAmountFloor", config);
+			var axisYAmountFloor;
+			if(null != config_axisYAmountFloor){
+				var isFunction = typeof config_axisYAmountFloor === "function";
 				if(isFunction)
-					axisYPriceFloor = util.try2Call(config_axisYPriceFloor, null,
+					axisYAmountFloor = util.try2Call(config_axisYAmountFloor, null,
 						kDataSketch.getMinPrice(),
 						kDataSketch.getMaxPrice(),
 						kDataSketch.getAvgPriceVariation(),
 						kDataSketch.getMaxPriceVariation()
 					);
 				else{
-					if(!util.isValidNumber(config_axisYPriceFloor))
-						console.warn("Invalid configuration value for 'axisYPriceFloor'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
-					axisYPriceFloor = util.parseAsNumber(config_axisYPriceFloor, 0);
+					if(!util.isValidNumber(config_axisYAmountFloor))
+						console.warn("Invalid configuration value for 'axisYAmountFloor'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
+					axisYAmountFloor = util.parseAsNumber(config_axisYAmountFloor, 0);
 				}
 
-				if(!isFinite(axisYPriceFloor) || axisYPriceFloor < 0){
-					console.warn((isFunction? "Calculated": "Specified") + " 'axisYPriceFloor': " + axisYPriceFloor + " is infinite or lte 0, auto adjust to 0.");
-					axisYPriceFloor = 0;
+				if(!isFinite(axisYAmountFloor) || axisYAmountFloor < 0){
+					console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountFloor': " + axisYAmountFloor + " is infinite or lte 0, auto adjust to 0.");
+					axisYAmountFloor = 0;
 				}
 				
-				kDataSketch.setPriceFloor(axisYPriceFloor);
+				kDataSketch.setPriceFloor(axisYAmountFloor);
 			}
-			axisYPriceFloor = kDataSketch.getPriceFloor();
+			axisYAmountFloor = kDataSketch.getPriceFloor();
 
 			/* Y轴最大值 */
-			var config_axisYPriceCeiling = _getConfigItem("axisYPriceCeiling", config);
-			var axisYPriceCeiling;
-			if(null != config_axisYPriceCeiling){
-				var isFunction = typeof config_axisYPriceCeiling === "function";
+			var config_axisYAmountCeiling = _getConfigItem("axisYAmountCeiling", config);
+			var axisYAmountCeiling;
+			if(null != config_axisYAmountCeiling){
+				var isFunction = typeof config_axisYAmountCeiling === "function";
 				if(isFunction)
-					axisYPriceCeiling = util.try2Call(config_axisYPriceCeiling, null,
+					axisYAmountCeiling = util.try2Call(config_axisYAmountCeiling, null,
 						kDataSketch.getMinPrice(),
 						kDataSketch.getMaxPrice(),
 						kDataSketch.getAvgPriceVariation(),
 						kDataSketch.getMaxPriceVariation()
 					);
 				else{
-					if(!util.isValidNumber(config_axisYPriceCeiling))
-						console.warn("Invalid configuration value for 'axisYPriceCeiling'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
-					axisYPriceCeiling = util.parseAsNumber(axisYPriceCeiling, 0);
+					if(!util.isValidNumber(config_axisYAmountCeiling))
+						console.warn("Invalid configuration value for 'axisYAmountCeiling'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
+					axisYAmountCeiling = util.parseAsNumber(axisYAmountCeiling, 0);
 				}
 
-				if(!isFinite(axisYPriceCeiling) || axisYPriceCeiling <= axisYPriceFloor)
-					console.warn((isFunction? "Calculated": "Specified") + " 'axisYPriceCeiling': " + axisYPriceCeiling + " is infinite or lte 'axisYPriceFloor'(" + axisYPriceFloor + "), auto adjust to 0.");
+				if(!isFinite(axisYAmountCeiling) || axisYAmountCeiling <= axisYAmountFloor)
+					console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + "), auto adjust to 0.");
 				else
-					kDataSketch.setPriceCeiling(axisYPriceCeiling);
+					kDataSketch.setPriceCeiling(axisYAmountCeiling);
 			}
 		};
 
@@ -168,14 +168,14 @@
 				config_axisYLabelFont = getConfigItem("axisYLabelFont"),
 				config_axisYLabelColor = getConfigItem("axisYLabelColor"),
 				config_axisYLabelOffset = getConfigItem("axisYLabelOffset"),
-				config_axisYPriceFloor = getConfigItem("axisYPriceFloor"),
+				config_axisYAmountFloor = getConfigItem("axisYAmountFloor"),
 				config_axisYMidTickQuota = getConfigItem("axisYMidTickQuota"),
 				config_axisYLabelVerticalOffset = getConfigItem("axisYLabelVerticalOffset"),
-				config_axisYPriceFloorLabelFont = getConfigItem("axisYPriceFloorLabelFont"),
-				config_axisYPriceFloorLabelColor = getConfigItem("axisYPriceFloorLabelColor"),
+				config_axisYAmountFloorLabelFont = getConfigItem("axisYAmountFloorLabelFont"),
+				config_axisYAmountFloorLabelColor = getConfigItem("axisYAmountFloorLabelColor"),
 
-				config_axisYPriceCeilingLabelFont = getConfigItem("axisYPriceCeilingLabelFont"),
-				config_axisYPriceCeilingLabelColor = getConfigItem("axisYPriceCeilingLabelColor"),
+				config_axisYAmountCeilingLabelFont = getConfigItem("axisYAmountCeilingLabelFont"),
+				config_axisYAmountCeilingLabelColor = getConfigItem("axisYAmountCeilingLabelColor"),
 
 				config_showAxisXLine = getConfigItem("showAxisXLine"),
 				config_showAxisXLabel = getConfigItem("showAxisXLabel"),
@@ -201,7 +201,7 @@
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KDataSketch.sketchFromKChart(kChart),
-				kChartSketch = KChartSketch.sketchByConfig(this.getKChart().getConfig(), config_width),
+				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height);
 
 			/* 更新概览 */
@@ -230,9 +230,9 @@
 			/* 横坐标刻度个数 */
 			var axisXTickCount = floorBig(new Big(groupCount).div(axisXTickInterval));
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYPriceInterval = numBig(new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(config_axisYMidTickQuota + 1));
+			var axisYAmountInterval = numBig(new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(config_axisYMidTickQuota + 1));
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
-			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYPriceInterval);
+			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 			/* 是否绘制网格横线/竖线 */
 			var ifShowVerticalGridLine = config_showVerticalGridLine && config_verticalGridLineColor,
 				ifShowHorizontalGridLine = config_showHorizontalGridLine && config_horizontalGridLineColor;
@@ -248,7 +248,7 @@
 				if(arguments.length < 2)
 					price2 = kDataSketch.getPriceCeiling();
 
-				return kSubChartSketch.calculateHeight(numBig(new Big(price2).minus(price1).abs()));
+				return kSubChartSketch.calculateHeight(numBig(new Big(price2 || 0).minus(price1 || 0).abs()));
 			};
 
 			/**
@@ -359,14 +359,14 @@
 
 						if(i === 0){
 							ctx.save();
-							config_axisYPriceFloorLabelFont && (ctx.font = config_axisYPriceFloorLabelFont);
-							config_axisYPriceFloorLabelColor && (ctx.fillStyle = config_axisYPriceFloorLabelColor);
+							config_axisYAmountFloorLabelFont && (ctx.font = config_axisYAmountFloorLabelFont);
+							config_axisYAmountFloorLabelColor && (ctx.fillStyle = config_axisYAmountFloorLabelColor);
 							drawLabel();
 							ctx.restore();
 						}else if(i === maxAxisYTickIndex){
 							ctx.save();
-							config_axisYPriceCeilingLabelFont && (ctx.font = config_axisYPriceCeilingLabelFont);
-							config_axisYPriceCeilingLabelColor && (ctx.fillStyle = config_axisYPriceCeilingLabelColor);
+							config_axisYAmountCeilingLabelFont && (ctx.font = config_axisYAmountCeilingLabelFont);
+							config_axisYAmountCeilingLabelColor && (ctx.fillStyle = config_axisYAmountCeilingLabelColor);
 							drawLabel();
 							ctx.restore();
 						}else
@@ -498,7 +498,7 @@
 					/* 绘制Y轴刻度（自下而上） */
 					var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
 					for(var i = 0; i <= maxAxisYTickIndex; i++){
-						var price = kDataSketch.getPriceFloor() + numBig(new Big(axisYPriceInterval).mul(i)),
+						var price = kDataSketch.getPriceFloor() + numBig(new Big(axisYAmountInterval).mul(i)),
 							tickOffset = numBig(new Big(axisYHeightInterval).mul(maxAxisYTickIndex - i));
 						var tickY = Math.round(tickOffset);
 
@@ -600,7 +600,6 @@
 					util.try2Call(callback, null, data, i, lineX, barX);
 				};
 
-				/* 绘制蜡烛图及量图 */
 				for(var i = 0; i < groupCount; i++)
 					renderCandle(i);
 

@@ -10,25 +10,26 @@
 		padding: 0;
 		width: 100%;
 	}
-	.k-container{
+	.chart-container{
 		position: relative;
-		width: 100%;
+	}
+	.chart-container.candle{
 		height: 300px;
-		outline: solid 1px black;
+	}
+	.chart-container.volume{
+		height: 200px;
 	}
 	canvas{
 		position: absolute;
 		display: block;
 		margin: 0 auto;
 	}
-	canvas#detail{
-		z-index: 1;
-	}
 	</style>
 </head>
 <body>
-	<div class = "k-container"><canvas id = "chart"></canvas><canvas id = "detail"></canvas></div>
-	
+	<div class = "chart-container candle"><canvas></canvas></div>
+	<div class = "chart-container volume"><canvas></canvas></div>
+
 	<script type = "text/javascript" src = "../../trade-chart.js"></script>
 	<script type = "text/javascript" src = "../../comp/util.js"></script>
 	<script type = "text/javascript" src = "../../comp/LinearGradient.js"></script>
@@ -48,9 +49,10 @@
 	<script type = "text/javascript" src = "../KSubChartRenderResult.js"></script>
 
 	<script type = "text/javascript" src = "../KSubChartSketch_CandleChartSketch.js"></script>
+	<script type = "text/javascript" src = "../KSubChartSketch_VolumeChartSketch.js"></script>
 
 	<script type = "text/javascript" src = "../KSubChart_CandleChart.js"></script>
-	<script type = "text/javascript" src = "../KSubChart_CandleChart.js"></script>
+	<script type = "text/javascript" src = "../KSubChart_VolumeChart.js"></script>
 
 	<script type = "text/javascript" src = "testCanvas.js"></script>
 </body>
