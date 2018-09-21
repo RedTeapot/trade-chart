@@ -187,6 +187,57 @@
 	};
 
 	/**
+	 * 将给定的字符串自连n次后返回
+	 * @param str {String} 要重复的字符串单元
+	 * @param n {Number} 要重复的次数
+	 * @return {String} 重复连接后的字符串
+	 */
+	var repeatString = function(str, n){
+		var s = "";
+		while(n-- > 0)
+			s += str;
+		return s;
+	};
+
+	/**
+	 * 生成随机字符串
+	 * @param {String} [prefix=""] 前缀
+	 * @param {Number} [len=10] 除前缀外，要随机生成的字符串的长度
+	 */
+	var randomString = (function(){
+		var i = 0, tailLength = 2;
+		var alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+		var getTail = function(){
+			var s = repeatString("0", tailLength) + (i++).toString(36);
+			if(i > Math.pow(16, tailLength))
+				i = 0;
+
+			return s.substring(s.length -tailLength);
+		};
+
+		return function(prefix, len){
+			if(arguments.length < 2)
+				len = 10;
+			if(arguments.length < 1)
+				prefix = "";
+
+			var minLen = tailLength + 1;
+			if(len < minLen)
+				throw new Error("Length should not be little than " + minLen);
+			len -= tailLength;
+
+			var str = "";
+			while(len-- > 0){
+				var index = Math.floor(Math.random() * alphabet.length);
+				str += alphabet.charAt(index);
+			}
+
+			return prefix + str + getTail();
+		};
+	})();
+
+	/**
 	 * 判断给定的元素是否为一个合法的数字，或合法数字的字符串
 	 * @param {*} tar 要判断的对象
 	 */
@@ -231,32 +282,46 @@
 
 	/**
 	 * 使用给定的尺寸初始化画布
-	 * @param {HTMLCanvasElement} canvasObj 要初始化的画布
-	 * @param {Number} width 画布要呈现的宽度
-	 * @param {Number} height 画布要呈现的高度
-	 *
-	 * @returns {CanvasRenderingContext2D}
 	 */
-	var initCanvas = function(canvasObj, width, height){
-		/* 高分辨率适应 */
-		var pr = pixelRatio();
-		if(pr > 1){
-			canvasObj.style.width = width + "px";
-			canvasObj.style.height = height + "px";
+	var initCanvas = (function(){
+		var initFlag = randomString("CANVAS_TRADE_CHART_INIT_FLAG");
 
-			setAttributes(canvasObj, {width: pr * width, height: pr * height});
-		}else{
-			canvasObj.style.width = "";
-			canvasObj.style.height = "";
+		/**
+		 * 使用给定的尺寸初始化画布
+		 * @param {HTMLCanvasElement} canvasObj 要初始化的画布
+		 * @param {Number} width 画布要呈现的宽度
+		 * @param {Number} height 画布要呈现的高度
+		 *
+		 * @returns {CanvasRenderingContext2D}
+		 */
+		return function(canvasObj, width, height){
+			var ctx = canvasObj.getContext("2d");
 
-			setAttributes(canvasObj, {width: width, height: height});
-		}
+			if(canvasObj.initFlag){
+				console.warn("The canvas was initialized already.");
+				return ctx;
+			}
 
-		var ctx = canvasObj.getContext("2d");
-		ctx.scale(pr, pr);
+			/* 高分辨率适应 */
+			var pr = pixelRatio();
+			if(pr > 1){
+				canvasObj.style.width = width + "px";
+				canvasObj.style.height = height + "px";
 
-		return ctx;
-	};
+				setAttributes(canvasObj, {width: pr * width, height: pr * height});
+			}else{
+				canvasObj.style.width = "";
+				canvasObj.style.height = "";
+
+				setAttributes(canvasObj, {width: width, height: height});
+			}
+
+			ctx.scale(pr, pr);
+			canvasObj.initFlag = true;
+
+			return ctx;
+		};
+	})();
 
 	/**
 	 * 根据给定的数据计算返回对应在画布上可以清晰绘制线条的位置
@@ -280,6 +345,8 @@
 		pixelRatio: pixelRatio,
 		isValidNumber: isValidNumber,
 		isEmptyString: isEmptyString,
+		repeatString: repeatString,
+		randomString: randomString,
 		try2Call: try2Call,
 		try2Apply: try2Apply,
 		parseAsNumber: parseAsNumber,

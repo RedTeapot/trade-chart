@@ -304,7 +304,7 @@
 	 * @param {KChart} kChart K线图实例
 	 * @returns {KDataSketch}
 	 */
-	KDataSketch.sketchFromKChart = function(kChart){
+	KDataSketch.sketchFromKChartInstance = function(kChart){
 		var dataList = kChart.getDataList();
 		if(!Array.isArray(dataList))
 			throw new Error("Invalid data list to sketch. Type of 'Array' is required.");

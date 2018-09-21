@@ -28,6 +28,11 @@
 		verticalGridLineColor: "#A0A0A0",/** 网格竖线颜色 */
 		gridLineDash: [1, 3, 3],/** 网格横线的虚线构造方法。如果需要用实线，则用 [1] 表示 */
 
+		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
+		axisYLabelPosition: "outside",/** 纵坐标标签位置。outside：外侧；inside：内侧 */
+		axisYLabelOffset: 5,/** 纵坐标标签距离坐标轴刻度线的距离 */
+		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
+		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
 		axisYLabelVerticalOffset: function(){/** 纵坐标标签纵向位移 */
 			return 0;
 		},

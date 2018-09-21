@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleDataSketch.js" line="8" mnemonic="2" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="gn">
-      <change beforePath="$PROJECT_DIR$/src/k/testCanvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/k/testCanvas.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleDataSketch.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeDataSketch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/gulpfile2.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/gulpfile2.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/KDataSketch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KDataSketch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-chart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-chart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/comp/util.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/comp/util.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -16,30 +32,21 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="testCanvas.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/k/testCanvas.js">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="KSubChart_VolumeChart.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="836">
-              <caret line="134" column="147" selection-start-line="134" selection-start-column="147" selection-end-line="134" selection-end-column="147" />
+            <state relative-caret-position="542">
+              <caret line="146" column="54" selection-start-line="146" selection-start-column="54" selection-end-line="146" selection-end-column="54" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="testCanvas.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.html">
+      <file leaf-file-name="KSubChart_CandleChart.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="530">
-              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="testCanvas.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="141" column="147" selection-start-line="141" selection-start-column="147" selection-end-line="141" selection-end-column="147" />
+            <state relative-caret-position="-840">
+              <caret line="88" column="24" selection-start-line="88" selection-start-column="24" selection-end-line="88" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -48,10 +55,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>axisYPosition</find>
-      <find>axisYLabelPosition</find>
-      <find>·</find>
-      <find>formatter</find>
       <find>config_axisYFormatter</find>
       <find>initC</find>
       <find>initCanvas</find>
@@ -78,6 +81,10 @@
       <find>amou</find>
       <find>isEmpty</find>
       <find>price</find>
+      <find>ctx.clear</find>
+      <find>clearRect</find>
+      <find>sketchFromKChart</find>
+      <find>updateKDataSketch</find>
     </findStrings>
     <replaceStrings>
       <replace>_extended_</replace>
@@ -125,22 +132,24 @@
         <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js" />
         <option value="$PROJECT_DIR$/src/k/canvas/trade-chart_k.js" />
         <option value="$PROJECT_DIR$/src2/comp/LinearGradient.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-chart.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/KDataSketch.js" />
-        <option value="$PROJECT_DIR$/src2/comp/util.js" />
-        <option value="$PROJECT_DIR$/build/gulpfile2.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/KChart.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KChartDataTypes.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/test/data.js" />
+        <option value="$PROJECT_DIR$/src/k/testCanvas.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-chart.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/KChartDataTypes.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/test/data.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" />
+        <option value="$PROJECT_DIR$/src2/comp/util.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/test/testCanvas.js" />
-        <option value="$PROJECT_DIR$/src/k/testCanvas.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KDataSketch.js" />
+        <option value="$PROJECT_DIR$/build/gulpfile2.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/test/testCanvas.html" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleDataSketch.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeDataSketch.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js" />
       </list>
     </option>
   </component>
@@ -547,13 +556,6 @@
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
               <item name="src2" type="462c0819:PsiDirectoryNode" />
               <item name="chart-k" type="462c0819:PsiDirectoryNode" />
-              <item name="default-config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
-              <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
-              <item name="src2" type="462c0819:PsiDirectoryNode" />
-              <item name="chart-k" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -577,8 +579,8 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="G:\代码仓库\js\trade-chart\src\k" />
       <recent name="G:\代码仓库\js\trade-chart\src2\chart-k" />
+      <recent name="G:\代码仓库\js\trade-chart\src\k" />
       <recent name="G:\代码仓库\js\trade-chart\src2\chart-k\default-config" />
       <recent name="G:\代码仓库\js\trade-chart\src2\chart-k\test" />
       <recent name="G:\代码仓库\js\trade-chart\build" />
@@ -665,12 +667,13 @@
       <workItem from="1535020570303" duration="1767000" />
       <workItem from="1535417711262" duration="3030000" />
       <workItem from="1536904108369" duration="42119000" />
-      <workItem from="1537253488349" duration="30297000" />
+      <workItem from="1537253488349" duration="30427000" />
+      <workItem from="1537404320677" duration="12238000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="333485000" />
+    <option name="totallyTimeSpent" value="345853000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -708,8 +711,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
-    <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
     <entry file="file://$PROJECT_DIR$/trend/canvas/trade-chart_trend.js" />
     <entry file="file://$PROJECT_DIR$/depth/canvas/trade-chart_depth.js" />
     <entry file="file://$PROJECT_DIR$/k/canvas/trade-chart_k.js" />
@@ -789,13 +790,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/k/testCanvas.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" column="6" lean-forward="true" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="139">
@@ -808,13 +802,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="2" column="32" selection-start-line="2" selection-start-column="32" selection-end-line="2" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KChartSketch.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="100" column="9" selection-start-line="100" selection-start-column="9" selection-end-line="100" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -832,86 +819,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-chart.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="40" column="34" selection-start-line="40" selection-start-column="34" selection-end-line="40" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartTypes.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="17" column="77" selection-start-line="17" selection-start-column="77" selection-end-line="17" selection-end-column="77" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/comp/util.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="205" column="33" selection-start-line="205" selection-start-column="33" selection-end-line="205" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/gulpfile2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="95" column="39" lean-forward="true" selection-start-line="95" selection-start-column="39" selection-end-line="95" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KChart.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="836">
-          <caret line="181" column="65" selection-start-line="181" selection-start-column="65" selection-end-line="181" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="39" column="33" lean-forward="true" selection-start-line="39" selection-start-column="33" selection-end-line="39" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
-          <caret line="51" column="50" selection-start-line="51" selection-start-column="50" selection-end-line="51" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KChartDataTypes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="806">
-          <caret line="152" column="42" selection-start-line="152" selection-start-column="42" selection-end-line="152" selection-end-column="42" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="33" column="45" lean-forward="true" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="537">
-          <caret line="39" column="19" lean-forward="true" selection-start-line="39" selection-start-column="19" selection-end-line="39" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="358">
-          <caret line="250" column="100" selection-start-line="250" selection-start-column="100" selection-end-line="250" selection-end-column="100" />
-          <folding>
-            <element signature="e#1093#1314#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -922,25 +833,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="202" column="49" selection-start-line="202" selection-start-column="49" selection-end-line="202" selection-end-column="49" />
-          <folding>
-            <element signature="e#1093#1314#0" />
-            <element signature="e#1508#3725#0" />
-            <element signature="e#3937#4147#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/KDataSketch.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="700">
-          <caret line="410" column="109" selection-start-line="410" selection-start-column="82" selection-end-line="410" selection-end-column="109" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/test/data.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="567">
@@ -948,24 +840,143 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.html">
+    <entry file="file://$PROJECT_DIR$/src/k/testCanvas.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
+        <state relative-caret-position="2278">
+          <caret line="134" column="147" selection-start-line="134" selection-start-column="147" selection-end-line="134" selection-end-column="147" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_candle.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="20" column="46" lean-forward="true" selection-start-line="19" selection-start-column="8" selection-end-line="20" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/comp/util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-968">
+          <caret line="297" selection-start-line="297" selection-end-line="297" />
+          <folding>
+            <element signature="e#4260#4320#0" />
+            <element signature="e#4236#4960#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-sub-chart_volume.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="605">
+          <caret line="48" column="33" lean-forward="true" selection-start-line="48" selection-start-column="33" selection-end-line="48" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/default-config/default-config_k-chart.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="31" column="28" lean-forward="true" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KChartSketch.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="377">
+          <caret line="104" column="7" lean-forward="true" selection-start-line="104" selection-start-column="7" selection-end-line="104" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KChart.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="887">
+          <caret line="71" column="44" lean-forward="true" selection-start-line="71" selection-start-column="44" selection-end-line="71" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KChartDataTypes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="500">
+          <caret line="134" column="52" selection-start-line="134" selection-start-column="30" selection-end-line="134" selection-end-column="52" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1411">
+          <caret line="83" column="117" lean-forward="true" selection-start-line="83" selection-start-column="4" selection-end-line="83" selection-end-column="117" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KDataSketch.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="303" column="35" lean-forward="true" selection-start-line="303" selection-start-column="7" selection-end-line="303" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/k/testCanvas.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="28" column="6" lean-forward="true" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/gulpfile2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10">
+          <caret line="70" column="9" lean-forward="true" selection-start-line="70" selection-start-column="9" selection-end-line="70" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="141" column="147" selection-start-line="141" selection-start-column="147" selection-end-line="141" selection-end-column="147" />
+        <state relative-caret-position="282">
+          <caret line="153" column="35" selection-start-line="153" selection-start-column="35" selection-end-line="153" selection-end-column="35" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/k/testCanvas.js">
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/test/testCanvas.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="836">
-          <caret line="134" column="147" selection-start-line="134" selection-start-column="147" selection-end-line="134" selection-end-column="147" />
+        <state relative-caret-position="299">
+          <caret line="29" column="46" lean-forward="true" selection-start-line="29" selection-start-column="46" selection-end-line="29" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleDataSketch.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="44" lean-forward="true" selection-start-line="44" selection-end-line="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeChartSketch.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="37" selection-start-line="16" selection-start-column="37" selection-end-line="16" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch_VolumeDataSketch.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="734">
+          <caret line="114" lean-forward="true" selection-start-line="114" selection-end-line="114" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-840">
+          <caret line="88" column="24" selection-start-line="88" selection-start-column="24" selection-end-line="88" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_VolumeChart.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="542">
+          <caret line="146" column="54" selection-start-line="146" selection-start-column="54" selection-end-line="146" selection-end-column="54" />
         </state>
       </provider>
     </entry>

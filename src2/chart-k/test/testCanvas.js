@@ -108,7 +108,7 @@
 			width: "100%",/* 整体图形宽度 */
 
 			paddingLeft: 60,
-			paddingRight: 20,
+			paddingRight: 60,
 			
 			groupWidth: 4,
 			groupGap: 3,
@@ -120,10 +120,9 @@
 			axisXTickOffset: 30,/* 横坐标刻度距离原点的位移 */
 			axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 			axisXLabelSize: 100,
-			
 		};
 
-		var kSubChartConfig = {
+		var kCandleConfig = {
 			height: "100%",
 
 			paddingTop: 20,
@@ -132,7 +131,21 @@
 			axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
 
 			coordinateBackground: "#F9F9F9"
-		};
+		},
+			kVolumeConfig = {
+				height: "100%",
+
+				paddingTop: 20,
+				paddingBottom: 30,
+
+				axisYPosition: "right",
+				axisYTickOffset: 10,
+
+				showVerticalGridLine: false,
+				horizontalGridLineColor: false,
+
+				coordinateBackground: null
+			};
 		
 		var candleObj = document.querySelector(".candle canvas"),
 			volumeObj = document.querySelector(".volume canvas");
@@ -162,10 +175,10 @@
 
 		/* 蜡烛图 */
 		var subChart = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-		subChart.render(candleObj, kSubChartConfig);
+		subChart.render(candleObj, kCandleConfig);
 
 		/* 量图 */
 		subChart = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-		subChart.render(volumeObj, kSubChartConfig);
+		subChart.render(volumeObj, kVolumeConfig);
 	});
 })();

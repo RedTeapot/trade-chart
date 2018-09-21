@@ -90,6 +90,9 @@ var concatK = function(){
 			"KSubChartSketch.js",
 			"KSubChartRenderResult.js",
 
+			"KSubChartSketch_CandleDataSketch.js",
+			"KSubChartSketch_VolumeDataSketch.js",
+
 			"KSubChartSketch_CandleChartSketch.js",
 			"KSubChartSketch_VolumeChartSketch.js",
 

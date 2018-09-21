@@ -10,6 +10,7 @@
 		KSubChart = TradeChart2.KSubChart,
 		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
 
+		KSubChartSketch_CandleDataSketch = TradeChart2.KSubChartSketch_CandleDataSketch,
 		KSubChartSketch_CandleChartSketch = TradeChart2.KSubChartSketch_CandleChartSketch;
 
 	var numBig = function(big){
@@ -26,6 +27,25 @@
 	};
 
 	/**
+	 * 从给定的配置集合中获取指定名称的配置项取值。
+	 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
+	 * 如果全局的配置中也不存在，则返回undefined
+	 *
+	 * @param {KChart} kChart K线图实例
+	 * @param {String} name 配置项名称
+	 * @param {KSubChartConfig_candle} config K线子图渲染配置
+	 */
+	var _getConfigItem = function(kChart, name, config){
+		var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
+		if(name in config)
+			return config[name];
+		else if(name in defaultConfig)
+			return defaultConfig[name];
+
+		return kChart.getConfigItem(name);
+	};
+
+	/**
 	 * @constructor
 	 * @augments KSubChart
 	 *
@@ -34,81 +54,6 @@
 	 */
 	var KSubChart_CandleChart = function(kChart){
 		KSubChart.call(this, kChart, KSubChartTypes.CANDLE);
-
-		/**
-		 * 从给定的配置集合中获取指定名称的配置项取值。
-		 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
-		 * 如果全局的配置中也不存在，则返回undefined
-		 *
-		 * @param {String} name 配置项名称
-		 */
-		var _getConfigItem = function(name, config){
-			var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
-			if(name in config)
-				return config[name];
-			else if(name in defaultConfig)
-				return defaultConfig[name];
-
-			return kChart.getConfigItem(name);
-		};
-
-		/**
-		 * 根据给定的配置更新由扫描数据得出的数据概览，以达到使能配置项的目的
-		 * @param {KDataSketch} kDataSketch 通过扫描数据得出的数据概览
-		 * @param {Object} config 渲染配置
-		 */
-		var updateKDataSketch = function(kDataSketch, config){
-			/* Y轴最小值 */
-			var config_axisYAmountFloor = _getConfigItem("axisYAmountFloor", config);
-			var axisYAmountFloor;
-			if(null != config_axisYAmountFloor){
-				var isFunction = typeof config_axisYAmountFloor === "function";
-				if(isFunction)
-					axisYAmountFloor = util.try2Call(config_axisYAmountFloor, null,
-						kDataSketch.getMinPrice(),
-						kDataSketch.getMaxPrice(),
-						kDataSketch.getAvgPriceVariation(),
-						kDataSketch.getMaxPriceVariation()
-					);
-				else{
-					if(!util.isValidNumber(config_axisYAmountFloor))
-						console.warn("Invalid configuration value for 'axisYAmountFloor'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
-					axisYAmountFloor = util.parseAsNumber(config_axisYAmountFloor, 0);
-				}
-
-				if(!isFinite(axisYAmountFloor) || axisYAmountFloor < 0){
-					console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountFloor': " + axisYAmountFloor + " is infinite or lte 0, auto adjust to 0.");
-					axisYAmountFloor = 0;
-				}
-				
-				kDataSketch.setPriceFloor(axisYAmountFloor);
-			}
-			axisYAmountFloor = kDataSketch.getPriceFloor();
-
-			/* Y轴最大值 */
-			var config_axisYAmountCeiling = _getConfigItem("axisYAmountCeiling", config);
-			var axisYAmountCeiling;
-			if(null != config_axisYAmountCeiling){
-				var isFunction = typeof config_axisYAmountCeiling === "function";
-				if(isFunction)
-					axisYAmountCeiling = util.try2Call(config_axisYAmountCeiling, null,
-						kDataSketch.getMinPrice(),
-						kDataSketch.getMaxPrice(),
-						kDataSketch.getAvgPriceVariation(),
-						kDataSketch.getMaxPriceVariation()
-					);
-				else{
-					if(!util.isValidNumber(config_axisYAmountCeiling))
-						console.warn("Invalid configuration value for 'axisYAmountCeiling'. Type of 'Number' of 'Function' needed. Auto adjust to 0.");
-					axisYAmountCeiling = util.parseAsNumber(axisYAmountCeiling, 0);
-				}
-
-				if(!isFinite(axisYAmountCeiling) || axisYAmountCeiling <= axisYAmountFloor)
-					console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + "), auto adjust to 0.");
-				else
-					kDataSketch.setPriceCeiling(axisYAmountCeiling);
-			}
-		};
 
 		/**
 		 * 根据给定的数据概览更新单纯由配置得出的图形绘制概览
@@ -130,7 +75,7 @@
 		 */
 		this.render = function(canvasObj, config){
 			var getConfigItem = function(name){
-				return _getConfigItem(name, config);
+				return _getConfigItem(kChart, name, config);
 			};
 
 			var config_width = getConfigItem("width"),
@@ -194,18 +139,18 @@
 			var dataList = kChart.getDataList();
 
 			/* 百分比尺寸自动转换 */
-			if(/%/.test(config_width))
-				config_width = canvasObj.parentElement.clientWidth * parseInt(config_width.replace(/%/, "")) / 100;
-			if(/%/.test(config_height))
-				config_height = canvasObj.parentElement.clientHeight * parseInt(config_height.replace(/%/, "")) / 100;
+			var r = /%/;
+			if(r.test(config_width))
+				config_width = canvasObj.parentElement.clientWidth * parseInt(config_width.replace(r, "")) / 100;
+			if(r.test(config_height))
+				config_height = canvasObj.parentElement.clientHeight * parseInt(config_height.replace(r, "")) / 100;
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var kDataSketch = KDataSketch.sketchFromKChart(kChart),
+			var kDataSketch = KSubChartSketch_CandleDataSketch.sketch(kChart, config),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height);
 
 			/* 更新概览 */
-			updateKDataSketch(kDataSketch, config);
 			updateKSubChartSketch(kSubChartSketch, kDataSketch);
 
 			/* 横坐标位置 */

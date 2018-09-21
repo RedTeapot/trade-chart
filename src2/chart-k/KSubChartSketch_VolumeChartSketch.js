@@ -12,6 +12,33 @@
 	};
 
 	/**
+	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
+	 * @param {String} name 配置项名称
+	 * @param {KSubChartConfig_volume} config 配置集合
+	 * @param {KChartConfig} [kChartConfig] K线图绘制配置
+	 * @returns {*}
+	 */
+	var getConfigItem = function(name, config, kChartConfig){
+		var defaultConfig = TradeChart2.K_SUB_VOLUME_DEFAULT_CONFIG;
+
+		if(name in config)
+			return config[name];
+		else if(name in defaultConfig)
+			return defaultConfig[name];
+
+		if(null != kChartConfig && name in kChartConfig)
+			return kChartConfig[name];
+
+		defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
+		if(name in defaultConfig)
+			return defaultConfig[name];
+		else{
+			console.warn("Unknown configuration item: " + name);
+			return undefined;
+		}
+	};
+
+	/**
 	 * @constructor
 	 * @augments KSubChartSketch
 	 *
@@ -22,28 +49,7 @@
 	};
 	KSubChartSketch_VolumeChartSketch.prototype = Object.create(KSubChartSketch.prototype);
 
-	/**
-	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
-	 * @param {String} name 配置项名称
-	 * @param {KSubChartConfig_candle} config 配置集合
-	 * @returns {*}
-	 */
-	var getConfigItem = function(name, config){
-		var defaultConfig = TradeChart2.K_SUB_VOLUME_DEFAULT_CONFIG;
 
-		if(name in config)
-			return config[name];
-		else if(name in defaultConfig)
-			return defaultConfig[name];
-
-		defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
-		if(name in defaultConfig)
-			return defaultConfig[name];
-		else{
-			console.warn("Unknown configuration item: " + name);
-			return undefined;
-		}
-	};
 
 	/**
 	 * 根据给定的配置，生成素描

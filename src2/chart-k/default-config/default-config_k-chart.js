@@ -30,13 +30,7 @@
 		},
 		axisXLabelHorizontalAlign: function(i, n){/** 横坐标标签的水平对齐方式。start：左对齐；center：居中；end：右对齐 */
 			return "center";
-		},
-
-		axisYPosition: "left",/** 纵坐标位置。left：左侧；right：右侧 */
-		axisYLabelPosition: "outside",/** 纵坐标标签位置。outside：外侧；inside：内侧 */
-		axisYLabelOffset: 5,/** 纵坐标标签距离坐标轴刻度线的距离 */
-		axisYLabelFont: null,/** 纵坐标的坐标标签字体 */
-		axisYLabelColor: null,/** 纵坐标的坐标标签颜色 */
+		}
 	};
 	Object.freeze && Object.freeze(defaultConfig);
 

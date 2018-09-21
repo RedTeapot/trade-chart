@@ -12,29 +12,22 @@
 	};
 
 	/**
-	 * @constructor
-	 * @augments KSubChartSketch
-	 *
-	 * 蜡烛图图形素描
-	 */
-	var KSubChartSketch_CandleChartSketch = function(){
-		KSubChartSketch.apply(this, arguments);
-	};
-	KSubChartSketch_CandleChartSketch.prototype = Object.create(KSubChartSketch.prototype);
-
-	/**
 	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
 	 * @param {String} name 配置项名称
 	 * @param {KSubChartConfig_candle} config 配置集合
+	 * @param {KChartConfig} [kChartConfig] K线图绘制配置
 	 * @returns {*}
 	 */
-	var getConfigItem = function(name, config){
+	var getConfigItem = function(name, config, kChartConfig){
 		var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
 
 		if(name in config)
 			return config[name];
 		else if(name in defaultConfig)
 			return defaultConfig[name];
+
+		if(null != kChartConfig && name in kChartConfig)
+			return kChartConfig[name];
 
 		defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
 		if(name in defaultConfig)
@@ -44,6 +37,27 @@
 			return undefined;
 		}
 	};
+
+	/**
+	 * @constructor
+	 * @augments KSubChartSketch
+	 *
+	 * 蜡烛图图形素描
+	 */
+	var KSubChartSketch_CandleChartSketch = function(){
+		KSubChartSketch.apply(this, arguments);
+
+		/**
+		 * 使用给定的配置根据更新数据概览（存在可能改变概览信息的配置，如：axisYAmountFloor 会影响amountHeightRatio等）
+		 * @param {KSubChartConfig_candle} kCandleChartConfig
+		 * @param {KChartConfig} [kChartConfig] K线图绘制配置
+		 * @returns {KSubChartSketch_CandleChartSketch}
+		 */
+		this.updateByConfig = function(kCandleChartConfig, kChartConfig){
+			return this;
+		};
+	};
+	KSubChartSketch_CandleChartSketch.prototype = Object.create(KSubChartSketch.prototype);
 
 	/**
 	 * 根据给定的配置，生成素描
