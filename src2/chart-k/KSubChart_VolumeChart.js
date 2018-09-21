@@ -56,16 +56,6 @@
 		KSubChart.call(this, kChart, KSubChartTypes.VOLUME);
 
 		/**
-		 * 根据给定的数据概览更新单纯由配置得出的图形绘制概览
-		 * @param {KSubChartSketch} kSubChartSketch 要更新的绘制概览
-		 * @param {KDataSketch} kDataSketch 数据概览
-		 */
-		var updateKSubChartSketch = function(kSubChartSketch, kDataSketch){
-			var b = new Big(kDataSketch.getVolumeCeiling()).minus(kDataSketch.getVolumeFloor()).div(Math.max(kSubChartSketch.getContentHeight(), 1));
-			kSubChartSketch.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
-		};
-
-		/**
 		 * @override
 		 *
 		 * 渲染图形，并呈现至指定的画布中
@@ -148,10 +138,7 @@
 
 			var kDataSketch = KSubChartSketch_VolumeDataSketch.sketch(kChart, config),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(config, config_height);
-
-			/* 更新概览 */
-			updateKSubChartSketch(kSubChartSketch, kDataSketch);
+				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
 
 			/* 横坐标位置 */
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),

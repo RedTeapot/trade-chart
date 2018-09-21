@@ -46,10 +46,19 @@
 	 */
 	var KSubChartSketch_VolumeChartSketch = function(){
 		KSubChartSketch.apply(this, arguments);
+
+		/**
+		 * 使用给定的数据概览更新图形概览
+		 * @param {KSubChartSketch_VolumeDataSketch} dataSketch 数据概览
+		 * @returns {KSubChartSketch_VolumeChartSketch}
+		 */
+		this.updateByDataSketch = function(dataSketch){
+			var b = new Big(dataSketch.getVolumeCeiling()).minus(dataSketch.getVolumeFloor()).div(Math.max(this.getContentHeight(), 1));
+			this.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
+			return this;
+		};
 	};
 	KSubChartSketch_VolumeChartSketch.prototype = Object.create(KSubChartSketch.prototype);
-
-
 
 	/**
 	 * 根据给定的配置，生成素描

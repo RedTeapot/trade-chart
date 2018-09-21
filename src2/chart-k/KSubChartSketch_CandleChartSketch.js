@@ -48,12 +48,13 @@
 		KSubChartSketch.apply(this, arguments);
 
 		/**
-		 * 使用给定的配置根据更新数据概览（存在可能改变概览信息的配置，如：axisYAmountFloor 会影响amountHeightRatio等）
-		 * @param {KSubChartConfig_candle} kCandleChartConfig
-		 * @param {KChartConfig} [kChartConfig] K线图绘制配置
+		 * 使用给定的数据概览更新图形概览
+		 * @param {KSubChartSketch_CandleDataSketch} dataSketch 数据概览
 		 * @returns {KSubChartSketch_CandleChartSketch}
 		 */
-		this.updateByConfig = function(kCandleChartConfig, kChartConfig){
+		this.updateByDataSketch = function(dataSketch){
+			var b = new Big(dataSketch.getPriceCeiling()).minus(dataSketch.getPriceFloor()).div(Math.max(this.getContentHeight(), 1));
+			this.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
 			return this;
 		};
 	};
