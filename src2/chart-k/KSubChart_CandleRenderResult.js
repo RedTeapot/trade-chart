@@ -40,6 +40,7 @@
 
 		/**
 		 * 获取可以渲染出来的数据个数
+		 * @override
 		 * @returns {Number}
 		 */
 		this.getRenderingGroupCount = function(){
@@ -47,24 +48,6 @@
 			var maxGroupCount = KChartSketch.calcMaxGroupCount(kChart.getConfig(), util.calcRenderingWidth(canvasObj, getConfigItem("width"))),
 				dataCount = kChart.getDataList().length;
 			return Math.max(Math.min(maxGroupCount, dataCount), 0);
-		};
-
-		/**
-		 * 获取可以渲染出来的数据列表
-		 * @returns {Array<KData|Object>}
-		 */
-		this.getRenderingDataList = function(){
-			//TODO
-			return null;
-		};
-
-		/**
-		 * 获取可以渲染出来的，被转换后的数据列表
-		 * @returns {Array<KData>}
-		 */
-		this.getConvertedRenderingDataList = function(){
-			//TODO
-			return null;
 		};
 	};
 	KSubChart_CandleRenderResult.prototype = Object.create(KSubChartRenderResult.prototype);
