@@ -8,7 +8,7 @@
 
 		KSubChartTypes = TradeChart2.KSubChartTypes,
 		KSubChart = TradeChart2.KSubChart,
-		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
+		KSubChart_VolumeRenderResult = TradeChart2.KSubChart_VolumeRenderResult,
 
 		KSubChartSketch_VolumeDataSketch = TradeChart2.KSubChartSketch_VolumeDataSketch,
 		KSubChartSketch_VolumeChartSketch = TradeChart2.KSubChartSketch_VolumeChartSketch;
@@ -61,15 +61,15 @@
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @param {Object} config 渲染配置
-		 * @returns {KSubChartRenderResult} 绘制的K线图
+		 * @returns {KSubChart_VolumeRenderResult} 绘制的K线图
 		 */
 		this.render = function(canvasObj, config){
 			var getConfigItem = function(name){
 				return _getConfigItem(kChart, name, config);
 			};
 
-			var config_width = getConfigItem("width"),
-				config_height = getConfigItem("height"),
+			var config_width = util.calcRenderingWidth(canvasObj, getConfigItem("width")),
+				config_height = util.calcRenderingHeight(canvasObj, getConfigItem("height")),
 
 				config_groupGap = getConfigItem("groupGap"),
 
@@ -127,13 +127,6 @@
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
 			var dataList = kChart.getDataList();
-
-			/* 百分比尺寸自动转换 */
-			var r = /%/;
-			if(r.test(config_width))
-				config_width = canvasObj.parentElement.clientWidth * parseInt(config_width.replace(r, "")) / 100;
-			if(r.test(config_height))
-				config_height = canvasObj.parentElement.clientHeight * parseInt(config_height.replace(r, "")) / 100;
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KSubChartSketch_VolumeDataSketch.sketch(kChart, config),
@@ -518,7 +511,7 @@
 				drawAxisYTickList();
 			})();
 
-			return new KSubChartRenderResult(this, config);
+			return new KSubChart_VolumeRenderResult(this, canvasObj, config);
 		};
 	};
 	KSubChart_VolumeChart.prototype = Object.create(KSubChart.prototype);

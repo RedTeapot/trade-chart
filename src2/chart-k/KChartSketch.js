@@ -124,5 +124,27 @@
 		return chartSketch;
 	};
 
+	/**
+	 * 根据给定的配置计算可以绘制的最大数据个数
+	 * @param {KChartConfig} config 绘制配置
+	 * @param {Number} [width] 绘制宽度（当配置中指定的宽度为百分比字符串时使用）
+	 * @returns {Number}
+	 */
+	KChartSketch.calcMaxGroupCount = function(config, width){
+		var config_width = getConfigItem("width", config),
+			config_paddingLeft = getConfigItem("paddingLeft", config),
+			config_paddingRight = getConfigItem("paddingRight", config),
+			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
+			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config),
+			config_groupLineWidth = getConfigItem("groupLineWidth", config),
+			config_groupGap = getConfigItem("groupGap", config),
+			config_groupBarWidth = getConfigItem("groupBarWidth", config);
+
+		var widthBig = new Big(width || config_width).minus(config_paddingLeft).minus(config_paddingRight);
+		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
+
+		return floorBig(contentWidthBig.minus(config_groupLineWidth).div(config_groupGap + config_groupBarWidth)) + 1;
+	};
+
 	util.defineReadonlyProperty(TradeChart2, "KChartSketch", KChartSketch);
 })();

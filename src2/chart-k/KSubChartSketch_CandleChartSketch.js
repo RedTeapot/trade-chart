@@ -1,6 +1,6 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var KSubChartSketch = TradeChart2.KSubChartSketch;
+	var KSubChartSketch_ChartSketch = TradeChart2.KSubChartSketch_ChartSketch;
 	var util = TradeChart2.util;
 	var Big = util.Big;
 
@@ -40,12 +40,12 @@
 
 	/**
 	 * @constructor
-	 * @augments KSubChartSketch
+	 * @augments KSubChartSketch_ChartSketch
 	 *
 	 * 蜡烛图图形素描
 	 */
 	var KSubChartSketch_CandleChartSketch = function(){
-		KSubChartSketch.apply(this, arguments);
+		KSubChartSketch_ChartSketch.apply(this, arguments);
 
 		/**
 		 * 使用给定的数据概览更新图形概览
@@ -58,7 +58,7 @@
 			return this;
 		};
 	};
-	KSubChartSketch_CandleChartSketch.prototype = Object.create(KSubChartSketch.prototype);
+	KSubChartSketch_CandleChartSketch.prototype = Object.create(KSubChartSketch_ChartSketch.prototype);
 
 	/**
 	 * 根据给定的配置，生成素描

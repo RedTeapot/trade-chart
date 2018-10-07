@@ -324,6 +324,36 @@
 	})();
 
 	/**
+	 * 计算给定画布的渲染宽度
+	 * @param {HTMLCanvasElement} canvasObj 要计算的画布
+	 * @param {String|Number} configuredWidth 配置的绘制宽度。支持像素单位的数字和代表百分比的字符串（如：100%）
+	 * @returns {Number}
+	 */
+	var calcRenderingWidth = function(canvasObj, configuredWidth){
+		var width = configuredWidth;
+		var r = /%/;
+		if(r.test(configuredWidth) || !isValidNumber(configuredWidth))
+			width = canvasObj.parentElement.clientWidth * parseInt(configuredWidth.replace(r, "")) / 100;
+
+		return width;
+	};
+
+	/**
+	 * 计算给定画布的渲染高度
+	 * @param {HTMLCanvasElement} canvasObj 要计算的画布
+	 * @param {String|Number} configuredHeight 配置的绘制高度。支持像素单位的数字和代表百分比的字符串（如：100%）
+	 * @returns {Number}
+	 */
+	var calcRenderingHeight = function(canvasObj, configuredHeight){
+		var height = configuredHeight;
+		var r = /%/;
+		if(r.test(configuredHeight) || !isValidNumber(configuredHeight))
+			height = canvasObj.parentElement.clientHeight * parseInt(configuredHeight.replace(r, "")) / 100;
+
+		return height;
+	};
+
+	/**
 	 * 根据给定的数据计算返回对应在画布上可以清晰绘制线条的位置
 	 * @param {String|Number|Big} d 坐标位置
 	 */
@@ -352,6 +382,8 @@
 		parseAsNumber: parseAsNumber,
 		getPrecision: getPrecision,
 		initCanvas: initCanvas,
+		calcRenderingWidth: calcRenderingWidth,
+		calcRenderingHeight: calcRenderingHeight,
 		getLinePosition: getLinePosition,
 		defineReadonlyProperty: defineReadonlyProperty
 	};

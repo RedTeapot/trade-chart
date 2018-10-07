@@ -105,10 +105,20 @@
 		};
 
 		/**
-		 * 获取指定索引对应的被转换后的数据
+		 * 获取指定的相对横坐标对应的数据索引
+		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布Canvas的左上角
+		 * @returns {Number} 相对横坐标对应的数据索引。如果位置在区域左侧，则返回0；如果在区域右侧，则返回最后一条数据的索引。如果数据区域中没有任何数据，则返回-1
+		 */
+		this.getDataIndex = function(x){
+			//TODO
+			return -1;
+		};
+
+		/**
+		 * 获取指定索引对应的原始数据
 		 * @param {Number} index 要获取的数据的索引
 		 */
-		this.getConvertedData = function(index){
+		this.getData = function(index){
 			if(!util.isValidNumber(index))
 				throw new Error("Invalid index: " + index + " to retrieve converted data.");
 
@@ -118,7 +128,18 @@
 				return null;
 			}
 
-			var data = dataList[index];
+			return dataList[index];
+		};
+
+		/**
+		 * 获取指定索引对应的被转换后的数据
+		 * @param {Number} index 要获取的数据的索引
+		 */
+		this.getConvertedData = function(index){
+			var data = this.getData(index);
+			if(null == data)
+				return data;
+
 			if(typeof dataParser === "function"){
 				try{
 					data = dataParser(data, index, dataList);
@@ -173,7 +194,7 @@
 		 */
 		this.newSubChart = function(subChartType){
 			var kSubChart;
-			switch(subChartType){
+			switch(String(subChartType).trim().toLowerCase()){
 			case TradeChart2.KSubChartTypes.CANDLE:
 				kSubChart = new TradeChart2.KSubChart_CandleChart(this);
 				break;

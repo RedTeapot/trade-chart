@@ -174,11 +174,12 @@
 		}).setDataList(datas).setConfig(kChartConfig);
 
 		/* 蜡烛图 */
-		var subChart = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-		subChart.render(candleObj, kCandleConfig);
+		var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
+		var result_candle = subChart_candle.render(candleObj, kCandleConfig);
+		window.result = result_candle;
 
 		/* 量图 */
-		subChart = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-		subChart.render(volumeObj, kVolumeConfig);
+		var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
+		var result_volume = subChart_volume.render(volumeObj, kVolumeConfig);
 	});
 })();

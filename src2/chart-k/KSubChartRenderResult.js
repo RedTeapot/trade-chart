@@ -9,7 +9,6 @@
 	 * @param {Object} config 绘制过程使用的配置
 	 */
 	var KSubChartRenderResult = function(kSubChart, config){
-
 		/**
 		 * 获取渲染用到的配置数据
 		 */

@@ -11,7 +11,7 @@
 	 * @constructor
 	 * K线子图形素描
 	 */
-	var KSubChartSketch = function(){
+	var KSubChartSketch_ChartSketch = function(){
 		/** 图表高度（纵坐标覆盖区域） */
 		var height;
 		/** 图表正文区域高度 */
@@ -30,7 +30,7 @@
 		/**
 		 * 设置图表高度（纵坐标覆盖区域）
 		 * @param {Number} v 图表高度（纵坐标覆盖区域）
-		 * @returns {KSubChartSketch}
+		 * @returns {KSubChartSketch_ChartSketch}
 		 */
 		this.setHeight = function(v){
 			height = v;
@@ -48,7 +48,7 @@
 		/**
 		 * 设置图表正文区域高度
 		 * @param {Number} v 图表正文区域高度
-		 * @returns {KSubChartSketch}
+		 * @returns {KSubChartSketch_ChartSketch}
 		 */
 		this.setContentHeight = function(v){
 			contentHeight = v;
@@ -66,7 +66,7 @@
 		/**
 		 * 设置纵坐标可呈现的量差与高度差之间的映射比例
 		 * @param {Number} v 纵坐标可呈现的量差与高度差之间的映射比例
-		 * @returns {KSubChartSketch}
+		 * @returns {KSubChartSketch_ChartSketch}
 		 */
 		this.setAmountHeightRatio = function(v){
 			if(null == v || isNaN(v = Number(v))){
@@ -92,5 +92,5 @@
 		};
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch", KSubChartSketch);
+	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch_ChartSketch", KSubChartSketch_ChartSketch);
 })();

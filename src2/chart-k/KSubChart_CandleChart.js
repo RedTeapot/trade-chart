@@ -8,7 +8,7 @@
 
 		KSubChartTypes = TradeChart2.KSubChartTypes,
 		KSubChart = TradeChart2.KSubChart,
-		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
+		KSubChart_CandleRenderResult = TradeChart2.KSubChart_CandleRenderResult,
 
 		KSubChartSketch_CandleDataSketch = TradeChart2.KSubChartSketch_CandleDataSketch,
 		KSubChartSketch_CandleChartSketch = TradeChart2.KSubChartSketch_CandleChartSketch;
@@ -61,15 +61,15 @@
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @param {KSubChartConfig_candle} config 渲染配置
-		 * @returns {KSubChartRenderResult} K线子图绘制结果
+		 * @returns {KSubChart_CandleRenderResult} K线子图绘制结果
 		 */
 		this.render = function(canvasObj, config){
 			var getConfigItem = function(name){
 				return _getConfigItem(kChart, name, config);
 			};
 
-			var config_width = getConfigItem("width"),
-				config_height = getConfigItem("height"),
+			var config_width = util.calcRenderingWidth(canvasObj, getConfigItem("width")),
+				config_height = util.calcRenderingHeight(canvasObj, getConfigItem("height")),
 
 				config_groupGap = getConfigItem("groupGap"),
 
@@ -127,13 +127,6 @@
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
 			var dataList = kChart.getDataList();
-
-			/* 百分比尺寸自动转换 */
-			var r = /%/;
-			if(r.test(config_width))
-				config_width = canvasObj.parentElement.clientWidth * parseInt(config_width.replace(r, "")) / 100;
-			if(r.test(config_height))
-				config_height = canvasObj.parentElement.clientHeight * parseInt(config_height.replace(r, "")) / 100;
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KSubChartSketch_CandleDataSketch.sketch(kChart, config),
@@ -544,7 +537,7 @@
 				drawAxisYTickList();
 			})();
 
-			return new KSubChartRenderResult(this, config);
+			return new KSubChart_CandleRenderResult(this, canvasObj, config);
 		};
 	};
 	KSubChart_CandleChart.prototype = Object.create(KSubChart.prototype);
