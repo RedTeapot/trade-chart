@@ -74,10 +74,10 @@
 			config_paddingBottom = getConfigItem("paddingBottom", config),
 			config_axisYTickOffset = getConfigItem("axisYTickOffset", config);
 
-		var heightBig = new Big(height || config_height).minus(config_paddingTop).minus(config_paddingBottom);
+		var heightBig = new Big(util.isValidNumber(height)? height: config_height).minus(config_paddingTop).minus(config_paddingBottom);
 		var contentHeightBig = heightBig.minus(config_axisYTickOffset);
-		chartSketch.setHeight(floorBig(heightBig))
-			.setContentHeight(floorBig(contentHeightBig));
+		chartSketch.setHeight(Math.max(floorBig(heightBig), 0))
+			.setContentHeight(Math.max(floorBig(contentHeightBig), 0));
 
 		return chartSketch;
 	};

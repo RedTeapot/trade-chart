@@ -102,8 +102,6 @@
 	})();
 	
 	loadData(function(datas){
-		var containerObj = document.querySelector(".k-container");
-		
 		var kChartConfig = {
 			width: "100%",/* 整体图形宽度 */
 
@@ -128,27 +126,38 @@
 			paddingTop: 20,
 			paddingBottom: 30,
 
+			showAxisXLabel: false,
+
 			axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
 
 			coordinateBackground: "#F9F9F9"
-		},
-			kVolumeConfig = {
-				height: "100%",
+		};
+		var kVolumeConfig = {
+			height: "100%",
 
-				paddingTop: 20,
-				paddingBottom: 30,
+			paddingTop: 20,
+			paddingBottom: 30,
 
-				axisYPosition: "right",
-				axisYTickOffset: 10,
+			axisYPosition: "right",
+			axisYTickOffset: 10,
 
-				showVerticalGridLine: false,
-				horizontalGridLineColor: false,
+			showVerticalGridLine: false,
+			horizontalGridLineColor: false,
 
-				coordinateBackground: null
-			};
+			coordinateBackground: null
+		};
 		
-		var candleObj = document.querySelector(".candle canvas"),
-			volumeObj = document.querySelector(".volume canvas");
+		var row_candleObj = document.querySelector(".row .candle canvas"),
+			row_volumeObj = document.querySelector(".row .volume canvas"),
+			row_candleDetailObj = document.querySelector(".row .candle .detail"),
+			row_volumeDetailObj = document.querySelector(".row .volume .detail"),
+
+			column_candleObj = document.querySelector(".column .candle canvas"),
+			column_volumeObj = document.querySelector(".column .volume canvas"),
+			column_candleDetailObj = document.querySelector(".column .candle .detail"),
+			column_volumeDetailObj = document.querySelector(".column .volume .detail"),
+
+			dataDetailObj = document.querySelector(".data-detail");
 
 		var KChart = TradeChart2.KChart;
 		var kChart = new KChart().setDataParser(function(d, i){
@@ -175,11 +184,87 @@
 
 		/* 蜡烛图 */
 		var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-		var result_candle = subChart_candle.render(candleObj, kCandleConfig);
-		window.result = result_candle;
+		var rowResult_candle = subChart_candle.render(row_candleObj, kCandleConfig);
+		window.rowResult_candle = rowResult_candle;
+		rowResult_candle.initCanvas(row_candleDetailObj);
+
+		var columnResult_candle = subChart_candle.render(column_candleObj, kCandleConfig);
+		window.columnResult_candle = columnResult_candle;
+		columnResult_candle.initCanvas(column_candleDetailObj);
 
 		/* 量图 */
 		var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-		var result_volume = subChart_volume.render(volumeObj, kVolumeConfig);
+		var rowResult_volume = subChart_volume.render(row_volumeObj, kVolumeConfig);
+		window.rowResult_volume = rowResult_volume;
+		rowResult_volume.initCanvas(row_volumeDetailObj);
+
+		var columnResult_volume = subChart_volume.render(column_volumeObj, kVolumeConfig);
+		window.columnResult_volume = columnResult_volume;
+		columnResult_volume.initCanvas(column_volumeDetailObj);
+
+
+		var showDetail = function(e, result, top, bottom){
+			var x = e.clientX - this.parentNode.offsetLeft;
+			var convertedData = result.getConvertedRenderingData(x);
+			dataDetailObj.innerHTML = null == convertedData? "--": JSON.stringify(convertedData);
+
+			var detailCtx = this.getContext("2d");
+			detailCtx.clearRect(0, 0, this.width, this.height);
+
+			/* 竖线 */
+			x = TradeChart2.util.getLinePosition(x);
+			detailCtx.lineWidth = 0.5;
+			detailCtx.setLineDash([5, 5]);
+			detailCtx.beginPath();
+			detailCtx.moveTo(x, top);
+			detailCtx.lineTo(x, bottom);
+			detailCtx.stroke();
+		};
+
+		/* 纵向排列时的明细查看 */
+		var f = function(e){
+			showDetail.call(column_candleDetailObj, e, columnResult_candle,
+				TradeChart2.util.getLinePosition(columnResult_candle.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(columnResult_candle.getConfigItem("height"))
+			);
+			showDetail.call(column_volumeDetailObj, e, columnResult_volume,
+				TradeChart2.util.getLinePosition(0),
+				TradeChart2.util.getLinePosition(columnResult_volume.getConfigItem("height") - columnResult_volume.getConfigItem("paddingBottom"))
+			);
+		};
+		column_candleDetailObj.addEventListener("mousemove", f);
+		column_volumeDetailObj.addEventListener("mousemove", f);
+
+		/* 横向排列时的明细查看 */
+		var showDetail_row = function(e, result, top, bottom){
+			var x = e.clientX;
+			var convertedData = result.getConvertedRenderingData(x);
+			dataDetailObj.innerHTML = null == convertedData? "--": JSON.stringify(convertedData);
+
+			var detailCtx = this.getContext("2d");
+			detailCtx.clearRect(0, 0, this.width, this.height);
+
+			/* 竖线 */
+			x = TradeChart2.util.getLinePosition(x);
+			detailCtx.lineWidth = 0.5;
+			detailCtx.setLineDash([5, 5]);
+			detailCtx.beginPath();
+			detailCtx.moveTo(x, top);
+			detailCtx.lineTo(x, bottom);
+			detailCtx.stroke();
+		};
+		g = function(e){
+			showDetail_row.call(row_candleDetailObj, e, rowResult_candle,
+				TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("height") - rowResult_candle.getConfigItem("paddingBottom"))
+			);
+
+			showDetail_row.call(row_volumeDetailObj, e, rowResult_volume,
+				TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(rowResult_volume.getConfigItem("height") - rowResult_volume.getConfigItem("paddingBottom"))
+			);
+		};
+		row_candleDetailObj.addEventListener("mousemove", g);
+		row_volumeDetailObj.addEventListener("mousemove", g);
 	});
 })();

@@ -27,25 +27,6 @@
 	};
 
 	/**
-	 * 从给定的配置集合中获取指定名称的配置项取值。
-	 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
-	 * 如果全局的配置中也不存在，则返回undefined
-	 *
-	 * @param {KChart} kChart K线图实例
-	 * @param {String} name 配置项名称
-	 * @param {KSubChartConfig_volume} config K线子图渲染配置
-	 */
-	var _getConfigItem = function(kChart, name, config){
-		var defaultConfig = TradeChart2.K_SUB_VOLUME_DEFAULT_CONFIG;
-		if(name in config)
-			return config[name];
-		else if(name in defaultConfig)
-			return defaultConfig[name];
-
-		return kChart.getConfigItem(name);
-	};
-
-	/**
 	 * @constructor
 	 * @augments KSubChart
 	 *
@@ -54,6 +35,26 @@
 	 */
 	var KSubChart_VolumeChart = function(kChart){
 		KSubChart.call(this, kChart, KSubChartTypes.VOLUME);
+		var self = this;
+
+		/**
+		 * @override
+		 * 从给定的配置集合中获取指定名称的配置项取值。
+		 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
+		 * 如果全局的配置中也不存在，则返回undefined
+		 *
+		 * @param {String} name 配置项名称
+		 * @returns {*}
+		 */
+		this.getConfigItem = function(name, config){
+			var defaultConfig = TradeChart2.K_SUB_VOLUME_DEFAULT_CONFIG;
+			if(name in config)
+				return config[name];
+			else if(name in defaultConfig)
+				return defaultConfig[name];
+
+			return kChart.getConfigItem(name);
+		};
 
 		/**
 		 * @override
@@ -65,7 +66,7 @@
 		 */
 		this.render = function(canvasObj, config){
 			var getConfigItem = function(name){
-				return _getConfigItem(kChart, name, config);
+				return self.getConfigItem(name, config);
 			};
 
 			var config_width = util.calcRenderingWidth(canvasObj, getConfigItem("width")),
@@ -209,7 +210,7 @@
 					var tickX = tick.x;
 
 					/* 绘制刻度线 */
-					if(config_showAxisXLine && config_showAxisXLabel){
+					if(config_showAxisXLine){
 						ctx.beginPath();
 						ctx.moveTo(tickX, y_axisX);
 						ctx.lineTo(tickX, y_axisX + config_axisTickLineLength);

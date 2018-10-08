@@ -5,30 +5,68 @@
 	<meta name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, width = device-width">
 	
 	<style type = "text/css">
-	html, body{
+	html, body {
 		margin: 0;
 		padding: 0;
 		width: 100%;
 	}
+	body{
+		padding: 20px;
+		box-sizing: border-box;
+	}
 	.chart-container{
 		position: relative;
 	}
-	.chart-container.candle{
+	.column .chart-container.candle{
 		height: 300px;
 	}
-	.chart-container.volume{
+	.column .chart-container.volume{
 		height: 200px;
+	}
+	.row{
+		height: 240px;
+	}
+	.row .candle{
+		float: left;
+		width: 50%;
+		height: 100%;
+	}
+	.row .volume{
+		float: right;
+		width: 50%;
+		height: 100%;
+	}
+	.row:after{
+		display: block;
+		content: "";
+		clear: both;
 	}
 	canvas{
 		position: absolute;
 		display: block;
 		margin: 0 auto;
 	}
+	canvas.detail{
+		z-index: 1;
+	}
+	.data-detail{
+		font-family: courier, sans-serif;
+		margin-top: 20px;
+		font-size: 12px;
+	}
 	</style>
 </head>
 <body>
-	<div class = "chart-container candle"><canvas></canvas></div>
-	<div class = "chart-container volume"><canvas></canvas></div>
+	<div class = "column">
+		<div class = "chart-container candle"><canvas></canvas><canvas class = "detail"></canvas></div>
+		<div class = "chart-container volume"><canvas></canvas><canvas class = "detail"></canvas></div>
+	</div>
+
+	<div class = "row">
+		<div class = "chart-container candle"><canvas></canvas><canvas class = "detail"></canvas></div>
+		<div class = "chart-container volume"><canvas></canvas><canvas class = "detail"></canvas></div>
+	</div>
+	<div class = "data-detail"></div>
 
 	<script type = "text/javascript" src = "../../trade-chart.js"></script>
 	<script type = "text/javascript" src = "../../comp/util.js"></script>

@@ -359,7 +359,7 @@
 	 */
 	var getLinePosition = function(d){
 		if(!isValidNumber(d))
-			throw new Error("Invalid line position: ") + d;
+			throw new Error("Invalid line position: " + d);
 
 		return Math.floor(parseAsNumber(d)) + 0.5;
 	};

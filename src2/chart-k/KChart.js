@@ -117,6 +117,7 @@
 		/**
 		 * 获取指定索引对应的原始数据
 		 * @param {Number} index 要获取的数据的索引
+		 * @returns {KData|Object}
 		 */
 		this.getData = function(index){
 			if(!util.isValidNumber(index))

@@ -26,6 +26,16 @@
 		};
 
 		/**
+		 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
+		 * @param {String} name 配置项名称
+		 * @returns {*}
+		 */
+		this.getConfigItem = function(name, config){
+			console.warn("Not implemented!");
+			return null;
+		};
+
+		/**
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @param {Object} config 渲染配置

@@ -115,7 +115,7 @@
 			config_groupGap = getConfigItem("groupGap", config),
 			config_groupBarWidth = getConfigItem("groupBarWidth", config);
 
-		var widthBig = new Big(width || config_width).minus(config_paddingLeft).minus(config_paddingRight);
+		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 		chartSketch.setWidth(floorBig(widthBig))
 			.setContentWidth(floorBig(contentWidthBig))
@@ -140,7 +140,7 @@
 			config_groupGap = getConfigItem("groupGap", config),
 			config_groupBarWidth = getConfigItem("groupBarWidth", config);
 
-		var widthBig = new Big(width || config_width).minus(config_paddingLeft).minus(config_paddingRight);
+		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 
 		return floorBig(contentWidthBig.minus(config_groupLineWidth).div(config_groupGap + config_groupBarWidth)) + 1;

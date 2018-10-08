@@ -73,9 +73,10 @@
 			config_paddingTop = getConfigItem("paddingTop", config),
 			config_paddingBottom = getConfigItem("paddingBottom", config);
 
-		var heightBig = new Big(height || config_height).minus(config_paddingTop).minus(config_paddingBottom);
-		chartSketch.setHeight(floorBig(heightBig))
-			.setContentHeight(floorBig(heightBig));
+		var heightBig = new Big(util.isValidNumber(height)? height: config_height).minus(config_paddingTop).minus(config_paddingBottom);
+		var height = Math.max(floorBig(heightBig), 0);
+		chartSketch.setHeight(height)
+			.setContentHeight(height);
 
 		return chartSketch;
 	};
