@@ -191,8 +191,18 @@
 
 			/**
 			 * 绘制横坐标刻度
+			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
-			var drawAxisXTickList = function(){
+			var drawAxisXTickList = function(drawContent){
+				drawContent = null == drawContent? null: String(drawContent).trim().toLowerCase();
+				if(drawContent !== "both" && drawContent !== "tick" && drawContent !== "label"){
+					console.warn("Unknown draw content: " + drawContent);
+					drawContent = "both";
+				}
+
+				var ifDrawTick = drawContent === "both" || drawContent === "tick",
+					ifDrawLabel = drawContent === "both" || drawContent === "label";
+
 				ctx.save();
 
 				ctx.lineWidth = 1;
@@ -211,7 +221,7 @@
 					var tickX = tick.x;
 
 					/* 绘制刻度线 */
-					if(config_showAxisXLine){
+					if(ifDrawTick && config_showAxisXLine){
 						ctx.beginPath();
 						ctx.moveTo(tickX, y_axisX);
 						ctx.lineTo(tickX, y_axisX + config_axisTickLineLength);
@@ -219,7 +229,7 @@
 					}
 
 					/* 绘制坐标取值 */
-					if(config_showAxisXLabel){
+					if(ifDrawLabel && config_showAxisXLabel){
 						ctx.save();
 
 						if(typeof config_axisXLabelHorizontalAlign === "function")
@@ -235,8 +245,18 @@
 
 			/**
 			 * 绘制纵坐标刻度
+			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
-			var drawAxisYTickList = function(){
+			var drawAxisYTickList = function(drawContent){
+				drawContent = null == drawContent? null: String(drawContent).trim().toLowerCase();
+				if(drawContent !== "both" && drawContent !== "tick" && drawContent !== "label"){
+					console.warn("Unknown draw content: " + drawContent);
+					drawContent = "both";
+				}
+
+				var ifDrawTick = drawContent === "both" || drawContent === "tick",
+					ifDrawLabel = drawContent === "both" || drawContent === "label";
+
 				ctx.save();
 
 				ctx.lineWidth = 1;
@@ -269,13 +289,14 @@
 					var tickY = tick.y;
 
 					/* 绘制刻度线 */
-					if(config_showAxisYLine){
+					if(ifDrawTick && config_showAxisYLine){
 						ctx.beginPath();
 						ctx.moveTo(x_axisY, yTop_axisY + tickY);
 						ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
 						ctx.stroke();
 					}
-					if(config_showAxisYLabel){
+
+					if(ifDrawLabel && config_showAxisYLabel){
 						if(typeof config_axisYLabelVerticalOffset === "function")
 							config_axisYLabelVerticalOffset = config_axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
 
@@ -473,6 +494,11 @@
 						delete config.axisYPrecision;
 				})();
 
+				/* 绘制刻度线 */
+				var drawContent = "tick";
+				drawAxisXTickList(drawContent);
+				drawAxisYTickList(drawContent);
+
 				ctx.restore();
 			})();
 
@@ -534,8 +560,9 @@
 
 			/* 绘制绘制坐标系刻度 */
 			(function(){
-				drawAxisXTickList();
-				drawAxisYTickList();
+				var drawContent = "label";
+				drawAxisXTickList(drawContent);
+				drawAxisYTickList(drawContent);
 			})();
 
 			return new KSubChart_CandleRenderResult(this, canvasObj, config);
