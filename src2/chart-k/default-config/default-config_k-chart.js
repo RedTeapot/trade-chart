@@ -20,6 +20,7 @@
 		axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
 		axisLabelColor: null,/** 坐标标签颜色 */
 		axisLineColor: null,/** 坐标轴颜色 */
+		axisLineWidth: 0.5,/** 坐标轴线条宽度 */
 
 		axisXTickOffset: 5,/** 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
 		axisXTickOffsetFromRight: 0,/** 最后一个横坐标刻度距离横坐标结束位置的位移 */

@@ -14,6 +14,8 @@
 	var defaultConfig = {
 		height: 300,/** 图表整体高度 */
 
+		coordinateBackground: null,/** 图标正文背景 */
+
 		paddingTop: 20,/** 图表内边距 - 上侧 */
 		paddingBottom: 20,/** 图表内边距 - 下侧 */
 

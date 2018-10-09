@@ -9,6 +9,9 @@
 	var floorBig = function(big){
 		return Math.floor(numBig(big));
 	};
+	var ceilBig = function(big){
+		return Math.ceil(numBig(big));
+	};
 
 	/**
 	 * 验证配置并自动纠正错误的配置
@@ -105,16 +108,6 @@
 		};
 
 		/**
-		 * 获取指定的相对横坐标对应的数据索引
-		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布Canvas的左上角
-		 * @returns {Number} 相对横坐标对应的数据索引。如果位置在区域左侧，则返回0；如果在区域右侧，则返回最后一条数据的索引。如果数据区域中没有任何数据，则返回-1
-		 */
-		this.getDataIndex = function(x){
-			//TODO
-			return -1;
-		};
-
-		/**
 		 * 获取指定索引对应的原始数据
 		 * @param {Number} index 要获取的数据的索引
 		 * @returns {KData|Object}
@@ -177,16 +170,37 @@
 
 		/**
 		 * 根据给定的配置信息计算蜡烛一半的宽度
-		 * @param {KChartConfig} [config] 绘制配置
 		 * @returns {Number}
 		 */
-		this.calcHalfGroupBarWidth = function(config){
-			config = config || this.getConfig();
-
-			var attrName = "groupBarWidth";
-			var groupBarWidth = config[attrName] || this.getConfigItem(attrName);
-
+		this.calcHalfGroupBarWidth = function(){
+			var groupBarWidth = this.getConfigItem("groupBarWidth");
 			return floorBig(new Big(groupBarWidth).minus(1).div(2));
+		};
+
+		/**
+		 * 根据给定的配置信息计算一组数据绘制宽度的一半的宽度
+		 * @returns {Number}
+		 */
+		this.calcHalfGroupSize = function(config){
+			var config_groupGap = this.getConfigItem("groupGap"),
+				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
+				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");
+
+			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
+			return Math.max(numBig(groupSizeBig.div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
+		};
+
+		/**
+		 * 根据设定的配置，计算横坐标刻度标签的刻度跨度，亦即一个刻度覆盖几组数据
+		 * @returns {Number}
+		 */
+		this.calcAxisXLabelTickSpan = function(){
+			var config_groupGap = this.getConfigItem("groupGap"),
+				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
+				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");
+
+			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
+			return ceilBig(new Big(config_axisXLabelSize).div(groupSizeBig));
 		};
 
 		/**

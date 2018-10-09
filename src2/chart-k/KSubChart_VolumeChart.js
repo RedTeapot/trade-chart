@@ -72,8 +72,6 @@
 			var config_width = util.calcRenderingWidth(canvasObj, getConfigItem("width")),
 				config_height = util.calcRenderingHeight(canvasObj, getConfigItem("height")),
 
-				config_groupGap = getConfigItem("groupGap"),
-
 				config_paddingLeft = getConfigItem("paddingLeft"),
 				config_paddingTop = getConfigItem("paddingTop"),
 
@@ -90,6 +88,7 @@
 
 				config_gridLineDash = getConfigItem("gridLineDash") || [1],
 
+				config_axisLineWidth = getConfigItem("axisLineWidth"),
 				config_axisLineColor = getConfigItem("axisLineColor"),
 				config_axisLabelFont = getConfigItem("axisLabelFont"),
 				config_axisLabelColor = getConfigItem("axisLabelColor"),
@@ -121,6 +120,7 @@
 				config_axisXTickOffset = getConfigItem("axisXTickOffset"),
 				config_axisXLabelHorizontalAlign = getConfigItem("axisXLabelHorizontalAlign"),
 
+				config_groupGap = getConfigItem("groupGap"),
 				config_groupBarWidth = getConfigItem("groupBarWidth"),
 				config_groupLineWidth = getConfigItem("groupLineWidth");
 
@@ -137,6 +137,7 @@
 			/* 横坐标位置 */
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
+				xLeft_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
@@ -148,13 +149,13 @@
 			/* 一组数据的宽度 */
 			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
 			/* 蜡烛一半的宽度 */
-			var halfGroupBarWidth = this.getKChart().calcHalfGroupBarWidth();
+			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 			/* 一组数据宽度的一半 */
-			var halfGroupSize = Math.max(numBig(groupSizeBig.div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
-			/* 横坐标刻度之间相差的数据的个数 */
-			var axisXTickInterval = ceilBig(new Big(config_axisXLabelSize).div(groupSizeBig));
+			var halfGroupSize = kChart.calcHalfGroupSize();
+			/* 一个横坐标刻度横跨的数据个数 */
+			var axisXLabelTickSpan = kChart.calcAxisXLabelTickSpan();
 			/* 横坐标刻度个数 */
-			var axisXTickCount = floorBig(new Big(groupCount).div(axisXTickInterval));
+			var axisXTickCount = floorBig(new Big(groupCount).div(axisXLabelTickSpan));
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
 			var axisYAmountInterval = numBig(new Big(kDataSketch.getVolumeCeiling()).minus(kDataSketch.getVolumeFloor()).div(config_axisYMidTickQuota + 1));
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
@@ -327,14 +328,14 @@
 			(function(){
 				ctx.save();
 
-				ctx.lineWidth = 1;
+				config_axisLineWidth && (ctx.lineWidth = config_axisLineWidth);
 				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
 
 				/* 绘制坐标区域背景 */
 				if(null != config_bg){
 					ctx.save();
 					ctx.beginPath();
-					ctx.rect(xLeft_axisX, yTop_axisY, kChartSketch.getWidth(), kSubChartSketch.getHeight());
+					ctx.rect(xLeft_axisX, yTop_axisY, util.getLinePosition(kChartSketch.getWidth()), util.getLinePosition(kSubChartSketch.getHeight()));
 
 					ctx.strokeWidth = 0;
 					if(config_bg instanceof TradeChart2.LinearGradient){
@@ -367,7 +368,7 @@
 						if(i < 0 || i >= groupCount)
 							return;
 
-						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_axisX).plus(config_axisXTickOffset));
+						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content));
 
 						var data = kChart.getConvertedData(i);
 
@@ -406,7 +407,7 @@
 					lastTickDataIndex;/** 最后一个的刻度所对应的数据索引 */
 					edgeTickDataIndex = groupCount - 1;
 
-					var b = new Big(axisXTickInterval);
+					var b = new Big(axisXLabelTickSpan);
 					for(var i = 0; i <= axisXTickCount - 1; i++){
 						renderXTick(roundBig(b.mul(i)));
 					}
@@ -511,7 +512,7 @@
 				 */
 				var renderVolume = function(i){
 					var data = kChart.getConvertedData(i);
-					var x = Math.floor(xLeft_axisX + config_axisXTickOffset + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
+					var x = Math.floor(xLeft_content + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
 
 					var isAppreciated = data.closePrice > data.openPrice,
 						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;

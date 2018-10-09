@@ -130,7 +130,13 @@
 		 */
 		var getMinX = function(){
 			var config_paddingLeft = self.getConfigItem("paddingLeft"),
-				config_axisXTickOffset = self.getConfigItem("axisXTickOffset");
+				config_axisXTickOffset = self.getConfigItem("axisXTickOffset"),
+				config_groupGap = self.getConfigItem("groupGap"),
+				config_groupBarWidth = self.getConfigItem("groupBarWidth"),
+				config_axisXLabelSize = self.getConfigItem("axisXLabelSize");
+
+			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
+			var halfGroupSize = Math.max(numBig(groupSizeBig.div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
 
 			return Math.floor(config_paddingLeft + config_axisXTickOffset);
 		};
@@ -155,16 +161,15 @@
 			var minX = getMinX(),
 				maxX = getMaxX();
 
-			if (x < minX || x > maxX)
+			if (x < minX || x > maxX){
 				return -1;
+			}
 
 			var tmpX = x - minX;
-			var groupSize = this.getConfigItem("groupBarWidth") + this.getConfigItem("groupGap");
+			var groupSizeBig = new Big(this.getConfigItem("groupBarWidth")).plus(this.getConfigItem("groupGap"));
 
-			var tmp = new Big(tmpX).div(groupSize);
+			var tmp = new Big(tmpX).div(groupSizeBig);
 			var index = roundBig(tmp);
-			if(tmp.mod(1).gte(0.5))
-				index += 1;
 
 			if(index >= groupCount){
 				if(groupCount > 0)
@@ -174,6 +179,51 @@
 			}
 
 			return index;
+		};
+
+		/**
+		 * 根据给定的数据索引，获取其在画布上的渲染位置（中心位置）
+		 * @param {Number} dataIndex 被渲染的数据的索引位置
+		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
+		 */
+		this.getRenderingHorizontalPosition = function(dataIndex){
+			var renderingGroupCount = this.getRenderingGroupCount();
+			if(dataIndex < 0 || dataIndex >= renderingGroupCount)
+				return -1;
+
+			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
+				config_paddingLeft = this.getConfigItem("paddingLeft"),
+				config_groupGap = this.getConfigItem("groupGap"),
+				config_groupBarWidth = this.getConfigItem("groupBarWidth");
+
+			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
+				groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
+
+			return util.getLinePosition(xLeft_axisX + config_axisXTickOffset + numBig(groupSizeBig.mul(dataIndex)));
+		};
+
+		/**
+		 * 获取第一条数据在画布上渲染的中心位置
+		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
+		 */
+		this.getMinRenderingHorizontalPosition = function(){
+			var groupCount = this.getRenderingGroupCount();
+			if(0 === groupCount)
+				return -1;
+
+			return this.getRenderingHorizontalPosition(0);
+		};
+
+		/**
+		 * 获取最后一条数据在画布上渲染的中心位置
+		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
+		 */
+		this.getMaxRenderingHorizontalPosition = function(){
+			var groupCount = this.getRenderingGroupCount();
+			if(0 === groupCount)
+				return -1;
+
+			return this.getRenderingHorizontalPosition(groupCount - 1);
 		};
 
 		/**
