@@ -155,11 +155,8 @@
 			var minX = getMinX(),
 				maxX = getMaxX();
 
-			if (x < minX){
-				x = minX;
-			} else if (x > maxX){
-				x = maxX;
-			}
+			if (x < minX || x > maxX)
+				return -1;
 
 			var tmpX = x - minX;
 			var groupSize = this.getConfigItem("groupBarWidth") + this.getConfigItem("groupGap");
@@ -182,7 +179,7 @@
 		/**
 		 * 获取指定的相对横坐标对应的原始数据
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 * @returns {KData|Object}
+		 * @returns {KData|Object|null}
 		 */
 		this.getRenderingData = function(x){
 			var index = this.getRenderingDataIndex(x);
@@ -195,7 +192,7 @@
 		/**
 		 * 获取指定的相对横坐标对应的被转换后的数据
 		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 * @returns {KData}
+		 * @returns {KData|null}
 		 */
 		this.getConvertedRenderingData = function(x){
 			var index = this.getRenderingDataIndex(x);

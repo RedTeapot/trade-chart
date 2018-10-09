@@ -115,7 +115,7 @@
 			axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 			axisLabelFont: null,
 			
-			axisXTickOffset: 30,/* 横坐标刻度距离原点的位移 */
+			axisXTickOffset: 0,/* 横坐标刻度距离原点的位移 */
 			axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 			axisXLabelSize: 100,
 		};
@@ -204,14 +204,16 @@
 
 
 		var showDetail = function(e, result, top, bottom){
+			var detailCtx = this.getContext("2d");
+			detailCtx.clearRect(0, 0, this.width, this.height);
+
 			var x = e.clientX - this.parentNode.offsetLeft;
 			var convertedData = result.getConvertedRenderingData(x);
 			dataDetailObj.innerHTML = null == convertedData? "--": JSON.stringify(convertedData);
 
-			var detailCtx = this.getContext("2d");
-			detailCtx.clearRect(0, 0, this.width, this.height);
+			if(null == convertedData)
+				return;
 
-			/* 竖线 */
 			x = TradeChart2.util.getLinePosition(x);
 			detailCtx.lineWidth = 0.5;
 			detailCtx.setLineDash([5, 5]);
@@ -236,13 +238,16 @@
 		column_volumeDetailObj.addEventListener("mousemove", f);
 
 		/* 横向排列时的明细查看 */
-		var showDetail_row = function(e, result, top, bottom){
-			var x = e.clientX;
+		var showDetail_row = function(x, result, top, bottom){
+			var detailCtx = this.getContext("2d");
+			detailCtx.clearRect(0, 0, this.width, this.height);
+
 			var convertedData = result.getConvertedRenderingData(x);
 			dataDetailObj.innerHTML = null == convertedData? "--": JSON.stringify(convertedData);
 
-			var detailCtx = this.getContext("2d");
-			detailCtx.clearRect(0, 0, this.width, this.height);
+			/* 竖线 */
+			if(null == convertedData)
+				return;
 
 			/* 竖线 */
 			x = TradeChart2.util.getLinePosition(x);
@@ -254,13 +259,13 @@
 			detailCtx.stroke();
 		};
 		g = function(e){
-			showDetail_row.call(row_candleDetailObj, e, rowResult_candle,
+			showDetail_row.call(row_candleDetailObj, e.layerX, rowResult_candle,
 				TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("paddingTop")),
 				TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("height") - rowResult_candle.getConfigItem("paddingBottom"))
 			);
 
-			showDetail_row.call(row_volumeDetailObj, e, rowResult_volume,
-				TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("paddingTop")),
+			showDetail_row.call(row_volumeDetailObj, e.layerX, rowResult_volume,
+				TradeChart2.util.getLinePosition(rowResult_volume.getConfigItem("paddingTop")),
 				TradeChart2.util.getLinePosition(rowResult_volume.getConfigItem("height") - rowResult_volume.getConfigItem("paddingBottom"))
 			);
 		};
