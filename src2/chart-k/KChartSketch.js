@@ -1,7 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
-	var Big = util.Big;
+	var Big = TradeChart2.Big;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -87,7 +87,7 @@
 	var getConfigItem = function(name, config){
 		var defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
 
-		if(name in config)
+		if(null != config && name in config)
 			return config[name];
 		else if(name in defaultConfig)
 			return defaultConfig[name];

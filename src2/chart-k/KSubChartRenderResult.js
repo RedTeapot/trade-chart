@@ -1,7 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
-	var Big = util.Big;
+	var Big = TradeChart2.Big;
 	var KChartSketch = TradeChart2.KChartSketch;
 
 	var numBig = function(big){

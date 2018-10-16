@@ -77,9 +77,11 @@ var concatK = function(){
 			"KChartDataTypes.js",
 
 			"default-config/default-config_k-chart.js",
+			"default-config/default-config_k-sub-chart.js",
 			"default-config/default-config_k-sub-chart_candle.js",
 			"default-config/default-config_k-sub-chart_volume.js",
 
+			"KDataManager.js",
 			"KChart.js",
 
 			"KChartSketch.js",
@@ -128,6 +130,8 @@ var concatAllAndSave = function(min){
 	var stream = merge2();
 	stream.add(gulp.src("../src2/trade-chart.js"));
 	stream.add(gulp.src("../src2/comp/util.js"));
+	stream.add(gulp.src("../src2/comp/eventDrive.js"));
+	stream.add(gulp.src("../src2/comp/Big.js"));
 	stream.add(gulp.src("../src2/comp/LinearGradient.js"));
 	stream.add(concatK());
 

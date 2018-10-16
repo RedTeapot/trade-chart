@@ -108,7 +108,6 @@
 			paddingLeft: 60,
 			paddingRight: 60,
 			
-			groupWidth: 4,
 			groupGap: 3,
 			
 			axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
@@ -226,6 +225,10 @@
 		};
 
 		var drawLineAndShowDataDetail4X = function(result, x, top, bottom){
+			var canvasObj = result.getCanvasDomElement();
+			var detailCtx = canvasObj.detailCanvas.getContext("2d");
+			detailCtx.clearRect(0, 0, canvasObj.width, canvasObj.height);
+
 			var convertedData = result.getConvertedRenderingData(x);
 			dataDetailObj.innerHTML = null == convertedData? "--": JSON.stringify(convertedData);
 			if(null == convertedData)

@@ -1,7 +1,9 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
-	var Big = util.Big;
+	var Big = TradeChart2.Big;
+	var KDataManager = TradeChart2.KDataManager;
+	var eventDrive = TradeChart2.eventDrive;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -32,18 +34,27 @@
 	 */
 	var KChart = function(){
 		TradeChart2.apply(this, arguments);
+		var self = this;
 
 		/** 绘制配置 */
 		var config = {};
 
-		/** 数据数组 */
-		var dataList = [];
-
-		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
-		var dataParser;
-
 		/** 附加的K线子图列表 */
 		var attachedKSubCharts = [];
+
+		/** 与该实例相关联的数据管理器 */
+		var kDataManager = new KDataManager();
+
+
+		/* 代理 KDataManager 的方法 */
+		for(var p in kDataManager)
+			if(typeof kDataManager[p] === "function")
+				this[p] = (function(p){
+					return function(){
+						var v = kDataManager[p].apply(kDataManager, arguments);
+						return v === kDataManager? self: v;
+					};
+				})(p);
 
 		/**
 		 * 设置绘制配置
@@ -75,7 +86,7 @@
 		this.getConfigItem = function(name){
 			var defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
 
-			if(name in config)
+			if(null != config && name in config)
 				return config[name];
 			else if(name in defaultConfig)
 				return defaultConfig[name];
@@ -83,89 +94,6 @@
 				console.warn("Unknown k chart configuration item: " + name);
 				return undefined;
 			}
-		};
-
-		/**
-		 * 设置数据源
-		 * @param {Array<KData|Object>} _datas 数据源，可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
-		 */
-		this.setDataList = function(_datas){
-			if(!Array.isArray(_datas)){
-				console.warn("Supplied k data should be an array.");
-				return this;
-			}
-
-			dataList = _datas;
-			return this;
-		};
-
-		/**
-		 * 获取设置的数据源
-		 * @returns {Array<KData|Object>}
-		 */
-		this.getDataList = function(){
-			return dataList;
-		};
-
-		/**
-		 * 获取指定索引对应的原始数据
-		 * @param {Number} index 要获取的数据的索引
-		 * @returns {KData|Object}
-		 */
-		this.getData = function(index){
-			if(!util.isValidNumber(index))
-				throw new Error("Invalid index: " + index + " to retrieve converted data.");
-
-			index = util.parseAsNumber(index);
-			if(index < 0 || index > dataList.length){
-				console.warn("Out of bound access for converted data of index: " + index);
-				return null;
-			}
-
-			return dataList[index];
-		};
-
-		/**
-		 * 获取指定索引对应的被转换后的数据
-		 * @param {Number} index 要获取的数据的索引
-		 */
-		this.getConvertedData = function(index){
-			var data = this.getData(index);
-			if(null == data)
-				return data;
-
-			if(typeof dataParser === "function"){
-				try{
-					data = dataParser(data, index, dataList);
-				}catch(e){
-					console.error("Fail to convert data of index: " + index + " using supplied data parser.", data);
-					console.error(e);
-				}
-			}
-
-			return data;
-		};
-
-		/**
-		 * 设置数据转换方法，当要扫描的数据是其它格式的数据时，用于指导本插件解析数据的解析器
-		 * @param parser {Function} 数据转换方法
-		 */
-		this.setDataParser = function(parser){
-			if(typeof parser !== "function"){
-				console.warn("Data parser should be of type: 'Function'.");
-				return this;
-			}
-
-			dataParser = parser;
-			return this;
-		};
-
-		/**
-		 * 获取数据转换方法
-		 * @return {Function} 数据转换方法
-		 */
-		this.getDataParser = function(){
-			return dataParser;
 		};
 
 		/**
@@ -237,6 +165,8 @@
 
 			return this;
 		};
+
+		eventDrive(this);
 	};
 	KChart.prototype = Object.create(TradeChart2.prototype);
 

@@ -2,7 +2,7 @@
 	var TradeChart2 = window.TradeChart2;
 	var KSubChartSketch_ChartSketch = TradeChart2.KSubChartSketch_ChartSketch;
 	var util = TradeChart2.util;
-	var Big = util.Big;
+	var Big = TradeChart2.Big;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -21,7 +21,7 @@
 	var getConfigItem = function(name, config, kChartConfig){
 		var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
 
-		if(name in config)
+		if(null != config && name in config)
 			return config[name];
 		else if(name in defaultConfig)
 			return defaultConfig[name];

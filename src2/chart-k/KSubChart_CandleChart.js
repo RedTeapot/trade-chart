@@ -1,7 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
-	var Big = util.Big;
+	var Big = TradeChart2.Big;
 
 	var KDataSketch = TradeChart2.KDataSketch,
 		KChartSketch = TradeChart2.KChartSketch,
@@ -26,6 +26,8 @@
 		return Math.floor(numBig(big));
 	};
 
+	var NOT_SUPPLIED = {};
+
 	/**
 	 * @constructor
 	 * @augments KSubChart
@@ -38,6 +40,18 @@
 		var self = this;
 
 		/**
+		 * 最后一次执行绘制操作时绘制到的目标Canvas
+		 * @type {HTMLCanvasElement}
+		 */
+		var lastRenderingCanvasObj = NOT_SUPPLIED;
+
+		/**
+		 * 最后一次执行绘制操作时所使用的绘制配置
+		 * @type {KSubChartConfig_candle}
+		 */
+		var lastRenderingConfig = NOT_SUPPLIED;
+
+		/**
 		 * @override
 		 * 从给定的配置集合中获取指定名称的配置项取值。
 		 * 如果给定的配置集合中不存在，则从K线图的全局配置中获取。
@@ -48,7 +62,7 @@
 		 */
 		this.getConfigItem = function(name, config){
 			var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
-			if(name in config)
+			if(null != config && name in config)
 				return config[name];
 			else if(name in defaultConfig)
 				return defaultConfig[name];
@@ -65,6 +79,23 @@
 		 * @returns {KSubChart_CandleRenderResult} K线子图绘制结果
 		 */
 		this.render = function(canvasObj, config){
+			if(null == config || typeof config !== "object"){
+				if(NOT_SUPPLIED !== lastRenderingConfig){
+					console.info("Using last render config", config);
+					config = lastRenderingConfig;
+				}
+			}else
+				lastRenderingConfig = config;
+
+			if(!(canvasObj instanceof HTMLCanvasElement)){
+				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
+					console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
+					canvasObj = lastRenderingCanvasObj;
+				}else
+					throw new Error("No canvas element supplied to render");
+			}else
+				lastRenderingCanvasObj = canvasObj;
+
 			var getConfigItem = function(name){
 				return self.getConfigItem(name, config);
 			};
