@@ -81,7 +81,7 @@
 		this.getRenderingGroupCount = function(){
 			var kChart = this.getKChart();
 			var maxGroupCount = KChartSketch.calcMaxGroupCount(kChart.getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width"))),
-				dataCount = kChart.getDataList().length;
+				dataCount = kChart.getRenderingDataList().length;
 			return Math.max(Math.min(maxGroupCount, dataCount), 0);
 		};
 
@@ -91,7 +91,7 @@
 		 */
 		this.getRenderingDataList = function(){
 			var kChart = this.getKChart();
-			var dataList = kChart.getDataList() || [];
+			var dataList = kChart.getRenderingDataList() || [];
 			var count = Math.min(this.getRenderingGroupCount(), dataList.length);
 
 			return dataList.slice(0, count);

@@ -2,6 +2,8 @@
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
 
+	var NOT_SUPPLIED = {};
+
 	/**
 	 * @constructor
 	 * K线子图
@@ -9,6 +11,8 @@
 	 * @param {KSubChartTypes} type 子图类型。如：volume - 量图；ma - MA指标图
 	 */
 	var KSubChart = function(kChart, type){
+		var self = this;
+
 		/**
 		 * 获取该子图的子图类型
 		 * @returns {KSubChartTypes}
@@ -41,9 +45,69 @@
 		 * @param {Object} config 渲染配置
 		 * @returns {KSubChartRenderResult} 绘制的K线子图
 		 */
-		this.render = function(canvasObj, config){
+		this.render = (function(){
+			var lastCall = NOT_SUPPLIED;
+			var a = {
+				withParams: true,
+				timestamp: -Infinity,
+				result: null
+			};
+			var gap = 50;
+
+			var tmp = function(canvasObj, config){
+				var now = Date.now();
+				var ifHasParams = arguments.length !== 0;
+
+				var f = function(){
+					var v = self.implRender.apply(self, arguments);
+
+					if(NOT_SUPPLIED === lastCall)
+						lastCall = {};
+
+					lastCall.result = v;
+					lastCall.timestamp = now;
+					lastCall.withParams = ifHasParams;
+
+					return v;
+				};
+
+				/**
+				 * 消除单位时间内的无参重复调用
+				 */
+				if(!ifHasParams){
+					if(NOT_SUPPLIED === lastCall || lastCall.withParams || now - lastCall.timestamp >= gap)
+						return f();
+
+					lastCall.timestamp = now;
+					return lastCall.result;
+				}else
+					return f();
+			};
+
+			return function(){
+				return self.implRender.apply(self, arguments);
+			};
+		})();
+
+		/**
+		 * 由子类实现的图形渲染方法
+		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {Object} config 渲染配置
+		 * @returns {KSubChartRenderResult} 绘制的K线子图
+		 */
+		this.implRender = function(canvasObj, config){
 			console.warn("Not implemented for k sub chart: " + this.getType());
+			return null;
 		};
+
+
+		//TODO 验证被动绘制的正确性
+		kChart.on("renderingpositionchange", function(){
+			self.render();
+		});
+		kChart.getKDataManager().on("storeddatachange, renderingdatachange", function(){
+			self.render();
+		});
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KSubChart", KSubChart);

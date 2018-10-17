@@ -4,6 +4,18 @@
 	var eventDrive = TradeChart2.eventDrive;
 
 	/**
+	 * 事件名称：数据仓库中的数据发生了变更
+	 * @type {string}
+	 */
+	var evtName_storedDataChanges = "storeddatachange";
+
+	/**
+	 * 事件名称：要渲染的数据发生了变更
+	 * @type {string}
+	 */
+	var evtName_renderingDataChanges = "renderingdatachange";
+
+	/**
 	 * @constructor
 	 * K线图数据管理器
 	 */
@@ -14,49 +26,57 @@
 		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
 		var dataParser;
 
-		/**
-		 * 从初次绘制开始到现在，用户通过拖拉的方式达到的“绘制位置的横向位移”
-		 * 取值为正，则代表图形向右移动；取值为负，则代表图形向左移动。
-		 *
-		 * @type {number}
-		 */
-		var renderingOffset = 0;
+		/* 画布上第一个可见的数据在整个数据中的索引位置 */
+		var firstVisibleDataIndex = 0;
 
 		/**
-		 * 获取当前的“绘制位置的横向位移”
-		 * @returns {Number}
-		 */
-		this.getRenderingOffset = function(){
-			return renderingOffset;
-		};
-
-		/**
-		 * 更新“绘制位置的横向位移”，使其在既有基础上累加上给定的偏移量
-		 * @param {Number} amount 要累加的横向偏移量
+		 * 使用给定的偏移量更新“画布上第一个可见的数据在整个数据中的索引位置”
+		 * @param {Number} offset 偏移量
 		 * @returns {KDataManager}
 		 */
-		this.updateRenderingOffsetBy = function(amount){
-			amount = Number(amount);
-			if(isNaN(amount))
-				amount = 0;
+		this.updateFirstVisibleDataIndexBy = function(offset){
+			var v = firstVisibleDataIndex += offset;
+			v = Math.max(v, 0);
+			v = Math.min(v, dataList.length - 1);
 
-			renderingOffset += amount;
-
-			if(amount !== 0)
-				this.fire("renderoffsetchange", {renderingOffset: renderingOffset});
+			if(v !== offset)
+				this.fire(evtName_renderingDataChanges);
 
 			return this;
 		};
 
 		/**
-		 * 重置“绘制位置的横向位移”为0
+		 * 向前追加数据，亦即追加更早的数据
+		 * @param {Array<KData|Object>} datas 数据源，可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
 		 * @returns {KDataManager}
 		 */
-		this.resetRenderingOffset = function(){
-			if(renderingOffset !== 0)
-				this.fire("renderoffsetchange", {renderingOffset: 0});
+		this.prependDataList = function(datas){
+			if(!Array.isArray(datas)){
+				console.warn("Supplied k data should be an array.");
+				return this;
+			}
 
-			renderingOffset = 0;
+			dataList = datas.concat(dataList);
+			firstVisibleDataIndex += datas.length;
+			this.fire(evtName_storedDataChanges);
+
+			return this;
+		};
+
+		/**
+		 * 向后追加数据，亦即追加较新的数据
+		 * @param {Array<KData|Object>} datas 数据源，可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
+		 * @returns {KDataManager}
+		 */
+		this.appendDataList = function(datas){
+			if(!Array.isArray(datas)){
+				console.warn("Supplied k data should be an array.");
+				return this;
+			}
+
+			dataList = dataList.concat(datas);
+			this.fire(evtName_storedDataChanges);
+
 			return this;
 		};
 
@@ -72,6 +92,10 @@
 			}
 
 			dataList = _datas;
+			firstVisibleDataIndex = 0;/* 数据发生变更，回到初始位置 */
+			this.fire(evtName_storedDataChanges);
+			this.fire(evtName_renderingDataChanges);
+
 			return this;
 		};
 
@@ -91,8 +115,7 @@
 		 * @returns {Array<KData|Object>}
 		 */
 		this.getRenderingDataList = function(){
-			//TODO
-			return dataList;
+			return dataList.slice(firstVisibleDataIndex);
 		};
 
 		/**
@@ -106,7 +129,7 @@
 
 			index = util.parseAsNumber(index);
 			if(index < 0 || index > dataList.length){
-				console.warn("Out of bound access for converted data of index: " + index);
+				console.warn("Out of bound access of index: " + index);
 				return null;
 			}
 

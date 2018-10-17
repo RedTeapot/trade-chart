@@ -78,7 +78,7 @@
 		 * @param {KSubChartConfig_volume} config 渲染配置
 		 * @returns {KSubChart_VolumeRenderResult} 绘制的K线图
 		 */
-		this.render = function(canvasObj, config){
+		this.implRender = function(canvasObj, config){
 			if(null == config || typeof config !== "object"){
 				if(NOT_SUPPLIED !== lastRenderingConfig){
 					console.info("Using last render config", config);
@@ -91,8 +91,10 @@
 				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
 					console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
 					canvasObj = lastRenderingCanvasObj;
-				}else
-					throw new Error("No canvas element supplied to render");
+				}else{
+					console.error("No canvas element supplied to render");
+					return this;
+				}
 			}else
 				lastRenderingCanvasObj = canvasObj;
 
@@ -158,7 +160,7 @@
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
-			var dataList = kChart.getDataList();
+			var dataList = kChart.getRenderingDataList();
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KSubChartSketch_VolumeDataSketch.sketch(kChart, config),

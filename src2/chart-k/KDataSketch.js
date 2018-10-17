@@ -305,7 +305,7 @@
 	 * @returns {KDataSketch}
 	 */
 	KDataSketch.sketchFromKChartInstance = function(kChart){
-		var dataList = kChart.getDataList();
+		var dataList = kChart.getRenderingDataList();
 		if(!Array.isArray(dataList))
 			throw new Error("Invalid data list to sketch. Type of 'Array' is required.");
 
