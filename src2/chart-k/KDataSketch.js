@@ -305,7 +305,7 @@
 	 * @returns {KDataSketch}
 	 */
 	KDataSketch.sketchFromKChartInstance = function(kChart){
-		var dataList = kChart.getRenderingDataList();
+		var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
 		if(!Array.isArray(dataList))
 			throw new Error("Invalid data list to sketch. Type of 'Array' is required.");
 
@@ -341,7 +341,7 @@
 			var previousVolume = 0;
 			var variationSum = 0, volumeVariationSum = 0;
 			for(var i = 0; i < dataList.length; i++){
-				var d = kChart.getConvertedData(i);
+				var d = dataList[i];
 				if(null == d || typeof d != "object")
 					continue;
 

@@ -102,12 +102,16 @@
 
 
 		//TODO 验证被动绘制的正确性
-		kChart.on("renderingpositionchange", function(){
-			self.render();
-		});
-		kChart.getKDataManager().on("storeddatachange, renderingdatachange", function(){
-			self.render();
-		});
+		var evtRenderTimer,
+			evtRenderDelay = 50;
+		var evtRenderAction = function(e){
+			clearTimeout(evtRenderTimer);
+			evtRenderTimer = setTimeout(function(){
+				self.render();
+			}, evtRenderDelay);
+		};
+		kChart.on("renderingpositionchange", evtRenderAction);
+		kChart.getKDataManager().on("storeddatachange, renderingdatachange", evtRenderAction);
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KSubChart", KSubChart);

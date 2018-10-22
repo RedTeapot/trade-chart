@@ -160,7 +160,10 @@
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
-			var dataList = kChart.getRenderingDataList();
+			var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
+			if(dataList.length > 0)
+				console.debug("First converted data to draw: " + this.getType(), kChart.getKDataManager().getConvertedData(kChart.getKDataManager().getFirstVisibleDataIndex()));
+
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KSubChartSketch_CandleDataSketch.sketch(kChart, config),
@@ -358,6 +361,9 @@
 				ctx.restore();
 			};
 
+			/* 清空既有内容 */
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
 			/* 绘制坐标系 */
 			(function(){
 				ctx.save();
@@ -402,7 +408,7 @@
 						if(i < 0 || i >= groupCount)
 							return;
 
-						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content));
+						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content).plus(kChart.getRenderingOffset()));
 
 						var data = kChart.getConvertedData(i);
 
@@ -546,8 +552,8 @@
 				 * @param {Function} [callback] 绘制完成后执行的方法
 				 */
 				var renderCandle = function(i, callback){
-					var data = kChart.getConvertedData(i);
-					var x = Math.floor(xLeft_content + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
+					var data = dataList[i];
+					var x = Math.floor(xLeft_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
 
 					var isAppreciated = data.closePrice > data.openPrice,
 						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;

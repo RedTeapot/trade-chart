@@ -90,8 +90,7 @@
 		 * @returns {Array<KData|Object>}
 		 */
 		this.getRenderingDataList = function(){
-			var kChart = this.getKChart();
-			var dataList = kChart.getRenderingDataList() || [];
+			var dataList = this.getKChart().getRenderingDataList() || [];
 			var count = Math.min(this.getRenderingGroupCount(), dataList.length);
 
 			return dataList.slice(0, count);
@@ -102,47 +101,24 @@
 		 * @returns {Array<KData>}
 		 */
 		this.getConvertedRenderingDataList = function(){
-			var kChart = this.getKChart(),
-				dataList = this.getRenderingDataList();
+			var dataList = this.getKChart().getKDataManager().getConvertedRenderingDataList() || [];
+			var count = Math.min(this.getRenderingGroupCount(), dataList.length);
 
-			var newDataList = dataList;
-			var dataParser = kChart.getDataParser();
-
-			if(typeof dataParser === "function"){
-				newDataList = dataList.map(function(data, index){
-					try{
-						data = dataParser(data, index, dataList);
-					}catch(e){
-						console.error("Fail to convert data of index: " + index + " using supplied data parser.", data);
-						console.error(e);
-					}
-
-					return data;
-				});
-			}else
-				console.warn("No data parser set, thus returning the original data list.");
-
-			return newDataList;
+			return dataList.slice(0, count);
 		};
 
 		/**
-		 * 获取图形正文区域的最小横坐标值
+		 * 获取图形正文区域的最小横坐标值，对应于最左侧蜡烛的中间位置
 		 */
 		var getMinX = function(){
 			var config_paddingLeft = self.getConfigItem("paddingLeft"),
-				config_axisXTickOffset = self.getConfigItem("axisXTickOffset"),
-				config_groupGap = self.getConfigItem("groupGap"),
-				config_groupBarWidth = self.getConfigItem("groupBarWidth"),
-				config_axisXLabelSize = self.getConfigItem("axisXLabelSize");
-
-			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
-			var halfGroupSize = Math.max(numBig(groupSizeBig.div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
+				config_axisXTickOffset = self.getConfigItem("axisXTickOffset");
 
 			return Math.floor(config_paddingLeft + config_axisXTickOffset);
 		};
 
 		/**
-		 * 获取图形正文区域的最大横坐标值
+		 * 获取图形正文区域的最大横坐标值，对应于做最右侧蜡烛的中间位置
 		 */
 		var getMaxX = function(){
 			var config_width = util.calcRenderingWidth(canvasObj, self.getConfigItem("width")),
@@ -178,7 +154,7 @@
 					index = -1;
 			}
 
-			return index;
+			return index + this.getKChart().getKDataManager().getFirstVisibleDataIndex();
 		};
 
 		/**
@@ -187,6 +163,7 @@
 		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
 		 */
 		this.getRenderingHorizontalPosition = function(dataIndex){
+			dataIndex -= this.getKChart().getKDataManager().getFirstVisibleDataIndex();
 			var renderingGroupCount = this.getRenderingGroupCount();
 			if(dataIndex < 0 || dataIndex >= renderingGroupCount)
 				return -1;
@@ -199,31 +176,7 @@
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
 
-			return util.getLinePosition(xLeft_axisX + config_axisXTickOffset + numBig(groupSizeBig.mul(dataIndex)));
-		};
-
-		/**
-		 * 获取第一条数据在画布上渲染的中心位置
-		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
-		 */
-		this.getMinRenderingHorizontalPosition = function(){
-			var groupCount = this.getRenderingGroupCount();
-			if(0 === groupCount)
-				return -1;
-
-			return this.getRenderingHorizontalPosition(0);
-		};
-
-		/**
-		 * 获取最后一条数据在画布上渲染的中心位置
-		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
-		 */
-		this.getMaxRenderingHorizontalPosition = function(){
-			var groupCount = this.getRenderingGroupCount();
-			if(0 === groupCount)
-				return -1;
-
-			return this.getRenderingHorizontalPosition(groupCount - 1);
+			return util.getLinePosition(xLeft_axisX + config_axisXTickOffset + kSubChart.getKChart().getRenderingOffset() + numBig(groupSizeBig.mul(dataIndex)));
 		};
 
 		/**

@@ -88,20 +88,22 @@
 					var event = new Event(_type, data);
 
 					/** 触发监听器 */
-					var t = function(){
-						build(_type);
-						for(var i = 0; i < eventHandlers[_type].length; i++){
-							var handler = eventHandlers[_type][i];
-							if(typeof handler !== "function")
-								continue;
+					var t = (function(event){
+						return function(){
+							build(_type);
+							for(var i = 0; i < eventHandlers[_type].length; i++){
+								var handler = eventHandlers[_type][i];
+								if(typeof handler !== "function")
+									continue;
 
-							try{
-								handler.call(ctx, event)
-							}catch(e){
-								console.error(e, e.stack);
+								try{
+									handler.call(ctx, event);
+								}catch(e){
+									console.error(e, e.stack);
+								}
 							}
-						}
-					};
+						};
+					})(event);
 
 					if(async)
 						setTimeout(t, 0);

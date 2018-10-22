@@ -132,7 +132,8 @@
 
 			axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
 
-			coordinateBackground: "#F0F0F0"
+			coordinateBackground: "#F0F0F0",
+			keepedColor: "blue"
 		};
 		var kVolumeConfig = {
 			height: "100%",
@@ -167,6 +168,7 @@
 		row_volumeObj.detailCanvas = row_volumeDetailObj;
 
 		var KChart = TradeChart2.KChart;
+		var sepIndex = Math.floor(datas.length / 2);
 		var kChart = new KChart().setDataParser(function(d, i){
 			var obj = {time: formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.a};
 			if(isNaN(obj.openPrice)){
@@ -187,7 +189,10 @@
 			}
 
 			return obj;
-		}).setDataList(datas).setConfig(kChartConfig);
+		}).setConfig(kChartConfig);
+		kChart.setDataList(datas.slice(sepIndex)).prependDataList(datas.slice(0, sepIndex));
+		// kChart.appendDataList(datas.slice(0, sepIndex));
+		console.log(kChart.getConvertedRenderingDataList());
 		window.kChart = kChart;
 
 		/* 蜡烛图 */
@@ -233,11 +238,12 @@
 			detailCtx.clearRect(0, 0, canvasObj.width, canvasObj.height);
 
 			var convertedData = result.getConvertedRenderingData(x);
-			dataDetailObj.innerHTML = null == convertedData? "--": JSON.stringify(convertedData);
+			var dataIndex = result.getRenderingDataIndex(x);
+
+			dataDetailObj.innerHTML = null == convertedData? "--": (dataIndex + " --> " + JSON.stringify(convertedData));
 			if(null == convertedData)
 				return;
 
-			var dataIndex = result.getRenderingDataIndex(x);
 			drawLine4DataIndex(result, dataIndex, top, bottom);
 		};
 
