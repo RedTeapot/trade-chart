@@ -274,7 +274,7 @@
 				self.renderBackground(ctx, config, kChartSketch.getWidth(), kSubChartSketch.getHeight());
 
 				/* 绘制X轴 */
-				self.renderAxisX(ctx, config, kChartSketch, kSubChartSketch);
+				axisXTickList = self.renderAxisX(ctx, config, kChartSketch, kSubChartSketch);
 
 				/* 绘制Y轴 */
 				(function(){
