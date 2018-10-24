@@ -1,6 +1,17 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
+	var Big = TradeChart2.Big;
+
+	var numBig = function(big){
+		return Number(big.toString());
+	};
+	var roundBig = function(big){
+		return Math.round(numBig(big));
+	};
+	var floorBig = function(big){
+		return Math.floor(numBig(big));
+	};
 
 	var NOT_SUPPLIED = {};
 
@@ -107,11 +118,12 @@
 		/**
 		 * 绘制横坐标刻度
 		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
+		 * @param {KSubChartConfig} config 渲染配置
 		 * @param {Number} y_axisX 横坐标刻度的纵向位置
 		 * @param {XTick[]} axisXTickList 横坐标刻度列表
 		 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 		 */
-		this.renderAxisXTickList = function(ctx, y_axisX, axisXTickList, drawContent){
+		this.renderAxisXTickList = function(ctx, config, y_axisX, axisXTickList, drawContent){
 			drawContent = null == drawContent? null: String(drawContent).trim().toLowerCase();
 			if(drawContent !== "both" && drawContent !== "tick" && drawContent !== "label"){
 				console.warn("Unknown draw content: " + drawContent);
@@ -121,14 +133,14 @@
 			var ifDrawTick = drawContent === "both" || drawContent === "tick",
 				ifDrawLabel = drawContent === "both" || drawContent === "label";
 
-			var config_axisLineColor = this.getConfigItem("axisLineColor"),
-				config_axisLabelFont = this.getConfigItem("axisLabelFont"),
-				config_axisLabelColor = this.getConfigItem("axisLabelColor"),
-				config_axisXLabelOffset = this.getConfigItem("axisXLabelOffset"),
-				config_showAxisXLine = this.getConfigItem("showAxisXLine"),
-				config_axisTickLineLength = this.getConfigItem("axisTickLineLength"),
-				config_showAxisXLabel = this.getConfigItem("showAxisXLabel"),
-				config_axisXLabelHorizontalAlign = this.getConfigItem("axisXLabelHorizontalAlign");
+			var config_axisLineColor = this.getConfigItem("axisLineColor", config),
+				config_axisLabelFont = this.getConfigItem("axisLabelFont", config),
+				config_axisLabelColor = this.getConfigItem("axisLabelColor", config),
+				config_axisXLabelOffset = this.getConfigItem("axisXLabelOffset", config),
+				config_showAxisXLine = this.getConfigItem("showAxisXLine", config),
+				config_axisTickLineLength = this.getConfigItem("axisTickLineLength", config),
+				config_showAxisXLabel = this.getConfigItem("showAxisXLabel", config),
+				config_axisXLabelHorizontalAlign = this.getConfigItem("axisXLabelHorizontalAlign", config);
 
 			ctx.save();
 
@@ -174,11 +186,12 @@
 		/**
 		 * 绘制纵坐标刻度
 		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
+		 * @param {KSubChartConfig} config 渲染配置
 		 * @param {Number} x_axisY 纵坐标刻度的横向位置
 		 * @param {YTick[]} axisYTickList 横坐标刻度列表
 		 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 		 */
-		this.renderAxisYTickList = function(ctx, x_axisY, axisYTickList, drawContent){
+		this.renderAxisYTickList = function(ctx, config, x_axisY, axisYTickList, drawContent){
 			drawContent = null == drawContent? null: String(drawContent).trim().toLowerCase();
 			if(drawContent !== "both" && drawContent !== "tick" && drawContent !== "label"){
 				console.warn("Unknown draw content: " + drawContent);
@@ -188,26 +201,26 @@
 			var ifDrawTick = drawContent === "both" || drawContent === "tick",
 				ifDrawLabel = drawContent === "both" || drawContent === "label";
 
-			var config_paddingLeft = this.getConfigItem("paddingLeft"),
-				config_paddingTop = this.getConfigItem("paddingTop"),
-				config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
-				config_axisLineColor = this.getConfigItem("axisLineColor"),
-				config_axisLabelFont = this.getConfigItem("axisLabelFont"),
-				config_axisLabelColor = this.getConfigItem("axisLabelColor"),
-				config_axisYLabelFont = this.getConfigItem("axisYLabelFont"),
-				config_axisYLabelColor = this.getConfigItem("axisYLabelColor"),
-				config_axisTickLineLength = this.getConfigItem("axisTickLineLength"),
-				config_showAxisYLine = this.getConfigItem("showAxisYLine"),
-				config_axisYLabelOffset = this.getConfigItem("axisYLabelOffset"),
-				config_axisYMidTickQuota = this.getConfigItem("axisYMidTickQuota"),
-				config_showAxisYLabel = this.getConfigItem("showAxisYLabel"),
-				config_axisYLabelVerticalOffset = this.getConfigItem("axisYLabelVerticalOffset"),
-				config_axisYAmountFloorLabelFont = this.getConfigItem("axisYAmountFloorLabelFont"),
-				config_axisYAmountFloorLabelColor = this.getConfigItem("axisYAmountFloorLabelColor"),
-				config_axisYAmountCeilingLabelFont = this.getConfigItem("axisYAmountCeilingLabelFont"),
-				config_axisYAmountCeilingLabelColor = this.getConfigItem("axisYAmountCeilingLabelColor"),
-				config_axisYPosition = this.getConfigItem("axisYPosition"),
-				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition");
+			var config_paddingLeft = this.getConfigItem("paddingLeft", config),
+				config_paddingTop = this.getConfigItem("paddingTop", config),
+				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
+				config_axisLineColor = this.getConfigItem("axisLineColor", config),
+				config_axisLabelFont = this.getConfigItem("axisLabelFont", config),
+				config_axisLabelColor = this.getConfigItem("axisLabelColor", config),
+				config_axisYLabelFont = this.getConfigItem("axisYLabelFont", config),
+				config_axisYLabelColor = this.getConfigItem("axisYLabelColor", config),
+				config_axisTickLineLength = this.getConfigItem("axisTickLineLength", config),
+				config_showAxisYLine = this.getConfigItem("showAxisYLine", config),
+				config_axisYLabelOffset = this.getConfigItem("axisYLabelOffset", config),
+				config_axisYMidTickQuota = this.getConfigItem("axisYMidTickQuota", config),
+				config_showAxisYLabel = this.getConfigItem("showAxisYLabel", config),
+				config_axisYLabelVerticalOffset = this.getConfigItem("axisYLabelVerticalOffset", config),
+				config_axisYAmountFloorLabelFont = this.getConfigItem("axisYAmountFloorLabelFont", config),
+				config_axisYAmountFloorLabelColor = this.getConfigItem("axisYAmountFloorLabelColor", config),
+				config_axisYAmountCeilingLabelFont = this.getConfigItem("axisYAmountCeilingLabelFont", config),
+				config_axisYAmountCeilingLabelColor = this.getConfigItem("axisYAmountCeilingLabelColor", config),
+				config_axisYPosition = this.getConfigItem("axisYPosition", config),
+				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition", config);
 
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
@@ -281,6 +294,160 @@
 			ctx.restore();
 		};
 
+		/**
+		 * 绘制图形区域背景
+		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
+		 * @param {KSubChartConfig} config 渲染配置
+		 * @param {Number} width 图形区域的宽度
+		 * @param {Number} height 图形区域的高度
+		 */
+		this.renderBackground = function(ctx, config, width, height){
+			var config_bg = this.getConfigItem("coordinateBackground", config);
+			if(util.isEmptyString(config_bg))
+				return;
+
+			var config_paddingLeft = this.getConfigItem("paddingLeft", config),
+				config_paddingTop = this.getConfigItem("paddingTop", config);
+
+
+			var yTop_axisY = util.getLinePosition(config_paddingTop),
+				xLeft_axisX = util.getLinePosition(config_paddingLeft);
+
+			ctx.save();
+			ctx.beginPath();
+			ctx.rect(xLeft_axisX, yTop_axisY, util.getLinePosition(width), util.getLinePosition(height));
+
+			ctx.strokeWidth = 0;
+			if(config_bg instanceof TradeChart2.LinearGradient){
+				config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + height);
+			}else
+				ctx.fillStyle = config_bg;
+
+			ctx.fill();
+			ctx.restore();
+		};
+
+		/**
+		 * 绘制X轴
+		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
+		 * @param {KSubChartConfig} config 渲染配置
+		 * @param {KChartSketch} kChartSketch
+		 * @param {KSubChartSketch_ChartSketch} kSubChartSketch
+		 * @returns {XTick[]}
+		 */
+		this.renderAxisX = function(ctx, config, kChartSketch, kSubChartSketch){
+			var config_showAxisXLine = this.getConfigItem("showAxisXLine", config),
+				config_paddingLeft = this.getConfigItem("paddingLeft", config),
+				config_paddingTop = this.getConfigItem("paddingTop", config),
+				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
+				config_groupBarWidth = this.getConfigItem("groupBarWidth", config),
+				config_groupGap = this.getConfigItem("groupGap", config),
+				config_gridLineDash = this.getConfigItem("gridLineDash", config),
+				config_verticalGridLineColor = this.getConfigItem("verticalGridLineColor", config),
+				config_showVerticalGridLine = this.getConfigItem("showVerticalGridLine", config),
+				config_showAxisXLabel = this.getConfigItem("showAxisXLabel", config),
+				config_axisXLabelGenerator = this.getConfigItem("axisXLabelGenerator", config);
+
+			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
+				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
+				xLeft_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
+				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
+
+			/* 绘制的数据个数 */
+			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), kChart.getKDataManager().getConvertedRenderingDataList().length);
+			/* 一组数据的宽度 */
+			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
+			/* 蜡烛一半的宽度 */
+			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
+			/* 一组数据宽度的一半 */
+			var halfGroupSize = kChart.calcHalfGroupSize();
+			/* 是否绘制网格横线/竖线 */
+			var ifShowVerticalGridLine = config_showVerticalGridLine && !util.isEmptyString(config_verticalGridLineColor);
+			/* 一个横坐标刻度横跨的数据个数 */
+			var axisXLabelTickSpan = kChart.calcAxisXLabelTickSpan();
+			/* 横坐标刻度个数 */
+			var axisXTickCount = floorBig(new Big(groupCount).div(axisXLabelTickSpan));
+
+			/* 绘制X轴坐标线 */
+			if(config_showAxisXLine){
+				ctx.beginPath();
+				ctx.moveTo(xLeft_axisX, y_axisX);
+				ctx.lineTo(xRight_axisX, y_axisX);
+				ctx.stroke();
+			}
+
+			/* 上一个绘制的横坐标刻度对应的数据索引 */
+			var previousXTickDataIndex = null;
+
+			var axisXTickList = [];
+
+			/**
+			 * 根据提供的数据的索引位置绘制刻度
+			 * @param {Number} i 数据的索引位置
+			 */
+			var renderXTick = function(i){
+				if(i < 0 || i >= groupCount)
+					return;
+
+				var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content).plus(kChart.getRenderingOffset()));
+
+				var data = kChart.getKDataManager().getConvertedData(i);
+
+				/* 绘制网格竖线 */
+				if(ifShowVerticalGridLine){
+					ctx.save();
+					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
+					config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
+
+					/* 蜡烛图 */
+					ctx.beginPath();
+					ctx.moveTo(tickX, y_axisX - 1);
+					ctx.lineTo(tickX, y_axisX - 1 - Math.floor(kSubChartSketch.getHeight()));
+					ctx.stroke();
+					ctx.restore();
+				}
+
+				/* 汇集刻度，用于图形绘制完毕后统一绘制 */
+				var label = (function(){
+					if(!config_showAxisXLabel)
+						return "";
+
+					var previousData = null;
+					if(null != previousXTickDataIndex)
+						previousData = kChart.getKDataManager().getConvertedData(previousXTickDataIndex);
+
+					return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
+				})();
+				axisXTickList.push({x: tickX, label: label});
+
+				previousXTickDataIndex = i;
+			};
+
+			/* 绘制X轴刻度 */
+			var edgeTickDataIndex,/** 处于边界位置的刻度所对应的数据索引 */
+			lastTickDataIndex;/** 最后一个的刻度所对应的数据索引 */
+			edgeTickDataIndex = groupCount - 1;
+
+			var b = new Big(axisXLabelTickSpan);
+			for(var i = 0; i <= axisXTickCount - 1; i++){
+				renderXTick(roundBig(b.mul(i)));
+			}
+			lastTickDataIndex = Math.min(roundBig(b.mul(i)), groupCount - 1);
+
+			var totalSpace = Math.min(numBig(groupSizeBig.mul(groupCount - 1)), kChartSketch.getContentWidth());
+			var remainingSpace = totalSpace - (numBig(groupSizeBig.mul(lastTickDataIndex)) - halfGroupBarWidth + halfGroupSize);
+			if(remainingSpace < halfGroupSize){
+				/* 剩余空间不足，只绘制边界刻度 */
+				renderXTick(edgeTickDataIndex);
+			}else{
+				/* 绘制最后一个刻度和边界刻度 */
+				renderXTick(edgeTickDataIndex);
+				if(lastTickDataIndex !== edgeTickDataIndex)
+					renderXTick(lastTickDataIndex);
+			}
+
+			return axisXTickList;
+		};
 
 
 		console.info("Create k sub chart: " + this.id);

@@ -250,7 +250,7 @@
 			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
 			var drawAxisXTickList = function(drawContent){
-				self.renderAxisXTickList(ctx, y_axisX, axisXTickList, drawContent);
+				self.renderAxisXTickList(ctx, config, y_axisX, axisXTickList, drawContent);
 			};
 
 			/**
@@ -258,7 +258,7 @@
 			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
 			var drawAxisYTickList = function(drawContent){
-				self.renderAxisYTickList(ctx, x_axisY, axisYTickList, drawContent);
+				self.renderAxisYTickList(ctx, config, x_axisY, axisYTickList, drawContent);
 			};
 
 			// /* 清空既有内容 */
@@ -272,99 +272,10 @@
 				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
 
 				/* 绘制坐标区域背景 */
-				if(null != config_bg){
-					ctx.save();
-					ctx.beginPath();
-					ctx.rect(xLeft_axisX, yTop_axisY, util.getLinePosition(kChartSketch.getWidth()), util.getLinePosition(kSubChartSketch.getHeight()));
-
-					ctx.strokeWidth = 0;
-					if(config_bg instanceof TradeChart2.LinearGradient){
-						config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + kSubChartSketch.getHeight());
-					}else
-						ctx.fillStyle = config_bg;
-
-					ctx.fill();
-					ctx.restore();
-				}
+				self.renderBackground(ctx, config, kChartSketch.getWidth(), kSubChartSketch.getHeight());
 
 				/* 绘制X轴 */
-				(function(){
-					/* 绘制X轴坐标线 */
-					if(config_showAxisXLine){
-						ctx.beginPath();
-						ctx.moveTo(xLeft_axisX, y_axisX);
-						ctx.lineTo(xRight_axisX, y_axisX);
-						ctx.stroke();
-					}
-
-					/* 上一个绘制的横坐标刻度对应的数据索引 */
-					var previousXTickDataIndex = null;
-
-					/**
-					 * 根据提供的数据的索引位置绘制刻度
-					 * @param {Number} i 数据的索引位置
-					 */
-					var renderXTick = function(i){
-						if(i < 0 || i >= groupCount)
-							return;
-
-						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content).plus(kChart.getRenderingOffset()));
-
-						var data = kChart.getKDataManager().getConvertedData(i);
-
-						/* 绘制网格竖线 */
-						if(ifShowVerticalGridLine){
-							ctx.save();
-							ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
-							config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
-
-							/* 蜡烛图 */
-							ctx.beginPath();
-							ctx.moveTo(tickX, y_axisX - 1);
-							ctx.lineTo(tickX, y_axisX - 1 - Math.floor(kSubChartSketch.getHeight()));
-							ctx.stroke();
-							ctx.restore();
-						}
-
-						/* 汇集刻度，用于图形绘制完毕后统一绘制 */
-						var label = (function(){
-							if(!config_showAxisXLabel)
-								return "";
-
-							var previousData = null;
-							if(null != previousXTickDataIndex && previousXTickDataIndex >= 0 && previousXTickDataIndex < dataList.length)
-								previousData = kChart.getKDataManager().getConvertedData(previousXTickDataIndex);
-
-							return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
-						})();
-						axisXTickList.push({x: tickX, label: label});
-
-						previousXTickDataIndex = i;
-					};
-
-					/* 绘制X轴刻度 */
-					var edgeTickDataIndex,/** 处于边界位置的刻度所对应的数据索引 */
-						lastTickDataIndex;/** 最后一个的刻度所对应的数据索引 */
-					edgeTickDataIndex = groupCount - 1;
-
-					var b = new Big(axisXLabelTickSpan);
-					for(var i = 0; i <= axisXTickCount - 1; i++){
-						renderXTick(roundBig(b.mul(i)));
-					}
-					lastTickDataIndex = Math.min(roundBig(b.mul(i)), groupCount - 1);
-
-					var totalSpace = Math.min(numBig(groupSizeBig.mul(groupCount - 1)), kChartSketch.getContentWidth());
-					var remainingSpace = totalSpace - (numBig(groupSizeBig.mul(lastTickDataIndex)) - halfGroupBarWidth + halfGroupSize);
-					if(remainingSpace < halfGroupSize){
-						/* 剩余空间不足，只绘制边界刻度 */
-						renderXTick(edgeTickDataIndex);
-					}else{
-						/* 绘制最后一个刻度和边界刻度 */
-						renderXTick(edgeTickDataIndex);
-						if(lastTickDataIndex !== edgeTickDataIndex)
-							renderXTick(lastTickDataIndex);
-					}
-				})();
+				self.renderAxisX(ctx, config, kChartSketch, kSubChartSketch);
 
 				/* 绘制Y轴 */
 				(function(){
