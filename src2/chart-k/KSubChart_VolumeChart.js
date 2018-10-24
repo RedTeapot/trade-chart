@@ -81,7 +81,7 @@
 		this.implRender = function(canvasObj, config){
 			if(null == config || typeof config !== "object"){
 				if(NOT_SUPPLIED !== lastRenderingConfig){
-					console.info("Using last render config", config);
+					console.info("Using last render config", lastRenderingConfig);
 					config = lastRenderingConfig;
 				}
 			}else
@@ -92,8 +92,7 @@
 					console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
 					canvasObj = lastRenderingCanvasObj;
 				}else{
-					console.error("No canvas element supplied to render");
-					return this;
+					throw new Error("No canvas element supplied to render");
 				}
 			}else
 				lastRenderingCanvasObj = canvasObj;
@@ -162,7 +161,7 @@
 
 			var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
 			if(dataList.length > 0)
-				console.debug("First converted data to draw: " + this.getType(), kChart.getKDataManager().getConvertedData(kChart.getKDataManager().getFirstVisibleDataIndex()));
+				console.debug("First converted data to draw: " + this.id, kChart.getKDataManager().getFirstVisibleConvertedData());
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
@@ -226,57 +225,31 @@
 			var axisYTickList = [];
 
 			/**
+			 * 添加纵坐标刻度。如果相同位置，或相同标签的刻度已经存在，则不再添加
+			 * @param {Number} tickY 纵坐标刻度位置
+			 * @param {Number} tickAmount 该刻度对应的量
+			 */
+			var try2AddAxisYTick = function(tickY, tickAmount){
+				var tickAmountBig = new Big(tickAmount);
+				var tickLabel = config_axisYFormatter(tickAmount, config);
+
+				for(var i = 0; i < axisYTickList.length; i++){
+					var tick = axisYTickList[i];
+					if(tick.label === tickLabel || Math.abs(tick.y - tickY) < 1 || tickAmountBig.eq(tick.amount)){
+						console.warn("Found potential existing tick while adding tick: " + tickLabel + "(" + tickAmount + ") at " + tickY, JSON.stringify(tick));
+						return;
+					}
+				}
+
+				axisYTickList.push({y: tickY, amount: tickAmount, label: tickLabel});
+			};
+
+			/**
 			 * 绘制横坐标刻度
 			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
 			var drawAxisXTickList = function(drawContent){
-				drawContent = null == drawContent? null: String(drawContent).trim().toLowerCase();
-				if(drawContent !== "both" && drawContent !== "tick" && drawContent !== "label"){
-					console.warn("Unknown draw content: " + drawContent);
-					drawContent = "both";
-				}
-
-				var ifDrawTick = drawContent === "both" || drawContent === "tick",
-					ifDrawLabel = drawContent === "both" || drawContent === "label";
-
-				ctx.save();
-
-				ctx.lineWidth = 1;
-				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
-				config_axisLabelFont && (ctx.font = config_axisLabelFont);
-				config_axisLabelColor && (ctx.fillStyle = config_axisLabelColor);
-				ctx.textAlign = "center";
-				ctx.textBaseline = "top";
-
-				var y_axisXTickLabel = config_axisXLabelOffset + y_axisX;
-				if(config_showAxisXLine)
-					y_axisXTickLabel += config_axisTickLineLength;
-
-				for(var i = 0; i < axisXTickList.length; i++){
-					var tick = axisXTickList[i];
-					var tickX = tick.x;
-
-					/* 绘制刻度线 */
-					if(ifDrawTick && config_showAxisXLine){
-						ctx.beginPath();
-						ctx.moveTo(tickX, y_axisX);
-						ctx.lineTo(tickX, y_axisX + config_axisTickLineLength);
-						ctx.stroke();
-					}
-
-					/* 绘制坐标取值 */
-					if(ifDrawLabel && config_showAxisXLabel){
-						ctx.save();
-
-						if(typeof config_axisXLabelHorizontalAlign === "function")
-							config_axisXLabelHorizontalAlign = config_axisXLabelHorizontalAlign(i, axisXTickList.length);
-						config_axisXLabelHorizontalAlign && (ctx.textAlign = config_axisXLabelHorizontalAlign);
-						ctx.fillText(tick.label, tickX, y_axisXTickLabel);
-						ctx.restore();
-					}
-				}
-
-				ctx.restore();
+				self.renderAxisXTickList(ctx, y_axisX, axisXTickList, drawContent);
 			};
 
 			/**
@@ -284,84 +257,11 @@
 			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
 			var drawAxisYTickList = function(drawContent){
-				drawContent = null == drawContent? null: String(drawContent).trim().toLowerCase();
-				if(drawContent !== "both" && drawContent !== "tick" && drawContent !== "label"){
-					console.warn("Unknown draw content: " + drawContent);
-					drawContent = "both";
-				}
-
-				var ifDrawTick = drawContent === "both" || drawContent === "tick",
-					ifDrawLabel = drawContent === "both" || drawContent === "label";
-
-				ctx.save();
-
-				ctx.lineWidth = 1;
-				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
-				config_axisLabelFont && (ctx.font = config_axisLabelFont);
-				config_axisLabelColor && (ctx.fillStyle = config_axisLabelColor);
-				config_axisYLabelFont && (ctx.font = config_axisYLabelFont);
-				config_axisYLabelColor && (ctx.fillStyle = config_axisYLabelColor);
-
-				if(ifShowAxisYLeft){
-					ctx.textAlign = ifShowAxisYLabelOutside? "end": "start";
-				}else{
-					ctx.textAlign = ifShowAxisYLabelOutside? "start": "end";
-				}
-				ctx.textBaseline = "middle";
-
-				var sign;
-				if(ifShowAxisYLeft){
-					sign = ifShowAxisYLabelOutside? -1: 1;
-				}else{
-					sign = ifShowAxisYLabelOutside? 1: -1;
-				}
-
-				var axisTickLineOffset = sign * config_axisTickLineLength,
-					axisYLabelOffset = sign * ((config_showAxisYLine? config_axisTickLineLength: 0) + config_axisYLabelOffset);
-				var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
-
-				for(var i = 0; i < axisYTickList.length; i++){
-					var tick = axisYTickList[i];
-					var tickY = tick.y;
-
-					/* 绘制刻度线 */
-					if(ifDrawTick && config_showAxisYLine){
-						ctx.beginPath();
-						ctx.moveTo(x_axisY, yTop_axisY + tickY);
-						ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
-						ctx.stroke();
-					}
-
-					if(ifDrawLabel && config_showAxisYLabel){
-						if(typeof config_axisYLabelVerticalOffset === "function")
-							config_axisYLabelVerticalOffset = config_axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
-
-						var drawLabel = function(){
-							ctx.fillText(tick.label, x_axisY + axisYLabelOffset, yTop_axisY + tickY + config_axisYLabelVerticalOffset);
-						};
-
-						if(i === 0){
-							ctx.save();
-							config_axisYAmountFloorLabelFont && (ctx.font = config_axisYAmountFloorLabelFont);
-							config_axisYAmountFloorLabelColor && (ctx.fillStyle = config_axisYAmountFloorLabelColor);
-							drawLabel();
-							ctx.restore();
-						}else if(i === maxAxisYTickIndex){
-							ctx.save();
-							config_axisYAmountCeilingLabelFont && (ctx.font = config_axisYAmountCeilingLabelFont);
-							config_axisYAmountCeilingLabelColor && (ctx.fillStyle = config_axisYAmountCeilingLabelColor);
-							drawLabel();
-							ctx.restore();
-						}else
-							drawLabel();
-					}
-				}
-
-				ctx.restore();
+				self.renderAxisYTickList(ctx, x_axisY, axisYTickList, drawContent);
 			};
 
-			/* 清空既有内容 */
-			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			// /* 清空既有内容 */
+			// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 			/* 绘制坐标系 */
 			(function(){
@@ -409,7 +309,7 @@
 
 						var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content).plus(kChart.getRenderingOffset()));
 
-						var data = kChart.getConvertedData(i);
+						var data = kChart.getKDataManager().getConvertedData(i);
 
 						/* 绘制网格竖线 */
 						if(ifShowVerticalGridLine){
@@ -432,7 +332,7 @@
 
 							var previousData = null;
 							if(null != previousXTickDataIndex && previousXTickDataIndex >= 0 && previousXTickDataIndex < dataList.length)
-								previousData = kChart.getConvertedData(previousXTickDataIndex);
+								previousData = kChart.getKDataManager().getConvertedData(previousXTickDataIndex);
 
 							return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 						})();
@@ -502,7 +402,7 @@
 						}
 
 						/* 汇集刻度，用于图形绘制完毕后统一绘制 */
-						axisYTickList.push({y: tickY, amount: amount, label: config_axisYFormatter(amount, config)});
+						try2AddAxisYTick(tickY, amount);
 					}
 
 					/* 自动检测精度，规避多个刻度使用相同取值的情况 */
@@ -524,7 +424,8 @@
 							config.axisYPrecision += 1;
 							for(var i = 0; i < axisYTickList.length; i++)
 								axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].amount, config);
-						}
+						}else
+							break;
 					}while(flag);
 
 					if(ifDeclaredAxisYPrecision)

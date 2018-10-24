@@ -123,6 +123,8 @@
 			};
 		});
 
+		util.defineReadonlyProperty(this, "id", util.randomString("k-", 3));
+
 		/**
 		 * 获取关联的K线数据管理器
 		 * @returns {KDataManager}
@@ -133,10 +135,19 @@
 
 		/**
 		 * 设置数据源（代理KDataManager）
+		 * @param {Array<UserSuppliedData>} dataList 数据源
 		 * @returns {KChart}
 		 */
-		this.setDataList = function(){
-			kDataManager.setDataList.apply(kDataManager, arguments);
+		this.setDataList = function(dataList){
+			if(!Array.isArray(dataList)){
+				console.warn("Supplied k data should be an array.");
+				return this;
+			}
+
+			kDataManager.setDataList(dataList);
+
+			if(renderingOffset !== 0)
+				this.fire(evtName_renderingPositionChanges);
 			renderingOffset = 0;
 
 			return this;
@@ -239,6 +250,8 @@
 			return getConfigItem(name, config);
 		};
 
+
+
 		/**
 		 * 根据给定的配置信息计算蜡烛一半的宽度
 		 * @returns {Number}
@@ -273,6 +286,8 @@
 			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
 			return ceilBig(new Big(config_axisXLabelSize).div(groupSizeBig));
 		};
+
+
 
 		/**
 		 * 为该K线图创建指定类型的子图

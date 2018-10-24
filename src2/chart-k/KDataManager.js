@@ -35,6 +35,8 @@
 		/* 画布上第一个可见的数据在整个数据中的索引位置 */
 		var firstVisibleDataIndex = 0;
 
+
+
 		/**
 		 * 获取当前画布上第一个可见的数据在整个数据中的索引位置
 		 * @returns {number}
@@ -57,7 +59,7 @@
 				firstVisibleDataIndex = v;
 
 				console.log("Update first visible data index to " + v);
-				this.fire(evtName_renderingDataChanges);
+				this.fire(evtName_renderingDataChanges, null, false);
 			}
 
 			return this;
@@ -76,7 +78,7 @@
 
 			dataList = datas.concat(dataList);
 			firstVisibleDataIndex += datas.length;
-			this.fire(evtName_storedDataChanges);
+			this.fire(evtName_storedDataChanges, null, false);
 
 			return this;
 		};
@@ -93,7 +95,7 @@
 			}
 
 			dataList = dataList.concat(datas);
-			this.fire(evtName_storedDataChanges);
+			this.fire(evtName_storedDataChanges, null, false);
 
 			return this;
 		};
@@ -110,11 +112,11 @@
 			}
 
 			if(_datas !== dataList)
-				this.fire(evtName_storedDataChanges);
+				this.fire(evtName_storedDataChanges, null, false);
 			dataList = _datas;
 
 			if(firstVisibleDataIndex !== 0)
-				this.fire(evtName_renderingDataChanges);/* 数据发生变更，回到初始位置 */
+				this.fire(evtName_renderingDataChanges, null, false);/* 数据发生变更，回到初始位置 */
 			firstVisibleDataIndex = 0;
 
 			return this;
@@ -207,6 +209,14 @@
 				return data;
 
 			return convertData(data);
+		};
+
+		/**
+		 * 获取当前可见的第一个格式被转换了的数据
+		 * @returns {KData}
+		 */
+		this.getFirstVisibleConvertedData = function(){
+			return this.getConvertedData(this.getFirstVisibleDataIndex());
 		};
 
 		/**

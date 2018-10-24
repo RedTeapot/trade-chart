@@ -9,7 +9,7 @@
  */
 
 /**
- * @callback KDataParser
+ * @callback KDataParser K线数据解析器
  * @param {Object} originalData 含有最高价、最低价、开盘价，收盘价等任意格式的原始数据
  * @returns {KData}
  */
@@ -74,7 +74,7 @@
 
 
 /**
- * @typedef {Object} KChartConfig
+ * @typedef {Object} KChartConfig K线图配置
  *
  * @property {String|Number} width 图表整体宽度。可以为固定的数字（单位：像素），也可以是相对画布Canvas父元素高度的百分比字符串，如：“100%”
  *
@@ -106,7 +106,7 @@
 
 
 /**
- * @typedef {Object} KSubChartConfig
+ * @typedef {Object} KSubChartConfig K线子图通用配置
  *
  * @property {String|Number} height 图表整体高度。可以为固定的数字（单位：像素），也可以是相对画布Canvas父元素高度的百分比字符串，如：“100%”
  *
@@ -132,7 +132,7 @@
  */
 
 /**
- * @typedef {KSubChartConfig} KSubChartConfig_candle
+ * @typedef {KSubChartConfig} KSubChartConfig_candle K线子图-蜡烛图配置
  *
  * @property {Number|Function} axisYAmountFloor 纵坐标最小值
  * @property {String} axisYAmountFloorLabelFont 纵坐标最小值的坐标标签字体
@@ -148,7 +148,7 @@
  */
 
 /**
- * @typedef {KSubChartConfig} KSubChartConfig_volume
+ * @typedef {KSubChartConfig} KSubChartConfig_volume K线子图-量图配置
  *
  * @property {Number|Function} axisYAmountFloor 纵坐标最小值
  * @property {String} axisYAmountFloorLabelFont 纵坐标最小值的坐标标签字体
@@ -164,13 +164,13 @@
  */
 
 /**
- * @typedef {Object} XTick
+ * @typedef {Object} XTick 横坐标刻度描述
  * @property {Number} x 横坐标位置
  * @property {String} label 横坐标标签
  */
 
 /**
- * @typedef {Object} YTick
+ * @typedef {Object} YTick 纵坐标刻度描述
  * @property {Number} y 纵坐标位置
  * @property {String} label 纵坐标标签
  */

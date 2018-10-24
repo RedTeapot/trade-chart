@@ -190,9 +190,9 @@
 
 			return obj;
 		}).setConfig(kChartConfig);
+		// kChart.setDataList([]);
 		kChart.setDataList(datas.slice(sepIndex)).prependDataList(datas.slice(0, sepIndex));
 		// kChart.appendDataList(datas.slice(0, sepIndex));
-		console.log(kChart.getConvertedRenderingDataList());
 		window.kChart = kChart;
 
 		/* 蜡烛图 */
