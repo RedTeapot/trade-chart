@@ -98,7 +98,6 @@
 		 * 1. offset 在区间 [0, half + gap) 时，什么也不做
 		 * 2. offset 在区间 [half + gap, half + gap + half) 时，kDataManager 的绘制索引±1
 		 * 3. offset 在区间 [half + gap + half, ...) 时，调整 offset，使得 offset = offset - (half + gap + half)
-		 * //TODO
 		 * @type {number}
 		 */
 		var renderingOffset = 0;

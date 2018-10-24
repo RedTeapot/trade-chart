@@ -97,7 +97,7 @@
 					return f();
 			};
 
-			return function(){
+			return function(canvasObj, config){
 				return self.implRender.apply(self, arguments);
 			};
 		})();
@@ -447,6 +447,143 @@
 			}
 
 			return axisXTickList;
+		};
+
+		/**
+		 * 绘制Y轴
+		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
+		 * @param {KSubChartConfig} config 渲染配置
+		 * @param {KChartSketch} kChartSketch
+		 * @param {KSubChartSketch_ChartSketch} kSubChartSketch
+		 * @param {KDataSketch} kDataSketch
+		 * @returns {YTick[]}
+		 */
+		this.renderAxisY = function(ctx, config, kChartSketch, kSubChartSketch, kDataSketch){
+			var config_showAxisYLine = this.getConfigItem("showAxisYLine", config),
+				config_paddingLeft = this.getConfigItem("paddingLeft", config),
+				config_paddingTop = this.getConfigItem("paddingTop", config),
+				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
+				config_axisYPosition = this.getConfigItem("axisYPosition", config),
+				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition", config),
+				config_axisYPrecision = this.getConfigItem("axisYPrecision", config),
+				config_axisYMidTickQuota = this.getConfigItem("axisYMidTickQuota", config),
+				config_gridLineDash = this.getConfigItem("gridLineDash", config),
+				config_horizontalGridLineColor = this.getConfigItem("horizontalGridLineColor", config),
+				config_showHorizontalGridLine = this.getConfigItem("showHorizontalGridLine", config),
+				config_axisYFormatter = this.getConfigItem("axisYFormatter", config);
+
+			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
+				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
+
+			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
+				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
+				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
+
+				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
+				yTop_axisY = util.getLinePosition(config_paddingTop),
+				yBottom_axisY = y_axisX;
+
+			/** 相邻两个纵坐标刻度之间的价格悬差 */
+			var axisYAmountInterval = numBig(new Big(kDataSketch.getAmountCeiling()).minus(kDataSketch.getAmountFloor()).div(config_axisYMidTickQuota + 1));
+			/** 相邻两个纵坐标刻度之间的高度悬差 */
+			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
+			/* 是否绘制网格横线/竖线 */
+			var ifShowHorizontalGridLine = config_showHorizontalGridLine && config_horizontalGridLineColor;
+
+
+
+			/**
+			 * 要绘制的纵坐标刻度集合
+			 * @type {YTick[]}
+			 */
+			var axisYTickList = [];
+
+			/**
+			 * 添加纵坐标刻度。如果相同位置，或相同标签的刻度已经存在，则不再添加
+			 * @param {Number} tickY 纵坐标刻度位置
+			 * @param {Number} tickAmount 该刻度对应的价钱
+			 */
+			var try2AddAxisYTick = function(tickY, tickAmount){
+				var tickAmountBig = new Big(tickAmount);
+				var tickLabel = config_axisYFormatter(tickAmount, config);
+
+				for(var i = 0; i < axisYTickList.length; i++){
+					var tick = axisYTickList[i];
+					if(tick.label === tickLabel || Math.abs(tick.y - tickY) < 1 || tickAmountBig.eq(tick.amount)){
+						console.warn("Found potential existing tick while adding tick: " + tickLabel + "(" + tickAmount + ") at " + tickY, JSON.stringify(tick));
+						return;
+					}
+				}
+
+				axisYTickList.push({y: tickY, amount: tickAmount, label: tickLabel});
+			};
+
+			if(config_showAxisYLine){
+				ctx.beginPath();
+				ctx.moveTo(x_axisY, yTop_axisY);
+				ctx.lineTo(x_axisY, yBottom_axisY);
+				ctx.stroke();
+			}
+
+			var isAxisYPrecisionAuto = "auto" == String(config_axisYPrecision).trim().toLowerCase();
+			var axisYPrecisionBak = config_axisYPrecision;
+			var ifDeclaredAxisYPrecision = "axisYPrecision" in config;
+			if(isAxisYPrecisionAuto)
+				config.axisYPrecision = kDataSketch.getAmountPrecision();
+
+			/* 绘制Y轴刻度（自下而上） */
+			var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
+			for(var i = 0; i <= maxAxisYTickIndex; i++){
+				var amount = kDataSketch.getAmountFloor() + numBig(new Big(axisYAmountInterval).mul(i)),
+					tickOffset = numBig(new Big(axisYHeightInterval).mul(maxAxisYTickIndex - i));
+				var tickY = Math.round(tickOffset);
+
+				/* 绘制网格横线 */
+				if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
+					ctx.save();
+					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
+					config_horizontalGridLineColor && (ctx.strokeStyle = config_horizontalGridLineColor);
+
+					ctx.beginPath();
+					ctx.moveTo(x_axisY, yTop_axisY + tickY);
+					ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(kChartSketch.getWidth()), yTop_axisY + tickY);
+					ctx.stroke();
+					ctx.restore();
+				}
+
+				/* 汇集刻度，用于图形绘制完毕后统一绘制 */
+				try2AddAxisYTick(tickY, amount);
+			}
+
+			/* 自动检测精度，规避多个刻度使用相同取值的情况 */
+			var flag = false;
+			do{
+				flag = false;
+				for(var i = 0; i < axisYTickList.length - 1; i++)
+					for(var j = i + 1; j < axisYTickList.length; j++){
+						if(axisYTickList[i].label === axisYTickList[j].label){
+							flag = true;
+							break;
+						}
+
+						if(flag)
+							break;
+					}
+
+				if(flag && config.axisYPrecision < 20){
+					config.axisYPrecision += 1;
+					for(var i = 0; i < axisYTickList.length; i++)
+						axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].amount, config);
+				}else
+					break;
+			}while(flag);
+
+			if(ifDeclaredAxisYPrecision)
+				config.axisYPrecision = axisYPrecisionBak;
+			else
+				delete config.axisYPrecision;
+
+			return axisYTickList;
 		};
 
 

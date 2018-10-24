@@ -192,7 +192,7 @@
 			/* 横坐标刻度个数 */
 			var axisXTickCount = floorBig(new Big(groupCount).div(axisXLabelTickSpan));
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYAmountInterval = numBig(new Big(kDataSketch.getPriceCeiling()).minus(kDataSketch.getPriceFloor()).div(config_axisYMidTickQuota + 1));
+			var axisYAmountInterval = numBig(new Big(kDataSketch.getAmountCeiling()).minus(kDataSketch.getAmountFloor()).div(config_axisYMidTickQuota + 1));
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
 			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 			/* 是否绘制网格横线/竖线 */
@@ -203,12 +203,12 @@
 			/**
 			 * 获取指定价钱对应的物理高度
 			 * @param {Number} price1 价钱1
-			 * @param {Number} [price2=kDataSketch.getPriceCeiling()] 价钱2
+			 * @param {Number} [price2=kDataSketch.getAmountCeiling()] 价钱2
 			 * @returns {Number} 物理高度
 			 */
 			var calcHeight = function(price1, price2){
 				if(arguments.length < 2)
-					price2 = kDataSketch.getPriceCeiling();
+					price2 = kDataSketch.getAmountCeiling();
 
 				return kSubChartSketch.calculateHeight(numBig(new Big(price2 || 0).minus(price1 || 0).abs()));
 			};
@@ -226,26 +226,6 @@
 			var axisYTickList = [];
 
 			/**
-			 * 添加纵坐标刻度。如果相同位置，或相同标签的刻度已经存在，则不再添加
-			 * @param {Number} tickY 纵坐标刻度位置
-			 * @param {Number} tickPrice 该刻度对应的价钱
-			 */
-			var try2AddAxisYTick = function(tickY, tickPrice){
-				var tickPriceBig = new Big(tickPrice);
-				var tickLabel = config_axisYFormatter(tickPrice, config);
-
-				for(var i = 0; i < axisYTickList.length; i++){
-					var tick = axisYTickList[i];
-					if(tick.label === tickLabel || Math.abs(tick.y - tickY) < 1 || tickPriceBig.eq(tick.price)){
-						console.warn("Found potential existing tick while adding tick: " + tickLabel + "(" + tickPrice + ") at " + tickY, JSON.stringify(tick));
-						return;
-					}
-				}
-
-				axisYTickList.push({y: tickY, price: tickPrice, label: tickLabel});
-			};
-
-			/**
 			 * 绘制横坐标刻度
 			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
 			 */
@@ -261,8 +241,8 @@
 				self.renderAxisYTickList(ctx, config, x_axisY, axisYTickList, drawContent);
 			};
 
-			// /* 清空既有内容 */
-			// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			/* 清空既有内容 */
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 			/* 绘制坐标系 */
 			(function(){
@@ -278,73 +258,7 @@
 				axisXTickList = self.renderAxisX(ctx, config, kChartSketch, kSubChartSketch);
 
 				/* 绘制Y轴 */
-				(function(){
-					/* 绘制Y轴坐标线 */
-					if(config_showAxisYLine){
-						ctx.beginPath();
-						ctx.moveTo(x_axisY, yTop_axisY);
-						ctx.lineTo(x_axisY, yBottom_axisY);
-						ctx.stroke();
-					}
-
-					var isAxisYPrecisionAuto = "auto" == String(config_axisYPrecision).trim().toLowerCase();
-					var axisYPrecisionBak = config_axisYPrecision;
-					var ifDeclaredAxisYPrecision = "axisYPrecision" in config;
-					if(isAxisYPrecisionAuto)
-						config.axisYPrecision = kDataSketch.getPricePrecision();
-
-					var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
-					/* 绘制Y轴刻度（自下而上） */
-					for(var i = 0; i <= maxAxisYTickIndex; i++){
-						var price = kDataSketch.getPriceFloor() + numBig(new Big(axisYAmountInterval).mul(i)),
-							tickOffset = numBig(new Big(axisYHeightInterval).mul(maxAxisYTickIndex - i));
-						var tickY = Math.round(tickOffset);
-
-						/* 绘制网格横线 */
-						if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
-							ctx.save();
-							ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
-							config_horizontalGridLineColor && (ctx.strokeStyle = config_horizontalGridLineColor);
-
-							ctx.beginPath();
-							ctx.moveTo(x_axisY, yTop_axisY + tickY);
-							ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(kChartSketch.getWidth()), yTop_axisY + tickY);
-							ctx.stroke();
-							ctx.restore();
-						}
-
-						/* 汇集刻度，用于图形绘制完毕后统一绘制 */
-						try2AddAxisYTick(tickY, price);
-					}
-
-					/* 自动检测精度，规避多个刻度使用相同取值的情况 */
-					var flag = false;
-					do{
-						flag = false;
-						for(var i = 0; i < axisYTickList.length - 1; i++)
-							for(var j = i + 1; j < axisYTickList.length; j++){
-								if(axisYTickList[i].label === axisYTickList[j].label){
-									flag = true;
-									break;
-								}
-
-								if(flag)
-									break;
-							}
-
-						if(flag && config.axisYPrecision < 20){
-							config.axisYPrecision += 1;
-							for(var i = 0; i < axisYTickList.length; i++)
-								axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].price, config);
-						}else
-							break;
-					}while(flag);
-
-					if(ifDeclaredAxisYPrecision)
-						config.axisYPrecision = axisYPrecisionBak;
-					else
-						delete config.axisYPrecision;
-				})();
+				axisYTickList = self.renderAxisY(ctx, config, kChartSketch, kSubChartSketch, kDataSketch);
 
 				/* 绘制刻度线 */
 				var drawContent = "tick";

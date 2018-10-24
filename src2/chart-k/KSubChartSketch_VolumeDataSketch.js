@@ -4,6 +4,10 @@
 	var util = TradeChart2.util;
 	var Big = TradeChart2.Big;
 
+	var numBig = function(big){
+		return Number(big.toString());
+	};
+
 	/**
 	 * @constructor
 	 * @augments KDataSketch
@@ -44,7 +48,82 @@
 		var instance = new KSubChartSketch_VolumeDataSketch();
 
 		/* 扫描数据，初步得到概览 */
-		var kDataSketch = KDataSketch.sketchFromKChartInstance(kChart);
+		var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
+		var dataSketch_origin_maxVolume = -Infinity,/* 最大交易量 */
+			dataSketch_origin_minVolume = Infinity,/* 最小交易量 */
+			dataSketch_origin_avgVolumeVariation = 0,/* 交易量的平均变动幅度 */
+			dataSketch_origin_maxVolumeVariation = 0,/* 交易量的最大变动幅度 */
+
+			dataSketch_extended_volumeCeiling = 0,/* 坐标中成交量的最大值 */
+			dataSketch_extended_volumeFloor = 0,/* 坐标中成交量的最小值 */
+			dataSketch_extended_volumePrecision = 0;/* 坐标中成交量的精度 */
+
+		if(dataList.length === 0){
+			dataSketch_origin_maxVolume = 0;
+			dataSketch_origin_minVolume = 0;
+			dataSketch_origin_avgVolumeVariation = 0;
+			dataSketch_origin_maxVolumeVariation = 0;
+		}else{
+			var previousVolume = 0;
+			var variationSum = 0, volumeVariationSum = 0;
+			for(var i = 0; i < dataList.length; i++){
+				var d = dataList[i];
+				if(null == d || typeof d != "object")
+					continue;
+
+				var openPrice = +d.openPrice,
+					highPrice = +d.highPrice,
+					lowPrice = +d.lowPrice,
+					closePrice = +d.closePrice,
+
+					volume = util.parseAsNumber(d.volume, 0);
+
+				/* 数据精度确定 */
+				dataSketch_extended_volumePrecision = Math.max(
+					dataSketch_extended_volumePrecision,
+					util.getPrecision(volume)
+				);
+
+				if(volume > dataSketch_origin_maxVolume)
+					dataSketch_origin_maxVolume = volume;
+				if(volume < dataSketch_origin_minVolume)
+					dataSketch_origin_minVolume = volume;
+
+				/* 确定更大的变动幅度 */
+				var volumeVariation = Math.abs(volume - previousVolume);
+				if(volumeVariation > dataSketch_origin_maxVolumeVariation)
+					dataSketch_origin_maxVolumeVariation = volumeVariation;
+
+				volumeVariationSum += volumeVariation;
+			}
+			var len = dataList.length;
+			dataSketch_origin_avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
+
+			/* 确定Y轴最小值 */
+			dataSketch_extended_volumeFloor = numBig(new Big(util.parseAsNumber(dataSketch_origin_minVolume, 0)).minus(new Big(dataSketch_origin_avgVolumeVariation).div(2)));
+			if(!isFinite(dataSketch_extended_volumeFloor) || dataSketch_extended_volumeFloor < 0)
+				dataSketch_extended_volumeFloor = 0;
+
+			/* 确定Y轴最大值 */
+			dataSketch_extended_volumeCeiling = numBig(new Big(util.parseAsNumber(dataSketch_origin_maxVolume, 0)).plus(new Big(dataSketch_origin_avgVolumeVariation).div(2)));
+			if(dataSketch_extended_volumeCeiling < dataSketch_origin_maxVolume)
+				dataSketch_extended_volumeCeiling = dataSketch_origin_maxVolume;
+			if(!isFinite(dataSketch_extended_volumeCeiling) || dataSketch_extended_volumeCeiling < 0)
+				dataSketch_extended_volumeCeiling = dataSketch_extended_volumeFloor;
+
+			/* 确保最大值与最小值不同 */
+			var b = new Big(dataSketch_extended_volumeFloor);
+			if(b.eq(dataSketch_extended_volumeCeiling))
+				dataSketch_extended_volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+		}
+		instance.setMinAmount(dataSketch_origin_minVolume)
+			.setMaxAmount(dataSketch_origin_maxVolume)
+			.setAvgAmountVariation(dataSketch_origin_avgVolumeVariation)
+			.setMaxAmountVariation(dataSketch_origin_maxVolumeVariation)
+			.setAmountFloor(dataSketch_extended_volumeFloor)
+			.setAmountCeiling(dataSketch_extended_volumeCeiling)
+			.setAmountPrecision(dataSketch_extended_volumePrecision);
+
 
 		/* 根据渲染配置更新概览 */
 		/* Y轴最小值 */
@@ -54,10 +133,10 @@
 			var isFunction = typeof config_axisYAmountFloor === "function";
 			if(isFunction)
 				axisYAmountFloor = util.try2Call(config_axisYAmountFloor, null,
-					kDataSketch.getMinVolume(),
-					kDataSketch.getMaxVolume(),
-					kDataSketch.getAvgVolumeVariation(),
-					kDataSketch.getMaxVolumeVariation()
+					instance.getMinAmount(),
+					instance.getMaxAmount(),
+					instance.getAvgAmountVariation(),
+					instance.getMaxAmountVariation()
 				);
 			else{
 				if(!util.isValidNumber(config_axisYAmountFloor))
@@ -70,9 +149,9 @@
 				axisYAmountFloor = 0;
 			}
 
-			kDataSketch.setVolumeFloor(axisYAmountFloor);
+			instance.setAmountFloor(axisYAmountFloor);
 		}
-		axisYAmountFloor = kDataSketch.getVolumeFloor();
+		axisYAmountFloor = instance.getAmountFloor();
 
 		/* Y轴最大值 */
 		var config_axisYAmountCeiling = _getConfigItem(kChart, "axisYAmountCeiling", kSubChartConfig);
@@ -81,10 +160,10 @@
 			var isFunction = typeof config_axisYAmountCeiling === "function";
 			if(isFunction)
 				axisYAmountCeiling = util.try2Call(config_axisYAmountCeiling, null,
-					kDataSketch.getMinVolume(),
-					kDataSketch.getMaxVolume(),
-					kDataSketch.getAvgVolumeVariation(),
-					kDataSketch.getMaxVolumeVariation()
+					instance.getMinAmount(),
+					instance.getMaxAmount(),
+					instance.getAvgAmountVariation(),
+					instance.getMaxAmountVariation()
 				);
 			else{
 				if(!util.isValidNumber(config_axisYAmountCeiling))
@@ -95,19 +174,7 @@
 			if(!isFinite(axisYAmountCeiling) || axisYAmountCeiling <= axisYAmountFloor)
 				console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + "), auto adjust to 0.");
 			else
-				kDataSketch.setVolumeCeiling(axisYAmountCeiling);
-		}
-
-		/* 代理属性 */
-		for(var p in kDataSketch){
-			if(typeof kDataSketch[p] === "function")
-				instance[p] = (function(p){
-					return function(){
-						return kDataSketch[p].apply(kDataSketch, arguments);
-					};
-				})(p);
-			else
-				instance[p] = kDataSketch[p];
+				instance.setAmountCeiling(axisYAmountCeiling);
 		}
 
 		return instance;
