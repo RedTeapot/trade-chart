@@ -264,7 +264,7 @@
 		 * 根据给定的配置信息计算一组数据绘制宽度的一半的宽度
 		 * @returns {Number}
 		 */
-		this.calcHalfGroupSize = function(config){
+		this.calcHalfGroupSize = function(){
 			var config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
 				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");

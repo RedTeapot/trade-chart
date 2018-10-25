@@ -1,11 +1,6 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util;
-	var Big = TradeChart2.Big;
-
-	var numBig = function(big){
-		return Number(big.toString());
-	};
 
 	/**
 	 * @constructor

@@ -201,9 +201,7 @@
 			var ifDrawTick = drawContent === "both" || drawContent === "tick",
 				ifDrawLabel = drawContent === "both" || drawContent === "label";
 
-			var config_paddingLeft = this.getConfigItem("paddingLeft", config),
-				config_paddingTop = this.getConfigItem("paddingTop", config),
-				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
+			var config_paddingTop = this.getConfigItem("paddingTop", config),
 				config_axisLineColor = this.getConfigItem("axisLineColor", config),
 				config_axisLabelFont = this.getConfigItem("axisLabelFont", config),
 				config_axisLabelColor = this.getConfigItem("axisLabelColor", config),
@@ -462,7 +460,6 @@
 			var config_showAxisYLine = this.getConfigItem("showAxisYLine", config),
 				config_paddingLeft = this.getConfigItem("paddingLeft", config),
 				config_paddingTop = this.getConfigItem("paddingTop", config),
-				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
 				config_axisYPosition = this.getConfigItem("axisYPosition", config),
 				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition", config),
 				config_axisYPrecision = this.getConfigItem("axisYPrecision", config),
@@ -525,7 +522,7 @@
 				ctx.stroke();
 			}
 
-			var isAxisYPrecisionAuto = "auto" == String(config_axisYPrecision).trim().toLowerCase();
+			var isAxisYPrecisionAuto = "auto" === String(config_axisYPrecision).trim().toLowerCase();
 			var axisYPrecisionBak = config_axisYPrecision;
 			var ifDeclaredAxisYPrecision = "axisYPrecision" in config;
 			if(isAxisYPrecisionAuto)
