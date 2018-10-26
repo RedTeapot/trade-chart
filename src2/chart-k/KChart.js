@@ -191,9 +191,8 @@
 				H = ceilBig(new Big(B).plus(1).div(2));
 			var groupSize = B + g;
 
-			// debugger;
-			var ifMovingToRight = amount > 0;
 			renderingOffsetBig = renderingOffsetBig.plus(amount);
+			var ifMovingToRight = renderingOffsetBig.gt(0);
 			amount = Math.abs(amount);
 
 			var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
@@ -201,7 +200,8 @@
 			var newRenderingOffsetBig = renderingOffsetBig;
 			if(tmp.gte(h + g + 1)){
 				dataIndexOffset += 1;
-				newRenderingOffsetBig = new Big(H - (numBig(renderingOffsetBig.abs()) - (h + g))).mul(-1);
+				var newTouchOffset = numBig(renderingOffsetBig.abs()) - (h + g);
+				newRenderingOffsetBig = new Big(H - newTouchOffset).mul(ifMovingToRight? -1: 1);
 			}else
 				newRenderingOffsetBig = renderingOffsetBig;
 			if(ifMovingToRight)
@@ -220,7 +220,7 @@
 		 * @returns {KChart}
 		 */
 		this.resetRenderingOffset = function(){
-			if(!renderingOffset.eq(0))
+			if(!renderingOffsetBig.eq(0))
 				this.fire(evtName_renderingPositionChanges);
 
 			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);

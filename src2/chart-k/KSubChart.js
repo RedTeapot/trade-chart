@@ -391,8 +391,11 @@
 
 				var data = kChart.getKDataManager().getConvertedData(i);
 
+				if(i == 0)
+					console.log(">>", tickX, xLeft_content, kChart.getRenderingOffset());
+
 				/* 绘制网格竖线 */
-				if(ifShowVerticalGridLine){
+				if(ifShowVerticalGridLine && tickX >= xLeft_content){
 					ctx.save();
 					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
 					config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
