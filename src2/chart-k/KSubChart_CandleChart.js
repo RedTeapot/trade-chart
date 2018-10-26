@@ -73,6 +73,8 @@
 		 * @returns {KSubChart_CandleRenderResult} K线子图绘制结果
 		 */
 		this.implRender = function(canvasObj, config){
+			var self = this;
+
 			if(null == config || typeof config !== "object"){
 				if(NOT_SUPPLIED !== lastRenderingConfig){
 					console.info("Using last render config", lastRenderingConfig);
@@ -101,7 +103,7 @@
 				config_paddingLeft = getConfigItem("paddingLeft"),
 				config_paddingTop = getConfigItem("paddingTop"),
 
-				config_keepedColor = getConfigItem("keepedColor"),
+				config_keepingColor = getConfigItem("keepingColor"),
 				config_appreciatedColor = getConfigItem("appreciatedColor"),
 				config_depreciatedColor = getConfigItem("depreciatedColor"),
 
@@ -224,10 +226,13 @@
 				var renderCandle = function(i, callback){
 					var data = dataList[i];
 					var x = Math.floor(xLeft_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
+					if(i == 0){
+						console.info("First candle left position: " + x + " on sub chart: " + self.id);
+					}
 
 					var isAppreciated = data.closePrice > data.openPrice,
-						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
-					ctx.fillStyle = ctx.strokeStyle = isKeeped? config_keepedColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
+						isKeeping = Math.abs(data.closePrice - data.openPrice) < 2e-7;
+					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
 
 					var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);

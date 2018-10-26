@@ -70,6 +70,8 @@
 		 * @returns {KSubChart_VolumeRenderResult} 绘制的K线图
 		 */
 		this.implRender = function(canvasObj, config){
+			var self = this;
+
 			if(null == config || typeof config !== "object"){
 				if(NOT_SUPPLIED !== lastRenderingConfig){
 					console.info("Using last render config", lastRenderingConfig);
@@ -98,7 +100,7 @@
 				config_paddingLeft = getConfigItem("paddingLeft"),
 				config_paddingTop = getConfigItem("paddingTop"),
 
-				config_keepedColor = getConfigItem("keepedColor"),
+				config_keepingColor = getConfigItem("keepingColor"),
 				config_appreciatedColor = getConfigItem("appreciatedColor"),
 				config_depreciatedColor = getConfigItem("depreciatedColor"),
 
@@ -217,13 +219,16 @@
 				var renderVolume = function(i){
 					var data = dataList[i];
 					var x = Math.floor(xLeft_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
+					if(i == 0){
+						console.info("First volume left position: " + x + " on sub chart: " + self.id);
+					}
 
 					var isAppreciated = data.closePrice > data.openPrice,
 						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
 
 					ctx.save();
 					ctx.strokeWidth = 0;
-					ctx.fillStyle = ctx.strokeStyle = isKeeped? config_keepedColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
+					ctx.fillStyle = ctx.strokeStyle = isKeeped? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
 
 					var barX = x;
 					var volumeHeight = Math.ceil(calcHeight(data.volume));

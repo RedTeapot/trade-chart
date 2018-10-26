@@ -144,7 +144,7 @@
  *
  * @property {String} appreciatedColor 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  * @property {String} depreciatedColor 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
- * @property {String} keepedColor 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
+ * @property {String} keepingColor 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  */
 
 /**
@@ -160,7 +160,7 @@
  *
  * @property {String} appreciatedColor 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  * @property {String} depreciatedColor 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
- * @property {String} keepedColor 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
+ * @property {String} keepingColor 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色
  */
 
 /**

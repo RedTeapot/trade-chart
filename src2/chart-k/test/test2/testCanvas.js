@@ -133,7 +133,7 @@
 			axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
 
 			coordinateBackground: "#F0F0F0",
-			keepedColor: "blue"
+			keepingColor: "blue"
 		};
 		var kVolumeConfig = {
 			height: "100%",

@@ -98,9 +98,9 @@
 		 * 1. offset 在区间 [0, half + gap) 时，什么也不做
 		 * 2. offset 在区间 [half + gap, half + gap + half) 时，kDataManager 的绘制索引±1
 		 * 3. offset 在区间 [half + gap + half, ...) 时，调整 offset，使得 offset = offset - (half + gap + half)
-		 * @type {number}
+		 * @type {Big}
 		 */
-		var renderingOffset = 0;
+		var renderingOffsetBig = new Big(0);
 
 
 		/* 代理 KDataManager 的方法 */
@@ -145,9 +145,9 @@
 
 			kDataManager.setDataList(dataList);
 
-			if(renderingOffset !== 0)
+			if(!renderingOffsetBig.eq(0))
 				this.fire(evtName_renderingPositionChanges);
-			renderingOffset = 0;
+			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);
 
 			return this;
 		};
@@ -157,12 +157,24 @@
 		 * @returns {Number}
 		 */
 		this.getRenderingOffset = function(){
-			return renderingOffset;
+			return numBig(renderingOffsetBig);
 		};
 
 		/**
 		 * 更新“绘制位置的横向位移”，使其在既有基础上累加上给定的偏移量
-		 * @param {Number} amount 要累加的横向偏移量
+		 * 设定：
+		 * 1. B = 柱子的宽度
+		 * 2. h = Math.floor((B-1) / 2)
+		 * 3. H = Math.ceil((B+1) / 2)
+		 * 4. g = 柱子之间的间隙
+		 * 5. Δ = 原始位移
+		 * 6. Δ' = 调整后的位移
+		 * 7. d = 第一个可见数据的索引
+		 * 则：
+		 * 0 <= Δ < h+g+1 时，Δ' = Δ；
+		 * h+g+1 <= Δ < h+g+h+1 = B+g 时，Δ' = (H - (Δ - (h+g))) * -1，d ±= 1
+		 *
+		 * @param {Number} amount 要累加的横向偏移量。正数代表图形向右移动；负数代表图形向左移动
 		 * @returns {KChart}
 		 */
 		this.updateRenderingOffsetBy = function(amount){
@@ -173,35 +185,32 @@
 			if(0 === amount)
 				return this;
 
-			var half = this.calcHalfGroupBarWidth(),
-				gap = this.getConfigItem("groupGap"),
-				barSize = this.getConfigItem("groupBarWidth"),
-				halfBarSizeBig = new Big(this.calcHalfGroupBarWidth());
+			var h = this.calcHalfGroupBarWidth(),
+				g = this.getConfigItem("groupGap"),
+				B = this.getConfigItem("groupBarWidth"),
+				H = ceilBig(new Big(B).plus(1).div(2));
+			var groupSize = B + g;
 
-			var barSizeBig = new Big(barSize);
-			var offsetBig = new Big(renderingOffset).plus(amount);
-			var ifMovingToRight = offsetBig.gt(0);
+			// debugger;
+			var ifMovingToRight = amount > 0;
+			renderingOffsetBig = renderingOffsetBig.plus(amount);
+			amount = Math.abs(amount);
 
-			offsetBig = offsetBig.abs();
-			renderingOffset = numBig(offsetBig);
+			var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
+			var tmp = renderingOffsetBig.abs().mod(groupSize);
+			var newRenderingOffsetBig = renderingOffsetBig;
+			if(tmp.gte(h + g + 1)){
+				dataIndexOffset += 1;
+				newRenderingOffsetBig = new Big(H - (numBig(renderingOffsetBig.abs()) - (h + g))).mul(-1);
+			}else
+				newRenderingOffsetBig = renderingOffsetBig;
+			if(ifMovingToRight)
+				dataIndexOffset = dataIndexOffset * -1;
 
-			var tmp = barSizeBig.plus(gap);
-
-			var indexOffset = Math.floor(Number(offsetBig.div(tmp).toString()));
-			offsetBig = offsetBig.mod(tmp).abs();
-			renderingOffset = Number(offsetBig.toString());
-
-			tmp = halfBarSizeBig.plus(gap);
-			if(offsetBig.gt(tmp)){
-				indexOffset += 1;
-				offsetBig = halfBarSizeBig.plus(1).minus(offsetBig.minus(tmp)).mul(-1);
-				renderingOffset = Number(offsetBig.toString());
-			}
-
-			indexOffset = indexOffset * (ifMovingToRight? -1: 1);
+			renderingOffsetBig = newRenderingOffsetBig;
 			this.fire(evtName_renderingPositionChanges);
 
-			kDataManager.updateFirstVisibleDataIndexBy(indexOffset);
+			kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
 
 			return this;
 		};
@@ -211,10 +220,10 @@
 		 * @returns {KChart}
 		 */
 		this.resetRenderingOffset = function(){
-			if(renderingOffset !== 0)
+			if(!renderingOffset.eq(0))
 				this.fire(evtName_renderingPositionChanges);
 
-			renderingOffset = 0;
+			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);
 			return this;
 		};
 
