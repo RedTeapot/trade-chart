@@ -388,19 +388,21 @@
 					return;
 
 				var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content).plus(kChart.getRenderingOffset()));
-
 				var data = kChart.getKDataManager().getConvertedData(i);
 
-				if(i == 0)
-					console.log(">>", tickX, xLeft_content, kChart.getRenderingOffset());
+				// if(i == 0)
+				// 	console.log(">>", tickX, xLeft_content, kChart.getRenderingOffset());
+
+				var ifRender = tickX >= xLeft_content;
+				if(!ifRender)
+					return;
 
 				/* 绘制网格竖线 */
-				if(ifShowVerticalGridLine && tickX >= xLeft_content){
+				if(ifShowVerticalGridLine){
 					ctx.save();
 					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
 					config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
 
-					/* 蜡烛图 */
 					ctx.beginPath();
 					ctx.moveTo(tickX, y_axisX - 1);
 					ctx.lineTo(tickX, y_axisX - 1 - Math.floor(kSubChartSketch.getHeight()));

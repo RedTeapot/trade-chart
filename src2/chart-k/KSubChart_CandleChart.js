@@ -129,21 +129,22 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
 
-			/* 横坐标位置 */
-			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
-				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				xLeft_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
-				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
-
-				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
-				yTop_axisY = util.getLinePosition(config_paddingTop);
-
 			/* 绘制的数据个数 */
 			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
 			/* 一组数据的宽度 */
 			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
+
+			/* 横坐标位置 */
+			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
+				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
+				xLeft_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
+				xLeftEdge_content = xLeft_content - halfGroupBarWidth,
+				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
+
+				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
+				yTop_axisY = util.getLinePosition(config_paddingTop);
 
 
 			/**
@@ -225,8 +226,8 @@
 				 */
 				var renderCandle = function(i, callback){
 					var data = dataList[i];
-					var x = Math.floor(xLeft_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
-					if(i == 0){
+					var x = Math.floor(xLeftEdge_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)));
+					if(i === 0){
 						console.info("First candle left position: " + x + " on sub chart: " + self.id);
 					}
 
@@ -237,12 +238,28 @@
 					var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);
 
-					/* 绘制线 */
 					var lineX = x + floorBig(new Big(config_groupBarWidth).minus(config_groupLineWidth).div(2)),
 						lineYTop = Math.floor(yTop_axisY + calcHeight(maxLinePrice));
 					var lineYBottom = lineYTop + Math.floor(calcHeight(data.highPrice, data.lowPrice));
 					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
 						lineYBottom += 1;
+
+					var barX = x,
+						barY = Math.floor(yTop_axisY + calcHeight(maxBarPrice));
+					var barHeight = Math.floor(calcHeight(data.openPrice, data.closePrice));
+					if(0 === barHeight)
+						barHeight = 1;
+
+					if(i === 0){
+						/* 裁剪掉第一个蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
+						var minY = Math.min(lineYTop, barY),
+							maxHeight = Math.max(lineYBottom - lineYTop, barHeight);
+
+						var oldImgData = ctx.getImageData(xLeft_axisX, minY, xLeftEdge_content - xLeft_axisX, maxHeight);
+						console.log("####1", xLeft_axisX, minY, xLeftEdge_content - xLeft_axisX, maxHeight);
+					}
+
+					/* 绘制线 */
 					if(config_groupLineWidth > 1){
 						ctx.strokeWidth = 0;
 						ctx.fillRect(lineX, lineYTop, config_groupLineWidth, Math.abs(lineYBottom - lineYTop));
@@ -256,13 +273,13 @@
 					}
 
 					/* 绘制蜡烛 */
-					var barX = x,
-						barY = Math.floor(yTop_axisY + calcHeight(maxBarPrice));
-					var barHeight = Math.floor(calcHeight(data.openPrice, data.closePrice));
-					if(0 === barHeight)
-						barHeight = 1;
 					ctx.strokeWidth = 0;
 					ctx.fillRect(barX, barY, config_groupBarWidth, barHeight);
+
+					if(i === 0){
+						/* 裁剪掉第一个蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
+						ctx.putImageData(oldImgData, xLeft_axisX, minY);
+					}
 
 					util.try2Call(callback, null, data, i, lineX, barX);
 				};

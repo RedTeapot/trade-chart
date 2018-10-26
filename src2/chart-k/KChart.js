@@ -185,6 +185,8 @@
 			if(0 === amount)
 				return this;
 
+			var ifMovingToRight = amount > 0;
+
 			var h = this.calcHalfGroupBarWidth(),
 				g = this.getConfigItem("groupGap"),
 				B = this.getConfigItem("groupBarWidth"),
@@ -192,7 +194,7 @@
 			var groupSize = B + g;
 
 			renderingOffsetBig = renderingOffsetBig.plus(amount);
-			var ifMovingToRight = renderingOffsetBig.gt(0);
+			var ifGloballyMovingToRight = renderingOffsetBig.gt(0);
 			amount = Math.abs(amount);
 
 			var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
@@ -201,16 +203,19 @@
 			if(tmp.gte(h + g + 1)){
 				dataIndexOffset += 1;
 				var newTouchOffset = numBig(renderingOffsetBig.abs()) - (h + g);
-				newRenderingOffsetBig = new Big(H - newTouchOffset).mul(ifMovingToRight? -1: 1);
+				newRenderingOffsetBig = new Big(H - newTouchOffset).mul(ifGloballyMovingToRight? -1: 1);
 			}else
-				newRenderingOffsetBig = renderingOffsetBig;
-			if(ifMovingToRight)
+				newRenderingOffsetBig = tmp.mul(ifMovingToRight? 1: -1);
+			if(ifGloballyMovingToRight)
 				dataIndexOffset = dataIndexOffset * -1;
 
 			renderingOffsetBig = newRenderingOffsetBig;
 			this.fire(evtName_renderingPositionChanges);
 
 			kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
+
+
+			//TODO 1. 边界数据更换时，位移不连续
 
 			return this;
 		};

@@ -125,6 +125,13 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
 
+			/* 绘制的数据个数 */
+			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
+			/* 一组数据的宽度 */
+			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
+			/* 蜡烛一半的宽度 */
+			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
+
 			/* 横坐标位置 */
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
@@ -133,12 +140,6 @@
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX;
 
-			/* 绘制的数据个数 */
-			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
-			/* 一组数据的宽度 */
-			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
-			/* 蜡烛一半的宽度 */
-			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
 			/**
 			 * 获取指定成交量对应的物理高度
@@ -219,7 +220,7 @@
 				var renderVolume = function(i){
 					var data = dataList[i];
 					var x = Math.floor(xLeft_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
-					if(i == 0){
+					if(i === 0){
 						console.info("First volume left position: " + x + " on sub chart: " + self.id);
 					}
 

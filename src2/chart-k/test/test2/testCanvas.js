@@ -109,7 +109,7 @@
 			paddingRight: 60,
 			
 			groupLineWidth: 3,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
-			groupBarWidth: 4,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
+			groupBarWidth: 7,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
 			groupGap: 3,
 			
 			axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
