@@ -36,7 +36,6 @@
 		var firstVisibleDataIndex = 0;
 
 
-
 		/**
 		 * 获取当前画布上第一个可见的数据在整个数据中的索引位置
 		 * @returns {number}
@@ -160,24 +159,46 @@
 		 * 没有拖动时，第一条被绘制的数据，应为提供的数据源中的第一个。
 		 * 没有拖动时，绘制的第一个蜡烛图的正中间与正文区域的左侧重合。
 		 *
+		 * @param {Number} [maxGroupCount] 图形正文区域可以呈现的最大数据量
 		 * @returns {Array<UserSuppliedData>}
 		 */
-		this.getRenderingDataList = function(){
-			return dataList.slice(firstVisibleDataIndex);
+		this.getRenderingDataList = function(maxGroupCount){
+			if(!util.isValidNumber(maxGroupCount))
+				return dataList.slice(firstVisibleDataIndex);
+			else
+				return dataList.slice(firstVisibleDataIndex, Math.min(dataList.length, firstVisibleDataIndex + maxGroupCount));
 		};
 
 		/**
 		 * 结合用户的拖动位置，获取可以被渲染的数据列表。
 		 * 没有拖动时，第一条被绘制的数据，应为提供的数据源中的第一个。
 		 * 没有拖动时，绘制的第一个蜡烛图的正中间与正文区域的左侧重合。
+		 *
+		 * @param {Number} [maxGroupCount] 图形正文区域可以呈现的最大数据量
 		 * @returns {KData[]}
 		 */
-		this.getConvertedRenderingDataList = function(){
-			var list = this.getRenderingDataList();
+		this.getConvertedRenderingDataList = function(maxGroupCount){
+			var list = this.getRenderingDataList(maxGroupCount);
 			if(typeof dataParser !== "function")
 				return list;
 
 			return list.map(convertData);
+		};
+
+		/**
+		 * 获取向右拖动时经过的，不再可见的数据个数
+		 * @param {Number} maxGroupCount 图形正文区域可以呈现的最大数据量
+		 * @returns {Number}
+		 */
+		this.getElapsedNewerDataCount = function(maxGroupCount){
+			if(dataList.length < maxGroupCount)
+				return 0;
+
+			var expectedLastVisibleIndex = firstVisibleDataIndex + maxGroupCount - 1;
+			if(expectedLastVisibleIndex >= dataList.length - 1)
+				return 0;
+
+			return dataList.length - 1 - expectedLastVisibleIndex;
 		};
 
 		/**

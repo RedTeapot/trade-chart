@@ -9,8 +9,8 @@
 	var roundBig = function(big){
 		return Math.round(numBig(big));
 	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
+	var ceilBig = function(big){
+		return Math.ceil(numBig(big));
 	};
 
 	var NOT_SUPPLIED = {};
@@ -348,11 +348,13 @@
 
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				xLeft_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
+				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
 
+			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
+
 			/* 绘制的数据个数 */
-			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), kChart.getKDataManager().getConvertedRenderingDataList().length);
+			var groupCount = dataList.length;
 			/* 一组数据的宽度 */
 			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
 			/* 蜡烛一半的宽度 */
@@ -363,8 +365,6 @@
 			var ifShowVerticalGridLine = config_showVerticalGridLine && !util.isEmptyString(config_verticalGridLineColor);
 			/* 一个横坐标刻度横跨的数据个数 */
 			var axisXLabelTickSpan = kChart.calcAxisXLabelTickSpan();
-			/* 横坐标刻度个数 */
-			var axisXTickCount = floorBig(new Big(groupCount).div(axisXLabelTickSpan));
 
 			/* 绘制X轴坐标线 */
 			if(config_showAxisXLine){
@@ -381,21 +381,21 @@
 
 			/**
 			 * 根据提供的数据的索引位置绘制刻度
-			 * @param {Number} i 数据的索引位置
+			 * @param {Number} i 从右向左方向的数据索引位置。索引为0的数据在最后
 			 */
-			var renderXTick = function(i){
+			var tryToRenderXTick = function(i){
 				if(i < 0 || i >= groupCount)
 					return;
 
-				var tickX = util.getLinePosition(groupSizeBig.mul(i).plus(xLeft_content).plus(kChart.getRenderingOffset()));
-				var data = kChart.getKDataManager().getConvertedData(i);
+				var dataIndex = groupCount - 1 - i;
+				var dataOverallIndex = kChart.getKDataManager().getElapsedNewerDataCount(kChartSketch.getMaxGroupCount()) + dataIndex;
 
-				// if(i == 0)
-				// 	console.log(">>", tickX, xLeft_content, kChart.getRenderingOffset());
-
-				var ifRender = tickX >= xLeft_content;
-				if(!ifRender)
+				var ifShowTick = dataOverallIndex % axisXLabelTickSpan === 0;
+				if(!ifShowTick)
 					return;
+
+				var data = dataList[dataIndex];
+				var tickX = util.getLinePosition(groupSizeBig.mul(dataIndex).plus(xLeft_axisX_content).plus(kChart.getRenderingOffset()));
 
 				/* 绘制网格竖线 */
 				if(ifShowVerticalGridLine){
@@ -427,27 +427,8 @@
 			};
 
 			/* 绘制X轴刻度 */
-			var edgeTickDataIndex,/** 处于边界位置的刻度所对应的数据索引 */
-			lastTickDataIndex;/** 最后一个的刻度所对应的数据索引 */
-			edgeTickDataIndex = groupCount - 1;
-
-			var b = new Big(axisXLabelTickSpan);
-			for(var i = 0; i <= axisXTickCount - 1; i++){
-				renderXTick(roundBig(b.mul(i)));
-			}
-			lastTickDataIndex = Math.min(roundBig(b.mul(i)), groupCount - 1);
-
-			var totalSpace = Math.min(numBig(groupSizeBig.mul(groupCount - 1)), kChartSketch.getContentWidth());
-			var remainingSpace = totalSpace - (numBig(groupSizeBig.mul(lastTickDataIndex)) - halfGroupBarWidth + halfGroupSize);
-			if(remainingSpace < halfGroupSize){
-				/* 剩余空间不足，只绘制边界刻度 */
-				renderXTick(edgeTickDataIndex);
-			}else{
-				/* 绘制最后一个刻度和边界刻度 */
-				renderXTick(edgeTickDataIndex);
-				if(lastTickDataIndex !== edgeTickDataIndex)
-					renderXTick(lastTickDataIndex);
-			}
+			for(var i = 0; i < groupCount; i++)
+				tryToRenderXTick(i);
 
 			return axisXTickList;
 		};
@@ -592,7 +573,7 @@
 		console.info("Create k sub chart: " + this.id);
 
 		var evtRenderTimer,
-			evtRenderDelay = 50;
+			evtRenderDelay = 15;
 		var evtRenderAction = function(e){
 			clearTimeout(evtRenderTimer);
 			evtRenderTimer = setTimeout(function(){

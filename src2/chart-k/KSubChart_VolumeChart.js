@@ -108,6 +108,7 @@
 				config_axisLineColor = getConfigItem("axisLineColor"),
 
 				config_axisXTickOffset = getConfigItem("axisXTickOffset"),
+				config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight"),
 				config_axisYPosition = getConfigItem("axisYPosition"),
 
 				config_groupGap = getConfigItem("groupGap"),
@@ -115,15 +116,15 @@
 
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase();
 
-			var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
-			if(dataList.length > 0)
-				console.debug("First converted data to draw: " + this.id, kChart.getKDataManager().getFirstVisibleConvertedData());
-
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KSubChartSketch_VolumeDataSketch.sketch(kChart, config),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
+
+			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
+			if(dataList.length > 0)
+				console.debug("First converted data to draw: " + this.id, kChart.getKDataManager().getFirstVisibleConvertedData());
 
 			/* 绘制的数据个数 */
 			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
@@ -135,7 +136,10 @@
 			/* 横坐标位置 */
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				xLeft_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
+				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
+				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
+				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
+				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX;
@@ -219,22 +223,43 @@
 				 */
 				var renderVolume = function(i){
 					var data = dataList[i];
-					var x = Math.floor(xLeft_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
+					var x = Math.floor(xLeft_axisX_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
 					if(i === 0){
 						console.info("First volume left position: " + x + " on sub chart: " + self.id);
 					}
 
-					var isAppreciated = data.closePrice > data.openPrice,
-						isKeeped = Math.abs(data.closePrice - data.openPrice) < 2e-7;
-
-					ctx.save();
-					ctx.strokeWidth = 0;
-					ctx.fillStyle = ctx.strokeStyle = isKeeped? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
+					var volumeHeight = Math.ceil(calcHeight(data.volume));
+					if(0 === volumeHeight)
+						return;
 
 					var barX = x;
-					var volumeHeight = Math.ceil(calcHeight(data.volume));
-					ctx.fillRect(barX, Math.floor(y_axisX - volumeHeight), config_groupBarWidth, volumeHeight);
-					ctx.restore();
+					var barY = Math.floor(y_axisX - volumeHeight);
+
+					var isAppreciated = data.closePrice > data.openPrice,
+						isKeeping = Math.abs(data.closePrice - data.openPrice) < 2e-7;
+
+					ctx.strokeWidth = 0;
+					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
+
+					if(i === 0 || i === groupCount - 1){
+						/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
+						var oldImgData;
+						if(i === 0)
+							oldImgData = ctx.getImageData(0, barY, xLeftEdge_axisX_content, volumeHeight);
+						else
+							oldImgData = ctx.getImageData(xRightEdge_axisX_content, barY, config_width - xRightEdge_axisX_content, volumeHeight)
+					}
+
+
+					ctx.fillRect(barX, barY, config_groupBarWidth, volumeHeight);
+
+					if(i === 0 || i === groupCount - 1){
+						/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
+						if(i === 0)
+							ctx.putImageData(oldImgData, 0, barY);
+						else
+							ctx.putImageData(oldImgData, xRightEdge_axisX_content, barY);
+					}
 				};
 
 				for(var i = 0; i < groupCount; i++)

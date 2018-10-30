@@ -9,6 +9,9 @@
 	var floorBig = function(big){
 		return Math.floor(numBig(big));
 	};
+	var ceilBig = function(big){
+		return Math.ceil(numBig(big));
+	};
 
 	/**
 	 * @constructor
@@ -119,7 +122,8 @@
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 		chartSketch.setWidth(floorBig(widthBig))
 			.setContentWidth(floorBig(contentWidthBig))
-			.setMaxGroupCount(floorBig(contentWidthBig.minus(config_groupLineWidth).div(config_groupGap + config_groupBarWidth)) + 1);
+			/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半 */
+			.setMaxGroupCount(ceilBig(contentWidthBig.plus(config_groupBarWidth).minus(1).div(config_groupGap + config_groupBarWidth)));
 
 		return chartSketch;
 	};
@@ -143,7 +147,8 @@
 		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 
-		return floorBig(contentWidthBig.minus(config_groupLineWidth).div(config_groupGap + config_groupBarWidth)) + 1;
+		/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半 */
+		return ceilBig(contentWidthBig.plus(config_groupBarWidth).minus(1).div(config_groupGap + config_groupBarWidth));
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KChartSketch", KChartSketch);

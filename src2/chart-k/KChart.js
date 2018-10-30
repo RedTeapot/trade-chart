@@ -237,7 +237,7 @@
 
 				kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
 			}
-			
+
 			return this;
 		};
 
