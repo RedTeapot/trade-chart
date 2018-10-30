@@ -185,38 +185,59 @@
 			if(0 === amount)
 				return this;
 
-			var ifMovingToRight = amount > 0;
-
 			var h = this.calcHalfGroupBarWidth(),
 				g = this.getConfigItem("groupGap"),
 				B = this.getConfigItem("groupBarWidth"),
-				H = ceilBig(new Big(B).plus(1).div(2));
+				H = h + 1;
 			var groupSize = B + g;
 
 			renderingOffsetBig = renderingOffsetBig.plus(amount);
-			var ifGloballyMovingToRight = renderingOffsetBig.gt(0);
-			amount = Math.abs(amount);
 
-			var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
-			var tmp = renderingOffsetBig.abs().mod(groupSize);
-			var newRenderingOffsetBig = renderingOffsetBig;
-			if(tmp.gte(h + g + 1)){
-				dataIndexOffset += 1;
-				var newTouchOffset = numBig(renderingOffsetBig.abs()) - (h + g);
-				newRenderingOffsetBig = new Big(H - newTouchOffset).mul(ifGloballyMovingToRight? -1: 1);
-			}else
-				newRenderingOffsetBig = tmp.mul(ifMovingToRight? 1: -1);
-			if(ifGloballyMovingToRight)
+			var ifMovingToRight = amount > 0;
+			if(ifMovingToRight){
+				if(renderingOffsetBig.lt(0)){
+					this.fire(evtName_renderingPositionChanges);
+					return this;
+				}
+
+				amount = Math.abs(amount);
+
+				var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
+				var tmp = renderingOffsetBig.abs().mod(groupSize);
+				var newRenderingOffsetBig = renderingOffsetBig;
+				if(tmp.gt(g)){
+					dataIndexOffset += 1;
+					newRenderingOffsetBig = new Big(B - (tmp-g)).mul(-1);
+				}else
+					newRenderingOffsetBig = tmp;
 				dataIndexOffset = dataIndexOffset * -1;
 
-			renderingOffsetBig = newRenderingOffsetBig;
-			this.fire(evtName_renderingPositionChanges);
+				renderingOffsetBig = newRenderingOffsetBig;
+				this.fire(evtName_renderingPositionChanges);
 
-			kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
+				kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
+			}else{
+				if(renderingOffsetBig.gt(0)){
+					this.fire(evtName_renderingPositionChanges);
+					return this;
+				}
 
+				var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
+				var tmp = renderingOffsetBig.abs().mod(groupSize);
+				var newRenderingOffsetBig = renderingOffsetBig;
+				if(tmp.gte(B)){
+					dataIndexOffset += 1;
+					newRenderingOffsetBig = new Big(g - (tmp-B)).mul(1);
+				}else{
+					newRenderingOffsetBig = tmp.mul(-1);
+				}
 
-			//TODO 1. 边界数据更换时，位移不连续
+				renderingOffsetBig = newRenderingOffsetBig;
+				this.fire(evtName_renderingPositionChanges);
 
+				kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
+			}
+			
 			return this;
 		};
 

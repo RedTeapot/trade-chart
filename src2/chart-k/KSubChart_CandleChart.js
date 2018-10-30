@@ -256,7 +256,6 @@
 							maxHeight = Math.max(lineYBottom - lineYTop, barHeight);
 
 						var oldImgData = ctx.getImageData(xLeft_axisX, minY, xLeftEdge_content - xLeft_axisX, maxHeight);
-						console.log("####1", xLeft_axisX, minY, xLeftEdge_content - xLeft_axisX, maxHeight);
 					}
 
 					/* 绘制线 */
