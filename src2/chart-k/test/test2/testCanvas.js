@@ -188,6 +188,7 @@
 		}).setConfig(kChartConfig);
 		kChart.setDataList(datas.slice(sepIndex)).prependDataList(datas.slice(0, sepIndex));
 		window.kChart = kChart;
+		window.kdm = kChart.getKDataManager();
 
 		var moveDelayTimer, moveTimer;
 		moveLeftObj.addEventListener("mousedown", function(){

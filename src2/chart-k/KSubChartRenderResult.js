@@ -90,10 +90,7 @@
 		 * @returns {Array<KData|Object>}
 		 */
 		this.getRenderingDataList = function(){
-			var dataList = this.getKChart().getRenderingDataList() || [];
-			var count = Math.min(this.getRenderingGroupCount(), dataList.length);
-
-			return dataList.slice(0, count);
+			return this.getKChart().getRenderingDataList(this.getRenderingGroupCount());
 		};
 
 		/**
@@ -101,10 +98,7 @@
 		 * @returns {Array<KData>}
 		 */
 		this.getConvertedRenderingDataList = function(){
-			var dataList = this.getKChart().getKDataManager().getConvertedRenderingDataList() || [];
-			var count = Math.min(this.getRenderingGroupCount(), dataList.length);
-
-			return dataList.slice(0, count);
+			return this.getKChart().getKDataManager().getConvertedRenderingDataList(this.getRenderingGroupCount());
 		};
 
 		/**
@@ -125,6 +119,15 @@
 				config_paddingRight = self.getConfigItem("paddingRight"),
 				config_axisXTickOffsetFromRight = self.getConfigItem("axisXTickOffsetFromRight");
 			return Math.floor(config_width - config_paddingRight - config_axisXTickOffsetFromRight);
+		};
+
+		/**
+		 * 获取第一条可见数据的索引位置
+		 * @returns {number}
+		 */
+		var getFirstVisibleDataIndex = function(){
+			var kDataManager = self.getKChart().getKDataManager();
+			return kDataManager.getDataList().length - kDataManager.getElapsedNewerDataCount() - self.getRenderingGroupCount();
 		};
 
 		/**
@@ -154,7 +157,7 @@
 					index = -1;
 			}
 
-			return index + this.getKChart().getKDataManager().getFirstVisibleDataIndex();
+			return index + getFirstVisibleDataIndex();
 		};
 
 		/**
@@ -163,7 +166,7 @@
 		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
 		 */
 		this.getRenderingHorizontalPosition = function(dataIndex){
-			dataIndex -= this.getKChart().getKDataManager().getFirstVisibleDataIndex();
+			dataIndex -= getFirstVisibleDataIndex();
 			var renderingGroupCount = this.getRenderingGroupCount();
 			if(dataIndex < 0 || dataIndex >= renderingGroupCount)
 				return -1;

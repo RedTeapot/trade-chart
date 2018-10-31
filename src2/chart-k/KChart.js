@@ -162,17 +162,6 @@
 
 		/**
 		 * 更新“绘制位置的横向位移”，使其在既有基础上累加上给定的偏移量
-		 * 设定：
-		 * 1. B = 柱子的宽度
-		 * 2. h = Math.floor((B-1) / 2)
-		 * 3. H = Math.ceil((B+1) / 2)
-		 * 4. g = 柱子之间的间隙
-		 * 5. Δ = 原始位移
-		 * 6. Δ' = 调整后的位移
-		 * 7. d = 第一个可见数据的索引
-		 * 则：
-		 * 0 <= Δ < h+g+1 时，Δ' = Δ；
-		 * h+g+1 <= Δ < h+g+h+1 = B+g 时，Δ' = (H - (Δ - (h+g))) * -1，d ±= 1
 		 *
 		 * @param {Number} amount 要累加的横向偏移量。正数代表图形向右移动；负数代表图形向左移动
 		 * @returns {KChart}
@@ -210,12 +199,11 @@
 					newRenderingOffsetBig = new Big(B - (tmp-g)).mul(-1);
 				}else
 					newRenderingOffsetBig = tmp;
-				dataIndexOffset = dataIndexOffset * -1;
 
 				renderingOffsetBig = newRenderingOffsetBig;
 				this.fire(evtName_renderingPositionChanges);
 
-				kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
+				kDataManager.updateElapsedDataCountBy(dataIndexOffset);
 			}else{
 				if(renderingOffsetBig.gt(0)){
 					this.fire(evtName_renderingPositionChanges);
@@ -231,11 +219,12 @@
 				}else{
 					newRenderingOffsetBig = tmp.mul(-1);
 				}
+				dataIndexOffset = dataIndexOffset * -1;
 
 				renderingOffsetBig = newRenderingOffsetBig;
 				this.fire(evtName_renderingPositionChanges);
 
-				kDataManager.updateFirstVisibleDataIndexBy(dataIndexOffset);
+				kDataManager.updateElapsedDataCountBy(dataIndexOffset);
 			}
 
 			return this;

@@ -32,32 +32,34 @@
 		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
 		var dataParser;
 
-		/* 画布上第一个可见的数据在整个数据中的索引位置 */
-		var firstVisibleDataIndex = 0;
+		/* 向右拖动时经过的，不再可见的较新的数据个数 */
+		var elapsedDataCount = 0;
 
 
 		/**
-		 * 获取当前画布上第一个可见的数据在整个数据中的索引位置
-		 * @returns {number}
-		 */
-		this.getFirstVisibleDataIndex = function(){
-			return firstVisibleDataIndex;
-		};
-
-		/**
-		 * 使用给定的偏移量更新“画布上第一个可见的数据在整个数据中的索引位置”
+		 * 使用给定的偏移量更新“向右拖动时经过的，不再可见的较新的数据个数”
 		 * @param {Number} offset 偏移量
+		 * @param {Number} [maxGroupCount] 最大显示数据量
 		 * @returns {KDataManager}
 		 */
-		this.updateFirstVisibleDataIndexBy = function(offset){
-			var v = firstVisibleDataIndex + offset;
-			v = Math.max(v, 0);
-			v = Math.min(v, dataList.length - 1);
+		this.updateElapsedDataCountBy = function(offset, maxGroupCount){
+			var v = elapsedDataCount + offset;
+			if(util.isValidNumber(maxGroupCount)){
+				maxGroupCount = util.parseAsNumber(maxGroupCount);
 
-			if(v !== firstVisibleDataIndex){
-				firstVisibleDataIndex = v;
+				if(dataList.length >= maxGroupCount){
+					v = Math.min(v, dataList.length - maxGroupCount);
+				}else
+					v = 0;
+			}else{
+				v = Math.max(v, 0);
+				v = Math.min(v, dataList.length - 1);
+			}
 
-				console.log("Update first visible data index to " + v);
+			if(v !== elapsedDataCount){
+				elapsedDataCount = v;
+
+				console.log("Update elapsed data count to " + v);
 				this.fire(evtName_renderingDataChanges, null, false);
 			}
 
@@ -76,7 +78,6 @@
 			}
 
 			dataList = datas.concat(dataList);
-			firstVisibleDataIndex += datas.length;
 			this.fire(evtName_storedDataChanges, null, false);
 
 			return this;
@@ -94,6 +95,7 @@
 			}
 
 			dataList = dataList.concat(datas);
+			elapsedDataCount += datas.length;
 			this.fire(evtName_storedDataChanges, null, false);
 
 			return this;
@@ -114,9 +116,14 @@
 				this.fire(evtName_storedDataChanges, null, false);
 			dataList = _datas;
 
-			if(firstVisibleDataIndex !== 0)
+			var ifChanges = false;
+			if(elapsedDataCount !== 0)
+				ifChanges = true;
+
+			if(ifChanges)
 				this.fire(evtName_renderingDataChanges, null, false);/* 数据发生变更，回到初始位置 */
-			firstVisibleDataIndex = 0;
+
+			elapsedDataCount = 0;
 
 			return this;
 		};
@@ -155,18 +162,16 @@
 		};
 
 		/**
-		 * 结合用户的拖动位置，获取可以被渲染的数据列表。
-		 * 没有拖动时，第一条被绘制的数据，应为提供的数据源中的第一个。
-		 * 没有拖动时，绘制的第一个蜡烛图的正中间与正文区域的左侧重合。
+		 * 结合用户的拖动位置，从右向左获取可以被渲染的数据列表。
 		 *
 		 * @param {Number} [maxGroupCount] 图形正文区域可以呈现的最大数据量
 		 * @returns {Array<UserSuppliedData>}
 		 */
 		this.getRenderingDataList = function(maxGroupCount){
-			if(!util.isValidNumber(maxGroupCount))
-				return dataList.slice(firstVisibleDataIndex);
+			if(util.isValidNumber(maxGroupCount))
+				return dataList.slice(dataList.length - elapsedDataCount - maxGroupCount, dataList.length - elapsedDataCount);
 			else
-				return dataList.slice(firstVisibleDataIndex, Math.min(dataList.length, firstVisibleDataIndex + maxGroupCount));
+				return dataList.slice(0, dataList.length - elapsedDataCount);
 		};
 
 		/**
@@ -187,18 +192,10 @@
 
 		/**
 		 * 获取向右拖动时经过的，不再可见的数据个数
-		 * @param {Number} maxGroupCount 图形正文区域可以呈现的最大数据量
 		 * @returns {Number}
 		 */
-		this.getElapsedNewerDataCount = function(maxGroupCount){
-			if(dataList.length < maxGroupCount)
-				return 0;
-
-			var expectedLastVisibleIndex = firstVisibleDataIndex + maxGroupCount - 1;
-			if(expectedLastVisibleIndex >= dataList.length - 1)
-				return 0;
-
-			return dataList.length - 1 - expectedLastVisibleIndex;
+		this.getElapsedNewerDataCount = function(){
+			return elapsedDataCount;
 		};
 
 		/**
@@ -230,14 +227,6 @@
 				return data;
 
 			return convertData(data);
-		};
-
-		/**
-		 * 获取当前可见的第一个格式被转换了的数据
-		 * @returns {KData}
-		 */
-		this.getFirstVisibleConvertedData = function(){
-			return this.getConvertedData(this.getFirstVisibleDataIndex());
 		};
 
 		/**

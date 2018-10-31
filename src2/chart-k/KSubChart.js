@@ -388,9 +388,9 @@
 					return;
 
 				var dataIndex = groupCount - 1 - i;
-				var dataOverallIndex = kChart.getKDataManager().getElapsedNewerDataCount(kChartSketch.getMaxGroupCount()) + dataIndex;
+				var dataOverallIndexFromRightToLeft = kChart.getKDataManager().getElapsedNewerDataCount() + i;
 
-				var ifShowTick = dataOverallIndex % axisXLabelTickSpan === 0;
+				var ifShowTick = dataOverallIndexFromRightToLeft % axisXLabelTickSpan === 0;
 				if(!ifShowTick)
 					return;
 
@@ -422,6 +422,8 @@
 					return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 				})();
 				axisXTickList.push({x: tickX, label: label});
+
+				console.log(">>>", dataOverallIndex, label, tickX);
 
 				previousXTickDataIndex = i;
 			};

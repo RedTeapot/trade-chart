@@ -127,8 +127,7 @@
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
 
 			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
-			if(dataList.length > 0)
-				console.debug("First converted data to draw: " + this.id, kChart.getKDataManager().getFirstVisibleConvertedData());
+
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
