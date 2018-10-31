@@ -122,6 +122,13 @@
 			};
 		});
 
+
+
+		var fireEvent_renderingPositionChanges = function(){
+			self.fire(evtName_renderingPositionChanges, null, false);
+		};
+
+
 		util.defineReadonlyProperty(this, "id", util.randomString("k-", 3));
 
 		/**
@@ -146,7 +153,7 @@
 			kDataManager.setDataList(dataList);
 
 			if(!renderingOffsetBig.eq(0))
-				this.fire(evtName_renderingPositionChanges);
+				fireEvent_renderingPositionChanges();
 			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);
 
 			return this;
@@ -185,7 +192,7 @@
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){
 				if(renderingOffsetBig.lt(0)){
-					this.fire(evtName_renderingPositionChanges);
+					fireEvent_renderingPositionChanges();
 					return this;
 				}
 
@@ -201,12 +208,12 @@
 					newRenderingOffsetBig = tmp;
 
 				renderingOffsetBig = newRenderingOffsetBig;
-				this.fire(evtName_renderingPositionChanges);
+				fireEvent_renderingPositionChanges();
 
 				kDataManager.updateElapsedDataCountBy(dataIndexOffset);
 			}else{
 				if(renderingOffsetBig.gt(0)){
-					this.fire(evtName_renderingPositionChanges);
+					fireEvent_renderingPositionChanges();
 					return this;
 				}
 
@@ -222,7 +229,7 @@
 				dataIndexOffset = dataIndexOffset * -1;
 
 				renderingOffsetBig = newRenderingOffsetBig;
-				this.fire(evtName_renderingPositionChanges);
+				fireEvent_renderingPositionChanges();
 
 				kDataManager.updateElapsedDataCountBy(dataIndexOffset);
 			}
@@ -236,7 +243,7 @@
 		 */
 		this.resetRenderingOffset = function(){
 			if(!renderingOffsetBig.eq(0))
-				this.fire(evtName_renderingPositionChanges);
+				fireEvent_renderingPositionChanges();
 
 			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);
 			return this;

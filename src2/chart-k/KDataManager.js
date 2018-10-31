@@ -59,7 +59,7 @@
 			if(v !== elapsedDataCount){
 				elapsedDataCount = v;
 
-				console.log("Update elapsed data count to " + v);
+				TradeChart2.showLog && console.log("Update elapsed data count to " + v);
 				this.fire(evtName_renderingDataChanges, null, false);
 			}
 

@@ -77,7 +77,7 @@
 
 			if(null == config || typeof config !== "object"){
 				if(NOT_SUPPLIED !== lastRenderingConfig){
-					console.info("Using last render config", lastRenderingConfig);
+					TradeChart2.showLog && console.info("Using last render config", lastRenderingConfig);
 					config = lastRenderingConfig;
 				}
 			}else
@@ -85,7 +85,7 @@
 
 			if(!(canvasObj instanceof HTMLCanvasElement)){
 				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
-					console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
+					TradeChart2.showLog && console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
 					canvasObj = lastRenderingCanvasObj;
 				}else{
 					throw new Error("No canvas element supplied to render");
@@ -230,7 +230,7 @@
 					var data = dataList[i];
 					var x = Math.floor(xLeftEdge_axisX_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)));
 					if(i === 0){
-						console.info("First candle left position: " + x + " on sub chart: " + self.id);
+						TradeChart2.showLog && console.info("First candle left position: " + x + " on sub chart: " + self.id);
 					}
 
 					var isAppreciated = data.closePrice > data.openPrice,

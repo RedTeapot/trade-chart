@@ -24,5 +24,8 @@
 	};
 	CommonTradeChart.prototype = Object.create(Chart.prototype);
 
+	/* 内部状态位，用于控制是否输出日志，以辅助定位插件问题 */
+	CommonTradeChart.showLog = true;
+
 	attachContext[attachName] = CommonTradeChart;
 })();

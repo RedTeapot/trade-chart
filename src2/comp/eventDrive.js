@@ -44,8 +44,10 @@
 				for(var i = 0; i < types.length; i++){
 					var _type = types[i];
 					build(_type);
-					if(eventHandlers[_type].indexOf(handler) !== -1)
+					if(eventHandlers[_type].indexOf(handler) !== -1){
+						console.warn("Handle of name: '" + handler.name + "' for type: '" + type + "' exists already.");
 						continue;
+					}
 
 					/* 加入列表 */
 					eventHandlers[_type].push(handler);

@@ -338,6 +338,7 @@
 				config_paddingLeft = this.getConfigItem("paddingLeft", config),
 				config_paddingTop = this.getConfigItem("paddingTop", config),
 				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
+				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight", config),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth", config),
 				config_groupGap = this.getConfigItem("groupGap", config),
 				config_gridLineDash = this.getConfigItem("gridLineDash", config),
@@ -349,6 +350,7 @@
 			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
 				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
 				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
+				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
 
 			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
@@ -398,7 +400,7 @@
 				var tickX = util.getLinePosition(groupSizeBig.mul(dataIndex).plus(xLeft_axisX_content).plus(kChart.getRenderingOffset()));
 
 				/* 绘制网格竖线 */
-				if(ifShowVerticalGridLine){
+				if(ifShowVerticalGridLine && tickX >= xLeft_axisX_content && tickX <= xRight_axisX){
 					ctx.save();
 					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
 					config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
@@ -422,8 +424,6 @@
 					return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 				})();
 				axisXTickList.push({x: tickX, label: label});
-
-				console.log(">>>", dataOverallIndex, label, tickX);
 
 				previousXTickDataIndex = i;
 			};
@@ -574,15 +574,9 @@
 
 		console.info("Create k sub chart: " + this.id);
 
-		var evtRenderTimer,
-			evtRenderDelay = 15;
 		var evtRenderAction = function(e){
-			clearTimeout(evtRenderTimer);
-			evtRenderTimer = setTimeout(function(){
-				console.debug("Auto render for sub chart: " + self.id + " by event: " + e.type);
-
-				self.render();
-			}, evtRenderDelay);
+			TradeChart2.showLog && console.debug("Auto render for sub chart: " + self.id + " by event: " + e.type);
+			self.render();
 		};
 		kChart.on("renderingpositionchange", evtRenderAction);
 		kChart.getKDataManager().on("storeddatachange, renderingdatachange", evtRenderAction);
