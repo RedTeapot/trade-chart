@@ -313,7 +313,7 @@
 		 */
 		this.calcHalfGroupBarWidth = function(){
 			var groupBarWidth = this.getConfigItem("groupBarWidth");
-			return floorBig(new Big(groupBarWidth).minus(1).div(2));
+			return floorBig(new Big(groupBarWidth).div(2));
 		};
 
 		/**
