@@ -130,7 +130,7 @@
 			/* 绘制的数据个数 */
 			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
 			/* 一组数据的宽度 */
-			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
+			var groupSize = config_groupBarWidth + config_groupGap;
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
@@ -156,7 +156,7 @@
 				if(arguments.length < 2)
 					volume2 = kDataSketch.getAmountFloor();
 
-				return kSubChartSketch.calculateHeight(numBig(new Big(volume2 || 0).minus(volume1 || 0).abs()));
+				return kSubChartSketch.calculateHeight(Math.abs(volume2 - volume1));
 			};
 
 			/**
@@ -225,7 +225,7 @@
 				var renderVolume = function(i){
 					var dataIndex = groupCount - 1 - i;
 					var data = dataList[dataIndex];
-					var x = floorBig(xRightBig_axisX_content.minus(halfGroupBarWidth).minus(groupSizeBig.mul(i)).plus(kChart.getRenderingOffset()));
+					var x = Math.floor(xRight_axisX_content + kChart.getRenderingOffset() - halfGroupBarWidth - groupSize * i);
 
 					if(i === 0){
 						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);

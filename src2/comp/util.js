@@ -242,6 +242,9 @@
 	 * @param {*} tar 要判断的对象
 	 */
 	var isValidNumber = function(tar){
+		if(typeof tar === "number")
+			return true;
+
 		var isEmpty = isEmptyString(tar, true);
 		return !isEmpty && (/^-?\d*(?:\.\d+)?$/.test(tar) || /^\d+\.\d*$/.test(tar));
 	};
@@ -253,17 +256,20 @@
 	 * @returns {*}
 	 */
 	var parseAsNumber = function(tar, dftValue){
-		if(tar instanceof TradeChart2.Big)
-			tar = tar.toString();
+		if(typeof tar === "number")
+			return tar;
+		else{
+			if(typeof tar === "string"){
+				if(isValidNumber(tar))
+					return Number(tar);
+			}else if(tar instanceof TradeChart2.Big)
+				return Number(tar.toString());
 
-		var isNumber = isValidNumber(tar);
-		if(isNumber)
-			return Number(tar);
+			if(arguments.length > 1)
+				return Number(dftValue);
 
-		if(arguments.length > 1)
-			return Number(dftValue);
-
-		return tar;
+			return tar;
+		}
 	};
 
 	/**
@@ -357,10 +363,7 @@
 	 * @param {String|Number|Big} d 坐标位置
 	 */
 	var getLinePosition = function(d){
-		if(!isValidNumber(d))
-			throw new Error("Invalid line position: " + d);
-
-		return Math.floor(parseAsNumber(d)) + 0.5;
+		return Math.floor(Number(d)) + 0.5;
 	};
 
 	/**

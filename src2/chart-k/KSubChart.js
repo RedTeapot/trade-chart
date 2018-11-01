@@ -352,14 +352,15 @@
 				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
 				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
-			var xRightBig_axisX_content = new Big(xRight_axisX_content);
 
-			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
+			var kDataManager = kChart.getKDataManager();
+
+			var dataList = kDataManager.getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
 			/* 一组数据的宽度 */
-			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
+			var groupSize = config_groupBarWidth + config_groupGap;
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 			/* 一组数据宽度的一半 */
@@ -390,28 +391,26 @@
 				if(i < 0 || i >= groupCount)
 					return;
 
-				var dataIndex = groupCount - 1 - i;
-				var dataOverallIndexFromRightToLeft = kChart.getKDataManager().getElapsedNewerDataCount() + i;
-
-				var data = dataList[dataIndex];
-				var tickX = util.getLinePosition(xRightBig_axisX_content.minus(groupSizeBig.mul(i)).plus(kChart.getRenderingOffset()));
+				var dataOverallIndexFromRightToLeft = kDataManager.getElapsedNewerDataCount() + i;
 
 				var ifShowTick = dataOverallIndexFromRightToLeft % axisXLabelTickSpan === 0;
-				ifShowTick = ifShowTick && tickX >= xLeft_axisX_content && tickX <= xRight_axisX;
 				if(!ifShowTick)
 					return;
 
+				var tickX = util.getLinePosition(xRight_axisX_content + kChart.getRenderingOffset() - groupSize * i);
+				ifShowTick = tickX >= xLeft_axisX_content && tickX <= xRight_axisX;
+				if(!ifShowTick)
+					return;
+
+				var dataIndex = groupCount - 1 - i;
+				var data = dataList[dataIndex];
+
 				/* 绘制网格竖线 */
 				if(ifShowVerticalGridLine){
-					ctx.save();
-					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
-					config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
-
 					ctx.beginPath();
 					ctx.moveTo(tickX, y_axisX - 1);
 					ctx.lineTo(tickX, y_axisX - 1 - Math.floor(kSubChartSketch.getHeight()));
 					ctx.stroke();
-					ctx.restore();
 				}
 
 				/* 汇集刻度，用于图形绘制完毕后统一绘制 */
@@ -421,7 +420,7 @@
 
 					var previousData = null;
 					if(null != previousXTickDataIndex)
-						previousData = kChart.getKDataManager().getConvertedData(previousXTickDataIndex);
+						previousData = kDataManager.getConvertedData(previousXTickDataIndex);
 
 					return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
 				})();
@@ -431,8 +430,12 @@
 			};
 
 			/* 绘制X轴刻度 */
+			ctx.save();
+			config_gridLineDash && ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
+			config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
 			for(var i = 0; i < groupCount; i++)
 				tryToRenderXTick(i);
+			ctx.restore();
 
 			return axisXTickList;
 		};
@@ -471,7 +474,7 @@
 				yBottom_axisY = y_axisX;
 
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYAmountInterval = numBig(new Big(kDataSketch.getAmountCeiling()).minus(kDataSketch.getAmountFloor()).div(config_axisYMidTickQuota + 1));
+			var axisYAmountInterval = (kDataSketch.getAmountCeiling() - kDataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
 			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 			/* 是否绘制网格横线/竖线 */
@@ -520,6 +523,9 @@
 
 			/* 绘制Y轴刻度（自下而上） */
 			var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
+			ctx.save();
+			config_gridLineDash && ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
+			config_horizontalGridLineColor && (ctx.strokeStyle = config_horizontalGridLineColor);
 			for(var i = 0; i <= maxAxisYTickIndex; i++){
 				var amount = kDataSketch.getAmountFloor() + numBig(new Big(axisYAmountInterval).mul(i)),
 					tickOffset = numBig(new Big(axisYHeightInterval).mul(maxAxisYTickIndex - i));
@@ -527,20 +533,16 @@
 
 				/* 绘制网格横线 */
 				if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
-					ctx.save();
-					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
-					config_horizontalGridLineColor && (ctx.strokeStyle = config_horizontalGridLineColor);
-
 					ctx.beginPath();
 					ctx.moveTo(x_axisY, yTop_axisY + tickY);
 					ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(kChartSketch.getWidth()), yTop_axisY + tickY);
 					ctx.stroke();
-					ctx.restore();
 				}
 
 				/* 汇集刻度，用于图形绘制完毕后统一绘制 */
 				try2AddAxisYTick(tickY, amount);
 			}
+			ctx.restore();
 
 			/* 自动检测精度，规避多个刻度使用相同取值的情况 */
 			var flag = false;

@@ -133,6 +133,7 @@
 			var groupCount = dataList.length;
 			/* 一组数据的宽度 */
 			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
+			var groupSize = numBig(groupSizeBig);
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
@@ -159,7 +160,7 @@
 				if(arguments.length < 2)
 					price2 = kDataSketch.getAmountCeiling();
 
-				return kSubChartSketch.calculateHeight(numBig(new Big(price2 || 0).minus(price1 || 0).abs()));
+				return kSubChartSketch.calculateHeight(Math.abs(price2 - price1));
 			};
 
 			/**
@@ -224,12 +225,11 @@
 				/**
 				 * 绘制给定索引对应的数据的蜡烛
 				 * @param {Number} i 数据索引（从右向左）
-				 * @param {Function} [callback] 绘制完成后执行的方法
 				 */
-				var renderCandle = function(i, callback){
+				var renderCandle = function(i){
 					var dataIndex = groupCount - 1 - i;
 					var data = dataList[dataIndex];
-					var x = floorBig(xRightBig_axisX_content.minus(halfGroupBarWidth).minus(groupSizeBig.mul(i)).plus(kChart.getRenderingOffset()));
+					var x = Math.floor(xRight_axisX_content + kChart.getRenderingOffset() - halfGroupBarWidth - groupSize * i);
 
 					if(i === 0){
 						TradeChart2.showLog && console.info("First candle left position: " + x + " on sub chart: " + self.id);
@@ -242,7 +242,7 @@
 					var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);
 
-					var lineX = x + floorBig(new Big(config_groupBarWidth).minus(config_groupLineWidth).div(2)),
+					var lineX = x + Math.floor((config_groupBarWidth - config_groupLineWidth) / 2),
 						lineYTop = Math.floor(yTop_axisY + calcHeight(maxLinePrice));
 					var lineYBottom = lineYTop + Math.floor(calcHeight(data.highPrice, data.lowPrice));
 					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
@@ -295,8 +295,6 @@
 						else
 							ctx.putImageData(oldImgData, 0, minY);
 					}
-
-					util.try2Call(callback, null, data, i, lineX, barX);
 				};
 
 				for(var i = 0; i < groupCount; i++)

@@ -84,11 +84,10 @@
 		 * @returns {Number}
 		 */
 		this.calculateHeight = function(amount){
-			amount = Math.abs(util.parseAsNumber(amount, 0));
-			if(util.parseAsNumber(amountHeightRatio, 0) == 0)
+			if(amountHeightRatio === 0)
 				return 0;
 
-			return numBig(new Big(amount).div(amountHeightRatio));
+			return Math.round(amount / amountHeightRatio);
 		};
 	};
 

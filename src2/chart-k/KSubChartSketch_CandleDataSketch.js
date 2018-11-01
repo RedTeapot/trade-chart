@@ -98,15 +98,17 @@
 					dataSketch_origin_maxVariation = variation;
 			}
 			var len = dataList.length;
-			dataSketch_origin_avgVariation = len > 0? numBig(new Big(variationSum).div(len)): 0;
+			dataSketch_origin_avgVariation = len > 0? (variationSum / len): 0;
+
+			var tmp = dataSketch_origin_avgVariation / 2;
 
 			/* 确定Y轴最小值 */
-			dataSketch_extended_priceFloor = numBig(new Big(util.parseAsNumber(dataSketch_origin_min, 0)).minus(new Big(dataSketch_origin_avgVariation).div(2)));
+			dataSketch_extended_priceFloor = util.parseAsNumber(dataSketch_origin_min, 0) - tmp;
 			if(!isFinite(dataSketch_extended_priceFloor) || dataSketch_extended_priceFloor < 0)
 				dataSketch_extended_priceFloor = 0;
 
 			/* 确定Y轴最大值 */
-			dataSketch_extended_priceCeiling = numBig(new Big(util.parseAsNumber(dataSketch_origin_max, 0)).plus(new Big(dataSketch_origin_avgVariation).div(2)));
+			dataSketch_extended_priceCeiling = util.parseAsNumber(dataSketch_origin_max, 0) + tmp;
 			if(dataSketch_extended_priceCeiling < dataSketch_origin_max)
 				dataSketch_extended_priceCeiling = dataSketch_origin_max;
 			if(!isFinite(dataSketch_extended_priceCeiling) || dataSketch_extended_priceCeiling < 0)

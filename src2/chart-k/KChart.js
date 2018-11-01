@@ -312,8 +312,7 @@
 		 * @returns {Number}
 		 */
 		this.calcHalfGroupBarWidth = function(){
-			var groupBarWidth = this.getConfigItem("groupBarWidth");
-			return floorBig(new Big(groupBarWidth).div(2));
+			return Math.floor(this.getConfigItem("groupBarWidth") / 2);
 		};
 
 		/**
@@ -325,8 +324,7 @@
 				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
 				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");
 
-			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
-			return Math.max(numBig(groupSizeBig.div(2)), numBig(new Big(config_axisXLabelSize).div(2)));
+			return Math.max((config_groupBarWidth + config_groupGap) / 2, config_axisXLabelSize / 2);
 		};
 
 		/**
@@ -338,8 +336,7 @@
 				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
 				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");
 
-			var groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
-			return ceilBig(new Big(config_axisXLabelSize).div(groupSizeBig));
+			return Math.ceil(config_axisXLabelSize / (config_groupBarWidth + config_groupGap));
 		};
 
 

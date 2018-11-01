@@ -97,15 +97,17 @@
 				volumeVariationSum += volumeVariation;
 			}
 			var len = dataList.length;
-			dataSketch_origin_avgVolumeVariation = len > 0? numBig(new Big(volumeVariationSum).div(len)): 0;
+			dataSketch_origin_avgVolumeVariation = len > 0? volumeVariationSum / len: 0;
+
+			var tmp = dataSketch_origin_avgVolumeVariation / 2;
 
 			/* 确定Y轴最小值 */
-			dataSketch_extended_volumeFloor = numBig(new Big(util.parseAsNumber(dataSketch_origin_minVolume, 0)).minus(new Big(dataSketch_origin_avgVolumeVariation).div(2)));
+			dataSketch_extended_volumeFloor = util.parseAsNumber(dataSketch_origin_minVolume, 0) - tmp;
 			if(!isFinite(dataSketch_extended_volumeFloor) || dataSketch_extended_volumeFloor < 0)
 				dataSketch_extended_volumeFloor = 0;
 
 			/* 确定Y轴最大值 */
-			dataSketch_extended_volumeCeiling = numBig(new Big(util.parseAsNumber(dataSketch_origin_maxVolume, 0)).plus(new Big(dataSketch_origin_avgVolumeVariation).div(2)));
+			dataSketch_extended_volumeCeiling = util.parseAsNumber(dataSketch_origin_maxVolume, 0) + tmp;
 			if(dataSketch_extended_volumeCeiling < dataSketch_origin_maxVolume)
 				dataSketch_extended_volumeCeiling = dataSketch_origin_maxVolume;
 			if(!isFinite(dataSketch_extended_volumeCeiling) || dataSketch_extended_volumeCeiling < 0)
