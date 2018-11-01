@@ -75,7 +75,15 @@
 		};
 
 		/**
-		 * 获取可以渲染出来的数据个数
+		 * 获取可以渲染的最多的数据个数
+		 * @returns {Number}
+		 */
+		this.getMaxGroupCount = function(){
+			return KChartSketch.calcMaxGroupCount(kChart.getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width")));
+		};
+
+		/**
+		 * 获取渲染出来的数据个数
 		 * @returns {Number}
 		 */
 		this.getRenderingGroupCount = function(){

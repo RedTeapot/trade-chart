@@ -168,16 +168,31 @@
 		};
 
 		/**
+		 * 检查当前呈现的数据是否已经达到左侧极限
+		 * @param {Number} maxGroupCount 最大显示数据量
+		 * @returns {Boolean}
+		 */
+		this.checkIfReachesLeftLimit = function(maxGroupCount){
+			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.eq(0);
+		};
+
+		/**
+		 * 检查当前呈现的数据是否已经达到右侧极限
+		 * @returns {Boolean}
+		 */
+		this.checkIfReachesRightLimit = function(){
+			return kDataManager.checkIfReachesRightLimit() && renderingOffsetBig.eq(0);
+		};
+
+		/**
 		 * 更新“绘制位置的横向位移”，使其在既有基础上累加上给定的偏移量
 		 *
 		 * @param {Number} amount 要累加的横向偏移量。正数代表图形向右移动；负数代表图形向左移动
+		 * @param {Number} [maxGroupCount] 最大显示数据量
 		 * @returns {KChart}
 		 */
-		this.updateRenderingOffsetBy = function(amount){
-			amount = Number(amount);
-			if(isNaN(amount))
-				amount = 0;
-
+		this.updateRenderingOffsetBy = function(amount, maxGroupCount){
+			amount = util.parseAsNumber(amount, 0);
 			if(0 === amount)
 				return this;
 
@@ -187,10 +202,14 @@
 				H = h + 1;
 			var groupSize = B + g;
 
-			renderingOffsetBig = renderingOffsetBig.plus(amount);
-
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){
+				if(util.isValidNumber(maxGroupCount) && this.checkIfReachesLeftLimit(maxGroupCount)){
+					console.info("Reaches left limit", renderingOffsetBig.toString());
+					return this;
+				}
+
+				renderingOffsetBig = renderingOffsetBig.plus(amount);
 				if(renderingOffsetBig.lt(0)){
 					fireEvent_renderingPositionChanges();
 					return this;
@@ -210,8 +229,14 @@
 				renderingOffsetBig = newRenderingOffsetBig;
 				fireEvent_renderingPositionChanges();
 
-				kDataManager.updateElapsedDataCountBy(dataIndexOffset);
+				kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
 			}else{
+				if(this.checkIfReachesRightLimit()){
+					console.info("Reaches right limit", renderingOffsetBig.toString());
+					return this;
+				}
+
+				renderingOffsetBig = renderingOffsetBig.plus(amount);
 				if(renderingOffsetBig.gt(0)){
 					fireEvent_renderingPositionChanges();
 					return this;
@@ -231,7 +256,7 @@
 				renderingOffsetBig = newRenderingOffsetBig;
 				fireEvent_renderingPositionChanges();
 
-				kDataManager.updateElapsedDataCountBy(dataIndexOffset);
+				kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
 			}
 
 			return this;

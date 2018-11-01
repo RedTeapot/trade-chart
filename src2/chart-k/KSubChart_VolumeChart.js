@@ -15,6 +15,9 @@
 	var numBig = function(big){
 		return Number(big.toString());
 	};
+	var floorBig = function(big){
+		return Math.floor(numBig(big));
+	};
 
 	var NOT_SUPPLIED = {};
 
@@ -141,7 +144,7 @@
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX;
-
+			var xRightBig_axisX_content = new Big(xRight_axisX_content);
 
 			/**
 			 * 获取指定成交量对应的物理高度
@@ -217,11 +220,13 @@
 
 				/**
 				 * 绘制给定索引对应的数据的量柱
-				 * @param {Number} i 数据索引
+				 * @param {Number} i 数据索引（从右向左）
 				 */
 				var renderVolume = function(i){
-					var data = dataList[i];
-					var x = Math.floor(xLeft_axisX_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)) - halfGroupBarWidth);
+					var dataIndex = groupCount - 1 - i;
+					var data = dataList[dataIndex];
+					var x = floorBig(xRightBig_axisX_content.minus(halfGroupBarWidth).minus(groupSizeBig.mul(i)).plus(kChart.getRenderingOffset()));
+
 					if(i === 0){
 						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);
 					}
@@ -233,6 +238,13 @@
 					var barX = x;
 					var barY = Math.floor(y_axisX - volumeHeight);
 
+					var cutY = barY;
+					if(cutY > 1)
+						cutY -= 2;
+					else if(cutY > 0)
+						cutY -= 1;
+					var cutHeight = volumeHeight + 4;
+
 					var isAppreciated = data.closePrice > data.openPrice,
 						isKeeping = Math.abs(data.closePrice - data.openPrice) < 2e-7;
 
@@ -243,9 +255,9 @@
 						/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
 						var oldImgData;
 						if(i === 0)
-							oldImgData = ctx.getImageData(0, barY, xLeftEdge_axisX_content, volumeHeight);
+							oldImgData = ctx.getImageData(xRightEdge_axisX_content + 1, cutY, config_width - xRightEdge_axisX_content - 1, cutHeight);
 						else
-							oldImgData = ctx.getImageData(xRightEdge_axisX_content, barY, config_width - xRightEdge_axisX_content, volumeHeight)
+							oldImgData = ctx.getImageData(0, cutY, xLeftEdge_axisX_content, cutHeight);
 					}
 
 
@@ -254,9 +266,9 @@
 					if(i === 0 || i === groupCount - 1){
 						/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
 						if(i === 0)
-							ctx.putImageData(oldImgData, 0, barY);
+							ctx.putImageData(oldImgData, xRightEdge_axisX_content + 1, cutY);
 						else
-							ctx.putImageData(oldImgData, xRightEdge_axisX_content, barY);
+							ctx.putImageData(oldImgData, 0, cutY);
 					}
 				};
 

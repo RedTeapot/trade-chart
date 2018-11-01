@@ -61,7 +61,7 @@ util.loadData(function(datas){
 	column_volumeObj.detailCanvas = column_volumeDetailObj;
 
 	var KChart = TradeChart2.KChart;
-	var sepIndex = Math.floor(datas.length / 2);
+	var sepIndex = Math.floor(datas.length - 10);
 	var kChart = new KChart().setDataParser(function(d, i){
 		var obj = {time: util.formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.a};
 		if(isNaN(obj.openPrice)){
@@ -89,17 +89,17 @@ util.loadData(function(datas){
 
 	/* 蜡烛图 */
 	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-	var columnResult_candle = subChart_candle.render(column_candleObj, kCandleConfig);
+	var result_candle = subChart_candle.render(column_candleObj, kCandleConfig);
 	window.subChart_candle = subChart_candle;
-	window.columnResult_candle = columnResult_candle;
-	columnResult_candle.initCanvas(column_candleDetailObj);
+	window.result_candle = result_candle;
+	result_candle.initCanvas(column_candleDetailObj);
 
 	/* 量图 */
 	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-	var columnResult_volume = subChart_volume.render(column_volumeObj, kVolumeConfig);
+	var result_volume = subChart_volume.render(column_volumeObj, kVolumeConfig);
 	window.subChart_volume = subChart_volume;
-	window.columnResult_volume = columnResult_volume;
-	columnResult_volume.initCanvas(column_volumeDetailObj);
+	window.result_volume = result_volume;
+	result_volume.initCanvas(column_volumeDetailObj);
 
 
 	var isModeViewDetail = true;
@@ -138,20 +138,20 @@ util.loadData(function(datas){
 	var viewDetail = function(e){
 		var x = e.layerX;
 
-		drawLineAndShowDataDetail4X(columnResult_candle, x,
-			columnResult_candle.getConfigItem("paddingTop"),
-			TradeChart2.util.getLinePosition(columnResult_candle.getConfigItem("height"))
+		drawLineAndShowDataDetail4X(result_candle, x,
+			result_candle.getConfigItem("paddingTop"),
+			TradeChart2.util.getLinePosition(result_candle.getConfigItem("height"))
 		);
-		drawLineAndShowDataDetail4X(columnResult_volume, x,
+		drawLineAndShowDataDetail4X(result_volume, x,
 			TradeChart2.util.getLinePosition(0),
-			TradeChart2.util.getLinePosition(columnResult_volume.getConfigItem("height") - columnResult_volume.getConfigItem("paddingBottom"))
+			TradeChart2.util.getLinePosition(result_volume.getConfigItem("height") - result_volume.getConfigItem("paddingBottom"))
 		);
 	};
 
 	var showPrevious = function(e){
 		var x = e.layerX;
 		var offsetX = x - lastX;
-		kChart.updateRenderingOffsetBy(offsetX);
+		kChart.updateRenderingOffsetBy(offsetX, result_candle.getMaxGroupCount());
 		lastX = x;
 	};
 

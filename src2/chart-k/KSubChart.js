@@ -352,6 +352,7 @@
 				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
 				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
+			var xRightBig_axisX_content = new Big(xRight_axisX_content);
 
 			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
 
@@ -392,15 +393,16 @@
 				var dataIndex = groupCount - 1 - i;
 				var dataOverallIndexFromRightToLeft = kChart.getKDataManager().getElapsedNewerDataCount() + i;
 
+				var data = dataList[dataIndex];
+				var tickX = util.getLinePosition(xRightBig_axisX_content.minus(groupSizeBig.mul(i)).plus(kChart.getRenderingOffset()));
+
 				var ifShowTick = dataOverallIndexFromRightToLeft % axisXLabelTickSpan === 0;
+				ifShowTick = ifShowTick && tickX >= xLeft_axisX_content && tickX <= xRight_axisX;
 				if(!ifShowTick)
 					return;
 
-				var data = dataList[dataIndex];
-				var tickX = util.getLinePosition(groupSizeBig.mul(dataIndex).plus(xLeft_axisX_content).plus(kChart.getRenderingOffset()));
-
 				/* 绘制网格竖线 */
-				if(ifShowVerticalGridLine && tickX >= xLeft_axisX_content && tickX <= xRight_axisX){
+				if(ifShowVerticalGridLine){
 					ctx.save();
 					ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
 					config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);

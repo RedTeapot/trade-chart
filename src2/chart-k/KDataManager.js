@@ -35,6 +35,22 @@
 		/* 向右拖动时经过的，不再可见的较新的数据个数 */
 		var elapsedDataCount = 0;
 
+		/**
+		 * 检查当前呈现的数据是否已经达到左侧极限
+		 * @param {Number} maxGroupCount 最大显示数据量
+		 * @returns {Boolean}
+		 */
+		this.checkIfReachesLeftLimit = function(maxGroupCount){
+			return elapsedDataCount + maxGroupCount >= dataList.length;
+		};
+
+		/**
+		 * 检查当前呈现的数据是否已经达到右侧极限
+		 * @returns {Boolean}
+		 */
+		this.checkIfReachesRightLimit = function(){
+			return elapsedDataCount === 0;
+		};
 
 		/**
 		 * 使用给定的偏移量更新“向右拖动时经过的，不再可见的较新的数据个数”
@@ -44,6 +60,9 @@
 		 */
 		this.updateElapsedDataCountBy = function(offset, maxGroupCount){
 			var v = elapsedDataCount + offset;
+			v = Math.max(v, 0);
+			v = Math.min(v, dataList.length - 1);
+
 			if(util.isValidNumber(maxGroupCount)){
 				maxGroupCount = util.parseAsNumber(maxGroupCount);
 
@@ -51,9 +70,6 @@
 					v = Math.min(v, dataList.length - maxGroupCount);
 				}else
 					v = 0;
-			}else{
-				v = Math.max(v, 0);
-				v = Math.min(v, dataList.length - 1);
 			}
 
 			if(v !== elapsedDataCount){
@@ -86,16 +102,28 @@
 		/**
 		 * 向后追加数据，亦即追加较新的数据
 		 * @param {Array<UserSuppliedData>} datas 数据源
+		 * @param {Boolean} [ifResetsElapsedDataCount=false] 是否同步重置“向右拖动时经过的，不再可见的较新的数据个数”
 		 * @returns {KDataManager}
 		 */
-		this.appendDataList = function(datas){
+		this.appendDataList = function(datas, ifResetsElapsedDataCount){
+			if(arguments.length < 2)
+				ifResetsElapsedDataCount = false;
+
 			if(!Array.isArray(datas)){
 				console.warn("Supplied k data should be an array.");
 				return this;
 			}
 
 			dataList = dataList.concat(datas);
-			elapsedDataCount += datas.length;
+			if(!ifResetsElapsedDataCount)
+				elapsedDataCount += datas.length;
+			else{
+				var flag = elapsedDataCount !== 0;
+				elapsedDataCount = 0;
+
+				if(flag)
+					this.fire(evtName_renderingDataChanges, null, false);
+			}
 			this.fire(evtName_storedDataChanges, null, false);
 
 			return this;

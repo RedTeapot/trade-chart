@@ -243,7 +243,7 @@
 	 */
 	var isValidNumber = function(tar){
 		var isEmpty = isEmptyString(tar, true);
-		return !isEmpty && (/^\d*(?:\.\d+)?$/.test(tar) || /^\d+\.\d*$/.test(tar));
+		return !isEmpty && (/^-?\d*(?:\.\d+)?$/.test(tar) || /^\d+\.\d*$/.test(tar));
 	};
 
 	/**
@@ -298,7 +298,6 @@
 			var ctx = canvasObj.getContext("2d");
 
 			if(canvasObj.initFlag){
-				TradeChart2.showLog && console.warn("The canvas was initialized already.");
 				return ctx;
 			}
 

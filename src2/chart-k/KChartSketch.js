@@ -114,7 +114,6 @@
 			config_paddingRight = getConfigItem("paddingRight", config),
 			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
 			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config),
-			config_groupLineWidth = getConfigItem("groupLineWidth", config),
 			config_groupGap = getConfigItem("groupGap", config),
 			config_groupBarWidth = getConfigItem("groupBarWidth", config);
 
@@ -122,8 +121,7 @@
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 		chartSketch.setWidth(floorBig(widthBig))
 			.setContentWidth(floorBig(contentWidthBig))
-			/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半 */
-			.setMaxGroupCount(ceilBig(contentWidthBig.plus(config_groupBarWidth).minus(1).div(config_groupGap + config_groupBarWidth)));
+			.setMaxGroupCount(KChartSketch.calcMaxGroupCount(config, width));
 
 		return chartSketch;
 	};
@@ -140,15 +138,54 @@
 			config_paddingRight = getConfigItem("paddingRight", config),
 			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
 			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config),
-			config_groupLineWidth = getConfigItem("groupLineWidth", config),
 			config_groupGap = getConfigItem("groupGap", config),
 			config_groupBarWidth = getConfigItem("groupBarWidth", config);
 
 		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 
-		/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半 */
-		return ceilBig(contentWidthBig.plus(config_groupBarWidth).minus(1).div(config_groupGap + config_groupBarWidth));
+		/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半（两侧都可以） */
+		var newWidth = floorBig(contentWidthBig.plus(config_groupBarWidth).minus(1));
+
+		var L = newWidth, B = config_groupBarWidth, G = config_groupGap;
+		return (function(){
+			if(L <= 0 || B <= 0)
+				return 0;
+			if(G < 0)
+				G = 0;
+
+			var t = (B + G);
+			if(t === 0)
+				return 0;
+
+			var i = 0, n = 0, tmp = L;
+			while(true){
+				if(tmp <= 0)
+					return n;
+
+				if(i % 2 === 0 || G === 0){/* 处理柱子 */
+					if(tmp >= B){
+						n += 1;
+						tmp -= B;
+					}else{
+						if(tmp > 2){
+							n += 2;
+							tmp -= 2 * B;
+						}else if(tmp > 1){
+							n += 1;
+							tmp -= 1 * B;
+						}
+					}
+				}else{/* 处理间隙 */
+					if(tmp < G)
+						return n;
+					else
+						tmp -= G;
+				}
+
+				i++;
+			}
+		})();
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KChartSketch", KChartSketch);

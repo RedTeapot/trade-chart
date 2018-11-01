@@ -147,7 +147,7 @@
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
 				yTop_axisY = util.getLinePosition(config_paddingTop);
-
+			var xRightBig_axisX_content = new Big(xRight_axisX_content);
 
 			/**
 			 * 获取指定价钱对应的物理高度
@@ -223,12 +223,14 @@
 
 				/**
 				 * 绘制给定索引对应的数据的蜡烛
-				 * @param {Number} i 数据索引
+				 * @param {Number} i 数据索引（从右向左）
 				 * @param {Function} [callback] 绘制完成后执行的方法
 				 */
 				var renderCandle = function(i, callback){
-					var data = dataList[i];
-					var x = Math.floor(xLeftEdge_axisX_content + kChart.getRenderingOffset() + numBig(groupSizeBig.mul(i)));
+					var dataIndex = groupCount - 1 - i;
+					var data = dataList[dataIndex];
+					var x = floorBig(xRightBig_axisX_content.minus(halfGroupBarWidth).minus(groupSizeBig.mul(i)).plus(kChart.getRenderingOffset()));
+
 					if(i === 0){
 						TradeChart2.showLog && console.info("First candle left position: " + x + " on sub chart: " + self.id);
 					}
@@ -255,14 +257,18 @@
 					if(i === 0 || i === groupCount - 1){
 						/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
 						var minY = Math.min(lineYTop, barY),
-							maxHeight = Math.max(lineYBottom - lineYTop, barHeight);
+							maxHeight = Math.max(lineYBottom - lineYTop, barHeight) + 4;
+						if(minY > 1)
+							minY -= 2;
+						else if(minY > 0)
+							minY -= 1;
 
 						var oldImgData;
 
 						if(i === 0)
-							oldImgData = ctx.getImageData(0, minY, xLeftEdge_axisX_content, maxHeight);
+							oldImgData = ctx.getImageData(xRightEdge_axisX_content + 1, minY, config_width - xRightEdge_axisX_content - 1, maxHeight);
 						else
-							oldImgData = ctx.getImageData(xRightEdge_axisX_content, minY, config_width - xRightEdge_axisX_content, maxHeight)
+							oldImgData = ctx.getImageData(0, minY, xLeftEdge_axisX_content, maxHeight);
 					}
 
 					/* 绘制线 */
@@ -285,9 +291,9 @@
 					if(i === 0 || i === groupCount - 1){
 						/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
 						if(i === 0)
-							ctx.putImageData(oldImgData, 0, minY);
+							ctx.putImageData(oldImgData, xRightEdge_axisX_content + 1, minY);
 						else
-							ctx.putImageData(oldImgData, xRightEdge_axisX_content, minY);
+							ctx.putImageData(oldImgData, 0, minY);
 					}
 
 					util.try2Call(callback, null, data, i, lineX, barX);
