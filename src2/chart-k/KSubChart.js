@@ -579,7 +579,7 @@
 		console.info("Create k sub chart: " + this.id);
 
 		var evtRenderAction = function(e){
-			TradeChart2.showLog && console.debug("Auto render for sub chart: " + self.id + " by event: " + e.type);
+			TradeChart2.showLog && console.debug("Auto render for " + self.id + " by event: " + e.type, kChart.getRenderingOffset(), kChart.getKDataManager().getElapsedNewerDataCount());
 			self.render();
 		};
 		kChart.on("renderingpositionchange", evtRenderAction);

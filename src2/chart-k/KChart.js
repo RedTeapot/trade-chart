@@ -89,18 +89,11 @@
 		/**
 		 * 从初次绘制开始到现在，用户通过拖拉的方式达到的“绘制位置的横向位移”
 		 * 取值为正，则代表图形向右移动；取值为负，则代表图形向左移动。
-		 *
-		 * 设定
-		 * 1. half = 蜡烛宽度的一半
-		 * 2. gap = 蜡烛之间的见习
-		 *
-		 * 基于“第一个蜡烛的中心位置与正文区域左边界重合”的前提，绘制位置的横向位移offset在不同的区间范围内需执行不同操作：
-		 * 1. offset 在区间 [0, half + gap) 时，什么也不做
-		 * 2. offset 在区间 [half + gap, half + gap + half) 时，kDataManager 的绘制索引±1
-		 * 3. offset 在区间 [half + gap + half, ...) 时，调整 offset，使得 offset = offset - (half + gap + half)
 		 * @type {Big}
 		 */
 		var renderingOffsetBig = new Big(0);
+
+		var zeroBig = new Big(0);
 
 
 		/* 代理 KDataManager 的方法 */
@@ -205,7 +198,7 @@
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){
 				if(util.isValidNumber(maxGroupCount) && this.checkIfReachesLeftLimit(maxGroupCount)){
-					console.info("Reaches left limit", renderingOffsetBig.toString());
+					TradeChart2.showLog && console.info("Reaches left limit");
 					return this;
 				}
 
@@ -232,10 +225,11 @@
 				kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
 			}else{
 				if(this.checkIfReachesRightLimit()){
-					console.info("Reaches right limit", renderingOffsetBig.toString());
+					TradeChart2.showLog && console.info("Reaches right limit");
 					return this;
 				}
 
+				var oldRenderingOffsetBig = renderingOffsetBig;
 				renderingOffsetBig = renderingOffsetBig.plus(amount);
 				if(renderingOffsetBig.gt(0)){
 					fireEvent_renderingPositionChanges();
@@ -244,7 +238,7 @@
 
 				var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
 				var tmp = renderingOffsetBig.abs().mod(groupSize);
-				var newRenderingOffsetBig = renderingOffsetBig;
+
 				if(tmp.gte(B)){
 					dataIndexOffset += 1;
 					newRenderingOffsetBig = new Big(g - (tmp-B)).mul(1);
@@ -253,10 +247,16 @@
 				}
 				dataIndexOffset = dataIndexOffset * -1;
 
+				/* 更新数据偏移量。如果向左移动到头，则重置渲染位移量为0 */
+				var ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
+				if(kDataManager.checkIfReachesRightLimit() && newRenderingOffsetBig.lt(0)){
+					newRenderingOffsetBig = zeroBig;
+				}
+				var ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
 				renderingOffsetBig = newRenderingOffsetBig;
-				fireEvent_renderingPositionChanges();
 
-				kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
+				if(ifElapsedDataCountChanges || ifOffsetChanges)
+					fireEvent_renderingPositionChanges();
 			}
 
 			return this;

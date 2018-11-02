@@ -56,7 +56,7 @@
 		 * 使用给定的偏移量更新“向右拖动时经过的，不再可见的较新的数据个数”
 		 * @param {Number} offset 偏移量
 		 * @param {Number} [maxGroupCount] 最大显示数据量
-		 * @returns {KDataManager}
+		 * @returns {Boolean} 偏移量是否发生变更
 		 */
 		this.updateElapsedDataCountBy = function(offset, maxGroupCount){
 			var v = elapsedDataCount + offset;
@@ -75,11 +75,12 @@
 			if(v !== elapsedDataCount){
 				elapsedDataCount = v;
 
-				TradeChart2.showLog && console.log("Update elapsed data count to " + v);
+				TradeChart2.showLog && console.log("Update elapsed data count to " + v + " from " + elapsedDataCount);
 				this.fire(evtName_renderingDataChanges, null, false);
+				return true;
 			}
 
-			return this;
+			return false;
 		};
 
 		/**
