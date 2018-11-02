@@ -202,6 +202,7 @@
 					return this;
 				}
 
+				var oldRenderingOffsetBig = renderingOffsetBig;
 				renderingOffsetBig = renderingOffsetBig.plus(amount);
 				if(renderingOffsetBig.lt(0)){
 					fireEvent_renderingPositionChanges();
@@ -219,10 +220,16 @@
 				}else
 					newRenderingOffsetBig = tmp;
 
+				/* 更新数据偏移量。如果向左移动到头，则重置渲染位移量为0 */
+				var ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
+				if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && newRenderingOffsetBig.gt(0)){
+					newRenderingOffsetBig = zeroBig;
+				}
+				var ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
 				renderingOffsetBig = newRenderingOffsetBig;
-				fireEvent_renderingPositionChanges();
 
-				kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
+				if(ifElapsedDataCountChanges || ifOffsetChanges)
+					fireEvent_renderingPositionChanges();
 			}else{
 				if(this.checkIfReachesRightLimit()){
 					TradeChart2.showLog && console.info("Reaches right limit");
