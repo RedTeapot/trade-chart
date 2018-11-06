@@ -85,7 +85,6 @@
 
 			if(!(canvasObj instanceof HTMLCanvasElement)){
 				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
-					TradeChart2.showLog && console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
 					canvasObj = lastRenderingCanvasObj;
 				}else{
 					throw new Error("No canvas element supplied to render");
@@ -125,6 +124,7 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
 
+			var xPositionList = self.getRenderingXPositionListFromRight(config, kChartSketch);
 			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
 
 			/* 绘制的数据个数 */
@@ -135,10 +135,10 @@
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
 			/* 横坐标位置 */
-			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
-				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
-				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
+			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
@@ -225,7 +225,7 @@
 				var renderVolume = function(i){
 					var dataIndex = groupCount - 1 - i;
 					var data = dataList[dataIndex];
-					var x = Math.floor(xRight_axisX_content + kChart.getRenderingOffset() - halfGroupBarWidth - groupSize * i);
+					var x = xPositionList[i] - halfGroupBarWidth;
 
 					if(i === 0){
 						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);

@@ -85,7 +85,6 @@
 
 			if(!(canvasObj instanceof HTMLCanvasElement)){
 				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
-					TradeChart2.showLog && console.info("Rendering onto last used canvas", lastRenderingCanvasObj);
 					canvasObj = lastRenderingCanvasObj;
 				}else{
 					throw new Error("No canvas element supplied to render");
@@ -126,6 +125,7 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(config, config_height).updateByDataSketch(kDataSketch);
 
+			var xPositionList = self.getRenderingXPositionListFromRight(config, kChartSketch);
 			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
 
 
@@ -138,16 +138,16 @@
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
 			/* 横坐标位置 */
-			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
-				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
-				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
+			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
-				yTop_axisY = util.getLinePosition(config_paddingTop);
+				$yTop_axisY = config_paddingTop;/* 整数使用$开头*/
 			var xRightBig_axisX_content = new Big(xRight_axisX_content);
 
 			/**
@@ -222,6 +222,8 @@
 			(function(){
 				ctx.save();
 
+				var linePosition = Math.floor((config_groupBarWidth - config_groupLineWidth) / 2);
+
 				/**
 				 * 绘制给定索引对应的数据的蜡烛
 				 * @param {Number} i 数据索引（从右向左）
@@ -229,7 +231,7 @@
 				var renderCandle = function(i){
 					var dataIndex = groupCount - 1 - i;
 					var data = dataList[dataIndex];
-					var x = Math.floor(xRight_axisX_content + kChart.getRenderingOffset() - halfGroupBarWidth - groupSize * i);
+					var x = xPositionList[i] - halfGroupBarWidth;
 
 					if(i === 0){
 						TradeChart2.showLog && console.info("First candle left position: " + x + " on sub chart: " + self.id);
@@ -237,21 +239,19 @@
 
 					var isAppreciated = data.closePrice > data.openPrice,
 						isKeeping = Math.abs(data.closePrice - data.openPrice) < 2e-7;
-					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
-
 					var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);
 
-					var lineX = x + Math.floor((config_groupBarWidth - config_groupLineWidth) / 2),
-						lineYTop = Math.floor(yTop_axisY + calcHeight(maxLinePrice));
-					var lineYBottom = lineYTop + Math.floor(calcHeight(data.highPrice, data.lowPrice));
+					var lineX = x + linePosition,
+						lineYTop = $yTop_axisY + calcHeight(maxLinePrice);
+					var lineYBottom = lineYTop + calcHeight(data.highPrice, data.lowPrice);
 					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
 						lineYBottom += 1;
 
 					var barX = x,
-						barY = Math.floor(yTop_axisY + calcHeight(maxBarPrice));
-					var barHeight = Math.floor(calcHeight(data.openPrice, data.closePrice));
-					if(0 === barHeight)
+						barY = $yTop_axisY + calcHeight(maxBarPrice);
+					var barHeight = calcHeight(data.openPrice, data.closePrice);
+					if(barHeight < 1)
 						barHeight = 1;
 
 					if(i === 0 || i === groupCount - 1){
@@ -272,15 +272,17 @@
 					}
 
 					/* 绘制线 */
+					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
 					if(config_groupLineWidth > 1){
 						ctx.strokeWidth = 0;
 						ctx.fillRect(lineX, lineYTop, config_groupLineWidth, Math.abs(lineYBottom - lineYTop));
 					}else{
-						ctx.strokeWidth = 1;
+						lineX = util.getLinePosition(lineX);
 
+						ctx.strokeWidth = 1;
 						ctx.beginPath();
-						ctx.moveTo(util.getLinePosition(lineX), util.getLinePosition(lineYTop));
-						ctx.lineTo(util.getLinePosition(lineX), util.getLinePosition(lineYBottom));
+						ctx.moveTo(lineX, util.getLinePosition(lineYTop));
+						ctx.lineTo(lineX, util.getLinePosition(lineYBottom));
 						ctx.stroke();
 					}
 

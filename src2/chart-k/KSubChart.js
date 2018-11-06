@@ -326,6 +326,52 @@
 		};
 
 		/**
+		 * 获取右侧开始渲染时的渲染位置列表。用于使用统一的方法决定横坐标位置，而非各个子图自行计算。
+		 * 返回的位置，是渲染目的地的中心位置
+		 * @returns {Number[]}
+		 */
+		this.getRenderingXPositionListFromRight = function(config, kChartSketch){
+			var config_paddingLeft = this.getConfigItem("paddingLeft", config),
+				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
+				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight", config),
+				config_groupBarWidth = this.getConfigItem("groupBarWidth", config),
+				config_groupGap = this.getConfigItem("groupGap", config);
+
+
+			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth());
+
+			var maxGroupCount = kChartSketch.getMaxGroupCount();
+			var halfGroupBarSize = kChart.calcHalfGroupBarWidth();
+			var groupSize = config_groupBarWidth + config_groupGap;
+			var groupCount = kChart.getKDataManager().getRenderingDataCount(maxGroupCount);
+
+			/**
+			 * 第一个位置是图形上在最右侧渲染的数据的位置
+			 * @type {Number[]}
+			 */
+			var arr = [];
+
+			/**
+			 * 数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧
+			 */
+			var offset = 0;
+			if(groupCount < maxGroupCount && groupCount !== 0){
+				var length_gap = (groupCount - 1) * config_groupGap;
+				var length_bar = (groupCount >= 2? (groupCount - 2) * config_groupBarWidth: 0) + 2 * (halfGroupBarSize + 1);
+				offset = kChartSketch.getContentWidth() - (length_gap + length_bar);
+			}else
+				offset = 0;
+
+			for(var i = 0; i < groupCount; i++)
+				arr.push(Math.floor(xRight_axisX_content + kChart.getRenderingOffset() - groupSize * i - offset));
+
+			return arr;
+		};
+
+		/**
 		 * 绘制X轴
 		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
 		 * @param {KSubChartConfig} config 渲染配置
@@ -335,10 +381,7 @@
 		 */
 		this.renderAxisX = function(ctx, config, kChartSketch, kSubChartSketch){
 			var config_showAxisXLine = this.getConfigItem("showAxisXLine", config),
-				config_paddingLeft = this.getConfigItem("paddingLeft", config),
 				config_paddingTop = this.getConfigItem("paddingTop", config),
-				config_axisXTickOffset = this.getConfigItem("axisXTickOffset", config),
-				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight", config),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth", config),
 				config_groupGap = this.getConfigItem("groupGap", config),
 				config_gridLineDash = this.getConfigItem("gridLineDash", config),
@@ -347,10 +390,10 @@
 				config_showAxisXLabel = this.getConfigItem("showAxisXLabel", config),
 				config_axisXLabelGenerator = this.getConfigItem("axisXLabelGenerator", config);
 
-			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
-				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
-				xLeft_axisX_content = xLeft_axisX + Math.floor(config_axisXTickOffset),
-				xRight_axisX_content = xRight_axisX - Math.floor(config_axisXTickOffsetFromRight),
+			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
 
 			var kDataManager = kChart.getKDataManager();
@@ -384,10 +427,10 @@
 			var axisXTickList = [];
 
 			/**
-			 * 根据提供的数据的索引位置绘制刻度
+			 * 根据提供的数据的索引位置添加刻度绘制点
 			 * @param {Number} i 从右向左方向的数据索引位置。索引为0的数据在最后
 			 */
-			var tryToRenderXTick = function(i){
+			var addXTick = function(i){
 				if(i < 0 || i >= groupCount)
 					return;
 
@@ -434,7 +477,7 @@
 			config_gridLineDash && ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
 			config_verticalGridLineColor && (ctx.strokeStyle = config_verticalGridLineColor);
 			for(var i = 0; i < groupCount; i++)
-				tryToRenderXTick(i);
+				addXTick(i);
 			ctx.restore();
 
 			return axisXTickList;
@@ -451,7 +494,6 @@
 		 */
 		this.renderAxisY = function(ctx, config, kChartSketch, kSubChartSketch, kDataSketch){
 			var config_showAxisYLine = this.getConfigItem("showAxisYLine", config),
-				config_paddingLeft = this.getConfigItem("paddingLeft", config),
 				config_paddingTop = this.getConfigItem("paddingTop", config),
 				config_axisYPosition = this.getConfigItem("axisYPosition", config),
 				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition", config),
@@ -465,8 +507,8 @@
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
-			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
-				xRight_axisX = xLeft_axisX + Math.floor(kChartSketch.getWidth()),
+			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,

@@ -191,15 +191,38 @@
 		};
 
 		/**
-		 * 结合用户的拖动位置，从右向左获取可以被渲染的数据列表。
+		 * 结合用户的拖动位置，从右向左获取可以被渲染的数据个数
+		 *
+		 * @param {Number} [maxGroupCount] 图形正文区域可以呈现的最大数据量
+		 * @returns {Number}
+		 */
+		this.getRenderingDataCount = function(maxGroupCount){
+			if(util.isValidNumber(maxGroupCount)){
+				var endIndex = dataList.length - elapsedDataCount;
+				var beginIndex = endIndex - maxGroupCount;
+				if(beginIndex < 0)
+					beginIndex = 0;
+
+				return endIndex - beginIndex;
+			}else
+				return dataList.length - elapsedDataCount;
+		};
+
+		/**
+		 * 结合用户的拖动位置，从右向左获取可以被渲染的数据列表
 		 *
 		 * @param {Number} [maxGroupCount] 图形正文区域可以呈现的最大数据量
 		 * @returns {Array<UserSuppliedData>}
 		 */
 		this.getRenderingDataList = function(maxGroupCount){
-			if(util.isValidNumber(maxGroupCount))
-				return dataList.slice(dataList.length - elapsedDataCount - maxGroupCount, dataList.length - elapsedDataCount);
-			else
+			if(util.isValidNumber(maxGroupCount)){
+				var endIndex = dataList.length - elapsedDataCount;
+				var beginIndex = endIndex - maxGroupCount;
+				if(beginIndex < 0)
+					beginIndex = 0;
+
+				return dataList.slice(beginIndex, endIndex);
+			}else
 				return dataList.slice(0, dataList.length - elapsedDataCount);
 		};
 

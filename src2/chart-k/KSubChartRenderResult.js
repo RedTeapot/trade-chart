@@ -89,7 +89,7 @@
 		this.getRenderingGroupCount = function(){
 			var kChart = this.getKChart();
 			var maxGroupCount = KChartSketch.calcMaxGroupCount(kChart.getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width"))),
-				dataCount = kChart.getRenderingDataList().length;
+				dataCount = kChart.getRenderingDataCount();
 			return Math.max(Math.min(maxGroupCount, dataCount), 0);
 		};
 
@@ -153,10 +153,9 @@
 			}
 
 			var tmpX = x - minX;
-			var groupSizeBig = new Big(this.getConfigItem("groupBarWidth")).plus(this.getConfigItem("groupGap"));
+			var groupSize = this.getConfigItem("groupBarWidth") + this.getConfigItem("groupGap");
 
-			var tmp = new Big(tmpX).div(groupSizeBig);
-			var index = roundBig(tmp);
+			var index = Math.round(tmpX / groupSize);
 
 			if(index >= groupCount){
 				if(groupCount > 0)
@@ -170,7 +169,7 @@
 
 		/**
 		 * 根据给定的数据索引，获取其在画布上的渲染位置（中心位置）
-		 * @param {Number} dataIndex 被渲染的数据的索引位置
+		 * @param {Number} dataIndex 被渲染的数据的索引位置（相对于整个数据）
 		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
 		 */
 		this.getRenderingHorizontalPosition = function(dataIndex){
@@ -184,11 +183,15 @@
 				config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth");
 
-			var xLeft_axisX = util.getLinePosition(config_paddingLeft),
+			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
 				groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
 
 			return util.getLinePosition(xLeft_axisX + config_axisXTickOffset + kSubChart.getKChart().getRenderingOffset() + numBig(groupSizeBig.mul(dataIndex)));
 		};
+
+		//TODO 1. 左侧拉到头的时候没有呈现在期望的位置上
+		//TODO 2. 明细位置没有呈现在期望位置上
+		//TODO 3. 明细位置对应的数据检索不正确
 
 		/**
 		 * 获取指定的相对横坐标对应的原始数据

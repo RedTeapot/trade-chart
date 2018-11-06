@@ -62,28 +62,7 @@ util.loadData(function(datas){
 
 	var KChart = TradeChart2.KChart;
 	var sepIndex = Math.floor(datas.length - 10);
-	var kChart = new KChart().setDataParser(function(d, i){
-		var obj = {time: util.formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.a};
-		if(isNaN(obj.openPrice)){
-			console.error(d, i, obj.openPrice);
-			obj.openPrice = 0;
-		}
-		if(isNaN(obj.closePrice)){
-			console.error(d, i, obj.closePrice);
-			obj.closePrice = 0;
-		}
-		if(isNaN(obj.highPrice)){
-			console.error(d, i, obj.highPrice);
-			obj.highPrice = 0;
-		}
-		if(isNaN(obj.lowPrice)){
-			console.error(d, i, obj.lowPrice);
-			obj.lowPrice = 0;
-		}
-
-		return obj;
-	}).setConfig(kChartConfig);
-	kChart.setDataList(datas.slice(sepIndex)).prependDataList(datas.slice(0, sepIndex));
+	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas);
 	window.kChart = kChart;
 	window.kdm = kChart.getKDataManager();
 

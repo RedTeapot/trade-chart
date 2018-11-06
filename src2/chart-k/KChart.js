@@ -102,6 +102,7 @@
 			"appendDataList",
 			"getDataList",
 			"getConvertedDataList",
+			"getRenderingDataCount",
 			"getRenderingDataList",
 			"getConvertedRenderingDataList",
 			"getData",
@@ -313,6 +314,48 @@
 		};
 
 
+
+		/**
+		 * 计算横坐标左侧位置（坐标原点为：画布左上角）
+		 * @returns {Number}
+		 */
+		this.calcAxisXLeftPosition = function(){
+			var config_paddingLeft = this.getConfigItem("paddingLeft");
+			return util.getLinePosition(config_paddingLeft);
+		};
+
+		/**
+		 * 计算横坐标正文区域左侧位置（坐标原点为：画布左上角）
+		 * @returns {Number}
+		 */
+		this.calcAxisXContentLeftPosition = function(){
+			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset");
+
+			var xLeft_axisX = this.calcAxisXLeftPosition();
+			return xLeft_axisX + Math.floor(config_axisXTickOffset);
+		};
+
+		/**
+		 * 计算横坐标右侧位置（坐标原点为：画布左上角）
+		 * @param {Number} width 横坐标坐标轴长度
+		 * @returns {Number}
+		 */
+		this.calcAxisXRightPosition = function(width){
+			var xLeft_axisX = this.calcAxisXLeftPosition();
+			return xLeft_axisX + Math.floor(width - 1);/* xLeft_axis占据1像素 */
+		};
+
+		/**
+		 * 计算横坐标正文区域右侧位置（坐标原点为：画布左上角）
+		 * @param {Number} width 横坐标坐标轴长度
+		 * @returns {Number}
+		 */
+		this.calcAxisXContentRightPosition = function(width){
+			var config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
+
+			var xRight_axisX = this.calcAxisXRightPosition(width);
+			return xRight_axisX - Math.floor(config_axisXTickOffsetFromRight);
+		};
 
 		/**
 		 * 根据给定的配置信息计算蜡烛一半的宽度

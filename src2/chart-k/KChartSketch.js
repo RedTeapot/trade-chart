@@ -141,6 +141,7 @@
 			config_groupGap = getConfigItem("groupGap", config),
 			config_groupBarWidth = getConfigItem("groupBarWidth", config);
 
+		// debugger;
 		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
 		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
 
@@ -168,10 +169,11 @@
 						n += 1;
 						tmp -= B;
 					}else{
-						if(tmp > 2){
-							n += 2;
-							tmp -= 2 * B;
-						}else if(tmp > 1){
+						// if(tmp > 2){
+						// 	n += 2;
+						// 	tmp -= 2 * B;
+						// }else
+							if(tmp > 1){
 							n += 1;
 							tmp -= 1 * B;
 						}
