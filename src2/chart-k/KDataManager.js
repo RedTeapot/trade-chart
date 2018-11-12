@@ -55,7 +55,7 @@
 		/**
 		 * 使用给定的偏移量更新“向右拖动时经过的，不再可见的较新的数据个数”
 		 * @param {Number} offset 偏移量
-		 * @param {Number} [maxGroupCount] 最大显示数据量
+		 * @param {Number} [maxGroupCount] 最大显示数据量，用于锁定偏移量，使得没有更多数据时不会继续减少可见数据
 		 * @returns {Boolean} 偏移量是否发生变更
 		 */
 		this.updateElapsedDataCountBy = function(offset, maxGroupCount){

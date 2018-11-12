@@ -167,7 +167,9 @@
 		 * @returns {Boolean}
 		 */
 		this.checkIfReachesLeftLimit = function(maxGroupCount){
-			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.eq(0);
+			return false;
+			//TODO 判断方法不正确，需要改正
+			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.lte(0);
 		};
 
 		/**
@@ -180,6 +182,7 @@
 
 		/**
 		 * 更新“绘制位置的横向位移”，使其在既有基础上累加上给定的偏移量
+		 * 绘制的起点位置，为图形右侧
 		 *
 		 * @param {Number} amount 要累加的横向偏移量。正数代表图形向右移动；负数代表图形向左移动
 		 * @param {Number} [maxGroupCount] 最大显示数据量
@@ -196,71 +199,83 @@
 				H = h + 1;
 			var groupSize = B + g;
 
+			var oldRenderingOffsetBig,
+				newRenderingOffsetBig,
+				elapsedDataCount,
+				tmp,
+
+				ifElapsedDataCountChanges,
+				ifOffsetChanges;
+
 			var ifMovingToRight = amount > 0;
-			if(ifMovingToRight){
+			if(ifMovingToRight){/* 向右拖动 */
+				/* 检查是否达到左侧临界处 */
 				if(util.isValidNumber(maxGroupCount) && this.checkIfReachesLeftLimit(maxGroupCount)){
 					TradeChart2.showLog && console.info("Reaches left limit");
 					return this;
 				}
 
-				var oldRenderingOffsetBig = renderingOffsetBig;
+				oldRenderingOffsetBig = renderingOffsetBig;
 				renderingOffsetBig = renderingOffsetBig.plus(amount);
-				if(renderingOffsetBig.lt(0)){
+				if(renderingOffsetBig.lte(0)){
 					fireEvent_renderingPositionChanges();
 					return this;
 				}
 
-				amount = Math.abs(amount);
+				newRenderingOffsetBig = renderingOffsetBig;
+				renderingOffsetBig = renderingOffsetBig.abs();
+				elapsedDataCount = floorBig(renderingOffsetBig.div(groupSize));
+				tmp = renderingOffsetBig.mod(groupSize);
 
-				var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
-				var tmp = renderingOffsetBig.abs().mod(groupSize);
-				var newRenderingOffsetBig = renderingOffsetBig;
-				if(tmp.gt(g)){
-					dataIndexOffset += 1;
-					newRenderingOffsetBig = new Big(B - (tmp-g)).mul(-1);
-				}else
+				if(tmp.gte(B)){
+					elapsedDataCount += 1;
+					newRenderingOffsetBig = new Big(g - (tmp-B)).mul(-1);
+				}else{
 					newRenderingOffsetBig = tmp;
-
-				/* 更新数据偏移量。如果向左移动到头，则重置渲染位移量为0 */
-				var ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
-				if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && newRenderingOffsetBig.gt(0)){
-					newRenderingOffsetBig = zeroBig;
 				}
-				var ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
+
+				/* 更新数据偏移量。如果向右移动到头，则重置渲染位移量为0 */
+				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
+				// if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && newRenderingOffsetBig.gt(0)){
+				// 	newRenderingOffsetBig = zeroBig;
+				// }
+				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
 				renderingOffsetBig = newRenderingOffsetBig;
 
 				if(ifElapsedDataCountChanges || ifOffsetChanges)
 					fireEvent_renderingPositionChanges();
 			}else{
+				/* 检查是否达到右侧临界处 */
 				if(this.checkIfReachesRightLimit()){
 					TradeChart2.showLog && console.info("Reaches right limit");
 					return this;
 				}
 
-				var oldRenderingOffsetBig = renderingOffsetBig;
+				oldRenderingOffsetBig = renderingOffsetBig;
 				renderingOffsetBig = renderingOffsetBig.plus(amount);
-				if(renderingOffsetBig.gt(0)){
+				if(renderingOffsetBig.gte(0)){
 					fireEvent_renderingPositionChanges();
 					return this;
 				}
 
-				var dataIndexOffset = floorBig(renderingOffsetBig.abs().div(groupSize));
-				var tmp = renderingOffsetBig.abs().mod(groupSize);
+				newRenderingOffsetBig = renderingOffsetBig;
+				renderingOffsetBig = renderingOffsetBig.abs();
+				elapsedDataCount = floorBig(renderingOffsetBig.div(groupSize));
+				tmp = renderingOffsetBig.mod(groupSize);
 
-				if(tmp.gte(B)){
-					dataIndexOffset += 1;
-					newRenderingOffsetBig = new Big(g - (tmp-B)).mul(1);
-				}else{
+				if(tmp.gt(g)){
+					elapsedDataCount += 1;
+					newRenderingOffsetBig = new Big(B - (tmp-g));
+				}else
 					newRenderingOffsetBig = tmp.mul(-1);
-				}
-				dataIndexOffset = dataIndexOffset * -1;
+				elapsedDataCount = elapsedDataCount * -1;
 
 				/* 更新数据偏移量。如果向左移动到头，则重置渲染位移量为0 */
-				var ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(dataIndexOffset, maxGroupCount);
+				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
 				if(kDataManager.checkIfReachesRightLimit() && newRenderingOffsetBig.lt(0)){
 					newRenderingOffsetBig = zeroBig;
 				}
-				var ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
+				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
 				renderingOffsetBig = newRenderingOffsetBig;
 
 				if(ifElapsedDataCountChanges || ifOffsetChanges)
@@ -337,23 +352,23 @@
 
 		/**
 		 * 计算横坐标右侧位置（坐标原点为：画布左上角）
-		 * @param {Number} width 横坐标坐标轴长度
+		 * @param {Number} axisXWidth 横坐标坐标轴长度
 		 * @returns {Number}
 		 */
-		this.calcAxisXRightPosition = function(width){
+		this.calcAxisXRightPosition = function(axisXWidth){
 			var xLeft_axisX = this.calcAxisXLeftPosition();
-			return xLeft_axisX + Math.floor(width - 1);/* xLeft_axis占据1像素 */
+			return xLeft_axisX + Math.floor(axisXWidth - 1);/* xLeft_axis占据1像素 */
 		};
 
 		/**
 		 * 计算横坐标正文区域右侧位置（坐标原点为：画布左上角）
-		 * @param {Number} width 横坐标坐标轴长度
+		 * @param {Number} axisXWidth 横坐标坐标轴长度
 		 * @returns {Number}
 		 */
-		this.calcAxisXContentRightPosition = function(width){
+		this.calcAxisXContentRightPosition = function(axisXWidth){
 			var config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
 
-			var xRight_axisX = this.calcAxisXRightPosition(width);
+			var xRight_axisX = this.calcAxisXRightPosition(axisXWidth);
 			return xRight_axisX - Math.floor(config_axisXTickOffsetFromRight);
 		};
 

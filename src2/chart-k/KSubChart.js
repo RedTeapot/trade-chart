@@ -618,7 +618,7 @@
 		};
 
 
-		console.info("Create k sub chart: " + this.id);
+		TradeChart2.showLog && console.info("Create k sub chart: " + this.id);
 
 		var evtRenderAction = function(e){
 			TradeChart2.showLog && console.debug("Auto render for " + self.id + " by event: " + e.type, kChart.getRenderingOffset(), kChart.getKDataManager().getElapsedNewerDataCount());
