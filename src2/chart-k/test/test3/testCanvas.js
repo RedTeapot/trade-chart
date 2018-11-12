@@ -6,15 +6,15 @@ util.loadData(function(datas){
 		paddingRight: 60,
 
 		groupLineWidth: 3,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
-		groupBarWidth: 7,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
+		groupBarWidth: 9,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
 		groupGap: 3,
 
 		axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 		axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 		axisLabelFont: null,
 
-		axisXTickOffset: 0,/* 横坐标刻度距离原点的位移 */
-		axisXTickOffsetFromRight: 0,/* 横坐标右侧刻度距离原点的位移 */
+		axisXTickOffset: 10,/* 横坐标刻度距离原点的位移 */
+		axisXTickOffsetFromRight: 10,/* 横坐标右侧刻度距离原点的位移 */
 		axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 		axisXLabelSize: 100,
 	};
@@ -25,9 +25,14 @@ util.loadData(function(datas){
 		paddingTop: 20,
 		paddingBottom: 30,
 
-		showAxisXLabel: false,
+		showAxisXLine: true,/** 是否绘制横坐标轴 */
+		showAxisXLabel: false,/** 是否绘制横坐标刻度值 */
+		showAxisYLine: true,/** 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
 
 		axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
+
+		horizontalGridLineColor: false,
 
 		coordinateBackground: "#F0F0F0",
 		keepingColor: "blue"
@@ -37,6 +42,11 @@ util.loadData(function(datas){
 
 		paddingTop: 20,
 		paddingBottom: 30,
+
+		showAxisXLine: true,/** 是否绘制横坐标轴 */
+		showAxisXLabel: false,/** 是否绘制横坐标刻度值 */
+		showAxisYLine: true,/** 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
 
 		axisYPosition: "right",
 		axisYTickOffset: 10,

@@ -87,7 +87,7 @@
 			if(amountHeightRatio === 0)
 				return 0;
 
-			return Math.round(amount / amountHeightRatio);
+			return Math.floor(amount / amountHeightRatio);
 		};
 	};
 

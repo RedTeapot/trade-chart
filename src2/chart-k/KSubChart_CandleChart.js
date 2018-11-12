@@ -144,7 +144,7 @@
 				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
-				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
+				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
 				$yTop_axisY = config_paddingTop;/* 整数使用$开头*/

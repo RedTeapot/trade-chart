@@ -145,8 +145,7 @@
 			ctx.save();
 
 			ctx.lineWidth = 1;
-
-			config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
+			ctx.strokeStyle = config_axisLineColor;
 			config_axisLabelFont && (ctx.font = config_axisLabelFont);
 			config_axisLabelColor && (ctx.fillStyle = config_axisLabelColor);
 			ctx.textAlign = "center";
@@ -163,8 +162,8 @@
 				/* 绘制刻度线 */
 				if(ifDrawTick && config_showAxisXLine){
 					ctx.beginPath();
-					ctx.moveTo(tickX, y_axisX);
-					ctx.lineTo(tickX, y_axisX + config_axisTickLineLength);
+					ctx.moveTo(tickX, y_axisX + 1);
+					ctx.lineTo(tickX, y_axisX + 1 + config_axisTickLineLength);
 					ctx.stroke();
 				}
 
@@ -228,7 +227,7 @@
 			ctx.save();
 
 			ctx.lineWidth = 1;
-			config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
+			ctx.strokeStyle = config_axisLineColor;
 			config_axisLabelFont && (ctx.font = config_axisLabelFont);
 			config_axisLabelColor && (ctx.fillStyle = config_axisLabelColor);
 			config_axisYLabelFont && (ctx.font = config_axisYLabelFont);
@@ -248,19 +247,24 @@
 				sign = ifShowAxisYLabelOutside? 1: -1;
 			}
 
-			var axisTickLineOffset = sign * config_axisTickLineLength,
-				axisYLabelOffset = sign * ((config_showAxisYLine? config_axisTickLineLength: 0) + config_axisYLabelOffset);
+			var axisYTickBeginX;
+			if(ifShowAxisYLeft && ifShowAxisYLabelOutside || !ifShowAxisYLeft && !ifShowAxisYLabelOutside)
+				axisYTickBeginX = Math.floor(x_axisY) - config_axisTickLineLength;
+			else
+				axisYTickBeginX = Math.floor(x_axisY) + 1;
+
+			var axisYLabelOffset = sign * ((config_showAxisYLine? config_axisTickLineLength: 0) + config_axisYLabelOffset);
 			var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
 
 			for(var i = 0; i < axisYTickList.length; i++){
 				var tick = axisYTickList[i];
-				var tickY = tick.y;
+				var tickY = util.getLinePosition(tick.y);
 
 				/* 绘制刻度线 */
 				if(ifDrawTick && config_showAxisYLine){
 					ctx.beginPath();
-					ctx.moveTo(x_axisY, yTop_axisY + tickY);
-					ctx.lineTo(x_axisY + axisTickLineOffset, yTop_axisY + tickY);
+					ctx.moveTo(axisYTickBeginX, tickY);
+					ctx.lineTo(axisYTickBeginX + config_axisTickLineLength, tickY);
 					ctx.stroke();
 				}
 
@@ -269,7 +273,7 @@
 						config_axisYLabelVerticalOffset = config_axisYLabelVerticalOffset(i, maxAxisYTickIndex + 1);
 
 					var drawLabel = function(){
-						ctx.fillText(tick.label, x_axisY + axisYLabelOffset, yTop_axisY + tickY + config_axisYLabelVerticalOffset);
+						ctx.fillText(tick.label, x_axisY + axisYLabelOffset, tickY + config_axisYLabelVerticalOffset);
 					};
 
 					if(i === 0){
@@ -304,18 +308,13 @@
 			if(util.isEmptyString(config_bg))
 				return;
 
-			var config_paddingLeft = this.getConfigItem("paddingLeft", config),
-				config_paddingTop = this.getConfigItem("paddingTop", config);
-
-
-			var yTop_axisY = util.getLinePosition(config_paddingTop),
-				xLeft_axisX = util.getLinePosition(config_paddingLeft);
+			var config_paddingLeft = Math.floor(this.getConfigItem("paddingLeft", config)),
+				config_paddingTop = Math.floor(this.getConfigItem("paddingTop", config));
 
 			ctx.save();
 			ctx.beginPath();
-			ctx.rect(xLeft_axisX, yTop_axisY, util.getLinePosition(width), util.getLinePosition(height));
+			ctx.rect(config_paddingLeft, config_paddingTop, width, height);
 
-			ctx.strokeWidth = 0;
 			if(config_bg instanceof TradeChart2.LinearGradient){
 				config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + height);
 			}else
@@ -380,7 +379,8 @@
 		 * @returns {XTick[]}
 		 */
 		this.renderAxisX = function(ctx, config, kChartSketch, kSubChartSketch){
-			var config_showAxisXLine = this.getConfigItem("showAxisXLine", config),
+			var config_axisLineColor = this.getConfigItem("axisLineColor", config),
+				config_showAxisXLine = this.getConfigItem("showAxisXLine", config),
 				config_paddingTop = this.getConfigItem("paddingTop", config),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth", config),
 				config_groupGap = this.getConfigItem("groupGap", config),
@@ -391,7 +391,7 @@
 				config_axisXLabelGenerator = this.getConfigItem("axisXLabelGenerator", config);
 
 			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),/* 闭区间，亦即此像素点仍然是坐标轴的一部分 */
 				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
 				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
@@ -415,10 +415,16 @@
 
 			/* 绘制X轴坐标线 */
 			if(config_showAxisXLine){
+				ctx.save();
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = config_axisLineColor;
+
 				ctx.beginPath();
-				ctx.moveTo(xLeft_axisX, y_axisX);
-				ctx.lineTo(xRight_axisX, y_axisX);
+				ctx.moveTo(Math.floor(xLeft_axisX), y_axisX);
+				ctx.lineTo(Math.floor(xRight_axisX + 1), y_axisX);
 				ctx.stroke();
+
+				ctx.restore();
 			}
 
 			/* 上一个绘制的横坐标刻度对应的数据索引 */
@@ -441,7 +447,7 @@
 					return;
 
 				var tickX = util.getLinePosition(xRight_axisX_content + kChart.getRenderingOffset() - groupSize * i);
-				ifShowTick = tickX >= xLeft_axisX_content && tickX <= xRight_axisX;
+				ifShowTick = tickX >= xLeft_axisX_content && tickX <= xRight_axisX_content;
 				if(!ifShowTick)
 					return;
 
@@ -493,7 +499,8 @@
 		 * @returns {YTick[]}
 		 */
 		this.renderAxisY = function(ctx, config, kChartSketch, kSubChartSketch, kDataSketch){
-			var config_showAxisYLine = this.getConfigItem("showAxisYLine", config),
+			var config_axisLineColor = this.getConfigItem("axisLineColor", config),
+				config_showAxisYLine = this.getConfigItem("showAxisYLine", config),
 				config_paddingTop = this.getConfigItem("paddingTop", config),
 				config_axisYPosition = this.getConfigItem("axisYPosition", config),
 				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition", config),
@@ -512,8 +519,8 @@
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
-				yTop_axisY = util.getLinePosition(config_paddingTop),
-				yBottom_axisY = y_axisX;
+				yTop_axisY = Math.floor(config_paddingTop),
+				yBottom_axisY = Math.floor(y_axisX);
 
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
 			var axisYAmountInterval = (kDataSketch.getAmountCeiling() - kDataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
@@ -521,8 +528,6 @@
 			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 			/* 是否绘制网格横线/竖线 */
 			var ifShowHorizontalGridLine = config_showHorizontalGridLine && config_horizontalGridLineColor;
-
-
 
 			/**
 			 * 要绘制的纵坐标刻度集合
@@ -551,10 +556,16 @@
 			};
 
 			if(config_showAxisYLine){
+				ctx.save();
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = config_axisLineColor;
+
 				ctx.beginPath();
 				ctx.moveTo(x_axisY, yTop_axisY);
 				ctx.lineTo(x_axisY, yBottom_axisY);
 				ctx.stroke();
+
+				ctx.restore();
 			}
 
 			var isAxisYPrecisionAuto = "auto" === String(config_axisYPrecision).trim().toLowerCase();
@@ -569,9 +580,8 @@
 			config_gridLineDash && ctx.setLineDash && ctx.setLineDash(config_gridLineDash);
 			config_horizontalGridLineColor && (ctx.strokeStyle = config_horizontalGridLineColor);
 			for(var i = 0; i <= maxAxisYTickIndex; i++){
-				var amount = kDataSketch.getAmountFloor() + numBig(new Big(axisYAmountInterval).mul(i)),
-					tickOffset = numBig(new Big(axisYHeightInterval).mul(maxAxisYTickIndex - i));
-				var tickY = Math.round(tickOffset);
+				var amount = kDataSketch.getAmountFloor() + axisYAmountInterval * i;
+				var tickY = y_axisX - axisYHeightInterval * i;
 
 				/* 绘制网格横线 */
 				if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
