@@ -21,10 +21,12 @@
 	 * @constructor
 	 * K线子图绘制结果
 	 * @param {KSubChart} kSubChart 关联的，生成绘制结果的K线子图实例
+	 * @param {KChartSketch} kChartSketch K线图形素描
+	 * @param {KSubChartSketch_ChartSketch} kSubChartSketch K线子图形素描
 	 * @param {HTMLCanvasElement} canvasObj 绘制的画布所在的DOM元素
 	 * @param {KSubChartConfig} config 绘制过程使用的配置
 	 */
-	var KSubChartRenderResult = function(kSubChart, canvasObj, config){
+	var KSubChartRenderResult = function(kSubChart, kChartSketch, kSubChartSketch, canvasObj, config){
 		var self = this;
 
 		/**
@@ -40,6 +42,22 @@
 				v = util.calcRenderingHeight(canvasObj, v);
 
 			return v;
+		};
+
+		/**
+		 * 获取K线图形素描
+		 * @returns {KChartSketch}
+		 */
+		this.getKChartSketch = function(){
+			return kChartSketch;
+		};
+
+		/**
+		 * 获取K线子图形素描
+		 * @returns {KSubChartSketch_ChartSketch}
+		 */
+		this.getKSubChartSketch = function(){
+			return kSubChartSketch;
 		};
 
 		/**

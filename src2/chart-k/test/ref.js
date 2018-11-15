@@ -10,11 +10,11 @@
 	"default-config/default-config_k-sub-chart_candle.js",
 	"default-config/default-config_k-sub-chart_volume.js",
 
-	"KDataManager.js",
-	"KChart.js",
-
 	"KChartSketch.js",
 	"KDataSketch.js",
+
+	"KDataManager.js",
+	"KChart.js",
 
 	"KSubChart.js",
 	"KSubChartTypes.js",

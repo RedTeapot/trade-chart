@@ -1,9 +1,10 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var util = TradeChart2.util;
-	var Big = TradeChart2.Big;
-	var KDataManager = TradeChart2.KDataManager;
-	var eventDrive = TradeChart2.eventDrive;
+	var util = TradeChart2.util,
+		Big = TradeChart2.Big,
+		KDataManager = TradeChart2.KDataManager,
+		KChartSketch = TradeChart2.KChartSketch,
+		eventDrive = TradeChart2.eventDrive;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -164,19 +165,39 @@
 		/**
 		 * 检查当前呈现的数据是否已经达到左侧极限
 		 * @param {Number} maxGroupCount 最大显示数据量
+		 * @param {Number} axisXWidth 横坐标宽度
 		 * @returns {Boolean}
 		 */
-		this.checkIfReachesLeftLimit = function(maxGroupCount){
-			return false;
-			//TODO 判断方法不正确，需要改正
-			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.lte(0);
+		var checkIfReachesLeftLimit = function(maxGroupCount, axisXWidth){
+			var dataCount = kDataManager.getDataList().length;
+			if(dataCount <= maxGroupCount || 1 === dataCount)
+				return true;
+
+			var h = self.calcHalfGroupBarWidth(),
+				g = self.getConfigItem("groupGap"),
+				B = self.getConfigItem("groupBarWidth");
+
+			var axisXContentLength = self.calcAxisXContentRightPosition(axisXWidth) - self.calcAxisXContentLeftPosition() + 1;
+
+			// var idealAxisXContentLength = (dataCount - 1) * g + (dataCount - 2) * B + 2 * h + 2 - 1;
+
+			/* 最短的理想宽度（刚好使得两头柱子分别显示在两侧纵轴中间的最小长度） */
+			var shortestIdealAxisXContentLength = g + 2 * h + 2 - 1;
+
+			/* 横坐标超出理想长度的部分 */
+			var axisXRedundantOffset = axisXContentLength % shortestIdealAxisXContentLength - 1;
+			var offset = shortestIdealAxisXContentLength - axisXRedundantOffset;
+
+			console.log(h, g, B, axisXContentLength, shortestIdealAxisXContentLength, axisXRedundantOffset, offset, axisXWidth);
+			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.gte(offset);
+			//TODO 判断方法不准确，需要改正
 		};
 
 		/**
 		 * 检查当前呈现的数据是否已经达到右侧极限
 		 * @returns {Boolean}
 		 */
-		this.checkIfReachesRightLimit = function(){
+		var checkIfReachesRightLimit = function(){
 			return kDataManager.checkIfReachesRightLimit() && renderingOffsetBig.eq(0);
 		};
 
@@ -185,13 +206,15 @@
 		 * 绘制的起点位置，为图形右侧
 		 *
 		 * @param {Number} amount 要累加的横向偏移量。正数代表图形向右移动；负数代表图形向左移动
-		 * @param {Number} [maxGroupCount] 最大显示数据量
+		 * @param {Number} axisXWidth 横坐标宽度
 		 * @returns {KChart}
 		 */
-		this.updateRenderingOffsetBy = function(amount, maxGroupCount){
+		this.updateRenderingOffsetBy = function(amount, axisXWidth){
 			amount = util.parseAsNumber(amount, 0);
 			if(0 === amount)
 				return this;
+
+			var maxGroupCount = KChartSketch.calcMaxGroupCount(config, axisXWidth);
 
 			var h = this.calcHalfGroupBarWidth(),
 				g = this.getConfigItem("groupGap"),
@@ -210,7 +233,7 @@
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){/* 向右拖动 */
 				/* 检查是否达到左侧临界处 */
-				if(util.isValidNumber(maxGroupCount) && this.checkIfReachesLeftLimit(maxGroupCount)){
+				if(util.isValidNumber(maxGroupCount) && checkIfReachesLeftLimit(maxGroupCount, axisXWidth)){
 					TradeChart2.showLog && console.info("Reaches left limit");
 					return this;
 				}
@@ -236,9 +259,9 @@
 
 				/* 更新数据偏移量。如果向右移动到头，则重置渲染位移量为0 */
 				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
-				// if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && newRenderingOffsetBig.gt(0)){
-				// 	newRenderingOffsetBig = zeroBig;
-				// }
+				if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && newRenderingOffsetBig.gt(0)){/* “拉力过猛” */
+					newRenderingOffsetBig = zeroBig;
+				}
 				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
 				renderingOffsetBig = newRenderingOffsetBig;
 
@@ -246,7 +269,7 @@
 					fireEvent_renderingPositionChanges();
 			}else{
 				/* 检查是否达到右侧临界处 */
-				if(this.checkIfReachesRightLimit()){
+				if(checkIfReachesRightLimit()){
 					TradeChart2.showLog && console.info("Reaches right limit");
 					return this;
 				}
@@ -272,7 +295,7 @@
 
 				/* 更新数据偏移量。如果向左移动到头，则重置渲染位移量为0 */
 				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
-				if(kDataManager.checkIfReachesRightLimit() && newRenderingOffsetBig.lt(0)){
+				if(kDataManager.checkIfReachesRightLimit() && newRenderingOffsetBig.lt(0)){/* “拉力过猛” */
 					newRenderingOffsetBig = zeroBig;
 				}
 				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);

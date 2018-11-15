@@ -13,8 +13,8 @@ util.loadData(function(datas){
 		axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 		axisLabelFont: null,
 
-		axisXTickOffset: 10,/* 横坐标刻度距离原点的位移 */
-		axisXTickOffsetFromRight: 10,/* 横坐标右侧刻度距离原点的位移 */
+		axisXTickOffset: 0,/* 横坐标刻度距离原点的位移 */
+		axisXTickOffsetFromRight: 0,/* 横坐标右侧刻度距离原点的位移 */
 		axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 		axisXLabelSize: 100,
 	};
@@ -140,7 +140,7 @@ util.loadData(function(datas){
 	var showPrevious = function(e){
 		var x = e.layerX;
 		var offsetX = x - lastX;
-		kChart.updateRenderingOffsetBy(offsetX, result_candle.getMaxGroupCount());
+		kChart.updateRenderingOffsetBy(offsetX, TradeChart2.util.calcRenderingWidth(column_candleObj, result_candle.getKChartSketch().getWidth()));
 		lastX = x;
 	};
 

@@ -285,7 +285,7 @@
 				drawAxisYTickList(drawContent);
 			})();
 
-			return new KSubChart_VolumeRenderResult(this, canvasObj, config);
+			return new KSubChart_VolumeRenderResult(this, kChartSketch, kSubChartSketch, canvasObj, config);
 		};
 	};
 	KSubChart_VolumeChart.prototype = Object.create(KSubChart.prototype);

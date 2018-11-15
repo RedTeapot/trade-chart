@@ -312,7 +312,7 @@
 				drawAxisYTickList(drawContent);
 			})();
 
-			return new KSubChart_CandleRenderResult(this, canvasObj, config);
+			return new KSubChart_CandleRenderResult(this, kChartSketch, kSubChartSketch, canvasObj, config);
 		};
 	};
 	KSubChart_CandleChart.prototype = Object.create(KSubChart.prototype);
