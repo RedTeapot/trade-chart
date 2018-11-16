@@ -1,17 +1,26 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
+	var CommonChartConfig = TradeChart2.CommonChartConfig;
 	var util = TradeChart2.util;
 
 	/**
+	 * @callback KChartConfig~axisXLabelGenerator
+	 * @param {KData} convertedData 转换后的K线数据
+	 * @param {Number} index 数据在渲染的数据列表中的索引
+	 * @param {KData} previousConvertedData 上一个标签对应的转换后的K线数据
+	 * @param {KData} nextConvertedData 下一个标签对应的转换后的K线数据
+	 */
+
+	/**
+	 * @callback KChartConfig~axisXLabelHorizontalAlign
+	 * @param {Number} index 要绘制的横坐标标签索引
+	 * @param {Number} count 要绘制的横坐标标签的个数
+	 */
+
+	/**
 	 * 默认的，作用于主图和子图的全局配置项
-	 * @type {KChartConfig}
 	 */
 	var defaultConfig = {
-		width: "100%",/** 图表整体宽度 */
-
-		paddingLeft: 60,/** 图表内边距 - 左侧 */
-		paddingRight: 20,/** 图表内边距 - 右侧 */
-
 		groupLineWidth: 1,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
 		groupBarWidth: 5,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
 		groupGap: 3,/** 相邻两组数据之间的间隔 */
@@ -35,6 +44,22 @@
 	};
 	Object.freeze && Object.freeze(defaultConfig);
 
-	/* 暴露默认配置 */
+	/**
+	 * K线图绘制配置
+	 * @param {Object} config
+	 *
+	 * @constructor
+	 * @augments CommonChartConfig
+	 */
+	var KChartConfig = function(config){
+		var dftConfig = util.setDftValue(null, defaultConfig);
+		util.setDftValue(dftConfig, TradeChart2["COMMON_DEFAULT_CONFIG"]);
+
+		config = config || {};
+		CommonChartConfig.call(this, config, dftConfig);
+	};
+	KChartConfig.prototype = Object.create(CommonChartConfig.prototype);
+
+	util.defineReadonlyProperty(TradeChart2, "KChartConfig", KChartConfig);
 	util.defineReadonlyProperty(TradeChart2, "K_DEFAULT_CONFIG", defaultConfig);
 })();

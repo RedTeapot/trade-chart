@@ -1,10 +1,38 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
+	var CommonChartConfig = TradeChart2.CommonChartConfig;
 	var util = TradeChart2.util;
 
 	/**
-	 * 默认的，适用于K线图“蜡烛图”子图的配置项
-	 * @type {KSubChartConfig_candle}
+	 * @callback KSubChartConfig~axisYLabelVerticalOffset
+	 * @param {Number} index 要绘制的纵坐标标签索引
+	 * @param {Number} count 要绘制的纵坐标标签的个数
+	 */
+
+	/**
+	 * @callback KSubChartConfig~axisYFormatter
+	 * @param {Number} price 要格式化显示的价格
+	 * @param {Object} config 绘制配置。综合了 KChartConfig 和 KSubChartConfig
+	 */
+
+	/**
+	 * @callback KSubChartConfig~axisYAmountFloor
+	 * @param {Number} min 要绘制的数据集中出现的最小数值
+	 * @param {Number} max 要绘制的数据集中出现的最大数值
+	 * @param {Number} avgVariation 要绘制的数据集中数据变化幅度的平均值（以每条数据的最大数值和最小数值计算变化幅度）
+	 * @param {Number} maxVariation 要绘制的数据集中数据变化幅度的最大值
+	 */
+
+	/**
+	 * @callback KSubChartConfig~axisYAmountCeiling
+	 * @param {Number} min 要绘制的数据集中出现的最小数值
+	 * @param {Number} max 要绘制的数据集中出现的最大数值
+	 * @param {Number} avgVariation 要绘制的数据集中数据变化幅度的平均值（以每条数据的最大数值和最小数值计算变化幅度）
+	 * @param {Number} maxVariation 要绘制的数据集中数据变化幅度的最大值
+	 */
+
+	/**
+	 * 默认的，适用于K线图子图的通用配置项
 	 */
 	var defaultConfig = {
 		height: 300,/** 图表整体高度 */
@@ -37,7 +65,7 @@
 		axisYPrecision: "auto",/** 纵坐标的数字精度（仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值）。auto：根据给定的数据自动检测 */
 		axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
 			/** price：价格；config：配置 */
-			return util.formatMoney(price, config.axisYPrecision || defaultConfig.axisYPrecision || 0);
+			return util.formatMoney(price, config.getConfigItemValue("axisYPrecision") || defaultConfig.axisYPrecision || 0);
 		},
 		axisYAmountFloor: null,
 		axisYAmountFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
@@ -52,6 +80,21 @@
 	};
 	Object.freeze && Object.freeze(defaultConfig);
 
-	/* 暴露默认配置 */
+	/**
+	 * K线子图通用配置
+	 * @param {Object} config
+	 *
+	 * @constructor
+	 * @augments CommonChartConfig
+	 */
+	var KSubChartConfig = function(config){
+		var dftConfig = util.setDftValue(null, defaultConfig);
+
+		config = config || {};
+		CommonChartConfig.call(this, config, dftConfig);
+	};
+	KSubChartConfig.prototype = Object.create(CommonChartConfig.prototype);
+
+	util.defineReadonlyProperty(TradeChart2, "KSubChartConfig", KSubChartConfig);
 	util.defineReadonlyProperty(TradeChart2, "K_SUB_DEFAULT_CONFIG", defaultConfig);
 })();

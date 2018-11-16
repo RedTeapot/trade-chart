@@ -44,7 +44,7 @@ util.loadData(function(datas){
 		paddingBottom: 30,
 
 		showAxisXLine: true,/** 是否绘制横坐标轴 */
-		showAxisXLabel: false,/** 是否绘制横坐标刻度值 */
+		showAxisXLabel: true,/** 是否绘制横坐标刻度值 */
 		showAxisYLine: true,/** 是否绘制纵坐标轴 */
 		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
 
@@ -77,19 +77,18 @@ util.loadData(function(datas){
 	window.kdm = kChart.getKDataManager();
 
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-	var result_candle = subChart_candle.render(column_candleObj, kCandleConfig);
+	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var result_candle = subChart_candle.render(column_candleObj);
 	window.subChart_candle = subChart_candle;
 	window.result_candle = result_candle;
 	result_candle.initCanvas(column_candleDetailObj);
 
 	/* 量图 */
-	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-	var result_volume = subChart_volume.render(column_volumeObj, kVolumeConfig);
+	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
+	var result_volume = subChart_volume.render(column_volumeObj);
 	window.subChart_volume = subChart_volume;
 	window.result_volume = result_volume;
 	result_volume.initCanvas(column_volumeDetailObj);
-
 
 	var isModeViewDetail = true;
 	var lastX = 0;

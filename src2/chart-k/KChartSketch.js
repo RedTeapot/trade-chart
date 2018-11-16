@@ -128,15 +128,16 @@
 	KChartSketch.sketchByConfig = function(config, width){
 		var chartSketch = new KChartSketch();
 
-		var config_width = getConfigItem("width", config),
-			config_paddingLeft = getConfigItem("paddingLeft", config),
-			config_paddingRight = getConfigItem("paddingRight", config),
-			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
-			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config);
+		var config_width = config.getConfigItemValue("width"),
+			config_paddingLeft = config.getConfigItemValue("paddingLeft"),
+			config_paddingRight = config.getConfigItemValue("paddingRight"),
+			config_axisXTickOffset = config.getConfigItemValue("axisXTickOffset"),
+			config_axisXTickOffsetFromRight = config.getConfigItemValue("axisXTickOffsetFromRight");
 
 		var canvasWidth = util.isValidNumber(width)? width: config_width;
 		var axisXWidth = canvasWidth - config_paddingLeft - config_paddingRight;
 		var contentWidth = axisXWidth - config_axisXTickOffset - config_axisXTickOffsetFromRight;
+
 		chartSketch.setCanvasWidth(canvasWidth)
 			.setAxisXWidth(axisXWidth)
 			.setContentWidth(contentWidth)
@@ -152,13 +153,13 @@
 	 * @returns {Number}
 	 */
 	KChartSketch.calcMaxGroupCount = function(config, width){
-		var config_width = getConfigItem("width", config),
-			config_paddingLeft = getConfigItem("paddingLeft", config),
-			config_paddingRight = getConfigItem("paddingRight", config),
-			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
-			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config),
-			config_groupGap = getConfigItem("groupGap", config),
-			config_groupBarWidth = getConfigItem("groupBarWidth", config);
+		var config_width = config.getConfigItemValue("width"),
+			config_paddingLeft = config.getConfigItemValue("paddingLeft"),
+			config_paddingRight = config.getConfigItemValue("paddingRight"),
+			config_axisXTickOffset = config.getConfigItemValue("axisXTickOffset"),
+			config_axisXTickOffsetFromRight = config.getConfigItemValue("axisXTickOffsetFromRight"),
+			config_groupGap = config.getConfigItemValue("groupGap"),
+			config_groupBarWidth = config.getConfigItemValue("groupBarWidth");
 
 		// debugger;
 		var axisXWidth = (util.isValidNumber(width)? width: config_width) - config_paddingLeft - config_paddingRight;

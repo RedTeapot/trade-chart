@@ -26,14 +26,11 @@
 	 *
 	 * @param {KChart} kChart K线图实例
 	 * @param {String} name 配置项名称
-	 * @param {KSubChartConfig_candle} config K线子图渲染配置
+	 * @param {KSubChartConfig_CandleConfig} config K线子图渲染配置
 	 */
 	var _getConfigItem = function(kChart, name, config){
-		var defaultConfig = TradeChart2.K_SUB_CANDLE_DEFAULT_CONFIG;
-		if(null != config && name in config)
-			return config[name];
-		else if(name in defaultConfig)
-			return defaultConfig[name];
+		if(config.supportsConfigItem(name))
+			return config.getConfigItemValue(name);
 
 		return kChart.getConfigItem(name);
 	};
@@ -41,7 +38,7 @@
 	/**
 	 * 扫描给定的K线图实例和K线子图渲染配置，根据K线图实例中的数据生成素描
 	 * @param {KChart} kChart K线图实例
-	 * @param {KSubChartConfig_candle} kSubChartConfig K线子图渲染配置
+	 * @param {KSubChartConfig_CandleConfig} kSubChartConfig K线子图渲染配置
 	 * @returns {KSubChartSketch_CandleDataSketch}
 	 */
 	KSubChartSketch_CandleDataSketch.sketch = function(kChart, kSubChartConfig){
@@ -68,7 +65,7 @@
 			var variationSum = 0, volumeVariationSum = 0;
 			for(var i = 0; i < dataList.length; i++){
 				var d = dataList[i];
-				if(null == d || typeof d != "object")
+				if(null == d || typeof d !== "object")
 					continue;
 
 				var openPrice = +d.openPrice,

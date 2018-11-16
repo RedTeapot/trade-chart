@@ -4,25 +4,26 @@
 	"../comp/eventDrive.js",
 	"../comp/Big.js",
 	"../comp/LinearGradient.js",
-
-	"default-config/default-config_k-chart.js",
-	"default-config/default-config_k-sub-chart.js",
-	"default-config/default-config_k-sub-chart_candle.js",
-	"default-config/default-config_k-sub-chart_volume.js",
+	"../CommonChartConfig.js",
 
 	"KChartSketch.js",
 	"KDataSketch.js",
 
 	"KDataManager.js",
+	"KChartConfig.js",
 	"KChart.js",
 
-	"KSubChart.js",
+	"KSubChartConfig.js",
 	"KSubChartTypes.js",
-	"KSubChartSketch_ChartSketch.js",
+	"KSubChartSketch.js",
 	"KSubChartRenderResult.js",
+	"KSubChart.js",
 
 	"KSubChart_CandleRenderResult.js",
 	"KSubChart_VolumeRenderResult.js",
+
+	"KSubChartConfig_CandleConfig.js",
+	"KSubChartConfig_VolumeConfig.js",
 
 	"KSubChartSketch_CandleDataSketch.js",
 	"KSubChartSketch_VolumeDataSketch.js",

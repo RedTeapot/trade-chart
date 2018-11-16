@@ -2,6 +2,7 @@
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util,
 		Big = TradeChart2.Big,
+		KChartConfig = TradeChart2.KChartConfig,
 		KDataManager = TradeChart2.KDataManager,
 		KChartSketch = TradeChart2.KChartSketch,
 		eventDrive = TradeChart2.eventDrive;
@@ -23,50 +24,33 @@
 	var evtName_renderingPositionChanges = "renderingpositionchange";
 
 	/**
-	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
-	 * @param {String} name 配置项名称
-	 * @param {KChartConfig} config 配置集合
-	 * @returns {*}
-	 */
-	var getConfigItem = function(name, config){
-		var defaultConfig = TradeChart2.K_DEFAULT_CONFIG;
-
-		if(null != config && name in config)
-			return config[name];
-		else if(name in defaultConfig)
-			return defaultConfig[name];
-		else{
-			console.warn("Unknown k chart configuration item: " + name);
-			return undefined;
-		}
-	};
-
-	/**
 	 * 验证配置并自动纠正错误的配置
 	 * @param {KChartConfig} config K线绘制配置
 	 */
 	var validateConfig = function(config){
+		var v;
+
 		/* 线宽需要为奇数 */
-		var groupLineWidth = getConfigItem("groupLineWidth", config);
+		var groupLineWidth = config.getConfigItemValue("groupLineWidth");
 		if(groupLineWidth === 0)
 			groupLineWidth = 1;
 		if(groupLineWidth % 2 === 0){
-			var v = groupLineWidth + 1;
+			v = groupLineWidth + 1;
 			console.warn("K line with should be odd(supplied: " + groupLineWidth + "), auto adjust to " + v);
-			config.groupLineWidth = groupLineWidth = v;
+			config.setConfigItemValue("groupLineWidth", groupLineWidth = v);
 		}
 
 		/* 柱宽需大于等于线宽+2 */
-		var groupBarWidth = getConfigItem("groupBarWidth", config);
+		var groupBarWidth = config.getConfigItemValue("groupBarWidth");
 		var tmp = groupLineWidth + 2;
 		if(groupBarWidth < tmp){
 			console.warn("K chart bar width should be greater than group line width plus 2, auto adjust to " + tmp + ". Configured bar width: " + groupBarWidth + ", configured line with: " + groupLineWidth);
-			config.groupBarWidth = groupBarWidth = tmp;
+			config.setConfigItemValue("groupBarWidth", groupBarWidth = tmp);
 		}
 		if(groupBarWidth % 2 === 0){
-			var v = groupBarWidth + 1;
+			v = groupBarWidth + 1;
 			console.warn("K bar width should odd(supplied: " + groupBarWidth + "), auto adjust to " + v);
-			config.groupBarWidth = groupBarWidth = v;
+			config.setConfigItemValue("groupBarWidth", groupBarWidth = v);
 		}
 	};
 
@@ -79,7 +63,7 @@
 		var self = this;
 
 		/** 绘制配置 */
-		var config = {};
+		var config = new KChartConfig({});
 
 		/** 附加的K线子图列表 */
 		var attachedKSubCharts = [];
@@ -329,10 +313,12 @@
 		 * @param {Object} _config 图形绘制配置
 		 */
 		this.setConfig = function(_config){
-			if(null != _config && typeof _config === "object")
-				for(var p in _config)
-					config[p] = _config[p];
+			if(null == config || typeof config !== "object"){
+				console.warn("Invalid config");
+				return this;
+			}
 
+			config.setConfig(_config);
 			validateConfig(config);
 
 			return this;
@@ -340,7 +326,7 @@
 
 		/**
 		 * 获取图形绘制配置
-		 * @returns {*}
+		 * @returns {KChartConfig}
 		 */
 		this.getConfig = function(){
 			return config;
@@ -352,7 +338,7 @@
 		 * @returns {*}
 		 */
 		this.getConfigItem = function(name){
-			return getConfigItem(name, config);
+			return config.getConfigItemValue(name);
 		};
 
 

@@ -11,29 +11,50 @@
 	 * @constructor
 	 * K线子图形素描
 	 */
-	var KSubChartSketch_ChartSketch = function(){
-		/** 图表高度（纵坐标覆盖区域） */
-		var height;
+	var KSubChartSketch = function(){
+		/** 画布高度 */
+		var canvasHeight;
+		/** 纵坐标高度 */
+		var axisYHeight;
 		/** 图表正文区域高度 */
 		var contentHeight;
 		/** 纵坐标可呈现的量差与高度差之间的映射比例。用于决定给定的一个量需要占据多少像素 */
 		var amountHeightRatio;
 
+
 		/**
-		 * 获取图表高度（纵坐标覆盖区域）
+		 * 获取画布高度
 		 * @returns {Number}
 		 */
-		this.getHeight = function(){
-			return height;
+		this.getCanvasHeight = function(){
+			return canvasHeight;
 		};
 
 		/**
-		 * 设置图表高度（纵坐标覆盖区域）
-		 * @param {Number} v 图表高度（纵坐标覆盖区域）
-		 * @returns {KSubChartSketch_ChartSketch}
+		 * 设置画布高度
+		 * @param {Number} v 画布高度
+		 * @returns {KSubChartSketch}
 		 */
-		this.setHeight = function(v){
-			height = v;
+		this.setCanvasHeight = function(v){
+			canvasHeight = v;
+			return this;
+		};
+
+		/**
+		 * 获取纵坐标高度
+		 * @returns {Number}
+		 */
+		this.getAxisYHeight = function(){
+			return axisYHeight;
+		};
+
+		/**
+		 * 设置纵坐标高度
+		 * @param {Number} v 纵坐标高度
+		 * @returns {KSubChartSketch}
+		 */
+		this.setAxisYHeight = function(v){
+			axisYHeight = v;
 			return this;
 		};
 
@@ -48,7 +69,7 @@
 		/**
 		 * 设置图表正文区域高度
 		 * @param {Number} v 图表正文区域高度
-		 * @returns {KSubChartSketch_ChartSketch}
+		 * @returns {KSubChartSketch}
 		 */
 		this.setContentHeight = function(v){
 			contentHeight = v;
@@ -66,7 +87,7 @@
 		/**
 		 * 设置纵坐标可呈现的量差与高度差之间的映射比例
 		 * @param {Number} v 纵坐标可呈现的量差与高度差之间的映射比例
-		 * @returns {KSubChartSketch_ChartSketch}
+		 * @returns {KSubChartSketch}
 		 */
 		this.setAmountHeightRatio = function(v){
 			if(null == v || isNaN(v = Number(v))){
@@ -91,5 +112,5 @@
 		};
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch_ChartSketch", KSubChartSketch_ChartSketch);
+	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch", KSubChartSketch);
 })();
