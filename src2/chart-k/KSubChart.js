@@ -338,9 +338,9 @@
 
 
 			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
 				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
-				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth());
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth());
 
 			var maxGroupCount = kChartSketch.getMaxGroupCount();
 			var halfGroupBarSize = kChart.calcHalfGroupBarWidth();
@@ -391,9 +391,9 @@
 				config_axisXLabelGenerator = this.getConfigItem("axisXLabelGenerator", config);
 
 			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),/* 闭区间，亦即此像素点仍然是坐标轴的一部分 */
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),/* 闭区间，亦即此像素点仍然是坐标轴的一部分 */
 				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
-				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight());
 
 			var kDataManager = kChart.getKDataManager();
@@ -515,7 +515,7 @@
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
 
 			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getHeight()),
 
 				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
@@ -587,7 +587,7 @@
 				if(ifShowHorizontalGridLine && i > 0){/* 坐标轴横线上不再绘制 */
 					ctx.beginPath();
 					ctx.moveTo(x_axisY, yTop_axisY + tickY);
-					ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(kChartSketch.getWidth()), yTop_axisY + tickY);
+					ctx.lineTo(x_axisY + (ifShowAxisYLeft? 1: -1) * Math.floor(kChartSketch.getAxisXWidth()), yTop_axisY + tickY);
 					ctx.stroke();
 				}
 

@@ -18,29 +18,48 @@
 	 * K线图形素描
 	 */
 	var KChartSketch = function(){
-		/** 图表宽度（横坐标覆盖区域） */
-		var width;
+		/** 画布宽度 */
+		var canvasWidth;
+		/** 图表横坐标宽度 */
+		var axisXWidth;
 		/** 图表正文区域宽度 */
 		var contentWidth;
 		/** 可呈现的最多的数据组的个数 */
 		var maxGroupCount;
 
-
 		/**
-		 * 获取图表宽度（横坐标覆盖区域）
+		 * 获取画布宽度
 		 * @returns {Number}
 		 */
-		this.getWidth = function(){
-			return width;
+		this.getCanvasWidth = function(){
+			return canvasWidth;
 		};
 
 		/**
-		 * 设置图表宽度（横坐标覆盖区域）
-		 * @param {Number} v 图表宽度（横坐标覆盖区域）
+		 * 设置画布宽度
+		 * @param {Number} v 画布宽度
 		 * @returns {KChartSketch}
 		 */
-		this.setWidth = function(v){
-			width = v;
+		this.setCanvasWidth = function(v){
+			canvasWidth = v;
+			return this;
+		};
+
+		/**
+		 * 获取图表横坐标宽度
+		 * @returns {Number}
+		 */
+		this.getAxisXWidth = function(){
+			return axisXWidth;
+		};
+
+		/**
+		 * 设置图表横坐标宽度
+		 * @param {Number} v 图表横坐标宽度
+		 * @returns {KChartSketch}
+		 */
+		this.setAxisXWidth = function(v){
+			axisXWidth = v;
 			return this;
 		};
 
@@ -113,14 +132,14 @@
 			config_paddingLeft = getConfigItem("paddingLeft", config),
 			config_paddingRight = getConfigItem("paddingRight", config),
 			config_axisXTickOffset = getConfigItem("axisXTickOffset", config),
-			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config),
-			config_groupGap = getConfigItem("groupGap", config),
-			config_groupBarWidth = getConfigItem("groupBarWidth", config);
+			config_axisXTickOffsetFromRight = getConfigItem("axisXTickOffsetFromRight", config);
 
-		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
-		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
-		chartSketch.setWidth(floorBig(widthBig))
-			.setContentWidth(floorBig(contentWidthBig))
+		var canvasWidth = util.isValidNumber(width)? width: config_width;
+		var axisXWidth = canvasWidth - config_paddingLeft - config_paddingRight;
+		var contentWidth = axisXWidth - config_axisXTickOffset - config_axisXTickOffsetFromRight;
+		chartSketch.setCanvasWidth(canvasWidth)
+			.setAxisXWidth(axisXWidth)
+			.setContentWidth(contentWidth)
 			.setMaxGroupCount(KChartSketch.calcMaxGroupCount(config, width));
 
 		return chartSketch;
@@ -142,11 +161,11 @@
 			config_groupBarWidth = getConfigItem("groupBarWidth", config);
 
 		// debugger;
-		var widthBig = new Big(util.isValidNumber(width)? width: config_width).minus(config_paddingLeft).minus(config_paddingRight);
-		var contentWidthBig = widthBig.minus(config_axisXTickOffset).minus(config_axisXTickOffsetFromRight);
+		var axisXWidth = (util.isValidNumber(width)? width: config_width) - config_paddingLeft - config_paddingRight;
+		var contentWidth = axisXWidth - config_axisXTickOffset - config_axisXTickOffsetFromRight;
 
 		/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半（两侧都可以） */
-		var newWidth = floorBig(contentWidthBig.plus(config_groupBarWidth).minus(1));
+		var newWidth = contentWidth + config_groupBarWidth - 1;
 
 		var L = newWidth, B = config_groupBarWidth, G = config_groupGap;
 		return (function(){

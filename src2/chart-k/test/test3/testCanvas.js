@@ -140,7 +140,7 @@ util.loadData(function(datas){
 	var showPrevious = function(e){
 		var x = e.layerX;
 		var offsetX = x - lastX;
-		kChart.updateRenderingOffsetBy(offsetX, TradeChart2.util.calcRenderingWidth(column_candleObj, result_candle.getKChartSketch().getWidth()));
+		kChart.updateRenderingOffsetBy(offsetX, TradeChart2.util.calcRenderingWidth(column_candleObj, result_candle.getKChartSketch().getCanvasWidth()));
 		lastX = x;
 	};
 

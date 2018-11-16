@@ -41,6 +41,10 @@
 		 * @returns {Boolean}
 		 */
 		this.checkIfReachesLeftLimit = function(maxGroupCount){
+			var dataCount = dataList.length;
+			if(dataCount <= maxGroupCount || 1 === dataCount)
+				return true;
+
 			return elapsedDataCount + maxGroupCount >= dataList.length;
 		};
 

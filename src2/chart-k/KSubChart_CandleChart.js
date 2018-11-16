@@ -139,9 +139,9 @@
 
 			/* 横坐标位置 */
 			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getWidth()),
+				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
 				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
-				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getWidth()),
+				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getHeight()),
@@ -202,7 +202,7 @@
 				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
 
 				/* 绘制坐标区域背景 */
-				self.renderBackground(ctx, config, kChartSketch.getWidth(), kSubChartSketch.getHeight());
+				self.renderBackground(ctx, config, kChartSketch.getAxisXWidth(), kSubChartSketch.getHeight());
 
 				/* 绘制X轴 */
 				axisXTickList = self.renderAxisX(ctx, config, kChartSketch, kSubChartSketch);

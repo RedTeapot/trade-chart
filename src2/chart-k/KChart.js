@@ -163,23 +163,16 @@
 		};
 
 		/**
-		 * 检查当前呈现的数据是否已经达到左侧极限
-		 * @param {Number} maxGroupCount 最大显示数据量
-		 * @param {Number} axisXWidth 横坐标宽度
-		 * @returns {Boolean}
+		 * 计算可以达到左侧极限的最大位移量
+		 * @param {Number} canvasWidth 画布宽度
 		 */
-		var checkIfReachesLeftLimit = function(maxGroupCount, axisXWidth){
-			var dataCount = kDataManager.getDataList().length;
-			if(dataCount <= maxGroupCount || 1 === dataCount)
-				return true;
-
+		var calculateMaxOffsetToReachLeftLimit = function(canvasWidth){
 			var h = self.calcHalfGroupBarWidth(),
 				g = self.getConfigItem("groupGap"),
 				B = self.getConfigItem("groupBarWidth");
 
-			var axisXContentLength = self.calcAxisXContentRightPosition(axisXWidth) - self.calcAxisXContentLeftPosition() + 1;
-
-			// var idealAxisXContentLength = (dataCount - 1) * g + (dataCount - 2) * B + 2 * h + 2 - 1;
+			/* 内容区域的横坐标长度 */
+			var axisXContentLength = self.calcAxisXContentRightPosition(canvasWidth) - self.calcAxisXContentLeftPosition() + 1;
 
 			/* 最短的理想宽度（刚好使得两头柱子分别显示在两侧纵轴中间的最小长度） */
 			var shortestIdealAxisXContentLength = g + 2 * h + 2 - 1;
@@ -188,9 +181,17 @@
 			var axisXRedundantOffset = axisXContentLength % shortestIdealAxisXContentLength - 1;
 			var offset = shortestIdealAxisXContentLength - axisXRedundantOffset;
 
-			console.log(h, g, B, axisXContentLength, shortestIdealAxisXContentLength, axisXRedundantOffset, offset, axisXWidth);
-			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.gte(offset);
-			//TODO 判断方法不准确，需要改正
+			return offset;
+		};
+
+		/**
+		 * 检查当前呈现的数据是否已经达到左侧极限
+		 * @param {Number} maxGroupCount 最大显示数据量
+		 * @param {Number} canvasWidth 画布宽度
+		 * @returns {Boolean}
+		 */
+		var checkIfReachesLeftLimit = function(maxGroupCount, canvasWidth){
+			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.gte(calculateMaxOffsetToReachLeftLimit(canvasWidth));
 		};
 
 		/**
@@ -206,15 +207,15 @@
 		 * 绘制的起点位置，为图形右侧
 		 *
 		 * @param {Number} amount 要累加的横向偏移量。正数代表图形向右移动；负数代表图形向左移动
-		 * @param {Number} axisXWidth 横坐标宽度
+		 * @param {Number} canvasWidth 画布宽度
 		 * @returns {KChart}
 		 */
-		this.updateRenderingOffsetBy = function(amount, axisXWidth){
+		this.updateRenderingOffsetBy = function(amount, canvasWidth){
 			amount = util.parseAsNumber(amount, 0);
 			if(0 === amount)
 				return this;
 
-			var maxGroupCount = KChartSketch.calcMaxGroupCount(config, axisXWidth);
+			var maxGroupCount = KChartSketch.calcMaxGroupCount(config, canvasWidth);
 
 			var h = this.calcHalfGroupBarWidth(),
 				g = this.getConfigItem("groupGap"),
@@ -233,8 +234,10 @@
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){/* 向右拖动 */
 				/* 检查是否达到左侧临界处 */
-				if(util.isValidNumber(maxGroupCount) && checkIfReachesLeftLimit(maxGroupCount, axisXWidth)){
+				var maxOffset = calculateMaxOffsetToReachLeftLimit(canvasWidth);
+				if(checkIfReachesLeftLimit(maxGroupCount, canvasWidth)){
 					TradeChart2.showLog && console.info("Reaches left limit");
+					renderingOffsetBig = new Big(maxOffset);
 					return this;
 				}
 
@@ -257,10 +260,11 @@
 					newRenderingOffsetBig = tmp;
 				}
 
+
 				/* 更新数据偏移量。如果向右移动到头，则重置渲染位移量为0 */
 				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
-				if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && newRenderingOffsetBig.gt(0)){/* “拉力过猛” */
-					newRenderingOffsetBig = zeroBig;
+				if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.gte(maxOffset)){/* “拉力过猛” */
+					newRenderingOffsetBig = new Big(maxOffset);
 				}
 				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
 				renderingOffsetBig = newRenderingOffsetBig;
@@ -375,23 +379,23 @@
 
 		/**
 		 * 计算横坐标右侧位置（坐标原点为：画布左上角）
-		 * @param {Number} axisXWidth 横坐标坐标轴长度
+		 * @param {Number} canvasWidth 画布宽度
 		 * @returns {Number}
 		 */
-		this.calcAxisXRightPosition = function(axisXWidth){
+		this.calcAxisXRightPosition = function(canvasWidth){
 			var xLeft_axisX = this.calcAxisXLeftPosition();
+			var axisXWidth = canvasWidth - this.getConfigItem("paddingLeft") - this.getConfigItem("paddingRight");
 			return xLeft_axisX + Math.floor(axisXWidth - 1);/* xLeft_axis占据1像素 */
 		};
 
 		/**
 		 * 计算横坐标正文区域右侧位置（坐标原点为：画布左上角）
-		 * @param {Number} axisXWidth 横坐标坐标轴长度
+		 * @param {Number} canvasWidth 画布宽度
 		 * @returns {Number}
 		 */
-		this.calcAxisXContentRightPosition = function(axisXWidth){
+		this.calcAxisXContentRightPosition = function(canvasWidth){
 			var config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
-
-			var xRight_axisX = this.calcAxisXRightPosition(axisXWidth);
+			var xRight_axisX = this.calcAxisXRightPosition(canvasWidth);
 			return xRight_axisX - Math.floor(config_axisXTickOffsetFromRight);
 		};
 
