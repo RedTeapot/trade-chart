@@ -14,8 +14,8 @@ util.loadData(function(datas){
 		axisLabelFont: null,
 		axisLabelColor: "#333",
 
-		axisXTickOffset: 0,/* 横坐标刻度距离原点的位移 */
-		axisXTickOffsetFromRight: 0,/* 横坐标右侧刻度距离原点的位移 */
+		axisXTickOffset: 10,/* 横坐标刻度距离原点的位移 */
+		axisXTickOffsetFromRight: 20,/* 横坐标右侧刻度距离原点的位移 */
 		axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 		axisXLabelSize: 100,
 	};
@@ -72,7 +72,7 @@ util.loadData(function(datas){
 
 	var KChart = TradeChart2.KChart;
 	var sepIndex = Math.floor(datas.length - 20);
-	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(sepIndex));
+	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas);
 	window.kChart = kChart;
 	window.kdm = kChart.getKDataManager();
 

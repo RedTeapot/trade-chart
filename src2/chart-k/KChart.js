@@ -196,7 +196,8 @@
 			var rst = 0;
 			if(totalLength <= axisXContentLength)
 				rst = 0;
-			rst = totalLength - axisXContentLength;
+			else
+				rst = totalLength - axisXContentLength;
 
 			// console.log("@@@", rst, axisXContentLength, totalLength);
 
@@ -218,7 +219,7 @@
 		 * @returns {Boolean}
 		 */
 		var checkIfReachesRightLimit = function(){
-			return kDataManager.checkIfLastVisibleDataIsShown() && totalRenderingOffset < 0;
+			return kDataManager.checkIfLastVisibleDataIsShown() && totalRenderingOffset <= 0;
 		};
 
 		/**
@@ -244,7 +245,7 @@
 				/* 检查是否达到左侧临界处 */
 				var maxOffset = calculateMaxOffsetToReachLeftEdge(canvasWidth);
 				if(checkIfReachesLeftLimit(maxGroupCount, canvasWidth)){
-					TradeChart2.showLog && console.info("Reaches left edge");
+					TradeChart2.showLog && console.info("Reaches left edge, set total rendering offset to " + maxOffset);
 					elapsedDataCount = setTotalRenderingOffset(maxOffset);
 					kDataManager.setElapsedDataCount(elapsedDataCount);
 					return this;
