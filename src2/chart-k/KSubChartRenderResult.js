@@ -97,7 +97,7 @@
 		 * @returns {Number}
 		 */
 		this.getMaxGroupCount = function(){
-			return KChartSketch.calcMaxGroupCount(kChart.getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width")));
+			return KChartSketch.calcMaxGroupCount(this.getKChart().getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width")));
 		};
 
 		/**
@@ -153,7 +153,7 @@
 		 */
 		var getFirstVisibleDataIndex = function(){
 			var kDataManager = self.getKChart().getKDataManager();
-			return kDataManager.getDataList().length - kDataManager.getElapsedNewerDataCount() - self.getRenderingGroupCount();
+			return kDataManager.getDataList().length - kDataManager.getElapsedVisibleDataCount() - self.getRenderingGroupCount();
 		};
 
 		/**
@@ -201,7 +201,7 @@
 				config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth");
 
-			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
+			var xLeft_axisX = this.getKChart().calcAxisXLeftPosition(),
 				groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
 
 			return util.getLinePosition(xLeft_axisX + config_axisXTickOffset + kSubChart.getKChart().getRenderingOffset() + numBig(groupSizeBig.mul(dataIndex)));

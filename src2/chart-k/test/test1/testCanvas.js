@@ -85,22 +85,22 @@ util.loadData(function(datas){
 	}).setDataList(datas).setConfig(kChartConfig);
 
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-	var rowResult_candle = subChart_candle.render(row_candleObj, kCandleConfig);
+	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var rowResult_candle = subChart_candle.render(row_candleObj);
 	window.rowResult_candle = rowResult_candle;
 	rowResult_candle.initCanvas(row_candleDetailObj);
 
-	var columnResult_candle = subChart_candle.render(column_candleObj, kCandleConfig);
+	var columnResult_candle = subChart_candle.render(column_candleObj);
 	window.columnResult_candle = columnResult_candle;
 	columnResult_candle.initCanvas(column_candleDetailObj);
 
 	/* 量图 */
-	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-	var rowResult_volume = subChart_volume.render(row_volumeObj, kVolumeConfig);
+	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
+	var rowResult_volume = subChart_volume.render(row_volumeObj);
 	window.rowResult_volume = rowResult_volume;
 	rowResult_volume.initCanvas(row_volumeDetailObj);
 
-	var columnResult_volume = subChart_volume.render(column_volumeObj, kVolumeConfig);
+	var columnResult_volume = subChart_volume.render(column_volumeObj);
 	window.columnResult_volume = columnResult_volume;
 	columnResult_volume.initCanvas(column_volumeDetailObj);
 

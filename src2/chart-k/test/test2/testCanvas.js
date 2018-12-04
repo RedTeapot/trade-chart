@@ -6,12 +6,13 @@ util.loadData(function(datas){
 		paddingRight: 60,
 
 		groupLineWidth: 3,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
-		groupBarWidth: 7,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
+		groupBarWidth: 9,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
 		groupGap: 3,
 
 		axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 		axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 		axisLabelFont: null,
+		axisLabelColor: "#333",
 
 		axisXTickOffset: 0,/* 横坐标刻度距离原点的位移 */
 		axisXTickOffsetFromRight: 0,/* 横坐标右侧刻度距离原点的位移 */
@@ -25,7 +26,11 @@ util.loadData(function(datas){
 		paddingTop: 20,
 		paddingBottom: 30,
 
-		showAxisXLabel: false,
+		showAxisXLine: true,/** 是否绘制横坐标轴 */
+		showAxisXLabel: false,/** 是否绘制横坐标刻度值 */
+		showAxisYLine: true,/** 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
+		gridLineDash: [5, 5],
 
 		axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
 
@@ -38,11 +43,16 @@ util.loadData(function(datas){
 		paddingTop: 20,
 		paddingBottom: 30,
 
+		showAxisXLine: true,/** 是否绘制横坐标轴 */
+		showAxisXLabel: true,/** 是否绘制横坐标刻度值 */
+		showAxisYLine: true,/** 是否绘制纵坐标轴 */
+		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
+
 		axisYPosition: "right",
 		axisYTickOffset: 10,
 
 		showVerticalGridLine: false,
-		horizontalGridLineColor: false,
+		showHorizontalGridLine: false,
 
 		coordinateBackground: null
 	};
@@ -61,76 +71,23 @@ util.loadData(function(datas){
 	column_volumeObj.detailCanvas = column_volumeDetailObj;
 
 	var KChart = TradeChart2.KChart;
-	var sepIndex = Math.floor(datas.length / 2);
-	var kChart = new KChart().setDataParser(function(d, i){
-		var obj = {time: util.formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.a};
-		if(isNaN(obj.openPrice)){
-			console.error(d, i, obj.openPrice);
-			obj.openPrice = 0;
-		}
-		if(isNaN(obj.closePrice)){
-			console.error(d, i, obj.closePrice);
-			obj.closePrice = 0;
-		}
-		if(isNaN(obj.highPrice)){
-			console.error(d, i, obj.highPrice);
-			obj.highPrice = 0;
-		}
-		if(isNaN(obj.lowPrice)){
-			console.error(d, i, obj.lowPrice);
-			obj.lowPrice = 0;
-		}
-
-		return obj;
-	}).setConfig(kChartConfig);
-	kChart.setDataList(datas.slice(sepIndex)).prependDataList(datas.slice(0, sepIndex));
+	var sepIndex = Math.floor(datas.length - 20);
+	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(sepIndex));
 	window.kChart = kChart;
 	window.kdm = kChart.getKDataManager();
 
-	var moveDelayTimer, moveTimer;
-	moveLeftObj.addEventListener("mousedown", function(){
-		kChart.updateRenderingOffsetBy(-1);
-
-		clearTimeout(moveDelayTimer);
-		moveDelayTimer = setTimeout(function(){
-			clearInterval(moveTimer);
-			moveTimer = setInterval(function(){
-				kChart.updateRenderingOffsetBy(-1);
-			}, 20);
-		}, 500);
-	});
-	moveLeftObj.addEventListener("mouseup", function(){
-		clearTimeout(moveDelayTimer);
-		clearInterval(moveTimer);
-	});
-	moveRightObj.addEventListener("mousedown", function(){
-		kChart.updateRenderingOffsetBy(1);
-
-		clearTimeout(moveDelayTimer);
-		moveDelayTimer = setTimeout(function(){
-			clearInterval(moveTimer);
-			moveTimer = setInterval(function(){
-				kChart.updateRenderingOffsetBy(1);
-			}, 20);
-		}, 500);
-	});
-	moveRightObj.addEventListener("mouseup", function(){
-		clearTimeout(moveDelayTimer);
-		clearInterval(moveTimer);
-	});
-
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE);
-	var columnResult_candle = subChart_candle.render(column_candleObj, kCandleConfig);
-	window.columnResult_candle = columnResult_candle;
-	columnResult_candle.initCanvas(column_candleDetailObj);
+	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var result_candle = subChart_candle.render(column_candleObj);
+	result_candle.initCanvas(column_candleDetailObj);
 
 	/* 量图 */
-	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME);
-	var columnResult_volume = subChart_volume.render(column_volumeObj, kVolumeConfig);
-	window.columnResult_volume = columnResult_volume;
-	columnResult_volume.initCanvas(column_volumeDetailObj);
+	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
+	var result_volume = subChart_volume.render(column_volumeObj);
+	result_volume.initCanvas(column_volumeDetailObj);
 
+	var isModeViewDetail = true;
+	var lastX = 0;
 	var drawLine4DataIndex = function(result, dataIndex, top, bottom){
 		var canvasObj = result.getCanvasDomElement();
 		var detailCtx = canvasObj.detailCanvas.getContext("2d");
@@ -147,7 +104,6 @@ util.loadData(function(datas){
 		detailCtx.lineTo(x, bottom);
 		detailCtx.stroke();
 	};
-
 	var drawLineAndShowDataDetail4X = function(result, x, top, bottom){
 		var canvasObj = result.getCanvasDomElement();
 		var detailCtx = canvasObj.detailCanvas.getContext("2d");
@@ -163,18 +119,41 @@ util.loadData(function(datas){
 		drawLine4DataIndex(result, dataIndex, top, bottom);
 	};
 
-	var f = function(e){
+	var viewDetail = function(e){
 		var x = e.layerX;
 
-		drawLineAndShowDataDetail4X(columnResult_candle, x,
-			columnResult_candle.getConfigItem("paddingTop"),
-			TradeChart2.util.getLinePosition(columnResult_candle.getConfigItem("height"))
+		drawLineAndShowDataDetail4X(result_candle, x,
+			result_candle.getConfigItem("paddingTop"),
+			TradeChart2.util.getLinePosition(result_candle.getConfigItem("height"))
 		);
-		drawLineAndShowDataDetail4X(columnResult_volume, x,
+		drawLineAndShowDataDetail4X(result_volume, x,
 			TradeChart2.util.getLinePosition(0),
-			TradeChart2.util.getLinePosition(columnResult_volume.getConfigItem("height") - columnResult_volume.getConfigItem("paddingBottom"))
+			TradeChart2.util.getLinePosition(result_volume.getConfigItem("height") - result_volume.getConfigItem("paddingBottom"))
 		);
 	};
-	column_candleDetailObj.addEventListener("mousemove", f);
-	column_volumeDetailObj.addEventListener("mousemove", f);
+
+	var showPrevious = function(e){
+		var x = e.layerX;
+		var offsetX = x - lastX;
+		kChart.updateRenderingOffsetBy(offsetX, column_candleObj.width);
+		lastX = x;
+	};
+
+	[column_candleDetailObj, column_volumeDetailObj].forEach(function(obj){
+		obj.addEventListener("mousedown", function(e){
+			isModeViewDetail = false;
+			lastX = e.layerX;
+		});
+		obj.addEventListener("mousemove", function(e){
+			if(!isModeViewDetail)
+				showPrevious(e);
+			else
+				viewDetail(e);
+		});
+	});
+	["mouseup", "blur"].forEach(function(e){
+		document.addEventListener(e, function(){
+			isModeViewDetail = true;
+		});
+	});
 });

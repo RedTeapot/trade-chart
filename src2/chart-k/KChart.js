@@ -63,7 +63,7 @@
 		var self = this;
 
 		/** 绘制配置 */
-		var config = new KChartConfig({});
+		var config = new KChartConfig();
 
 		/** 附加的K线子图列表 */
 		var attachedKSubCharts = [];
@@ -74,11 +74,40 @@
 		/**
 		 * 从初次绘制开始到现在，用户通过拖拉的方式达到的“绘制位置的横向位移”
 		 * 取值为正，则代表图形向右移动；取值为负，则代表图形向左移动。
-		 * @type {Big}
 		 */
-		var renderingOffsetBig = new Big(0);
+		var renderingOffset = 0;
+		/**
+		 * 图形向右移动的累计位移
+		 */
+		var totalRenderingOffset = 0;
 
-		var zeroBig = new Big(0);
+		var fireEvent_renderingPositionChanges = function(){
+			self.fire(evtName_renderingPositionChanges, null, false);
+		};
+
+		var setTotalRenderingOffset = function(v){
+			var h = self.calcHalfGroupBarWidth(),
+				g = self.getConfigItem("groupGap"),
+				b = self.getConfigItem("groupBarWidth");
+			var groupSize = b + g;
+
+			var elapsedDataCount = Math.floor(v / groupSize);
+			var tmp = v % groupSize;
+			if(tmp < b){
+				elapsedDataCount += 0;
+				renderingOffset = tmp;
+			}else{
+				elapsedDataCount += 1;
+				renderingOffset = (g - (tmp - b)) * -1;
+			}
+
+			var ifChanges = totalRenderingOffset != v;
+			totalRenderingOffset = v;
+			if(ifChanges)
+				fireEvent_renderingPositionChanges();
+
+			return elapsedDataCount;
+		};
 
 
 		/* 代理 KDataManager 的方法 */
@@ -100,12 +129,6 @@
 				return v === kDataManager? self: v;
 			};
 		});
-
-
-
-		var fireEvent_renderingPositionChanges = function(){
-			self.fire(evtName_renderingPositionChanges, null, false);
-		};
 
 
 		util.defineReadonlyProperty(this, "id", util.randomString("k-", 3));
@@ -131,9 +154,12 @@
 
 			kDataManager.setDataList(dataList);
 
-			if(!renderingOffsetBig.eq(0))
+			if(totalRenderingOffset !== 0){
 				fireEvent_renderingPositionChanges();
-			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);
+
+				totalRenderingOffset = 0;
+				renderingOffset = 0;
+			}
 
 			return this;
 		};
@@ -143,29 +169,38 @@
 		 * @returns {Number}
 		 */
 		this.getRenderingOffset = function(){
-			return numBig(renderingOffsetBig);
+			return renderingOffset;
 		};
 
 		/**
 		 * 计算可以达到左侧极限的最大位移量
 		 * @param {Number} canvasWidth 画布宽度
 		 */
-		var calculateMaxOffsetToReachLeftLimit = function(canvasWidth){
+		var calculateMaxOffsetToReachLeftEdge = function(canvasWidth){
 			var h = self.calcHalfGroupBarWidth(),
-				g = self.getConfigItem("groupGap"),
-				B = self.getConfigItem("groupBarWidth");
+				b = self.getConfigItem("groupBarWidth"),
+				g = self.getConfigItem("groupGap");
 
+			var dataCount = kDataManager.getVisibleDataCount();
+			if(dataCount <= 1)
+				return 0;
+
+			var gap = (dataCount - 1) * g,
+				bar = (dataCount - 2) * b + 2 * (h + 1);
+
+			/* 剩余要渲染的数据全部绘制所需要占用的长度 */
+			var totalLength = gap + bar;
 			/* 内容区域的横坐标长度 */
 			var axisXContentLength = self.calcAxisXContentRightPosition(canvasWidth) - self.calcAxisXContentLeftPosition() + 1;
 
-			/* 最短的理想宽度（刚好使得两头柱子分别显示在两侧纵轴中间的最小长度） */
-			var shortestIdealAxisXContentLength = g + 2 * h + 2 - 1;
+			var rst = 0;
+			if(totalLength <= axisXContentLength)
+				rst = 0;
+			rst = totalLength - axisXContentLength;
 
-			/* 横坐标超出理想长度的部分 */
-			var axisXRedundantOffset = axisXContentLength % shortestIdealAxisXContentLength - 1;
-			var offset = shortestIdealAxisXContentLength - axisXRedundantOffset;
+			// console.log("@@@", rst, axisXContentLength, totalLength);
 
-			return offset;
+			return rst;
 		};
 
 		/**
@@ -175,7 +210,7 @@
 		 * @returns {Boolean}
 		 */
 		var checkIfReachesLeftLimit = function(maxGroupCount, canvasWidth){
-			return kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.gte(calculateMaxOffsetToReachLeftLimit(canvasWidth));
+			return kDataManager.checkIfFirstVisibleDataIsShown(maxGroupCount) && totalRenderingOffset >= calculateMaxOffsetToReachLeftEdge(canvasWidth);
 		};
 
 		/**
@@ -183,7 +218,7 @@
 		 * @returns {Boolean}
 		 */
 		var checkIfReachesRightLimit = function(){
-			return kDataManager.checkIfReachesRightLimit() && renderingOffsetBig.eq(0);
+			return kDataManager.checkIfLastVisibleDataIsShown() && totalRenderingOffset < 0;
 		};
 
 		/**
@@ -199,98 +234,37 @@
 			if(0 === amount)
 				return this;
 
+			TradeChart2.showLog && console.debug("Rendering position ~ TotalRenderingOffset: " + totalRenderingOffset + ", renderingOffset: " + renderingOffset + ", elapsedDataCount: " + kDataManager.getElapsedVisibleDataCount());
+
 			var maxGroupCount = KChartSketch.calcMaxGroupCount(config, canvasWidth);
-
-			var h = this.calcHalfGroupBarWidth(),
-				g = this.getConfigItem("groupGap"),
-				B = this.getConfigItem("groupBarWidth"),
-				H = h + 1;
-			var groupSize = B + g;
-
-			var oldRenderingOffsetBig,
-				newRenderingOffsetBig,
-				elapsedDataCount,
-				tmp,
-
-				ifElapsedDataCountChanges,
-				ifOffsetChanges;
+			var elapsedDataCount = 0, offset;
 
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){/* 向右拖动 */
 				/* 检查是否达到左侧临界处 */
-				var maxOffset = calculateMaxOffsetToReachLeftLimit(canvasWidth);
+				var maxOffset = calculateMaxOffsetToReachLeftEdge(canvasWidth);
 				if(checkIfReachesLeftLimit(maxGroupCount, canvasWidth)){
-					TradeChart2.showLog && console.info("Reaches left limit");
-					renderingOffsetBig = new Big(maxOffset);
+					TradeChart2.showLog && console.info("Reaches left edge");
+					elapsedDataCount = setTotalRenderingOffset(maxOffset);
+					kDataManager.setElapsedDataCount(elapsedDataCount);
 					return this;
 				}
 
-				oldRenderingOffsetBig = renderingOffsetBig;
-				renderingOffsetBig = renderingOffsetBig.plus(amount);
-				if(renderingOffsetBig.lte(0)){
-					fireEvent_renderingPositionChanges();
-					return this;
-				}
-
-				newRenderingOffsetBig = renderingOffsetBig;
-				renderingOffsetBig = renderingOffsetBig.abs();
-				elapsedDataCount = floorBig(renderingOffsetBig.div(groupSize));
-				tmp = renderingOffsetBig.mod(groupSize);
-
-				if(tmp.gte(B)){
-					elapsedDataCount += 1;
-					newRenderingOffsetBig = new Big(g - (tmp-B)).mul(-1);
-				}else{
-					newRenderingOffsetBig = tmp;
-				}
-
-
-				/* 更新数据偏移量。如果向右移动到头，则重置渲染位移量为0 */
-				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
-				if(kDataManager.checkIfReachesLeftLimit(maxGroupCount) && renderingOffsetBig.gte(maxOffset)){/* “拉力过猛” */
-					newRenderingOffsetBig = new Big(maxOffset);
-				}
-				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
-				renderingOffsetBig = newRenderingOffsetBig;
-
-				if(ifElapsedDataCountChanges || ifOffsetChanges)
-					fireEvent_renderingPositionChanges();
+				offset = Math.min(maxOffset, totalRenderingOffset + amount);
+				elapsedDataCount = setTotalRenderingOffset(offset);
+				kDataManager.setElapsedDataCount(elapsedDataCount);
 			}else{
 				/* 检查是否达到右侧临界处 */
 				if(checkIfReachesRightLimit()){
 					TradeChart2.showLog && console.info("Reaches right limit");
+					elapsedDataCount = setTotalRenderingOffset(0);
+					kDataManager.setElapsedDataCount(elapsedDataCount);
 					return this;
 				}
 
-				oldRenderingOffsetBig = renderingOffsetBig;
-				renderingOffsetBig = renderingOffsetBig.plus(amount);
-				if(renderingOffsetBig.gte(0)){
-					fireEvent_renderingPositionChanges();
-					return this;
-				}
-
-				newRenderingOffsetBig = renderingOffsetBig;
-				renderingOffsetBig = renderingOffsetBig.abs();
-				elapsedDataCount = floorBig(renderingOffsetBig.div(groupSize));
-				tmp = renderingOffsetBig.mod(groupSize);
-
-				if(tmp.gt(g)){
-					elapsedDataCount += 1;
-					newRenderingOffsetBig = new Big(B - (tmp-g));
-				}else
-					newRenderingOffsetBig = tmp.mul(-1);
-				elapsedDataCount = elapsedDataCount * -1;
-
-				/* 更新数据偏移量。如果向左移动到头，则重置渲染位移量为0 */
-				ifElapsedDataCountChanges = kDataManager.updateElapsedDataCountBy(elapsedDataCount, maxGroupCount);
-				if(kDataManager.checkIfReachesRightLimit() && newRenderingOffsetBig.lt(0)){/* “拉力过猛” */
-					newRenderingOffsetBig = zeroBig;
-				}
-				ifOffsetChanges = !oldRenderingOffsetBig.eq(newRenderingOffsetBig);
-				renderingOffsetBig = newRenderingOffsetBig;
-
-				if(ifElapsedDataCountChanges || ifOffsetChanges)
-					fireEvent_renderingPositionChanges();
+				offset = Math.max(0, totalRenderingOffset + amount);
+				elapsedDataCount = setTotalRenderingOffset(offset);
+				kDataManager.setElapsedDataCount(elapsedDataCount);
 			}
 
 			return this;
@@ -301,10 +275,11 @@
 		 * @returns {KChart}
 		 */
 		this.resetRenderingOffset = function(){
-			if(!renderingOffsetBig.eq(0))
+			if(totalRenderingOffset !== 0)
 				fireEvent_renderingPositionChanges();
 
-			renderingOffsetBig = renderingOffsetBig.minus(renderingOffsetBig);
+			totalRenderingOffset = 0;
+			renderingOffset = 0;
 			return this;
 		};
 
@@ -371,6 +346,9 @@
 		this.calcAxisXRightPosition = function(canvasWidth){
 			var xLeft_axisX = this.calcAxisXLeftPosition();
 			var axisXWidth = canvasWidth - this.getConfigItem("paddingLeft") - this.getConfigItem("paddingRight");
+			if(axisXWidth <= 0)
+				return xLeft_axisX;
+
 			return xLeft_axisX + Math.floor(axisXWidth - 1);/* xLeft_axis占据1像素 */
 		};
 

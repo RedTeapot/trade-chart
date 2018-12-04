@@ -32,54 +32,104 @@
 		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
 		var dataParser;
 
-		/* 向右拖动时经过的，不再可见的较新的数据个数 */
+		/**
+		 * 新附加的，即使拖动也不可见的数据量。
+		 * 引入该元素，用于辅助确定图形向右拖动时的最大位移量，使得最早的数据可以恰好呈现在开始位置的正中间。
+		 * 引入该元素后，即使在图形的向右拖动过程中附加新的K线数据，也不会影响要查阅的历史数据的集合，从而可以确定的计算最大位移量
+		 *
+		 * @type {number}
+		 */
+		var invisibleDataCount = 0;
+
+		/** 向右拖动时经过的，不再可见的较新的数据个数 */
 		var elapsedDataCount = 0;
 
+
+		var convertData = function(d){
+			if(null == d || typeof d !== "object")
+				return d;
+
+			if(typeof dataParser !== "function")
+				return d;
+
+			var index = dataList.indexOf(d);
+			try{
+				return dataParser(d, index, dataList);
+			}catch(e){
+				console.error("Fail to convert data of index: " + index + " using supplied data parser.", d);
+				console.error(e);
+				return d;
+			}
+		};
+
+
 		/**
-		 * 检查当前呈现的数据是否已经达到左侧极限
+		 * 检查当前第一个可视数据是否已被呈现
 		 * @param {Number} maxGroupCount 最大显示数据量
 		 * @returns {Boolean}
 		 */
-		this.checkIfReachesLeftLimit = function(maxGroupCount){
-			var dataCount = dataList.length;
-			if(dataCount <= maxGroupCount || 1 === dataCount)
+		this.checkIfFirstVisibleDataIsShown = function(maxGroupCount){
+			var visibleDataCount = this.getVisibleDataCount();
+			if(visibleDataCount <= maxGroupCount)
 				return true;
 
-			return elapsedDataCount + maxGroupCount >= dataList.length;
+			return elapsedDataCount + maxGroupCount >= visibleDataCount;
 		};
 
 		/**
-		 * 检查当前呈现的数据是否已经达到右侧极限
+		 * 检查当前最后一个可视数据是否已被呈现
 		 * @returns {Boolean}
 		 */
-		this.checkIfReachesRightLimit = function(){
+		this.checkIfLastVisibleDataIsShown = function(){
 			return elapsedDataCount === 0;
 		};
 
 		/**
-		 * 使用给定的偏移量更新“向右拖动时经过的，不再可见的较新的数据个数”
+		 * 使用给定的偏移量更新“向右拖动时经过的，消失的较新的数据个数”
 		 * @param {Number} offset 偏移量
 		 * @param {Number} [maxGroupCount] 最大显示数据量，用于锁定偏移量，使得没有更多数据时不会继续减少可见数据
 		 * @returns {Boolean} 偏移量是否发生变更
 		 */
 		this.updateElapsedDataCountBy = function(offset, maxGroupCount){
+			if(0 === offset)
+				return false;
+
+			var visibleDataCount = this.getVisibleDataCount();
 			var v = elapsedDataCount + offset;
 			v = Math.max(v, 0);
-			v = Math.min(v, dataList.length - 1);
+			v = Math.min(v, visibleDataCount - 1);
+			v = Math.max(v, 0);
 
 			if(util.isValidNumber(maxGroupCount)){
 				maxGroupCount = util.parseAsNumber(maxGroupCount);
 
-				if(dataList.length >= maxGroupCount){
-					v = Math.min(v, dataList.length - maxGroupCount);
+				if(visibleDataCount >= maxGroupCount){
+					var maxCount = visibleDataCount - maxGroupCount;
+					if(v > maxCount)
+						v = maxCount;
 				}else
 					v = 0;
 			}
 
 			if(v !== elapsedDataCount){
-				elapsedDataCount = v;
-
 				TradeChart2.showLog && console.log("Update elapsed data count to " + v + " from " + elapsedDataCount);
+				elapsedDataCount = v;
+				this.fire(evtName_renderingDataChanges, null, false);
+				return true;
+			}
+
+			return false;
+		};
+
+		/**
+		 * 设置“向右拖动时经过的，不再可见的较新的数据个数”
+		 * @param {Number} _elapsedDataCount 个数
+		 */
+		this.setElapsedDataCount = function(_elapsedDataCount){
+			if(elapsedDataCount !== _elapsedDataCount){
+				TradeChart2.showLog && console.log("Update elapsed data count to " + _elapsedDataCount + " from " + elapsedDataCount);
+
+				elapsedDataCount = _elapsedDataCount;
 				this.fire(evtName_renderingDataChanges, null, false);
 				return true;
 			}
@@ -120,11 +170,13 @@
 			}
 
 			dataList = dataList.concat(datas);
-			if(!ifResetsElapsedDataCount)
+			if(!ifResetsElapsedDataCount){
 				elapsedDataCount += datas.length;
-			else{
+				invisibleDataCount += datas.length;
+			}else{
 				var flag = elapsedDataCount !== 0;
 				elapsedDataCount = 0;
+				invisibleDataCount = 0;
 
 				if(flag)
 					this.fire(evtName_renderingDataChanges, null, false);
@@ -157,25 +209,9 @@
 				this.fire(evtName_renderingDataChanges, null, false);/* 数据发生变更，回到初始位置 */
 
 			elapsedDataCount = 0;
+			invisibleDataCount = 0;
 
 			return this;
-		};
-
-		var convertData = function(d){
-			if(null == d || typeof d !== "object")
-				return d;
-
-			if(typeof dataParser !== "function")
-				return d;
-
-			var index = dataList.indexOf(d);
-			try{
-				return dataParser(d, index, dataList);
-			}catch(e){
-				console.error("Fail to convert data of index: " + index + " using supplied data parser.", d);
-				console.error(e);
-				return d;
-			}
 		};
 
 		/**
@@ -201,15 +237,17 @@
 		 * @returns {Number}
 		 */
 		this.getRenderingDataCount = function(maxGroupCount){
+			var visibleDataCount = this.getVisibleDataCount();
+			var count = visibleDataCount - elapsedDataCount;
+
 			if(util.isValidNumber(maxGroupCount)){
-				var endIndex = dataList.length - elapsedDataCount;
-				var beginIndex = endIndex - maxGroupCount;
+				var beginIndex = count - maxGroupCount;
 				if(beginIndex < 0)
 					beginIndex = 0;
 
-				return endIndex - beginIndex;
+				return count - beginIndex;
 			}else
-				return dataList.length - elapsedDataCount;
+				return count;
 		};
 
 		/**
@@ -219,15 +257,17 @@
 		 * @returns {Array<UserSuppliedData>}
 		 */
 		this.getRenderingDataList = function(maxGroupCount){
+			var visibleDataCount = this.getVisibleDataCount();
+			var endIndex = visibleDataCount - elapsedDataCount;
+
 			if(util.isValidNumber(maxGroupCount)){
-				var endIndex = dataList.length - elapsedDataCount;
 				var beginIndex = endIndex - maxGroupCount;
 				if(beginIndex < 0)
 					beginIndex = 0;
 
 				return dataList.slice(beginIndex, endIndex);
 			}else
-				return dataList.slice(0, dataList.length - elapsedDataCount);
+				return dataList.slice(0, endIndex);
 		};
 
 		/**
@@ -247,11 +287,27 @@
 		};
 
 		/**
-		 * 获取向右拖动时经过的，不再可见的数据个数
+		 * 获取向右拖动时经过的，消失的数据个数
 		 * @returns {Number}
 		 */
-		this.getElapsedNewerDataCount = function(){
+		this.getElapsedVisibleDataCount = function(){
 			return elapsedDataCount;
+		};
+
+		/**
+		 * 获取可见的，或拖动后可见的数据量
+		 * @returns {Number}
+		 */
+		this.getVisibleDataCount = function(){
+			return dataList.length - invisibleDataCount;
+		};
+
+		/**
+		 * 获取新附加的，即使拖动也不可见的数据量
+		 * @returns {Number}
+		 */
+		this.getInvisibleDataCount = function(){
+			return invisibleDataCount;
 		};
 
 		/**

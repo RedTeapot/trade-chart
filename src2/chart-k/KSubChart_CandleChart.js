@@ -136,38 +136,12 @@
 				return kSubChartSketch.calculateHeight(Math.abs(price2 - price1));
 			};
 
-			/**
-			 * 要绘制的横坐标刻度集合
-			 * @type {XTick[]}
-			 */
-			var axisXTickList = [];
-
-			/**
-			 * 要绘制的纵坐标刻度集合
-			 * @type {YTick[]}
-			 */
-			var axisYTickList = [];
-
-			/**
-			 * 绘制横坐标刻度
-			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
-			 */
-			var drawAxisXTickList = function(drawContent){
-				self.renderAxisXTickList(ctx, y_axisX, axisXTickList, drawContent);
-			};
-
-			/**
-			 * 绘制纵坐标刻度
-			 * @param {String} drawContent 绘制内容。both：刻度线和坐标值；tick：只绘制刻度线；label：只绘制坐标值；
-			 */
-			var drawAxisYTickList = function(drawContent){
-				self.renderAxisYTickList(ctx, x_axisY, axisYTickList, drawContent);
-			};
-
 			/* 清空既有内容 */
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 			/* 绘制坐标系 */
+			var finishRemainingAxisXRendering,
+				finishRemainingAxisYRendering;
 			(function(){
 				ctx.save();
 
@@ -177,16 +151,11 @@
 				/* 绘制坐标区域背景 */
 				self.renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
 
-				/* 绘制X轴 */
-				axisXTickList = self.renderAxisX(ctx, kChartSketch, kSubChartSketch);
+				/* 绘制X轴、X轴刻度、网格竖线 */
+				finishRemainingAxisXRendering = self.renderAxisX(ctx, kChartSketch, kSubChartSketch);
 
-				/* 绘制Y轴 */
-				axisYTickList = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, kDataSketch);
-
-				/* 绘制刻度线 */
-				var drawContent = "tick";
-				drawAxisXTickList(drawContent);
-				drawAxisYTickList(drawContent);
+				/* 绘制Y轴、Y轴刻度、网格横线 */
+				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, kDataSketch);
 
 				ctx.restore();
 			})();
@@ -278,12 +247,9 @@
 				ctx.restore();
 			})();
 
-			/* 绘制绘制坐标系刻度 */
-			(function(){
-				var drawContent = "label";
-				drawAxisXTickList(drawContent);
-				drawAxisYTickList(drawContent);
-			})();
+			/* 绘制坐标系标签 */
+			finishRemainingAxisXRendering();
+			finishRemainingAxisYRendering();
 
 			return new KSubChart_CandleRenderResult(this, kChartSketch, kSubChartSketch, canvasObj);
 		};
