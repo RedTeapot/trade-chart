@@ -76,24 +76,24 @@ var concatK = function(){
 		gulp.src([
 			"KChartDataTypes.js",
 
-			"default-config/default-config_k-chart.js",
-			"default-config/default-config_k-sub-chart.js",
-			"default-config/default-config_k-sub-chart_candle.js",
-			"default-config/default-config_k-sub-chart_volume.js",
-
-			"KDataManager.js",
-			"KChart.js",
-
 			"KChartSketch.js",
 			"KDataSketch.js",
 
-			"KSubChart.js",
+			"KDataManager.js",
+			"KChartConfig.js",
+			"KChart.js",
+
+			"KSubChartConfig.js",
 			"KSubChartTypes.js",
 			"KSubChartSketch.js",
 			"KSubChartRenderResult.js",
+			"KSubChart.js",
 
-			"KSubChart_CandleRenderResult",
-			"KSubChart_VolumeRenderResult",
+			"KSubChart_CandleRenderResult.js",
+			"KSubChart_VolumeRenderResult.js",
+
+			"KSubChartConfig_CandleConfig.js",
+			"KSubChartConfig_VolumeConfig.js",
 
 			"KSubChartSketch_CandleDataSketch.js",
 			"KSubChartSketch_VolumeDataSketch.js",
@@ -133,6 +133,7 @@ var concatAllAndSave = function(min){
 	stream.add(gulp.src("../src2/comp/eventDrive.js"));
 	stream.add(gulp.src("../src2/comp/Big.js"));
 	stream.add(gulp.src("../src2/comp/LinearGradient.js"));
+	stream.add(gulp.src("../src2/CommonChartConfig.js"));
 	stream.add(concatK());
 
 	stream = xpipe(
@@ -155,7 +156,7 @@ var concatAllAndSave = function(min){
 
 gulp.task('concat', function(){
 	var min = getParameter("min") || "false";
-	var ifMin = "true" == String(min).trim().toLowerCase();
+	var ifMin = "true" === String(min).trim().toLowerCase();
 
 	concatAllAndSave(ifMin);
 });
