@@ -96,11 +96,11 @@
 
 
 		/**
-		 * 获取图形整体的横向绘制偏移（用于满足场景：'数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧'）
+		 * 获取图形正文的横向绘制偏移（用于满足场景：'数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧'）
 		 * @param {KChartSketch} kChartSketch 图形概览
-		 * @returns {Number}
+		 * @returns {Number} 取值为正，代表图形正文向左偏移
 		 */
-		var getHorizontalRenderOffset = function(kChartSketch){
+		this.getChartContentHorizontalRenderingOffset = function(kChartSketch){
 			var config_groupBarWidth = self.getConfigItem("groupBarWidth"),
 				config_groupGap = self.getConfigItem("groupGap");
 
@@ -173,7 +173,7 @@
 			 */
 			var arr = [];
 
-			var offset = getHorizontalRenderOffset(kChartSketch);/* 数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧 */
+			var offset = this.getChartContentHorizontalRenderingOffset(kChartSketch);/* 数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧 */
 			for(var i = 0; i < groupCount; i++)
 				arr.push(Math.floor(xRight_axisX_content + kChart.getRenderingOffset() - groupSize * i - offset));
 
@@ -206,7 +206,7 @@
 			/* 一个横坐标刻度横跨的数据个数 */
 			var axisXLabelTickSpan = kChart.calcAxisXLabelTickSpan();
 			/* 图形的整体横向便宜，用于实现“数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧” */
-			var offset = getHorizontalRenderOffset(kChartSketch);
+			var offset = this.getChartContentHorizontalRenderingOffset(kChartSketch);
 
 			/* 上一个绘制的横坐标刻度对应的数据索引 */
 			var previousXTickDataIndex = null;

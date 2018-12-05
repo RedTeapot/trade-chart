@@ -35,13 +35,7 @@
 		 * @returns {*}
 		 */
 		this.getConfigItem = function(name){
-			var v = kSubChart.getConfigItem(name, config);
-			if("width" === name)
-				v = util.calcRenderingWidth(canvasObj, v);
-			else if("height" === name)
-				v = util.calcRenderingHeight(canvasObj, v);
-
-			return v;
+			return kSubChart.getConfigItem(name);
 		};
 
 		/**
@@ -106,7 +100,7 @@
 		 */
 		this.getRenderingGroupCount = function(){
 			var kChart = this.getKChart();
-			var maxGroupCount = KChartSketch.calcMaxGroupCount(kChart.getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width"))),
+			var maxGroupCount = this.getMaxGroupCount(),
 				dataCount = kChart.getRenderingDataCount();
 			return Math.max(Math.min(maxGroupCount, dataCount), 0);
 		};
@@ -128,88 +122,96 @@
 		};
 
 		/**
-		 * 获取图形正文区域的最小横坐标值，对应于最左侧蜡烛的中间位置
+		 * 获取图形正文的横向绘制偏移（用于满足场景：'数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧'）
+		 * @returns {Number} 取值为正，代表图形正文向左偏移
 		 */
-		var getMinX = function(){
-			var config_paddingLeft = self.getConfigItem("paddingLeft"),
-				config_axisXTickOffset = self.getConfigItem("axisXTickOffset");
-
-			return Math.floor(config_paddingLeft + config_axisXTickOffset);
+		this.getChartContentHorizontalRenderingOffset = function(){
+			return kSubChart.getChartContentHorizontalRenderingOffset(kChartSketch);
 		};
 
 		/**
-		 * 获取图形正文区域的最大横坐标值，对应于做最右侧蜡烛的中间位置
+		 * 根据给定的相对横坐标位置，获取距离右侧边界位置的空间中渲染的数据个数（包括给定位置所匹配的数据）
+		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 */
-		var getMaxX = function(){
-			var config_width = util.calcRenderingWidth(canvasObj, self.getConfigItem("width")),
-				config_paddingRight = self.getConfigItem("paddingRight"),
-				config_axisXTickOffsetFromRight = self.getConfigItem("axisXTickOffsetFromRight");
-			return Math.floor(config_width - config_paddingRight - config_axisXTickOffsetFromRight);
-		};
+		var getRightSideDataCount = function(x){
+			var kChart = kSubChart.getKChart();
+			x -= kChart.getRenderingOffset();
+			x += self.getChartContentHorizontalRenderingOffset();
 
-		/**
-		 * 获取第一条可见数据的索引位置
-		 * @returns {number}
-		 */
-		var getFirstVisibleDataIndex = function(){
-			var kDataManager = self.getKChart().getKDataManager();
-			return kDataManager.getDataList().length - kDataManager.getElapsedVisibleDataCount() - self.getRenderingGroupCount();
+			var h = kChart.calcHalfGroupBarWidth();
+			var minX = Math.floor(kChart.calcAxisXContentLeftPosition()) - h;
+			var maxX = minX + kChartSketch.getContentWidth() - 1 + 2 * h;
+
+			if (x < minX || x > maxX){
+				console.warn("No in region", x, minX, maxX);
+				return -1;
+			}
+
+			var kDataManager = kChart.getKDataManager();
+			var firstIndex = kDataManager.getFirstRenderingDataIndexFromRight();
+			if(-1 === firstIndex){
+				console.warn("No data rendered.");
+				return -1;
+			}
+
+			var b = self.getConfigItem("groupBarWidth"),
+				g = self.getConfigItem("groupGap");
+			var groupSize = b + g;
+
+			var tmpX = maxX - x;
+			var c = Math.floor(tmpX / groupSize),
+				t = tmpX % groupSize;
+			if(t >= b + Math.floor(g / 2))
+				c += 1;
+
+			return c;
 		};
 
 		/**
 		 * 获取指定的相对横坐标对应的数据索引
-		 * @param x {Number} 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
+		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @returns {Number} 相对横坐标对应的数据索引。如果位置在区域左侧，则返回0；如果在区域右侧，则返回最后一条数据的索引。如果数据区域中没有任何数据，则返回-1
 		 */
 		this.getRenderingDataIndex = function(x){
-			var groupCount = this.getRenderingGroupCount();
-			var minX = getMinX(),
-				maxX = getMaxX();
-
-			if (x < minX || x > maxX){
+			var t = getRightSideDataCount(x);
+			if(-1 === t){
+				console.warn("No data rendered on the right side");
 				return -1;
 			}
 
-			var tmpX = x - minX;
-			var groupSize = this.getConfigItem("groupBarWidth") + this.getConfigItem("groupGap");
-
-			var index = Math.round(tmpX / groupSize);
-
-			if(index >= groupCount){
-				if(groupCount > 0)
-					index = groupCount - 1;
-				else
-					index = -1;
-			}
-
-			return index + getFirstVisibleDataIndex();
+			var firstIndex = kSubChart.getKChart().getKDataManager().getFirstRenderingDataIndexFromRight();
+			var index = firstIndex - t;
+			// console.log("getRenderingDataIndex:", x, index, firstIndex, t);
+			return index;
 		};
 
 		/**
-		 * 根据给定的数据索引，获取其在画布上的渲染位置（中心位置）
+		 * 根据给定的数据索引，获取其在画布上 的渲染位置（中心位置）
 		 * @param {Number} dataIndex 被渲染的数据的索引位置（相对于整个数据）
 		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
 		 */
 		this.getRenderingHorizontalPosition = function(dataIndex){
-			dataIndex -= getFirstVisibleDataIndex();
-			var renderingGroupCount = this.getRenderingGroupCount();
-			if(dataIndex < 0 || dataIndex >= renderingGroupCount)
+			var kChart = kSubChart.getKChart();
+
+			var firstIndex = kSubChart.getKChart().getKDataManager().getFirstRenderingDataIndexFromRight();
+			if(firstIndex === -1){
+				console.log("No data rendered");
 				return -1;
+			}
 
-			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
-				config_paddingLeft = this.getConfigItem("paddingLeft"),
-				config_groupGap = this.getConfigItem("groupGap"),
-				config_groupBarWidth = this.getConfigItem("groupBarWidth");
+			var lastIndex = firstIndex - this.getRenderingGroupCount() - 1;
+			if(dataIndex < lastIndex || dataIndex > firstIndex){
+				console.warn("Not in data region ", dataIndex, firstIndex, lastIndex);
+				return -1;
+			}
 
-			var xLeft_axisX = this.getKChart().calcAxisXLeftPosition(),
-				groupSizeBig = new Big(config_groupBarWidth + config_groupGap);
+			var b = self.getConfigItem("groupBarWidth"),
+				g = self.getConfigItem("groupGap");
+			var groupSize = b + g;
 
-			return util.getLinePosition(xLeft_axisX + config_axisXTickOffset + kSubChart.getKChart().getRenderingOffset() + numBig(groupSizeBig.mul(dataIndex)));
+			var x = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()) - (firstIndex - dataIndex) * groupSize + kChart.getRenderingOffset() - this.getChartContentHorizontalRenderingOffset();
+			return util.getLinePosition(x);
 		};
-
-		//TODO 1. 左侧拉到头的时候没有呈现在期望的位置上
-		//TODO 2. 明细位置没有呈现在期望位置上
-		//TODO 3. 明细位置对应的数据检索不正确
 
 		/**
 		 * 获取指定的相对横坐标对应的原始数据

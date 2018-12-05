@@ -93,6 +93,9 @@
 
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase();
 
+			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
+			config.setConfigItemConvertedValue("height", config_height);
+
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var kDataSketch = KSubChartSketch_CandleDataSketch.sketch(kChart, this.getConfig()),

@@ -63,6 +63,44 @@
 		};
 
 
+
+		/**
+		 * 获取向右拖动时经过的，消失的数据个数
+		 * @returns {Number}
+		 */
+		this.getElapsedVisibleDataCount = function(){
+			return elapsedDataCount;
+		};
+
+		/**
+		 * 获取可见的，或拖动后可见的数据量
+		 * @returns {Number}
+		 */
+		this.getVisibleDataCount = function(){
+			return dataList.length - invisibleDataCount;
+		};
+
+		/**
+		 * 获取新附加的，即使拖动也不可见的数据量
+		 * @returns {Number}
+		 */
+		this.getInvisibleDataCount = function(){
+			return invisibleDataCount;
+		};
+
+		/**
+		 * 获取自右向左的第一个被渲染的数据的自左向右索引位置。
+		 * 如果数据列表为空，则返回-1
+		 * @returns {Number|null}
+		 */
+		this.getFirstRenderingDataIndexFromRight = function(){
+			if(0 === dataList.length)
+				return -1;
+
+			var t = invisibleDataCount + elapsedDataCount;
+			return dataList.length - 1 - t;
+		};
+
 		/**
 		 * 检查当前第一个可视数据是否已被呈现
 		 * @param {Number} maxGroupCount 最大显示数据量
@@ -171,7 +209,6 @@
 
 			dataList = dataList.concat(datas);
 			if(!ifResetsElapsedDataCount){
-				elapsedDataCount += datas.length;
 				invisibleDataCount += datas.length;
 			}else{
 				var flag = elapsedDataCount !== 0;
@@ -284,30 +321,6 @@
 				return list;
 
 			return list.map(convertData);
-		};
-
-		/**
-		 * 获取向右拖动时经过的，消失的数据个数
-		 * @returns {Number}
-		 */
-		this.getElapsedVisibleDataCount = function(){
-			return elapsedDataCount;
-		};
-
-		/**
-		 * 获取可见的，或拖动后可见的数据量
-		 * @returns {Number}
-		 */
-		this.getVisibleDataCount = function(){
-			return dataList.length - invisibleDataCount;
-		};
-
-		/**
-		 * 获取新附加的，即使拖动也不可见的数据量
-		 * @returns {Number}
-		 */
-		this.getInvisibleDataCount = function(){
-			return invisibleDataCount;
 		};
 
 		/**

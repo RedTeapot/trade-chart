@@ -72,7 +72,7 @@ util.loadData(function(datas){
 
 	var KChart = TradeChart2.KChart;
 	var sepIndex = Math.floor(datas.length - 20);
-	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas);
+	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0));
 	window.kChart = kChart;
 	window.kdm = kChart.getKDataManager();
 
