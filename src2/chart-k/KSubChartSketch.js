@@ -6,6 +6,12 @@
 	var numBig = function(big){
 		return Number(big.toString());
 	};
+	var floorBig = function(big){
+		return Math.floor(numBig(big));
+	};
+	var roundBig = function(big){
+		return Math.round(numBig(big));
+	};
 
 	/**
 	 * @constructor
@@ -19,7 +25,7 @@
 		/** 图表正文区域高度 */
 		var contentHeight;
 		/** 纵坐标可呈现的量差与高度差之间的映射比例。用于决定给定的一个量需要占据多少像素 */
-		var amountHeightRatio;
+		var amountHeightRatioBig = new Big(1);
 
 
 		/**
@@ -78,37 +84,37 @@
 
 		/**
 		 * 获取纵坐标可呈现的量差与高度差之间的映射比例
-		 * @returns {Number}
+		 * @returns {Big}
 		 */
 		this.getAmountHeightRatio = function(){
-			return amountHeightRatio;
+			return amountHeightRatioBig;
 		};
 
 		/**
 		 * 设置纵坐标可呈现的量差与高度差之间的映射比例
-		 * @param {Number} v 纵坐标可呈现的量差与高度差之间的映射比例
+		 * @param {Number|Big} v 纵坐标可呈现的量差与高度差之间的映射比例
 		 * @returns {KSubChartSketch}
 		 */
 		this.setAmountHeightRatio = function(v){
-			if(null == v || isNaN(v = Number(v))){
-				console.error("Specified amount height ratio is not a valid number. " + v);
+			if(null == v || isNaN(v = Number(v)) && !(v instanceof Big)){
+				console.error("Specified amount height ratio is not a valid number: " + v);
 				return this;
 			}
 
-			amountHeightRatio = v;
+			amountHeightRatioBig = v instanceof Big? v: new Big(v);
 			return this;
 		};
 
 		/**
 		 * 根据给定的量差计算高度差并返回
-		 * @param {Number} amount 量差
-		 * @returns {Number}
+		 * @param {Number|Big} amount 量差
+		 * @returns {Big}
 		 */
 		this.calculateHeight = function(amount){
-			if(amountHeightRatio === 0)
+			if(amountHeightRatioBig.eq(0))
 				return 0;
 
-			return Math.floor(amount / amountHeightRatio);
+			return (amount instanceof Big? amount: new Big(amount)).div(amountHeightRatioBig);
 		};
 	};
 

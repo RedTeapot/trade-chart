@@ -76,22 +76,15 @@
 				config_paddingLeft = this.getConfigItem("paddingLeft"),
 				config_paddingTop = this.getConfigItem("paddingTop"),
 
+				config_axisYTickOffset = this.getConfigItem("axisYTickOffset"),
+
 				config_keepingColor = this.getConfigItem("keepingColor"),
 				config_appreciatedColor = this.getConfigItem("appreciatedColor"),
 				config_depreciatedColor = this.getConfigItem("depreciatedColor"),
 
-				config_axisLineWidth = this.getConfigItem("axisLineWidth"),
-				config_axisLineColor = this.getConfigItem("axisLineColor"),
-
-				config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
-				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight"),
-				config_axisYPosition = this.getConfigItem("axisYPosition"),
-
 				config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
 				config_groupLineWidth = this.getConfigItem("groupLineWidth");
-
-			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase();
 
 			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
 			config.setConfigItemConvertedValue("height", config_height);
@@ -107,9 +100,6 @@
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
-			/* 一组数据的宽度 */
-			var groupSizeBig = new Big(config_groupBarWidth).plus(config_groupGap);
-			var groupSize = numBig(groupSizeBig);
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
@@ -120,17 +110,14 @@
 				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
-				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getAxisYHeight()),
 
-				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX,
 				$yTop_axisY = config_paddingTop;/* 整数使用$开头*/
-			var xRightBig_axisX_content = new Big(xRight_axisX_content);
 
 			/**
 			 * 获取指定价钱对应的物理高度
 			 * @param {Number} price1 价钱1
 			 * @param {Number} [price2=kDataSketch.getAmountCeiling()] 价钱2
-			 * @returns {Number} 物理高度
+			 * @returns {Big} 物理高度
 			 */
 			var calcHeight = function(price1, price2){
 				if(arguments.length < 2)
@@ -148,9 +135,6 @@
 			(function(){
 				ctx.save();
 
-				config_axisLineWidth && (ctx.lineWidth = config_axisLineWidth);
-				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
-
 				/* 绘制坐标区域背景 */
 				self.renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
 
@@ -158,7 +142,13 @@
 				finishRemainingAxisXRendering = self.renderAxisX(ctx, kChartSketch, kSubChartSketch);
 
 				/* 绘制Y轴、Y轴刻度、网格横线 */
-				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, kDataSketch);
+				config_axisYTickOffset = util.parseAsNumber(config_axisYTickOffset, 0);
+				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, kDataSketch, {
+					axisYTickConverter: function(tick){
+						tick.y -= config_axisYTickOffset;
+						return tick;
+					}
+				});
 
 				ctx.restore();
 			})();
@@ -188,14 +178,14 @@
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);
 
 					var lineX = x + linePosition,
-						lineYTop = $yTop_axisY + calcHeight(maxLinePrice);
-					var lineYBottom = lineYTop + calcHeight(data.highPrice, data.lowPrice);
-					if(Math.abs(lineYBottom - lineYTop) < 2e-7)
+						lineYTop = $yTop_axisY + numBig(calcHeight(maxLinePrice));
+					var lineYBottom = lineYTop + numBig(calcHeight(data.highPrice, data.lowPrice));
+					if(Math.abs(lineYBottom - lineYTop) < 1)
 						lineYBottom += 1;
 
 					var barX = x,
-						barY = $yTop_axisY + calcHeight(maxBarPrice);
-					var barHeight = calcHeight(data.openPrice, data.closePrice);
+						barY = $yTop_axisY + numBig(calcHeight(maxBarPrice));
+					var barHeight = numBig(calcHeight(data.openPrice, data.closePrice));
 					if(barHeight < 1)
 						barHeight = 1;
 
@@ -254,7 +244,7 @@
 			finishRemainingAxisXRendering();
 			finishRemainingAxisYRendering();
 
-			return new KSubChart_CandleRenderResult(this, kChartSketch, kSubChartSketch, canvasObj);
+			return new KSubChart_CandleRenderResult(this, kChartSketch, kSubChartSketch, kDataSketch, canvasObj);
 		};
 	};
 	KSubChart_CandleChart.prototype = Object.create(KSubChart.prototype);

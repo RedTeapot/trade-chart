@@ -23,10 +23,10 @@
 	 * @param {KSubChart} kSubChart 关联的，生成绘制结果的K线子图实例
 	 * @param {KChartSketch} kChartSketch K线图形素描
 	 * @param {KSubChartSketch} kSubChartSketch K线子图形素描
+	 * @param {KDataSketch} kDataSketch K线数据素描
 	 * @param {HTMLCanvasElement} canvasObj 绘制的画布所在的DOM元素
-	 * @param {KSubChartConfig} config 绘制过程使用的配置
 	 */
-	var KSubChartRenderResult = function(kSubChart, kChartSketch, kSubChartSketch, canvasObj, config){
+	var KSubChartRenderResult = function(kSubChart, kChartSketch, kSubChartSketch, kDataSketch, canvasObj){
 		var self = this;
 
 		/**
@@ -55,11 +55,11 @@
 		};
 
 		/**
-		 * 获取渲染使用的子图渲染配置
-		 * @returns {KSubChartConfig}
+		 * 获取K线数据素描
+		 * @returns {KDataSketch}
 		 */
-		this.getKSubChartConfig = function(){
-			return config;
+		this.getKDataSketch = function(){
+			return kDataSketch
 		};
 
 		/**
@@ -143,14 +143,14 @@
 			var maxX = minX + kChartSketch.getContentWidth() - 1 + 2 * h;
 
 			if (x < minX || x > maxX){
-				console.warn("No in region", x, minX, maxX);
+				TradeChart2.showLog && console.warn("Not in region", x, minX, maxX);
 				return -1;
 			}
 
 			var kDataManager = kChart.getKDataManager();
 			var firstIndex = kDataManager.getFirstRenderingDataIndexFromRight();
 			if(-1 === firstIndex){
-				console.warn("No data rendered.");
+				TradeChart2.showLog && console.warn("No data rendered.");
 				return -1;
 			}
 
@@ -175,7 +175,7 @@
 		this.getRenderingDataIndex = function(x){
 			var t = getRightSideDataCount(x);
 			if(-1 === t){
-				console.warn("No data rendered on the right side");
+				TradeChart2.showLog && console.warn("No data rendered on the right side");
 				return -1;
 			}
 
@@ -195,13 +195,13 @@
 
 			var firstIndex = kSubChart.getKChart().getKDataManager().getFirstRenderingDataIndexFromRight();
 			if(firstIndex === -1){
-				console.log("No data rendered");
+				TradeChart2.showLog && console.log("No data rendered");
 				return -1;
 			}
 
 			var lastIndex = firstIndex - this.getRenderingGroupCount() - 1;
 			if(dataIndex < lastIndex || dataIndex > firstIndex){
-				console.warn("Not in data region ", dataIndex, firstIndex, lastIndex);
+				TradeChart2.showLog && console.warn("Not in data region ", dataIndex, firstIndex, lastIndex);
 				return -1;
 			}
 

@@ -7,7 +7,7 @@
 	 * 默认的，适用于K线图“蜡烛图”子图的配置项
 	 */
 	var defaultConfig = {
-		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移 */
+		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移，取值为正则向上偏移 */
 	};
 	Object.freeze && Object.freeze(defaultConfig);
 

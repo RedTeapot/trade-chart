@@ -80,11 +80,13 @@ util.loadData(function(datas){
 	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
 	var result_candle = subChart_candle.render(column_candleObj);
 	result_candle.initCanvas(column_candleDetailObj);
+	window.candleResult = result_candle;
 
 	/* 量图 */
 	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
 	var result_volume = subChart_volume.render(column_volumeObj);
 	result_volume.initCanvas(column_volumeDetailObj);
+	window.volumeResult = result_volume;
 
 	var isModeViewDetail = true;
 	var lastX = 0;

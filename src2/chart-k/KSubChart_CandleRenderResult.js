@@ -6,11 +6,8 @@
 	/**
 	 * @constructor
 	 * K线子图绘制结果
-	 * @param {KSubChart} kSubChart 关联的，生成绘制结果的K线子图实例
-	 * @param {HTMLCanvasElement} canvasObj 绘制的画布所在的DOM元素
-	 * @param {KSubChartConfig} config 绘制过程使用的配置
 	 */
-	var KSubChart_CandleRenderResult = function(kSubChart, canvasObj, config){
+	var KSubChart_CandleRenderResult = function(){
 		KSubChartRenderResult.apply(this, arguments);
 		var self = this;
 	};

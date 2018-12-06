@@ -24,7 +24,7 @@
 		 */
 		this.updateByDataSketch = function(dataSketch){
 			var b = new Big(dataSketch.getAmountCeiling()).minus(dataSketch.getAmountFloor()).div(Math.max(this.getContentHeight(), 1));
-			this.setAmountHeightRatio(b.eq(0)? 1: numBig(b));
+			this.setAmountHeightRatio(b);
 			return this;
 		};
 	};

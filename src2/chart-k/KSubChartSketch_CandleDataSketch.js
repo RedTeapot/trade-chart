@@ -93,6 +93,7 @@
 				var variation = Math.abs(max - min);
 				if(variation > dataSketch_origin_maxVariation)
 					dataSketch_origin_maxVariation = variation;
+				variationSum += variation;
 			}
 			var len = dataList.length;
 			dataSketch_origin_avgVariation = len > 0? (variationSum / len): 0;

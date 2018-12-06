@@ -16,8 +16,8 @@
 	var numBig = function(big){
 		return Number(big.toString());
 	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
+	var ceilBig = function(big){
+		return Math.ceil(numBig(big));
 	};
 
 	var NOT_SUPPLIED = {};
@@ -80,17 +80,8 @@
 				config_appreciatedColor = this.getConfigItem("appreciatedColor"),
 				config_depreciatedColor = this.getConfigItem("depreciatedColor"),
 
-				config_axisLineWidth = this.getConfigItem("axisLineWidth"),
-				config_axisLineColor = this.getConfigItem("axisLineColor"),
-
-				config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
-				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight"),
-				config_axisYPosition = this.getConfigItem("axisYPosition"),
-
 				config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth");
-
-			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase();
 
 			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
 			config.setConfigItemConvertedValue("height", config_height);
@@ -106,8 +97,6 @@
 
 			/* 绘制的数据个数 */
 			var groupCount = Math.min(kChartSketch.getMaxGroupCount(), dataList.length);
-			/* 一组数据的宽度 */
-			var groupSize = config_groupBarWidth + config_groupGap;
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
@@ -118,16 +107,13 @@
 				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
-				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getAxisYHeight()),
-
-				x_axisY = ifShowAxisYLeft? xLeft_axisX: xRight_axisX;
-			var xRightBig_axisX_content = new Big(xRight_axisX_content);
+				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
 			/**
 			 * 获取指定成交量对应的物理高度
 			 * @param {Number} volume1 成交量1
 			 * @param {Number} [volume2=kDataSketch.getAmountFloor()] 成交量2
-			 * @returns {Number} 物理高度
+			 * @returns {Big} 物理高度
 			 */
 			var calcHeight = function(volume1, volume2){
 				if(arguments.length < 2)
@@ -144,9 +130,6 @@
 				finishRemainingAxisYRendering;
 			(function(){
 				ctx.save();
-
-				config_axisLineWidth && (ctx.lineWidth = config_axisLineWidth);
-				config_axisLineColor && (ctx.strokeStyle = config_axisLineColor);
 
 				/* 绘制坐标区域背景 */
 				self.renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
@@ -177,7 +160,7 @@
 						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);
 					}
 
-					var volumeHeight = Math.ceil(calcHeight(data.volume));
+					var volumeHeight = ceilBig(calcHeight(data.volume));
 					if(0 === volumeHeight)
 						return;
 
@@ -228,7 +211,7 @@
 			finishRemainingAxisXRendering();
 			finishRemainingAxisYRendering();
 
-			return new KSubChart_VolumeRenderResult(this, kChartSketch, kSubChartSketch, canvasObj);
+			return new KSubChart_VolumeRenderResult(this, kChartSketch, kSubChartSketch, kDataSketch, canvasObj);
 		};
 	};
 	KSubChart_VolumeChart.prototype = Object.create(KSubChart.prototype);
