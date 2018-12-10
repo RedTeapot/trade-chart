@@ -84,6 +84,42 @@
 		};
 
 		/**
+		 * 在指定的容器中渲染图形，自动创建画布
+		 * @param {Element} containerObj 画布容器
+		 */
+		this.renderIn = function(containerObj){
+			var typeAttrName = "data-type",
+				subTypeAttrName = "data-sub-type";
+
+			var chartObj = containerObj.querySelector(".trade-chart[" + typeAttrName + "=k][" + subTypeAttrName + "=" + type + "]");
+			var canvasObj = null;
+			if(null == chartObj){
+				chartObj = document.createElement("div");
+				chartObj.className = "trade-chart";
+				chartObj.setAttribute(typeAttrName, "k");
+				chartObj.setAttribute(subTypeAttrName, type);
+
+				canvasObj = document.createElement("canvas");
+				var detailCanvasObj = document.createElement("canvas");
+				detailCanvasObj.className = "detail";
+
+				chartObj.appendChild(canvasObj);
+				chartObj.appendChild(detailCanvasObj);
+				containerObj.appendChild(chartObj);
+
+				var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
+					config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height"));
+
+				util.initCanvas(canvasObj, config_width, config_height);
+				util.initCanvas(detailCanvasObj, config_width, config_height);
+			}else{
+				canvasObj.querySelector("canvas:not(.detail)");
+			}
+
+			return this.render(canvasObj);
+		};
+
+		/**
 		 * 由子类实现的图形渲染方法
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @returns {KSubChartRenderResult} 绘制的K线子图

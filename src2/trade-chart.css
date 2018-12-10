@@ -1,0 +1,15 @@
+.trade-chart[data-sub-type]{
+	position: relative;
+	min-height: 50px;
+	background-color: white;
+}
+.trade-chart[data-sub-type] canvas{
+	display: block;
+	margin: 0 auto;
+}
+.trade-chart[data-sub-type] canvas.detail{
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 0;
+}
