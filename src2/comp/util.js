@@ -283,7 +283,7 @@
 		if(-1 === lastDotIndex)
 			return 0;
 
-		return tmp.substring(lastDotIndex + 1).length;
+		return tmp.length - 1 - lastDotIndex;
 	};
 
 	/**

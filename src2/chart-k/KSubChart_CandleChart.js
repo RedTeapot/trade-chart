@@ -16,6 +16,9 @@
 	var numBig = function(big){
 		return Number(big.toString());
 	};
+	var roundBig = function(big){
+		return Math.round(numBig(big));
+	};
 	var floorBig = function(big){
 		return Math.floor(numBig(big));
 	};
@@ -173,19 +176,19 @@
 					}
 
 					var isAppreciated = data.closePrice > data.openPrice,
-						isKeeping = Math.abs(data.closePrice - data.openPrice) < 2e-7;
+						isKeeping = Math.abs(data.closePrice - data.openPrice) < 1e-8;
 					var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
 						maxBarPrice = Math.max(data.openPrice, data.closePrice);
 
 					var lineX = x + linePosition,
-						lineYTop = $yTop_axisY + numBig(calcHeight(maxLinePrice));
-					var lineYBottom = lineYTop + numBig(calcHeight(data.highPrice, data.lowPrice));
+						lineYTop = $yTop_axisY + calcHeight(maxLinePrice);
+					var lineYBottom = lineYTop + calcHeight(data.highPrice, data.lowPrice);
 					if(Math.abs(lineYBottom - lineYTop) < 1)
 						lineYBottom += 1;
 
 					var barX = x,
-						barY = $yTop_axisY + numBig(calcHeight(maxBarPrice));
-					var barHeight = numBig(calcHeight(data.openPrice, data.closePrice));
+						barY = $yTop_axisY + calcHeight(maxBarPrice);
+					var barHeight = calcHeight(data.openPrice, data.closePrice);
 					if(barHeight < 1)
 						barHeight = 1;
 
@@ -210,7 +213,7 @@
 					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
 					if(config_groupLineWidth > 1){
 						ctx.strokeWidth = 0;
-						ctx.fillRect(lineX, lineYTop, config_groupLineWidth, Math.abs(lineYBottom - lineYTop));
+						ctx.fillRect(Math.floor(lineX), Math.round(lineYTop), config_groupLineWidth, Math.round(Math.abs(lineYBottom - lineYTop)));
 					}else{
 						lineX = util.getLinePosition(lineX);
 
@@ -223,7 +226,7 @@
 
 					/* 绘制蜡烛 */
 					ctx.strokeWidth = 0;
-					ctx.fillRect(barX, barY, config_groupBarWidth, barHeight);
+					ctx.fillRect(Math.floor(barX), Math.round(barY), config_groupBarWidth, Math.round(barHeight));
 
 					if(i === 0 || i === groupCount - 1){
 						/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */

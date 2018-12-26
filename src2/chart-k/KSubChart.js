@@ -311,9 +311,9 @@
 			var y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYAmountIntervalBig = new Big(kDataSketch.getAmountCeiling() - kDataSketch.getAmountFloor()).div(config_axisYMidTickQuota + 1);
+			var axisYAmountInterval = (kDataSketch.getAmountCeiling() - kDataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
-			var axisYHeightIntervalBig = kSubChartSketch.calculateHeight(axisYAmountIntervalBig);
+			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 			var isAxisYPrecisionAuto = "auto" === String(config_axisYPrecision).trim().toLowerCase();
 
 			if(isAxisYPrecisionAuto)
@@ -331,8 +331,8 @@
 			 */
 			var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
 			for(var i = 0; i <= maxAxisYTickIndex; i++){
-				var tickAmount = kDataSketch.getAmountFloor() + numBig(axisYAmountIntervalBig.mul(i)),
-					tickY = y_axisX - roundBig(axisYHeightIntervalBig.mul(i));
+				var tickAmount = kDataSketch.getAmountFloor() + axisYAmountInterval * i,
+					tickY = y_axisX - Math.round(axisYHeightInterval * i);
 				var tickLabel = config_axisYFormatter(tickAmount, config);
 
 				for(var j = 0; j < axisYTickList.length; j++){

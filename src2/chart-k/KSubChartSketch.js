@@ -25,7 +25,7 @@
 		/** 图表正文区域高度 */
 		var contentHeight;
 		/** 纵坐标可呈现的量差与高度差之间的映射比例。用于决定给定的一个量需要占据多少像素 */
-		var amountHeightRatioBig = new Big(1);
+		var amountHeightRatio = 1;
 
 
 		/**
@@ -87,7 +87,7 @@
 		 * @returns {Big}
 		 */
 		this.getAmountHeightRatio = function(){
-			return amountHeightRatioBig;
+			return amountHeightRatio;
 		};
 
 		/**
@@ -101,7 +101,7 @@
 				return this;
 			}
 
-			amountHeightRatioBig = v instanceof Big? v: new Big(v);
+			amountHeightRatio = v instanceof Big? numBig(v): v;
 			return this;
 		};
 
@@ -111,10 +111,10 @@
 		 * @returns {Big}
 		 */
 		this.calculateHeight = function(amount){
-			if(amountHeightRatioBig.eq(0))
+			if(amountHeightRatio === 0)
 				return 0;
 
-			return (amount instanceof Big? amount: new Big(amount)).div(amountHeightRatioBig);
+			return Math.round((amount instanceof Big? numBig(amount): amount) / amountHeightRatio);
 		};
 	};
 

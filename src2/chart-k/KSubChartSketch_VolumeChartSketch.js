@@ -23,8 +23,8 @@
 		 * @returns {KSubChartSketch_VolumeChartSketch}
 		 */
 		this.updateByDataSketch = function(dataSketch){
-			var b = new Big(dataSketch.getAmountCeiling()).minus(dataSketch.getAmountFloor()).div(Math.max(this.getContentHeight(), 1));
-			this.setAmountHeightRatio(b);
+			var ratio = (dataSketch.getAmountCeiling() - dataSketch.getAmountFloor()) / Math.max(this.getContentHeight(), 1);
+			this.setAmountHeightRatio(ratio);
 			return this;
 		};
 	};

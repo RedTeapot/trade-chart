@@ -113,9 +113,8 @@
 				dataSketch_extended_priceCeiling = dataSketch_extended_priceFloor;
 
 			/* 确保最大值与最小值不同 */
-			var b = new Big(dataSketch_extended_priceFloor);
-			if(b.eq(dataSketch_extended_priceCeiling))
-				dataSketch_extended_priceCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+			if(Math.abs(dataSketch_extended_priceCeiling - dataSketch_extended_priceFloor) < 1e-8)
+				dataSketch_extended_priceCeiling = dataSketch_extended_priceFloor < 1e-8? 1: dataSketch_extended_priceFloor * 1.3;
 		}
 		instance.setMinAmount(dataSketch_origin_min)
 			.setMaxAmount(dataSketch_origin_max)

@@ -111,9 +111,8 @@
 				dataSketch_extended_volumeCeiling = dataSketch_extended_volumeFloor;
 
 			/* 确保最大值与最小值不同 */
-			var b = new Big(dataSketch_extended_volumeFloor);
-			if(b.eq(dataSketch_extended_volumeCeiling))
-				dataSketch_extended_volumeCeiling = b.eq(0)? 1: numBig(b.mul(1.3));
+			if(Math.abs(dataSketch_extended_volumeCeiling - dataSketch_extended_volumeFloor) < 1e-8)
+				dataSketch_extended_volumeCeiling = dataSketch_extended_volumeFloor < 1e-8? 1: dataSketch_extended_volumeFloor * 1.3;
 		}
 		instance.setMinAmount(dataSketch_origin_minVolume)
 			.setMaxAmount(dataSketch_origin_maxVolume)

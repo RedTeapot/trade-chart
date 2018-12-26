@@ -160,7 +160,7 @@
 						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);
 					}
 
-					var volumeHeight = ceilBig(calcHeight(data.volume));
+					var volumeHeight = Math.ceil(calcHeight(data.volume));
 					if(0 === volumeHeight)
 						return;
 
