@@ -33,12 +33,6 @@
 		KSubChart.call(this, kChart, KSubChartTypes.VOLUME);
 		var self = this;
 
-		/**
-		 * 最后一次执行绘制操作时绘制到的目标Canvas
-		 * @type {HTMLCanvasElement}
-		 */
-		var lastRenderingCanvasObj = NOT_SUPPLIED;
-
 		/* 渲染配置 */
 		var config = new KSubChartConfig_VolumeConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
 
@@ -56,19 +50,13 @@
 		 *
 		 * 渲染图形，并呈现至指定的画布中
 		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {Object} env 当前环境信息
+		 * @param {Number} env.drawingOrderIndex 当前子图在该画布上的绘制顺序索引。第一个被绘制：0
+		 *
 		 * @returns {KSubChart_VolumeRenderResult} 绘制的K线图
 		 */
-		this.implRender = function(canvasObj){
+		this.implRender = function(canvasObj, env){
 			var self = this;
-
-			if(!(canvasObj instanceof HTMLCanvasElement)){
-				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
-					canvasObj = lastRenderingCanvasObj;
-				}else{
-					throw new Error("No canvas element supplied to render");
-				}
-			}else
-				lastRenderingCanvasObj = canvasObj;
 
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
@@ -123,7 +111,8 @@
 			};
 
 			/* 清空既有内容 */
-			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			if(env.drawingOrderIndex === 0)
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 			/* 绘制坐标系 */
 			var finishRemainingAxisXRendering,

@@ -25,6 +25,12 @@
 	var KSubChart = function(kChart, type){
 		var self = this;
 
+		/**
+		 * 最后一次执行绘制操作时绘制到的目标Canvas
+		 * @type {HTMLCanvasElement}
+		 */
+		var lastRenderingCanvasObj = NOT_SUPPLIED;
+
 		/* 渲染配置 */
 		var config = new KSubChartConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
 
@@ -80,7 +86,24 @@
 		 * @returns {KSubChartRenderResult} 绘制的K线子图
 		 */
 		this.render = function(canvasObj){
-			return self.implRender.apply(self, arguments);
+			if(!(canvasObj instanceof HTMLCanvasElement)){
+				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
+					canvasObj = lastRenderingCanvasObj;
+				}else{
+					throw new Error("No canvas element supplied to render");
+				}
+			}else
+				lastRenderingCanvasObj = canvasObj;
+
+			/* 记录画布上画质的图形类型，实现“第一个图形绘画时清空画布既有内容，后续图形绘画时，叠加绘制” */
+			canvasObj.renderingKSubChartTypes = canvasObj.renderingKSubChartTypes || [];
+			var subTypes = canvasObj.renderingKSubChartTypes;
+			subTypes.push(this.getType());
+
+			return self.implRender.call(self, canvasObj, {
+				/* 当前子图在该画布上的绘制顺序索引。第一个被绘制：0 */
+				drawingOrderIndex: subTypes.indexOf(this.getType())
+			});
 		};
 
 		/**
@@ -116,15 +139,18 @@
 				canvasObj.querySelector("canvas:not(.detail)");
 			}
 
+
 			return this.render(canvasObj);
 		};
 
 		/**
 		 * 由子类实现的图形渲染方法
 		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {Object} env 当前环境信息
+		 * @param {Number} env.drawingOrderIndex 当前子图在该画布上的绘制顺序索引。第一个被绘制：0
 		 * @returns {KSubChartRenderResult} 绘制的K线子图
 		 */
-		this.implRender = function(canvasObj){
+		this.implRender = function(canvasObj, env){
 			console.warn("Not implemented for k sub chart: " + this.getType());
 			return null;
 		};

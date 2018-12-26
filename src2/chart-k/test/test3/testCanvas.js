@@ -77,7 +77,7 @@ util.loadData(function(datas){
 
 		kChart.appendDataList(datas.slice(sepIndex, ++sepIndex), true);
 		console.log(kChart.getDataList());
-		setTimeout(append, 800);
+		setTimeout(append, 100);
 	};
 	append();
 
