@@ -67,10 +67,10 @@
 			/** price：价格；config：配置 */
 			return util.formatMoney(price, config.getConfigItemValue("axisYPrecision") || defaultConfig.axisYPrecision || 0);
 		},
-		axisYAmountFloor: null,
+		axisYAmountFloor: null,/** 纵坐标的最小值 */
 		axisYAmountFloorLabelFont: null,/** 纵坐标最小值的坐标标签字体 */
 		axisYAmountFloorLabelColor: null,/** 纵坐标最小值的坐标标签颜色 */
-		axisYAmountCeiling: null,
+		axisYAmountCeiling: null,/** 纵坐标的最大值 */
 		axisYAmountCeilingLabelFont: null,/** 纵坐标最大值的坐标标签字体 */
 		axisYAmountCeilingLabelColor: null,/** 纵坐标最大值的坐标标签颜色 */
 

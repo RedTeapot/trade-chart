@@ -68,12 +68,7 @@
 				if(null == d || typeof d !== "object")
 					continue;
 
-				var openPrice = +d.openPrice,
-					highPrice = +d.highPrice,
-					lowPrice = +d.lowPrice,
-					closePrice = +d.closePrice,
-
-					volume = util.parseAsNumber(d.volume, 0);
+				var volume = util.parseAsNumber(d.volume, 0);
 
 				/* 数据精度确定 */
 				dataSketch_extended_volumePrecision = Math.max(
