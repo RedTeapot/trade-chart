@@ -13,6 +13,9 @@
 
 		/** 量图 */
 		VOLUME: "volume",
+
+		/** 指标：MA */
+		INDICE_MA: "indice_ma",
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KSubChartTypes", KSubChartTypes);

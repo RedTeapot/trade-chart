@@ -12,21 +12,21 @@
 	 * @constructor
 	 * @augments KSubChartSketch
 	 *
-	 * 蜡烛图图形素描
+	 * “指标：MA图”图形素描
 	 */
-	var KSubChartSketch_CandleChartSketch = function(){
+	var KSubChartSketch_IndexMAChartSketch = function(){
 		KSubChartSketch.apply(this, arguments);
 	};
-	KSubChartSketch_CandleChartSketch.prototype = Object.create(KSubChartSketch.prototype);
+	KSubChartSketch_IndexMAChartSketch.prototype = Object.create(KSubChartSketch.prototype);
 
 	/**
 	 * 根据给定的配置，生成素描
-	 * @param {KSubChartConfig_CandleConfig} config 绘制配置
+	 * @param {KSubChartConfig_IndexMAConfig} config 绘制配置
 	 * @param {Number} [height] 绘制高度（当配置中指定的高度为百分比字符串时使用）
-	 * @returns {KSubChartSketch_CandleChartSketch}
+	 * @returns {KSubChartSketch_IndexMAChartSketch}
 	 */
-	KSubChartSketch_CandleChartSketch.sketchByConfig = function(config, height){
-		var chartSketch = new KSubChartSketch_CandleChartSketch();
+	KSubChartSketch_IndexMAChartSketch.sketchByConfig = function(config, height){
+		var chartSketch = new KSubChartSketch_IndexMAChartSketch();
 
 		var config_height = config.getConfigItemValue("height"),
 			config_paddingTop = config.getConfigItemValue("paddingTop"),
@@ -43,5 +43,5 @@
 		return chartSketch;
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch_CandleChartSketch", KSubChartSketch_CandleChartSketch);
+	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch_IndexMAChartSketch", KSubChartSketch_IndexMAChartSketch);
 })();

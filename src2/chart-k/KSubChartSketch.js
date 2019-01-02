@@ -84,7 +84,7 @@
 
 		/**
 		 * 获取纵坐标可呈现的量差与高度差之间的映射比例
-		 * @returns {Big}
+		 * @returns {Number}
 		 */
 		this.getAmountHeightRatio = function(){
 			return amountHeightRatio;
@@ -108,13 +108,24 @@
 		/**
 		 * 根据给定的量差计算高度差并返回
 		 * @param {Number|Big} amount 量差
-		 * @returns {Big}
+		 * @returns {Number}
 		 */
 		this.calculateHeight = function(amount){
 			if(amountHeightRatio === 0)
 				return 0;
 
 			return Math.round((amount instanceof Big? numBig(amount): amount) / amountHeightRatio);
+		};
+
+		/**
+		 * 使用给定的数据概览更新图形概览
+		 * @param {KDataSketch} dataSketch 数据概览
+		 * @returns {KSubChartSketch}
+		 */
+		this.updateByDataSketch = function(dataSketch){
+			var ratio = (dataSketch.getAmountCeiling() - dataSketch.getAmountFloor()) / Math.max(this.getContentHeight(), 1);
+			this.setAmountHeightRatio(ratio);
+			return this;
 		};
 	};
 
