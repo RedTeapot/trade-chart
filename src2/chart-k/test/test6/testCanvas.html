@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<meta name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, width = device-width">
+
+	<link rel = "stylesheet" href = "../../../trade-chart.css"/>
+	<style type = "text/css">
+	html, body {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+	}
+	body{
+		padding: 20px;
+		box-sizing: border-box;
+	}
+	.chart-container{
+		position: relative;
+		height: 200px;
+	}
+	canvas{
+		position: absolute;
+		display: block;
+		margin: 0 auto;
+	}
+	canvas.detail{
+		z-index: 1;
+	}
+	</style>
+</head>
+<body>
+	<div class = "container">
+		<div class = "chart-container candle"><canvas></canvas><canvas class = "detail"></canvas></div>
+		<div class = "chart-container index-ma"><canvas></canvas><canvas class = "detail"></canvas></div>
+	</div>
+	<div class = "data-detail"></div>
+
+	<script type = "text/javascript" src = "../ref.js"></script>
+	<script type = "text/javascript" src = "../util.js"></script>
+	<script type = "text/javascript" src = "testCanvas.js"></script>
+</body>
+</html>

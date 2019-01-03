@@ -76,7 +76,7 @@
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var kDataSketch = KSubChartSketch_VolumeDataSketch.sketch(kChart, this.getConfig()),
+			var kDataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_VolumeDataSketch.sketch)(kChart, this.getConfig()),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(kDataSketch);
 

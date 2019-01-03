@@ -413,6 +413,10 @@
 				kSubChart = new TradeChart2.KSubChart_VolumeChart(this);
 				break;
 
+			case TradeChart2.KSubChartTypes.INDEX_MA:
+				kSubChart = new TradeChart2.KSubChart_IndexMAChart(this);
+				break;
+
 			default:
 				throw new Error("Unknown sub chart type: " + subChartType);
 			}

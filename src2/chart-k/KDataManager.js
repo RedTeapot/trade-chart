@@ -20,6 +20,27 @@
 	var evtName_renderingDataChanges = "renderingdatachange";
 
 	/**
+	 * 附加至数据对象的，代表关联的其它数据存取上下文的属性名称
+	 * @type {string}
+	 */
+	var attrName_dataAttachContext = "_trade-chart2.data-attach-context__";
+
+	/**
+	 * 为给定的数据对象创建用于附加其它关联数据的存取上下文
+	 * @param {Object} data
+	 * @returns {Object|null}
+	 */
+	var buildDataAttachContext = function (data) {
+		if(null == data || typeof data !== "object"){
+			console.warn("Data of type of 'Object' is required.");
+			return null;
+		}
+
+		data[attrName_dataAttachContext] = data[attrName_dataAttachContext] || {};
+		return data[attrName_dataAttachContext];
+	};
+
+	/**
 	 * @constructor
 	 * K线图数据管理器
 	 */
@@ -342,16 +363,21 @@
 		};
 
 		/**
-		 * 获取指定索引对应的被转换后的数据
-		 * @param {Number} index 要获取的数据的索引
+		 * 获取指定索引，或原始数据对应的被转换后的数据
+		 * @param {Number|Object} index 要获取的数据的索引，或原始数据
 		 * @returns {KData}
 		 */
 		this.getConvertedData = function(index){
-			var data = this.getData(index);
-			if(null == data)
-				return data;
+			if(typeof index === "number"){
+				var data = this.getData(index);
+				if(null == data)
+					return data;
 
-			return convertData(data);
+				return convertData(data);
+			}else if(null != index && typeof index === 'object')
+				return convertData(index);
+			else
+				console.warn("Illegal argument!", index);
 		};
 
 		/**
@@ -371,13 +397,59 @@
 
 		/**
 		 * 获取数据转换方法
-		 * @return {Function} 数据转换方法
+		 * @returns {Function} 数据转换方法
 		 */
 		this.getDataParser = function(){
 			return dataParser;
 		};
 
 		eventDrive(this);
+	};
+
+	/**
+	 * 从给定的数据上获取附加的其它关联数据
+	 * @param {Object} data 附加了其它关联数据的数据对象
+	 * @param {String} key 关联数据的唯一性标识
+	 * @returns {*}
+	 */
+	KDataManager.getAttachedData = function(data, key){
+		if(null == data || typeof data !== "object"){
+			console.warn("Attach target should be of type 'Object'");
+			return null;
+		}
+
+		return buildDataAttachContext(data)[key];
+	};
+
+	/**
+	 * 附加关联数据至给定的数据对象上
+	 * @param {Object} data 要附加其它数据的数据对象
+	 * @param {String} key 关联数据的唯一性标识
+	 * @param {*} value 附加的数据内容
+	 */
+	KDataManager.setAttachedData = function(data, key, value){
+		if(null == data || typeof data !== "object")
+			throw new Error("Attach target should be of type 'Object'");
+
+		buildDataAttachContext(data)[key] = value;
+	};
+
+	/**
+	 * 从给定的数据对象上移除可能附加有的其它数据
+	 * @param {Object} data 可能附加了其它数据的数据对象
+	 * @param {String} key 要移除的关联数据的唯一性标识
+	 * @returns {*} 对应的附加数据
+	 */
+	KDataManager.removeAttachedData = function(data, key){
+		if(null == data || typeof data !== "object")
+			return null;
+
+		if(!(attrName_dataAttachContext in data))
+			return null;
+
+		var val = data[attrName_dataAttachContext][key];
+		delete data[attrName_dataAttachContext][key];
+		return val;
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KDataManager", KDataManager);

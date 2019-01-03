@@ -165,7 +165,7 @@
 			}
 
 			if(!isFinite(axisYAmountCeiling) || axisYAmountCeiling <= axisYAmountFloor)
-				console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + "), auto adjust to 0.");
+				console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + ").");
 			else
 				instance.setAmountCeiling(axisYAmountCeiling);
 		}

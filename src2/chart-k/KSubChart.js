@@ -17,6 +17,12 @@
 	var NOT_SUPPLIED = {};
 
 	/**
+	 * @callback DataSketchMethod
+	 * @param {KChart} kChart K线图实例
+	 * @param {KSubChartConfig} kSubChartConfig K线子图渲染配置
+	 */
+
+	/**
 	 * @constructor
 	 * K线子图
 	 * @param {KChart} kChart 附加该子图的K线图
@@ -33,6 +39,14 @@
 
 		/* 渲染配置 */
 		var config = new KSubChartConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
+
+		/**
+		 * 另外指定的数据概览的生成方法。默认为null，亦即各个子图使用各个子图配套的概览生成方法。
+		 * 当需要将多个子图绘制到同一个画布上时，需要统一画布纵坐标的刻度分布及取值，此时需要统一各个子图的数据概览的生成方法。
+		 *
+		 * @type {DataSketchMethod}
+		 */
+		var specifiedDataSketchMethod = null;
 
 
 		util.defineReadonlyProperty(this, "id", util.randomString("k-" + type + "-", 5));
@@ -78,6 +92,28 @@
 		 */
 		this.getConfigItem = function(name){
 			return this.getConfig().getConfigItemValue(name);
+		};
+
+		/**
+		 * 获取另外指定的数据概览的生成方法
+		 * @returns {DataSketchMethod}
+		 */
+		this.getSpecifiedDataSketchMethod = function(){
+			return specifiedDataSketchMethod;
+		};
+
+		/**
+		 * 设置数据概览的生成方法
+		 * @param {DataSketchMethod} method
+		 */
+		this.setSpecifiedDataSketchMethod = function(method){
+			if(typeof method !== "function"){
+				console.warn("Data sketch method should be of type: 'Function'.");
+				return this;
+			}
+
+			specifiedDataSketchMethod = method;
+			return this;
 		};
 
 		/**
