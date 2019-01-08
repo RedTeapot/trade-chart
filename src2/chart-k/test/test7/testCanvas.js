@@ -102,6 +102,13 @@ util.loadData(function(datas){
 	};
 
 	var ops = {
+		dataDetailViewingRevertAction: function(){
+			var detailCtx = candleOperationCanvasObj.getContext("2d");
+			detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+			
+			detailCtx = volumeOperationCanvasObj.getContext("2d");
+			detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+		},
 		dataDetailViewingAction: function(convertedData, dataMetadata){
 			drawLine(
 				candleOperationCanvasObj.getContext("2d"),

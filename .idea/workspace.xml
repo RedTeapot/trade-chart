@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6152d738-42b1-4ab6-8a19-dfa777960380" name="Default" comment="gn">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src2/comp/util.js" beforeDir="false" afterPath="$PROJECT_DIR$/src2/comp/util.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -28,8 +28,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src2/comp/util.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="424">
-              <caret line="455" column="7" lean-forward="true" selection-start-line="455" selection-start-column="7" selection-end-line="455" selection-end-column="7" />
+            <state relative-caret-position="323">
+              <caret line="475" column="14" lean-forward="true" selection-start-line="475" selection-start-column="14" selection-end-line="475" selection-end-column="14" />
               <folding>
                 <element signature="e#8821#10596#0" />
               </folding>
@@ -37,29 +37,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src2/comp/Big.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="4" column="4615" lean-forward="true" selection-start-line="4" selection-start-column="4615" selection-end-line="4" selection-end-column="4615" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js">
+        <entry file="file://$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="662">
-              <caret line="126" selection-start-line="126" selection-end-line="126" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="650">
-              <caret line="116" column="47" lean-forward="true" selection-start-line="116" selection-start-column="47" selection-end-line="116" selection-end-column="47" />
+            <state relative-caret-position="424">
+              <caret line="107" column="12" selection-start-line="107" selection-start-column="12" selection-end-line="107" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -68,9 +50,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>config_paddingTop</find>
-      <find>config_axisLineColor</find>
-      <find>config_axisLineWidth</find>
       <find>config_axisXTickOffsetFromRight</find>
       <find>config_axisXTickOffset</find>
       <find>x_axisY</find>
@@ -96,8 +75,11 @@
       <find>amountHeightRatio</find>
       <find>axisYHeightIntervalBig</find>
       <find>calcHeight</find>
-      <find>clearRect</find>
       <find>lastRenderingCanvasObj</find>
+      <find>No data rendered on</find>
+      <find>clearRect</find>
+      <find>dataDetailViewingRevertAction</find>
+      <find>clearRe</find>
     </findStrings>
     <replaceStrings>
       <replace>_extended_</replace>
@@ -169,16 +151,16 @@
         <option value="$PROJECT_DIR$/src2/chart-k/KSubChartRenderResult.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch_CandleChartSketch.js" />
         <option value="$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.html" />
-        <option value="$PROJECT_DIR$/src2/comp/util.js" />
-        <option value="$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js" />
         <option value="$PROJECT_DIR$/src2/todo.txt" />
         <option value="$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js" />
+        <option value="$PROJECT_DIR$/src2/comp/util.js" />
+        <option value="$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-1" />
-    <option name="width" value="1922" />
+    <option name="width" value="1927" />
     <option name="height" value="1053" />
   </component>
   <component name="ProjectLevelVcsManager">
@@ -207,6 +189,21 @@
               <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
               <item name="src2" type="462c0819:PsiDirectoryNode" />
               <item name="chart-k" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src2" type="462c0819:PsiDirectoryNode" />
+              <item name="chart-k" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
+              <item name="trade-chart" type="462c0819:PsiDirectoryNode" />
+              <item name="src2" type="462c0819:PsiDirectoryNode" />
+              <item name="chart-k" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="test7" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="trade-chart" type="b2602c69:ProjectViewProjectNode" />
@@ -387,12 +384,12 @@
       <workItem from="1546580638037" duration="11874000" />
       <workItem from="1546851426889" duration="5371000" />
       <workItem from="1546915438743" duration="3769000" />
-      <workItem from="1546928822750" duration="252000" />
+      <workItem from="1546928822750" duration="2258000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="813387000" />
+    <option name="totallyTimeSpent" value="815393000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -404,10 +401,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="0" width="1922" height="1053" extended-state="0" />
+    <frame x="-1" y="0" width="1927" height="1053" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17887473" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17840128" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
@@ -516,7 +513,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-360">
           <caret line="87" column="105" selection-start-line="87" selection-start-column="26" selection-end-line="87" selection-end-column="105" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -723,17 +719,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.html" />
-    <entry file="file://$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js" />
-    <entry file="file://$PROJECT_DIR$/src2/comp/util.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="424">
-          <caret line="455" column="7" lean-forward="true" selection-start-line="455" selection-start-column="7" selection-end-line="455" selection-end-column="7" />
-          <folding>
-            <element signature="e#8821#10596#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src2/todo.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -750,15 +735,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChart_CandleChart.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="650">
+        <state relative-caret-position="-676">
           <caret line="116" column="47" lean-forward="true" selection-start-line="116" selection-start-column="47" selection-end-line="116" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src2/chart-k/KSubChartSketch.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="662">
-          <caret line="126" selection-start-line="126" selection-end-line="126" />
+        <state relative-caret-position="356">
+          <caret line="108" column="26" lean-forward="true" selection-start-line="108" selection-start-column="26" selection-end-line="108" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/comp/util.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="475" column="14" lean-forward="true" selection-start-line="475" selection-start-column="14" selection-end-line="475" selection-end-column="14" />
+          <folding>
+            <element signature="e#8821#10596#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src2/chart-k/test/test7/testCanvas.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="424">
+          <caret line="107" column="12" selection-start-line="107" selection-start-column="12" selection-end-line="107" selection-end-column="12" />
         </state>
       </provider>
     </entry>

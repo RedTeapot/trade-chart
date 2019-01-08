@@ -156,7 +156,7 @@
 	/**
 	 * 尝试调用指定的方法
 	 * @param {Function} func 待执行的方法
-	 * @param {Object} ctx 方法执行时的this上下文
+	 * @param {Object} [ctx] 方法执行时的this上下文
 	 * @param {*} args... 方法参数列表
 	 */
 	var try2Call = function(func, ctx, args){
@@ -448,11 +448,12 @@
 	})();
 
 	/**
-	 * @typdef {Object} DataMetadata
+	 * @typedef {Object} DataMetadata
 	 * @property {Object} convertedData 被转换之后的数据
 	 * @property {*} originalData 被转换之前的原始数据
 	 * @property {Number} dataIndex 数据在数据列表中的索引位置
 	 */
+
 	/**
 	 * @callback DataDetailViewingAction 数据明细的查阅方法
 	 * @param {Object} convertedData 被转换之后的数据
@@ -461,20 +462,24 @@
 
 	/**
 	 * 为K线图子图添加图形交互支持
-	 * @param {HTMLCanvasElement} detailCanvasObj 悬浮于绘制正文的画布之上的操作画布
+	 * @param {HTMLCanvasElement} operationCanvasObj 悬浮于绘制正文的画布之上的操作画布
 	 * @param {KSubChartRenderResult} kSubChartRenderResult
 	 * @param {Object} [ops] 控制选项
+	 * @param {Function} ops.dataDetailViewingRevertAction 数据明细的查阅方法
 	 * @param {DataDetailViewingAction} ops.dataDetailViewingAction 数据明细的查阅方法
 	 */
 	var addKSubChartOperationSupport = function(operationCanvasObj, kSubChartRenderResult, ops){
 		ops = setDftValue(ops, {
+			dataDetailViewingRevertAction: function(){
+				var detailCtx = operationCanvasObj.getContext("2d");
+				detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+			},
 			dataDetailViewingAction: (function(){
 				var f = function(convertedData, dataMetadata){
 					// var kSubChartRenderResult = arguments.callee.kSubChartRenderResult,
 					// 	operationCanvasObj = arguments.callee.operationCanvasObj;
 
 					var detailCtx = operationCanvasObj.getContext("2d");
-					detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
 
 					var x = dataMetadata.renderingHorizontalPosition;
 					if(-1 == x)
@@ -520,10 +525,12 @@
 			canvasObj = kSubChartRenderResult.getCanvasDomElement(),
 			detailCtx = operationCanvasObj.getContext("2d");
 
-		var dataDetailViewingAction = ops.dataDetailViewingAction;
+		var dataDetailViewingAction = ops.dataDetailViewingAction,
+			dataDetailViewingRevertAction = ops.dataDetailViewingRevertAction;
+
 		var viewDetail = function(e){
 			var x = e.layerX;
-			detailCtx.clearRect(0, 0, canvasObj.width, canvasObj.height);
+			try2Call(dataDetailViewingRevertAction);
 
 			var convertedData = kSubChartRenderResult.getConvertedRenderingData(x),
 				dataIndex = kSubChartRenderResult.getRenderingDataIndex(x),
@@ -540,7 +547,7 @@
 		};
 
 		var viewHistory = function(e){
-			detailCtx.clearRect(0, 0, canvasObj.width, canvasObj.height);
+			try2Call(dataDetailViewingRevertAction);
 
 			var x = e.layerX;
 			var offsetX = x - lastX;
