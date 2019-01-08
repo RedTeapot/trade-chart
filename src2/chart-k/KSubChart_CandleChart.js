@@ -236,7 +236,15 @@
 			finishRemainingAxisXRendering();
 			finishRemainingAxisYRendering();
 
-			return new KSubChart_CandleRenderResult(this, kChartSketch, kSubChartSketch, kDataSketch, canvasObj);
+			var renderResult = this.getLatestRenderResult(canvasObj);
+			if(null == renderResult){
+				renderResult = new KSubChart_CandleRenderResult(this, canvasObj);
+				this.setLatestRenderResult(canvasObj, renderResult);
+			}
+			renderResult.setKChartSketch(kChartSketch)
+				.setKSubChartSketch(kSubChartSketch)
+				.setKDataSketch(kDataSketch);
+			return renderResult;
 		};
 	};
 	KSubChart_CandleChart.prototype = Object.create(KSubChart.prototype);

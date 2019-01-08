@@ -23,6 +23,13 @@
 	 */
 
 	/**
+	 * @typdef {Object} CanvasAndRenderResultBinding 画布及其子图在其上的最后一次绘制结果
+	 * @property {HTMLCanvasElement} canvas 画布
+	 * @property {String} subChartType 绘制的子图的类型
+	 * @property {KSubChartRenderResult} renderResult 最后一次绘制结果
+	 */
+
+	/**
 	 * @constructor
 	 * K线子图
 	 * @param {KChart} kChart 附加该子图的K线图
@@ -47,6 +54,16 @@
 		 * @type {DataSketchMethod}
 		 */
 		var specifiedDataSketchMethod = null;
+
+		/**
+		 * 绘制结果列表
+		 * 设定：
+		 * 1. 一个画布对应一个最近的绘制结果
+		 * 2. 一个子图可以在多个画布上绘制，分别对应多个相同数量的绘制结果
+		 *
+		 * @type {CanvasAndRenderResultBinding[]}
+		 */
+		var latestRenderResultList = [];
 
 
 		util.defineReadonlyProperty(this, "id", util.randomString("k-" + type + "-", 5));
@@ -113,6 +130,45 @@
 			}
 
 			specifiedDataSketchMethod = method;
+			return this;
+		};
+
+		/**
+		 * 获取给定画布上的最后一次绘制结果
+		 * @param {HTMLCanvasElement} [canvasObj] 画布。如果没有提供该参数，则使用 lastRenderingCanvasObj
+		 * @returns {KSubChartRenderResult|null}
+		 */
+		this.getLatestRenderResult = function(canvasObj){
+			if(arguments.length < 1 && NOT_SUPPLIED != lastRenderingCanvasObj)
+				canvasObj = lastRenderingCanvasObj;
+
+			for(var i = 0; i < latestRenderResultList.length; i++)
+				if(latestRenderResultList[i].canvas == canvasObj && latestRenderResultList[i].subChartType === type){
+					return latestRenderResultList[i].renderResult;
+				}
+
+			return null;
+		};
+
+		/**
+		 * 设置/添加特定画布及其最后一次绘制结果的对应关系
+		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {KSubChartRenderResult} renderResult 在该画布上的最后一次绘制结果
+		 * @returns {KSubChart}
+		 */
+		this.setLatestRenderResult = function(canvasObj, renderResult){
+			for(var i = 0; i < latestRenderResultList.length; i++)
+				if(latestRenderResultList[i].canvas == canvasObj && latestRenderResultList[i].subChartType === type){
+					latestRenderResultList[i].renderResult = renderResult;
+					return this;
+				}
+
+			latestRenderResultList.push({
+				canvas: canvasObj,
+				subChartType: type,
+				renderResult: renderResult
+			});
+
 			return this;
 		};
 

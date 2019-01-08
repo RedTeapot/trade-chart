@@ -21,13 +21,13 @@
 	 * @constructor
 	 * K线子图绘制结果
 	 * @param {KSubChart} kSubChart 关联的，生成绘制结果的K线子图实例
-	 * @param {KChartSketch} kChartSketch K线图形素描
-	 * @param {KSubChartSketch} kSubChartSketch K线子图形素描
-	 * @param {KDataSketch} kDataSketch K线数据素描
 	 * @param {HTMLCanvasElement} canvasObj 绘制的画布所在的DOM元素
 	 */
-	var KSubChartRenderResult = function(kSubChart, kChartSketch, kSubChartSketch, kDataSketch, canvasObj){
+	var KSubChartRenderResult = function(kSubChart, canvasObj){
 		var self = this;
+
+		var kSubChartSketch,
+			kDataSketch;
 
 		/**
 		 * 获取绘制所使用的指定名称的配置项取值
@@ -39,24 +39,51 @@
 		};
 
 		/**
+		 * 设置K线图形素描
+		 * @param {KChartSketch} _kChartSketch 图形素描
+		 * @returns {KSubChartRenderResult}
+		 */
+		this.setKChartSketch = function(_kChartSketch){
+			kChartSketch = _kChartSketch;
+			return this;
+		};
+		/**
 		 * 获取K线图形素描
-		 * @returns {KChartSketch}
+		 * @returns {KChartSketch} 图形素描
 		 */
 		this.getKChartSketch = function(){
 			return kChartSketch;
 		};
 
 		/**
-		 * 获取K线子图形素描
-		 * @returns {KSubChartSketch}
+		 * 设置K线子图图形素描
+		 * @param {KSubChartSketch}_kSubChartSketch K线子图图形素描
+		 * @returns {KSubChartRenderResult}
+		 */
+		this.setKSubChartSketch = function(_kSubChartSketch){
+			kSubChartSketch = _kSubChartSketch;
+			return this;
+		};
+		/**
+		 * 获取K线子图图形素描
+		 * @returns {KSubChartSketch} K线子图图形素描
 		 */
 		this.getKSubChartSketch = function(){
 			return kSubChartSketch;
 		};
 
 		/**
+		 * 设置K线数据素描
+		 * @param {KDataSketch} _kDataSketch K线数据素描
+		 * @returns {KSubChartRenderResult}
+		 */
+		this.setKDataSketch = function(_kDataSketch){
+			kDataSketch = _kDataSketch;
+			return this;
+		};
+		/**
 		 * 获取K线数据素描
-		 * @returns {KDataSketch}
+		 * @returns {KDataSketch} K线数据素描
 		 */
 		this.getKDataSketch = function(){
 			return kDataSketch

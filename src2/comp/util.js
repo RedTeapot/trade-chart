@@ -16,14 +16,23 @@
 
 	/**
 	 * 设定参数默认值
+	 * @param {Object|null} ops 要设置的目标参数集合
+	 * @param {Object} dftOps 默认值集合
+	 * @param {Function} [overrideCondition] 重载的判定条件
 	 */
-	var setDftValue = function(ops, dftOps){
+	var setDftValue = function(ops, dftOps, overrideCondition){
 		ops = ops || {};
 		dftOps = dftOps || {};
 
+		if(arguments.length < 3 || typeof overrideCondition !== "function"){
+			overrideCondition = function(ops, dftOps, p){
+				return !(p in ops);
+			};
+		}
+
 		/* 参数不存在时，从默认参数中读取并赋值 */
 		for(var p in dftOps)
-			if(!(p in ops))
+			if(overrideCondition(ops, dftOps, p))
 				ops[p] = dftOps[p];
 
 		return ops;
@@ -439,6 +448,125 @@
 	})();
 
 	/**
+	 * @typdef {Object} DataMetadata
+	 * @property {Object} convertedData 被转换之后的数据
+	 * @property {*} originalData 被转换之前的原始数据
+	 * @property {Number} dataIndex 数据在数据列表中的索引位置
+	 */
+	/**
+	 * @callback DataDetailViewingAction 数据明细的查阅方法
+	 * @param {Object} convertedData 被转换之后的数据
+	 * @param {DataMetadata} dataMetadata 数据的更多描述
+	 */
+
+	/**
+	 * 为K线图子图添加图形交互支持
+	 * @param {HTMLCanvasElement} detailCanvasObj 悬浮于绘制正文的画布之上的操作画布
+	 * @param {KSubChartRenderResult} kSubChartRenderResult
+	 * @param {Object} [ops] 控制选项
+	 * @param {DataDetailViewingAction} ops.dataDetailViewingAction 数据明细的查阅方法
+	 */
+	var addKSubChartOperationSupport = function(operationCanvasObj, kSubChartRenderResult, ops){
+		ops = setDftValue(ops, {
+			dataDetailViewingAction: (function(){
+				var f = function(convertedData, dataMetadata){
+					// var kSubChartRenderResult = arguments.callee.kSubChartRenderResult,
+					// 	operationCanvasObj = arguments.callee.operationCanvasObj;
+
+					var detailCtx = operationCanvasObj.getContext("2d");
+					detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+
+					var x = dataMetadata.renderingHorizontalPosition;
+					if(-1 == x)
+						return;
+
+					detailCtx.save();
+
+					detailCtx.lineWidth = 0.5;
+					detailCtx.setLineDash([5, 5]);
+					detailCtx.beginPath();
+
+					var yTop = kSubChartRenderResult.getConfigItem("paddingTop"),
+						yBottom = kSubChartRenderResult.getKSubChartSketch().getCanvasHeight() - kSubChartRenderResult.getConfigItem("paddingBottom");
+
+					detailCtx.moveTo(x, util.getLinePosition(yTop));
+					detailCtx.lineTo(x, util.getLinePosition(yBottom));
+					detailCtx.stroke();
+
+					detailCtx.restore();
+				};
+
+				// /**
+				//  * 借助附加属性的方式标记该方法是“专门服务于这几个参数组合的方法调用”的
+				//  */
+				// f.operationCanvasObj = operationCanvasObj;
+				// f.kSubChartRenderResult = kSubChartRenderResult;
+
+				return f;
+			})()
+		}, function(ops, dftOps, p){
+			return !(p in ops);
+			// if(p !== "dataDetailViewingAction")
+			// 	return !(p in ops);
+			//
+			// return !(p in ops) || ops[p].operationCanvasObj !== operationCanvasObj || ops[p].kSubChartRenderResult !== kSubChartRenderResult;
+		});
+
+
+		var isModeViewDetail = true,
+			lastX = 0;
+
+		var kChart = kSubChartRenderResult.getKChart(),
+			canvasObj = kSubChartRenderResult.getCanvasDomElement(),
+			detailCtx = operationCanvasObj.getContext("2d");
+
+		var dataDetailViewingAction = ops.dataDetailViewingAction;
+		var viewDetail = function(e){
+			var x = e.layerX;
+			detailCtx.clearRect(0, 0, canvasObj.width, canvasObj.height);
+
+			var convertedData = kSubChartRenderResult.getConvertedRenderingData(x),
+				dataIndex = kSubChartRenderResult.getRenderingDataIndex(x),
+				position = kSubChartRenderResult.getRenderingHorizontalPosition(dataIndex);
+
+			var metadata = {
+				dataIndex: dataIndex,
+				renderingHorizontalPosition: position,
+				convertedData: convertedData,
+				originalData: kSubChartRenderResult.getRenderingData(x)
+			};
+
+			try2Call(dataDetailViewingAction, operationCanvasObj, convertedData, metadata);
+		};
+
+		var viewHistory = function(e){
+			detailCtx.clearRect(0, 0, canvasObj.width, canvasObj.height);
+
+			var x = e.layerX;
+			var offsetX = x - lastX;
+			kChart.updateRenderingOffsetBy(offsetX, canvasObj.width);
+			lastX = x;
+		};
+
+		operationCanvasObj.addEventListener("mousedown", function(e){
+			isModeViewDetail = false;
+			lastX = e.layerX;
+		});
+		operationCanvasObj.addEventListener("mousemove", function(e){
+			if(!isModeViewDetail)
+				viewHistory(e);
+			else
+				viewDetail(e);
+		});
+		["mouseup", "blur"].forEach(function(e){
+			document.addEventListener(e, function(evt){
+				isModeViewDetail = true;
+				viewDetail(evt);
+			});
+		});
+	};
+
+	/**
 	 * 工具集合
 	 */
 	var util = {
@@ -460,7 +588,8 @@
 		calcRenderingWidth: calcRenderingWidth,
 		calcRenderingHeight: calcRenderingHeight,
 		getLinePosition: getLinePosition,
-		defineReadonlyProperty: defineReadonlyProperty
+		defineReadonlyProperty: defineReadonlyProperty,
+		addKSubChartOperationSupport: addKSubChartOperationSupport
 	};
 
 	defineReadonlyProperty(TradeChart2, "util", util);
