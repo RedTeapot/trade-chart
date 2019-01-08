@@ -114,7 +114,7 @@
 			if(amountHeightRatio === 0)
 				return 0;
 
-			return Math.round((amount instanceof Big? numBig(amount): amount) / amountHeightRatio);
+			return Math.floor((amount instanceof Big? numBig(amount): amount) / amountHeightRatio);
 		};
 
 		/**
