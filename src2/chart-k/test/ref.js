@@ -5,16 +5,18 @@
 	"../comp/Big.js",
 	"../comp/LinearGradient.js",
 	"../CommonChartConfig.js",
+	"../CommonDataManager.js",
+	"../CommonChart.js",
+	"../SubChart.js",
+	"../SubChartTypes.js",
 
 	"KChartSketch.js",
 	"KDataSketch.js",
 
-	"KDataManager.js",
 	"KChartConfig.js",
 	"KChart.js",
 
 	"KSubChartConfig.js",
-	"KSubChartTypes.js",
 	"KSubChartSketch.js",
 	"KSubChartRenderResult.js",
 	"KSubChart.js",

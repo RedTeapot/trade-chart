@@ -74,16 +74,16 @@ util.loadData(function(datas){
 	var sepIndex = Math.floor(datas.length - 20);
 	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0));
 	window.kChart = kChart;
-	window.kdm = kChart.getKDataManager();
+	window.kdm = kChart.getDataManager();
 
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var subChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
 	var result_candle = subChart_candle.render(column_candleObj);
 	result_candle.initCanvas(column_candleDetailObj);
 	window.candleResult = result_candle;
 
 	/* 量图 */
-	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
+	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
 	var result_volume = subChart_volume.render(column_candleObj);
 	result_volume.initCanvas(column_candleDetailObj);
 	window.volumeResult = result_volume;

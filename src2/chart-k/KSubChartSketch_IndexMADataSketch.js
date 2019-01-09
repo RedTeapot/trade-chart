@@ -46,7 +46,7 @@
 		var instance = new KSubChartSketch_IndexMADataSketch();
 
 		/* 扫描数据，初步得到概览 */
-		var kDataManager = kChart.getKDataManager();
+		var kDataManager = kChart.getDataManager();
 		var dataList = kDataManager.getRenderingDataList();
 		var dataSketch_origin_max = -Infinity,/* 最大价格 */
 			dataSketch_origin_min = Infinity,/* 最小价格 */

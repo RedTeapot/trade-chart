@@ -45,7 +45,7 @@
 		var instance = new KSubChartSketch_CandleDataSketch();
 
 		/* 扫描数据，初步得到概览 */
-		var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
+		var dataList = kChart.getDataManager().getConvertedRenderingDataList();
 		var dataSketch_origin_max = -Infinity,/* 最大价格 */
 			dataSketch_origin_min = Infinity,/* 最小价格 */
 			dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */

@@ -59,10 +59,10 @@ util.loadData(function(datas){
 	var KChart = TradeChart2.KChart;
 	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0));
 
-	var kSubChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var kSubChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
 	kSubChart_candle.render(candleCanvasObj);
 
-	var kSubChart_index_ma = kChart.newSubChart(TradeChart2.KSubChartTypes.INDEX_MA).setConfig(kIndexMAConfig);
+	var kSubChart_index_ma = kChart.newSubChart(TradeChart2.SubChartTypes.K_INDEX_MA).setConfig(kIndexMAConfig);
 	kSubChart_index_ma.setSpecifiedDataSketchMethod(TradeChart2.KSubChartSketch_CandleDataSketch.sketch);
 	kSubChart_index_ma.render(candleCanvasObj);
 });

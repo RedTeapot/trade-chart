@@ -45,7 +45,7 @@
 		var instance = new KSubChartSketch_VolumeDataSketch();
 
 		/* 扫描数据，初步得到概览 */
-		var dataList = kChart.getKDataManager().getConvertedRenderingDataList();
+		var dataList = kChart.getDataManager().getConvertedRenderingDataList();
 		var dataSketch_origin_maxVolume = -Infinity,/* 最大交易量 */
 			dataSketch_origin_minVolume = Infinity,/* 最小交易量 */
 			dataSketch_origin_avgVolumeVariation = 0,/* 交易量的平均变动幅度 */

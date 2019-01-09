@@ -4,7 +4,7 @@
 	var eventDrive = TradeChart2.eventDrive;
 
 	/**
-	 * @typedef {KData|Object} UserSuppliedData 数据源，可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
+	 * @typedef {Object} UserSuppliedData 数据源，可以是本插件约定格式的数据，也可以是任意其它格式的数据。如果是其它格式的数据，则需要同步提供数据解析器，以指导本插件解析数据
 	 */
 
 	/**
@@ -42,9 +42,9 @@
 
 	/**
 	 * @constructor
-	 * K线图数据管理器
+	 * 通用数据管理器
 	 */
-	var KDataManager = function(){
+	var CommonDataManager = function(){
 		var self = this;
 
 		/** 数据数组 */
@@ -56,7 +56,7 @@
 		/**
 		 * 新附加的，即使拖动也不可见的数据量。
 		 * 引入该元素，用于辅助确定图形向右拖动时的最大位移量，使得最早的数据可以恰好呈现在开始位置的正中间。
-		 * 引入该元素后，即使在图形的向右拖动过程中附加新的K线数据，也不会影响要查阅的历史数据的集合，从而可以确定的计算最大位移量
+		 * 引入该元素后，即使在图形的向右拖动过程中附加新的图形数据，也不会影响要查阅的历史数据的集合，从而可以确定的计算最大位移量
 		 *
 		 * @type {number}
 		 */
@@ -199,11 +199,11 @@
 		/**
 		 * 向前追加数据，亦即追加更早的数据
 		 * @param {Array<UserSuppliedData>} datas 数据源
-		 * @returns {KDataManager}
+		 * @returns {CommonDataManager}
 		 */
 		this.prependDataList = function(datas){
 			if(!Array.isArray(datas)){
-				console.warn("Supplied k data should be an array.");
+				console.warn("Supplied chart data should be an array.");
 				return this;
 			}
 
@@ -217,14 +217,14 @@
 		 * 向后追加数据，亦即追加较新的数据
 		 * @param {Array<UserSuppliedData>} datas 数据源
 		 * @param {Boolean} [ifResetsElapsedDataCount=false] 是否同步重置“向右拖动时经过的，不再可见的较新的数据个数”
-		 * @returns {KDataManager}
+		 * @returns {CommonDataManager}
 		 */
 		this.appendDataList = function(datas, ifResetsElapsedDataCount){
 			if(arguments.length < 2)
 				ifResetsElapsedDataCount = false;
 
 			if(!Array.isArray(datas)){
-				console.warn("Supplied k data should be an array.");
+				console.warn("Supplied chart data should be an array.");
 				return this;
 			}
 
@@ -247,11 +247,11 @@
 		/**
 		 * 设置数据源
 		 * @param {Array<UserSuppliedData>} _datas 数据源
-		 * @returns {KDataManager}
+		 * @returns {CommonDataManager}
 		 */
 		this.setDataList = function(_datas){
 			if(!Array.isArray(_datas)){
-				console.warn("Supplied k data should be an array.");
+				console.warn("Supplied chart data should be an array.");
 				return this;
 			}
 
@@ -282,7 +282,7 @@
 
 		/**
 		 * 获取转换后的设置的数据源
-		 * @returns {KData[]}
+		 * @returns {Object[]}
 		 */
 		this.getConvertedDataList = function(){
 			return dataList.map(convertData);
@@ -334,7 +334,7 @@
 		 * 没有拖动时，绘制的第一个蜡烛图的正中间与正文区域的左侧重合。
 		 *
 		 * @param {Number} [maxGroupCount] 图形正文区域可以呈现的最大数据量
-		 * @returns {KData[]}
+		 * @returns {Object[]}
 		 */
 		this.getConvertedRenderingDataList = function(maxGroupCount){
 			var list = this.getRenderingDataList(maxGroupCount);
@@ -347,7 +347,7 @@
 		/**
 		 * 获取指定索引对应的原始数据
 		 * @param {Number} index 要获取的数据的索引
-		 * @returns {KData|Object}
+		 * @returns {Object}
 		 */
 		this.getData = function(index){
 			if(!util.isValidNumber(index))
@@ -365,7 +365,7 @@
 		/**
 		 * 获取指定索引，或原始数据对应的被转换后的数据
 		 * @param {Number|Object} index 要获取的数据的索引，或原始数据
-		 * @returns {KData}
+		 * @returns {Object}
 		 */
 		this.getConvertedData = function(index){
 			if(typeof index === "number"){
@@ -383,7 +383,7 @@
 		/**
 		 * 设置数据转换方法，当要扫描的数据是其它格式的数据时，用于指导本插件解析数据的解析器
 		 * @param parser {Function} 数据转换方法
-		 * @returns {KDataManager}
+		 * @returns {CommonDataManager}
 		 */
 		this.setDataParser = function(parser){
 			if(typeof parser !== "function"){
@@ -412,7 +412,7 @@
 	 * @param {String} key 关联数据的唯一性标识
 	 * @returns {*}
 	 */
-	KDataManager.getAttachedData = function(data, key){
+	CommonDataManager.getAttachedData = function(data, key){
 		if(null == data || typeof data !== "object"){
 			console.warn("Attach target should be of type 'Object'");
 			return null;
@@ -427,7 +427,7 @@
 	 * @param {String} key 关联数据的唯一性标识
 	 * @param {*} value 附加的数据内容
 	 */
-	KDataManager.setAttachedData = function(data, key, value){
+	CommonDataManager.setAttachedData = function(data, key, value){
 		if(null == data || typeof data !== "object")
 			throw new Error("Attach target should be of type 'Object'");
 
@@ -440,7 +440,7 @@
 	 * @param {String} key 要移除的关联数据的唯一性标识
 	 * @returns {*} 对应的附加数据
 	 */
-	KDataManager.removeAttachedData = function(data, key){
+	CommonDataManager.removeAttachedData = function(data, key){
 		if(null == data || typeof data !== "object")
 			return null;
 
@@ -452,5 +452,5 @@
 		return val;
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "KDataManager", KDataManager);
+	util.defineReadonlyProperty(TradeChart2, "CommonDataManager", CommonDataManager);
 })();

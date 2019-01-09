@@ -5,7 +5,7 @@
 
 	var KChartSketch = TradeChart2.KChartSketch,
 
-		KSubChartTypes = TradeChart2.KSubChartTypes,
+		SubChartTypes = TradeChart2.SubChartTypes,
 		KSubChartConfig_CandleConfig = TradeChart2.KSubChartConfig_CandleConfig,
 		KSubChart = TradeChart2.KSubChart,
 		KSubChart_CandleRenderResult = TradeChart2.KSubChart_CandleRenderResult,
@@ -33,7 +33,7 @@
 	 * @param {KChart} kChart 附加该子图的K线图
 	 */
 	var KSubChart_CandleChart = function(kChart){
-		KSubChart.call(this, kChart, KSubChartTypes.CANDLE);
+		KSubChart.call(this, kChart, SubChartTypes.K_CANDLE);
 		var self = this;
 
 		/* 渲染配置 */
@@ -87,7 +87,7 @@
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(kDataSketch);
 
 			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
-			var dataList = kChart.getKDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
+			var dataList = kChart.getDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;

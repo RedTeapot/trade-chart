@@ -7,16 +7,16 @@
 	 * @readonly
 	 * @enum {String}
 	 */
-	var KSubChartTypes = {
+	var SubChartTypes = {
 		/** 蜡烛图 */
-		CANDLE: "candle",
+		K_CANDLE: "k_candle",
 
 		/** 量图 */
-		VOLUME: "volume",
+		K_VOLUME: "k_volume",
 
 		/** 指标：MA */
-		INDEX_MA: "index_ma",
+		K_INDEX_MA: "k_index_ma",
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "KSubChartTypes", KSubChartTypes);
+	util.defineReadonlyProperty(TradeChart2, "SubChartTypes", SubChartTypes);
 })();

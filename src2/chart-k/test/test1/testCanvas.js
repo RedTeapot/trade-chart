@@ -85,7 +85,7 @@ util.loadData(function(datas){
 	}).setDataList(datas).setConfig(kChartConfig);
 
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var subChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
 	var rowResult_candle = subChart_candle.render(row_candleObj);
 	window.rowResult_candle = rowResult_candle;
 	rowResult_candle.initCanvas(row_candleDetailObj);
@@ -95,7 +95,7 @@ util.loadData(function(datas){
 	columnResult_candle.initCanvas(column_candleDetailObj);
 
 	/* 量图 */
-	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
+	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
 	var rowResult_volume = subChart_volume.render(row_volumeObj);
 	window.rowResult_volume = rowResult_volume;
 	rowResult_volume.initCanvas(row_volumeDetailObj);

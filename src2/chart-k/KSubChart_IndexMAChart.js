@@ -6,7 +6,7 @@
 	var KChartSketch = TradeChart2.KChartSketch,
 		KDataManager = TradeChart2.KDataManager,
 
-		KSubChartTypes = TradeChart2.KSubChartTypes,
+		SubChartTypes = TradeChart2.SubChartTypes,
 		KSubChartConfig_IndexMAConfig = TradeChart2.KSubChartConfig_IndexMAConfig,
 		KSubChart = TradeChart2.KSubChart,
 		KSubChart_IndexMARenderResult = TradeChart2.KSubChart_IndexMARenderResult,
@@ -34,7 +34,7 @@
 	 * @param {KChart} kChart 附加该子图的K线图
 	 */
 	var KSubChart_IndexMAChart = function(kChart){
-		KSubChart.call(this, kChart, KSubChartTypes.INDEX_MA);
+		KSubChart.call(this, kChart, SubChartTypes.K_INDEX_MA);
 		var self = this;
 
 		/* 渲染配置 */
@@ -84,7 +84,7 @@
 				kSubChartSketch = KSubChartSketch_IndexMAChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(kDataSketch);
 
 			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
-			var kDataManager = kChart.getKDataManager();
+			var kDataManager = kChart.getDataManager();
 			var dataList = kDataManager.getRenderingDataList(kChartSketch.getMaxGroupCount());
 
 			/* 绘制的数据个数 */

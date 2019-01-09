@@ -21,10 +21,6 @@
 	 * 默认的，作用于主图和子图的全局配置项
 	 */
 	var defaultConfig = {
-		groupLineWidth: 1,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
-		groupBarWidth: 5,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
-		groupGap: 3,/** 相邻两组数据之间的间隔 */
-
 		axisTickLineLength: 6,/** 坐标轴刻度线的长度 */
 		axisLabelFont: "normal 10px sans-serif, serif",/** 坐标标签字体 */
 		axisLabelColor: null,/** 坐标标签颜色 */

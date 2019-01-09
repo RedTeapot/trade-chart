@@ -64,11 +64,11 @@ util.loadData(function(datas){
 	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0, sepIndex));
 
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.KSubChartTypes.CANDLE).setConfig(kCandleConfig);
+	var subChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
 	var result_candle = subChart_candle.renderIn(containerObj);
 
 	/* 量图 */
-	var subChart_volume = kChart.newSubChart(TradeChart2.KSubChartTypes.VOLUME).setConfig(kVolumeConfig);
+	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
 	var result_volume = subChart_volume.renderIn(containerObj);
 
 	var append = function(){
@@ -83,5 +83,5 @@ util.loadData(function(datas){
 
 
 	window.kChart = kChart;
-	window.kdm = kChart.getKDataManager();
+	window.kdm = kChart.getDataManager();
 });

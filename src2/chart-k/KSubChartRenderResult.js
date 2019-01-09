@@ -145,7 +145,7 @@
 		 * @returns {Array<KData>}
 		 */
 		this.getConvertedRenderingDataList = function(){
-			return this.getKChart().getKDataManager().getConvertedRenderingDataList(this.getRenderingGroupCount());
+			return this.getKChart().getDataManager().getConvertedRenderingDataList(this.getRenderingGroupCount());
 		};
 
 		/**
@@ -174,7 +174,7 @@
 				return -1;
 			}
 
-			var kDataManager = kChart.getKDataManager();
+			var kDataManager = kChart.getDataManager();
 			var firstIndex = kDataManager.getFirstRenderingDataIndexFromRight();
 			if(-1 === firstIndex){
 				TradeChart2.showLog && console.warn("No data rendered.");
@@ -206,7 +206,7 @@
 				return -1;
 			}
 
-			var firstIndex = kSubChart.getKChart().getKDataManager().getFirstRenderingDataIndexFromRight();
+			var firstIndex = kSubChart.getKChart().getDataManager().getFirstRenderingDataIndexFromRight();
 			var index = firstIndex - t;
 			// console.log("getRenderingDataIndex:", x, index, firstIndex, t);
 			return index;
@@ -220,7 +220,7 @@
 		this.getRenderingHorizontalPosition = function(dataIndex){
 			var kChart = kSubChart.getKChart();
 
-			var firstIndex = kSubChart.getKChart().getKDataManager().getFirstRenderingDataIndexFromRight();
+			var firstIndex = kSubChart.getKChart().getDataManager().getFirstRenderingDataIndexFromRight();
 			if(firstIndex === -1){
 				TradeChart2.showLog && console.log("No data rendered");
 				return -1;

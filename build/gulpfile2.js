@@ -79,12 +79,12 @@ var concatK = function(){
 			"KChartSketch.js",
 			"KDataSketch.js",
 
-			"KDataManager.js",
+			"CommonDataManager.js",
 			"KChartConfig.js",
 			"KChart.js",
 
 			"KSubChartConfig.js",
-			"KSubChartTypes.js",
+			"SubChartTypes.js",
 			"KSubChartSketch.js",
 			"KSubChartRenderResult.js",
 			"KSubChart.js",

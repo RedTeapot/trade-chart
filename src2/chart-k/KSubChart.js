@@ -1,6 +1,7 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util,
+		SubChart = TradeChart2.SubChart,
 		KSubChartConfig = TradeChart2.KSubChartConfig,
 		Big = TradeChart2.Big;
 
@@ -33,9 +34,11 @@
 	 * @constructor
 	 * K线子图
 	 * @param {KChart} kChart 附加该子图的K线图
-	 * @param {KSubChartTypes} type 子图类型。如：volume - 量图；
+	 * @param {SubChartTypes} type 子图类型。如：volume - 量图；
 	 */
 	var KSubChart = function(kChart, type){
+		SubChart.apply(this, arguments);
+
 		var self = this;
 
 		/**
@@ -70,7 +73,7 @@
 
 		/**
 		 * 获取该子图的子图类型
-		 * @returns {KSubChartTypes}
+		 * @returns {SubChartTypes}
 		 */
 		this.getType = function(){
 			return type;
@@ -188,8 +191,8 @@
 				lastRenderingCanvasObj = canvasObj;
 
 			/* 记录画布上画质的图形类型，实现“第一个图形绘画时清空画布既有内容，后续图形绘画时，叠加绘制” */
-			canvasObj.renderingKSubChartTypes = canvasObj.renderingKSubChartTypes || [];
-			var subTypes = canvasObj.renderingKSubChartTypes;
+			canvasObj.renderingSubChartTypes = canvasObj.renderingSubChartTypes || [];
+			var subTypes = canvasObj.renderingSubChartTypes;
 			subTypes.push(this.getType());
 
 			return self.implRender.call(self, canvasObj, {
@@ -261,7 +264,7 @@
 			var maxGroupCount = kChartSketch.getMaxGroupCount(),
 				halfGroupBarSize = kChart.calcHalfGroupBarWidth(),
 				groupSize = config_groupBarWidth + config_groupGap,
-				groupCount = kChart.getKDataManager().getRenderingDataCount(maxGroupCount);
+				groupCount = kChart.getDataManager().getRenderingDataCount(maxGroupCount);
 
 			/**
 			 * 数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧
@@ -319,7 +322,7 @@
 			var maxGroupCount = kChartSketch.getMaxGroupCount(),
 				halfGroupBarSize = kChart.calcHalfGroupBarWidth(),
 				groupSize = config_groupBarWidth + config_groupGap,
-				groupCount = kChart.getKDataManager().getRenderingDataCount(maxGroupCount);
+				groupCount = kChart.getDataManager().getRenderingDataCount(maxGroupCount);
 
 			/**
 			 * 第一个位置是图形上在最右侧渲染的数据的位置
@@ -349,7 +352,7 @@
 			var xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
 				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth());
 
-			var kDataManager = kChart.getKDataManager();
+			var kDataManager = kChart.getDataManager();
 			var dataList = kDataManager.getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
 
 			/* 绘制的数据个数 */
@@ -775,10 +778,11 @@
 			self.render();
 		};
 		kChart.on("renderingpositionchange", evtRenderAction);
-		kChart.getKDataManager().on("storeddatachange, renderingdatachange", evtRenderAction);
+		kChart.getDataManager().on("storeddatachange, renderingdatachange", evtRenderAction);
 
 		TradeChart2.showLog && console.info("Create k sub chart: " + this.id);
 	};
+	KSubChart.prototype = Object.create(SubChart.prototype);
 
 	util.defineReadonlyProperty(TradeChart2, "KSubChart", KSubChart);
 })();
