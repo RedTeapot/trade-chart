@@ -54,15 +54,22 @@ util.loadData(function(datas){
 
 	var containerObj = document.querySelector(".container"),
 		candleCanvasObj = document.querySelector(".chart-container.candle canvas"),
-		indexMACanvasObj = document.querySelector(".chart-container.index-ma canvas");
+		indexMACanvasObj = document.querySelector(".chart-container.index-ma canvas"),
 
-	var KChart = TradeChart2.KChart;
+		candleOperationCanvasObj = document.querySelector(".chart-container.candle .operation"),
+		indexMAOperationCanvasObj = document.querySelector(".chart-container.candle .operation");
+
+	var KChart = TradeChart2.KChart,
+		util = TradeChart2.util;
 	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0));
 
 	var kSubChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
-	kSubChart_candle.render(candleCanvasObj);
+	var result_candle = kSubChart_candle.render(candleCanvasObj);
+	window.result_candle = result_candle;
 
 	var kSubChart_index_ma = kChart.newSubChart(TradeChart2.SubChartTypes.K_INDEX_MA).setConfig(kIndexMAConfig);
 	kSubChart_index_ma.setSpecifiedDataSketchMethod(TradeChart2.KSubChartSketch_CandleDataSketch.sketch);
-	kSubChart_index_ma.render(candleCanvasObj);
+	var result_indexMA = kSubChart_index_ma.render(candleCanvasObj);
+
+	util.addKSubChartOperationSupport(candleOperationCanvasObj, result_candle);
 });

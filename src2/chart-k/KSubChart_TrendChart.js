@@ -4,15 +4,15 @@
 	var Big = TradeChart2.Big;
 
 	var KChartSketch = TradeChart2.KChartSketch,
-		CommonDataManager = TradeChart2.CommonDataManager,
 
 		SubChartTypes = TradeChart2.SubChartTypes,
-		KSubChartConfig_IndexMAConfig = TradeChart2.KSubChartConfig_IndexMAConfig,
+		CommonDataManager = TradeChart2.CommonDataManager,
+		KSubChartConfig_TrendConfig = TradeChart2.KSubChartConfig_TrendConfig,
 		KSubChart = TradeChart2.KSubChart,
-		KSubChart_IndexMARenderResult = TradeChart2.KSubChart_IndexMARenderResult,
+		KSubChart_TrendRenderResult = TradeChart2.KSubChart_TrendRenderResult,
 
-		KSubChartSketch_IndexMADataSketch = TradeChart2.KSubChartSketch_IndexMADataSketch,
-		KSubChartSketch_IndexMAChartSketch = TradeChart2.KSubChartSketch_IndexMAChartSketch;
+		KSubChartSketch_TrendDataSketch = TradeChart2.KSubChartSketch_TrendDataSketch,
+		KSubChartSketch_TrendChartSketch = TradeChart2.KSubChartSketch_TrendChartSketch;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -30,20 +30,20 @@
 	 * @constructor
 	 * @augments KSubChart
 	 *
-	 * K线图子图：指标：MA图
+	 * K线图子图：走势图
 	 * @param {KChart} kChart 附加该子图的K线图
 	 */
-	var KSubChart_IndexMAChart = function(kChart){
-		KSubChart.call(this, kChart, SubChartTypes.K_INDEX_MA);
+	var KSubChart_TrendChart = function(kChart){
+		KSubChart.call(this, kChart, SubChartTypes.K_TREND);
 		var self = this;
 
 		/* 渲染配置 */
-		var config = new KSubChartConfig_IndexMAConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
+		var config = new KSubChartConfig_TrendConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
 
 		/**
 		 * 获取配置项集合
 		 * @override
-		 * @returns {KSubChartConfig_IndexMAConfig}
+		 * @returns {KSubChartConfig_TrendConfig}
 		 */
 		this.getConfig = function(){
 			return config;
@@ -57,11 +57,9 @@
 		 * @param {Object} env 当前环境信息
 		 * @param {Number} env.drawingOrderIndex 当前子图在该画布上的绘制顺序索引。第一个被绘制：0
 		 *
-		 * @returns {KSubChart_IndexMARenderResult} K线子图绘制结果
+		 * @returns {KSubChart_TrendRenderResult} K线子图绘制结果
 		 */
 		this.implRender = function(canvasObj, env){
-			var self = this;
-
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
 
@@ -72,20 +70,26 @@
 
 				config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
-				config_groupLineWidth = this.getConfigItem("groupLineWidth");
+				config_groupLineWidth = this.getConfigItem("groupLineWidth"),
+
+				config_lineColor = this.getConfigItem("lineColor"),
+				config_enclosedAreaBackground = this.getConfigItem("enclosedAreaBackground"),
+
+				config_ifShowAverageLine = this.getConfigItem("ifShowAverageLine"),
+				config_ifShowAverageLine_lineColor = this.getConfigItem("ifShowAverageLine_lineColor");
 
 			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
 			config.setConfigItemConvertedValue("height", config_height);
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_IndexMADataSketch.sketch)(kChart, this.getConfig()),
+			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_TrendDataSketch.sketch)(kChart, this.getConfig()),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch_IndexMAChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
+				kSubChartSketch = KSubChartSketch_TrendChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
 			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
-			var kDataManager = kChart.getDataManager();
-			var dataList = kDataManager.getRenderingDataList(kChartSketch.getMaxGroupCount());
+			var dataManager = kChart.getDataManager();
+			var dataList = dataManager.getRenderingDataList(kChartSketch.getMaxGroupCount());
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
@@ -100,7 +104,8 @@
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 
-				$yTop_axisY = config_paddingTop;/* 整数使用$开头*/
+				$yTop_axisY = config_paddingTop,/* 整数使用$开头*/
+				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
 			/**
 			 * 获取指定价钱对应的物理高度
@@ -143,83 +148,87 @@
 				ctx.restore();
 			})();
 
-			/* 确定MA指标 */
-			var maArray = self.getConfigItem("maIndexList") || [];
-			maArray = maArray.map(function(d){
-				return util.parseAsNumber(d.replace(/[^\d]/gm, ""), 0);
-			}).reduce(function(rst, d){
-				if(isFinite(d) && d > 0 && rst.indexOf(d) === -1)
-					rst.push(d);
-
-				return rst;
-			}, []);
-
-			/* 计算并附加MA数据 */
+			/* 绘制走势图 */
 			(function(){
-				/* 缓存需要被反复使用的收盘价，降低计算量 */
-				for(var i = 0; i < dataList.length; i++){
-					var d = dataList[i];
-					if(null == d || typeof d !== "object")
-						continue;
+				if(0 == groupCount)
+					return;
 
-					var closePrice = +kDataManager.getConvertedData(d).closePrice;
-					CommonDataManager.setAttachedData(d, "closePrice", closePrice);
-				}
+				ctx.save();
 
-				/* 附加MA数据，供绘制时使用 */
-				if(maArray.length > 0){
-					var minMA = maArray[0];
+				/* 确定折线点 */
+				var dots = [],
+					avgDots = [];
+				for(var i = 0; i < groupCount; i++){
+					var dataIndex = groupCount - 1 - i;
+					var data = dataList[dataIndex];
+					var x = util.getLinePosition(xPositionList[i]);
 
-					for(var i = minMA - 1; i < dataList.length; i++){/* 为每个数据计算MA指标 */
-						var d = dataList[i];
+					var closePrice = +dataManager.getConvertedData(data).closePrice;
+					var y = util.getLinePosition(config_paddingTop + Math.round(calcHeight(closePrice)));
+					dots.push([x, y]);
 
-						for(var j = 0; j < maArray.length; j++){/* 计算每一个MA指标 */
-							var ma = maArray[j];
-							if(i < ma - 1)/* 检查数据跨度是否足够计算当前MA指标 */
-								break;/* ma按指标升序排序，如果当前索引所涵盖的数据个数不足以满足当下MA指标，则必然无法满足需要更大数据覆盖面的指标 */
-
-							var sum = 0;
-							for(var k = 0; k < ma; k++){
-								sum += CommonDataManager.getAttachedData(dataList[i - k], "closePrice") || 0;
-							}
-							CommonDataManager.setAttachedData(d, "MA" + ma, sum / ma);
-						}
+					if(config_ifShowAverageLine){
+						var averagePrice = CommonDataManager.getAttachedData(data, "averagePrice");
+						var averageY = config_paddingTop + Math.round(calcHeight(averagePrice));
+						avgDots.push([x, util.getLinePosition(averageY)]);
 					}
 				}
-			})();
 
-			/* 绘制MA图 */
-			xPositionList.reverse();
-			(function(){
-				var maIndexColorMap = self.getConfigItem("maIndexColorMap") || {};
+				if(dots.length == 1){/* 只有一个点 */
+					ctx.beginPath();
+					ctx.arc(dots[0][0], dots[0][1], ctx.lineWidth * 2, 0, 2*Math.PI);
+					ctx.fillStyle = config_lineColor;
+					ctx.fill();
+					return;
+				}
 
-				maArray.forEach(function(ma){
-					var maKey = "MA" + ma;
+				/* 绘制折线 */
+				ctx.strokeWidth = 0.5;
+				ctx.strokeStyle = config_lineColor;
+				ctx.beginPath();
+				ctx.moveTo(dots[0][0], dots[0][1]);
+				for(var i = 1; i < dots.length; i++)
+					ctx.lineTo(dots[i][0], dots[i][1]);
+				ctx.stroke();
+
+				/* 绘制分时图背景 */
+				var bg = config_enclosedAreaBackground;
+				if(null != bg){
+					dots.unshift([dots[0][0], y_axisX]);
+					dots.push([dots[dots.length - 1][0], y_axisX]);
 
 					ctx.save();
-					ctx.lineWidth = 0.5;
-					ctx.strokeStyle = maIndexColorMap[maKey];
+					ctx.beginPath();
+					ctx.moveTo(dots[0][0], dots[0][1]);
+					for(i = 1; i < dots.length; i++)
+						ctx.lineTo(dots[i][0], dots[i][1]);
 
-					var isFirstDot = true;
-					for(var i = ma - 1; i < dataList.length; i++){
-						var closePrice = CommonDataManager.removeAttachedData(dataList[i], maKey);
+					ctx.strokeWidth = 0;
+					if(bg instanceof TradeChart2.LinearGradient){
+						bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, y_axisX);
+					}else
+						ctx.fillStyle = bg;
+					ctx.fill();
+					ctx.restore();
+				}
 
-						var x = util.getLinePosition(xPositionList[i]),
-							y = util.getLinePosition($yTop_axisY + calcHeight(closePrice));
-						TradeChart2.showLog && console.log(maKey, i, x, y);
+				/* 绘制均线 */
+				if(config_ifShowAverageLine && avgDots.length > 1){
+					ctx.save();
 
-						if(isFirstDot){
-							ctx.beginPath();
-							ctx.moveTo(x, y);
-						}else
-							ctx.lineTo(x, y);
+					ctx.strokeWidth = 0.5;
+					ctx.strokeStyle = config_ifShowAverageLine_lineColor;
 
-						isFirstDot = false;
-					}
+					ctx.beginPath();
+					ctx.moveTo(avgDots[0][0], avgDots[0][1]);
+					for(var i = 1; i < avgDots.length; i++)
+						ctx.lineTo(avgDots[i][0], avgDots[i][1]);
 					ctx.stroke();
 
 					ctx.restore();
-				});
+				}
+
+				ctx.restore();
 			})();
 
 			/* 绘制坐标系标签 */
@@ -228,7 +237,7 @@
 
 			var renderResult = this.getLatestRenderResult(canvasObj);
 			if(null == renderResult){
-				renderResult = new KSubChart_IndexMARenderResult(this, canvasObj);
+				renderResult = new KSubChart_TrendRenderResult(this, canvasObj);
 				this.setLatestRenderResult(canvasObj, renderResult);
 			}
 			renderResult.setKChartSketch(kChartSketch)
@@ -237,7 +246,7 @@
 			return renderResult;
 		};
 	};
-	KSubChart_IndexMAChart.prototype = Object.create(KSubChart.prototype);
+	KSubChart_TrendChart.prototype = Object.create(KSubChart.prototype);
 
-	util.defineReadonlyProperty(TradeChart2, "KSubChart_IndexMAChart", KSubChart_IndexMAChart);
+	util.defineReadonlyProperty(TradeChart2, "KSubChart_TrendChart", KSubChart_TrendChart);
 })();

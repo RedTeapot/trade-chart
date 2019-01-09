@@ -11,8 +11,8 @@
 		paddingLeft: 60,/** 图表内边距 - 左侧 */
 		paddingRight: 20,/** 图表内边距 - 右侧 */
 
-		groupLineWidth: 1,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
-		groupBarWidth: 5,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
+		groupLineWidth: 1,/** 绘制中间位置线的宽度。最好为奇数，从而使得线可以正好在正中间 */
+		groupBarWidth: 5,/** 绘制柱的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
 		groupGap: 3,/** 相邻两组数据之间的间隔 */
 	};
 	Object.freeze && Object.freeze(defaultConfig);

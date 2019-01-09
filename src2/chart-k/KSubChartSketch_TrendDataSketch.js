@@ -1,8 +1,9 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var DataSketch = TradeChart2.DataSketch;
-	var util = TradeChart2.util;
-	var Big = TradeChart2.Big;
+	var DataSketch = TradeChart2.DataSketch,
+		CommonDataManager = TradeChart2.CommonDataManager,
+		util = TradeChart2.util,
+		Big = TradeChart2.Big;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -12,12 +13,12 @@
 	 * @constructor
 	 * @augments DataSketch
 	 *
-	 * K线子图：蜡烛图数据概览
+	 * K线子图：走势图数据概览
 	 */
-	var KSubChartSketch_CandleDataSketch = function(){
+	var KSubChartSketch_TrendDataSketch = function(){
 		DataSketch.apply(this, arguments);
 	};
-	KSubChartSketch_CandleDataSketch.prototype = Object.create(DataSketch.prototype);
+	KSubChartSketch_TrendDataSketch.prototype = Object.create(DataSketch.prototype);
 
 	/**
 	 * 从给定的配置集合中获取指定名称的配置项取值。
@@ -26,7 +27,7 @@
 	 *
 	 * @param {KChart} kChart K线图实例
 	 * @param {String} name 配置项名称
-	 * @param {KSubChartConfig_CandleConfig} config K线子图渲染配置
+	 * @param {KSubChartConfig_TrendConfig} config K线子图渲染配置
 	 */
 	var _getConfigItem = function(kChart, name, config){
 		if(config.supportsConfigItem(name))
@@ -38,14 +39,15 @@
 	/**
 	 * 扫描给定的K线图实例和K线子图渲染配置，根据K线图实例中的数据生成素描
 	 * @param {KChart} kChart K线图实例
-	 * @param {KSubChartConfig_CandleConfig} kSubChartConfig K线子图渲染配置
-	 * @returns {KSubChartSketch_CandleDataSketch}
+	 * @param {KSubChartConfig_TrendConfig} kSubChartConfig K线子图渲染配置
+	 * @returns {KSubChartSketch_TrendDataSketch}
 	 */
-	KSubChartSketch_CandleDataSketch.sketch = function(kChart, kSubChartConfig){
-		var instance = new KSubChartSketch_CandleDataSketch();
+	KSubChartSketch_TrendDataSketch.sketch = function(kChart, kSubChartConfig){
+		var instance = new KSubChartSketch_TrendDataSketch();
 
 		/* 扫描数据，初步得到概览 */
-		var dataList = kChart.getDataManager().getConvertedRenderingDataList();
+		var kDataManager = kChart.getDataManager();
+		var dataList = kDataManager.getRenderingDataList();
 		var dataSketch_origin_max = -Infinity,/* 最大价格 */
 			dataSketch_origin_min = Infinity,/* 最小价格 */
 			dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */
@@ -61,38 +63,40 @@
 			dataSketch_origin_avgVariation = 0;
 			dataSketch_origin_maxVariation = 0;
 		}else{
-			var variationSum = 0;
+			var ifShowAverageLine = _getConfigItem(kChart, "ifShowAverageLine", kSubChartConfig);
+
+			var previousClosePrice = null;
+			var variationSum = 0, sum = 0;
 			for(var i = 0; i < dataList.length; i++){
 				var d = dataList[i];
-				if(null == d || typeof d !== "object")
-					continue;
+				var closePrice = +kDataManager.getConvertedData(d).closePrice;
 
-				var openPrice = +d.openPrice,
-					highPrice = +d.highPrice,
-					lowPrice = +d.lowPrice,
-					closePrice = +d.closePrice;
+				/* 计算并暂存均线数值，用于绘制均线 */
+				if(ifShowAverageLine){
+					sum += closePrice;
+					CommonDataManager.setAttachedData(d, "averagePrice", sum / (i + 1));
+				}
 
 				/* 数据精度确定 */
 				dataSketch_extended_pricePrecision = Math.max(
 					dataSketch_extended_pricePrecision,
-					util.getPrecision(openPrice),
-					util.getPrecision(highPrice),
-					util.getPrecision(lowPrice),
 					util.getPrecision(closePrice)
 				);
 
-				var max = Math.max(openPrice, highPrice, lowPrice, closePrice),
-					min = Math.min(openPrice, highPrice, lowPrice, closePrice);
-				if(max > dataSketch_origin_max)
-					dataSketch_origin_max = max;
-				if(min < dataSketch_origin_min)
-					dataSketch_origin_min = min;
+				if(closePrice > dataSketch_origin_max)
+					dataSketch_origin_max = closePrice;
+				if(closePrice < dataSketch_origin_min)
+					dataSketch_origin_min = closePrice;
 
 				/* 确定更大的变动幅度 */
-				var variation = Math.abs(max - min);
-				if(variation > dataSketch_origin_maxVariation)
-					dataSketch_origin_maxVariation = variation;
-				variationSum += variation;
+				if(null !== previousClosePrice){
+					var variation = Math.abs(closePrice - previousClosePrice);
+					if(variation > dataSketch_origin_maxVariation)
+						dataSketch_origin_maxVariation = variation;
+					variationSum += variation;
+				}
+
+				previousClosePrice = closePrice;
 			}
 			var len = dataList.length;
 			dataSketch_origin_avgVariation = len > 0? (variationSum / len): 0;
@@ -171,7 +175,7 @@
 			}
 
 			if(!isFinite(axisYAmountCeiling) || axisYAmountCeiling <= axisYAmountFloor)
-				console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + ").");
+				console.warn((isFunction? "Calculated": "Specified") + " 'axisYAmountCeiling': " + axisYAmountCeiling + " is infinite or lte 'axisYAmountFloor'(" + axisYAmountFloor + ")");
 			else
 				instance.setAmountCeiling(axisYAmountCeiling);
 		}
@@ -179,5 +183,5 @@
 		return instance;
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch_CandleDataSketch", KSubChartSketch_CandleDataSketch);
+	util.defineReadonlyProperty(TradeChart2, "KSubChartSketch_TrendDataSketch", KSubChartSketch_TrendDataSketch);
 })();

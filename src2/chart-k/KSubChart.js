@@ -419,10 +419,10 @@
 		/**
 		 * 获取自下而上顺序的Y轴刻度列表
 		 * @param {KSubChartSketch} kSubChartSketch 子图概览
-		 * @param {KDataSketch} kDataSketch 数据概览
+		 * @param {DataSketch} dataSketch 数据概览
 		 * @returns {YTick[]}
 		 */
-		this.getRenderingYTickListFromBottom = function(kSubChartSketch, kDataSketch){
+		this.getRenderingYTickListFromBottom = function(kSubChartSketch, dataSketch){
 			var config_paddingTop = this.getConfigItem("paddingTop"),
 				config_axisYPrecision = this.getConfigItem("axisYPrecision"),
 				config_axisYMidTickQuota = this.getConfigItem("axisYMidTickQuota"),
@@ -432,13 +432,13 @@
 			var y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
 			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYAmountInterval = (kDataSketch.getAmountCeiling() - kDataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
+			var axisYAmountInterval = (dataSketch.getAmountCeiling() - dataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
 			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 			var isAxisYPrecisionAuto = "auto" === String(config_axisYPrecision).trim().toLowerCase();
 
 			if(isAxisYPrecisionAuto)
-				config.setConfigItemConvertedValue("axisYPrecision", kDataSketch.getAmountPrecision());
+				config.setConfigItemConvertedValue("axisYPrecision", dataSketch.getAmountPrecision());
 
 			/**
 			 * 要绘制的纵坐标刻度集合
@@ -452,7 +452,7 @@
 			 */
 			var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
 			for(var i = 0; i <= maxAxisYTickIndex; i++){
-				var tickAmount = kDataSketch.getAmountFloor() + axisYAmountInterval * i,
+				var tickAmount = dataSketch.getAmountFloor() + axisYAmountInterval * i,
 					tickY = y_axisX - Math.round(axisYHeightInterval * i);
 				var tickLabel = config_axisYFormatter(tickAmount, config);
 
@@ -609,14 +609,14 @@
 		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
 		 * @param {KChartSketch} kChartSketch 图形概览
 		 * @param {KSubChartSketch} kSubChartSketch 子图图形概览
-		 * @param {KDataSketch} kDataSketch 数据概览
+		 * @param {DataSketch} DataSketch 数据概览
 		 *
 		 * @param {Object} [ops] 控制选项
 		 * @param {Function} [ops.axisYTickConverter] 总坐标刻度转换器（用于辅助子图实现纵坐标刻度调整，如位置向上偏移等）
 		 *
 		 * @returns {Function} 完成剩余的Y轴绘制工作，子图在其图形正文绘制完成后调用
 		 */
-		this.renderAxisY = function(ctx, kChartSketch, kSubChartSketch, kDataSketch, ops){
+		this.renderAxisY = function(ctx, kChartSketch, kSubChartSketch, DataSketch, ops){
 			/**
 			 * 完成剩余的Y轴绘制工作。
 			 * 为达到良好的视觉效果，图形绘制的先后顺序，应为：
@@ -692,7 +692,7 @@
 			ctx.stroke();
 
 			/* 绘制Y轴刻度线 */
-			var axisYTickList = this.getRenderingYTickListFromBottom(kSubChartSketch, kDataSketch);
+			var axisYTickList = this.getRenderingYTickListFromBottom(kSubChartSketch, DataSketch);
 
 			/* 辅助子图实现纵坐标刻度调整，如向上偏移等 */
 			if(null != ops && typeof ops.axisYTickConverter === "function")

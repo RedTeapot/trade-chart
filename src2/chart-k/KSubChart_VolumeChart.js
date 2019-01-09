@@ -76,9 +76,9 @@
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var kDataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_VolumeDataSketch.sketch)(kChart, this.getConfig()),
+			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_VolumeDataSketch.sketch)(kChart, this.getConfig()),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(kDataSketch);
+				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
 			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
 			var dataList = kChart.getDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
@@ -100,12 +100,12 @@
 			/**
 			 * 获取指定成交量对应的物理高度
 			 * @param {Number} volume1 成交量1
-			 * @param {Number} [volume2=kDataSketch.getAmountFloor()] 成交量2
-			 * @returns {Big} 物理高度
+			 * @param {Number} [volume2=dataSketch.getAmountFloor()] 成交量2
+			 * @returns {Number} 物理高度
 			 */
 			var calcHeight = function(volume1, volume2){
 				if(arguments.length < 2)
-					volume2 = kDataSketch.getAmountFloor();
+					volume2 = dataSketch.getAmountFloor();
 
 				return kSubChartSketch.calculateHeight(Math.abs(volume2 - volume1));
 			};
@@ -127,7 +127,7 @@
 				finishRemainingAxisXRendering = self.renderAxisX(ctx, kChartSketch, kSubChartSketch);
 
 				/* 绘制Y轴、Y轴刻度、网格横线 */
-				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, kDataSketch);
+				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, dataSketch);
 
 				ctx.restore();
 			})();
@@ -207,7 +207,7 @@
 			}
 			renderResult.setKChartSketch(kChartSketch)
 				.setKSubChartSketch(kSubChartSketch)
-				.setKDataSketch(kDataSketch);
+				.setDataSketch(dataSketch);
 			return renderResult;
 		};
 	};

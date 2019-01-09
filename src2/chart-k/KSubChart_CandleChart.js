@@ -59,8 +59,6 @@
 		 * @returns {KSubChart_CandleRenderResult} K线子图绘制结果
 		 */
 		this.implRender = function(canvasObj, env){
-			var self = this;
-
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
 
@@ -82,9 +80,9 @@
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
-			var kDataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_CandleDataSketch.sketch)(kChart, this.getConfig()),
+			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_CandleDataSketch.sketch)(kChart, this.getConfig()),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(kDataSketch);
+				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
 			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
 			var dataList = kChart.getDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
@@ -107,12 +105,12 @@
 			/**
 			 * 获取指定价钱对应的物理高度
 			 * @param {Number} price1 价钱1
-			 * @param {Number} [price2=kDataSketch.getAmountCeiling()] 价钱2
-			 * @returns {Big} 物理高度
+			 * @param {Number} [price2=dataSketch.getAmountCeiling()] 价钱2
+			 * @returns {Number} 物理高度
 			 */
 			var calcHeight = function(price1, price2){
 				if(arguments.length < 2)
-					price2 = kDataSketch.getAmountCeiling();
+					price2 = dataSketch.getAmountCeiling();
 
 				return kSubChartSketch.calculateHeight(Math.abs(price2 - price1));
 			};
@@ -135,7 +133,7 @@
 
 				/* 绘制Y轴、Y轴刻度、网格横线 */
 				config_axisYTickOffset = util.parseAsNumber(config_axisYTickOffset, 0);
-				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, kDataSketch, {
+				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, dataSketch, {
 					axisYTickConverter: function(tick){
 						tick.y -= config_axisYTickOffset;
 						return tick;
@@ -243,7 +241,7 @@
 			}
 			renderResult.setKChartSketch(kChartSketch)
 				.setKSubChartSketch(kSubChartSketch)
-				.setKDataSketch(kDataSketch);
+				.setDataSketch(dataSketch);
 			return renderResult;
 		};
 	};

@@ -1,16 +1,10 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var util = TradeChart2.util;
-	var Big = TradeChart2.Big;
+	var util = TradeChart2.util,
+		Big = TradeChart2.Big;
 
 	var numBig = function(big){
 		return Number(big.toString());
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
-	var roundBig = function(big){
-		return Math.round(numBig(big));
 	};
 
 	/**

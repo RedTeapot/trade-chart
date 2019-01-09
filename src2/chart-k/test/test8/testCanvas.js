@@ -20,22 +20,15 @@ util.loadData(function(datas){
 		axisXLabelSize: 100,
 	};
 
-	var kCandleConfig = {
+	var kTrendConfig = {
 		height: "100%",
 
 		paddingTop: 30,
 		paddingBottom: 30,
 
-		showAxisXLine: true,/** 是否绘制横坐标轴 */
-		showAxisXLabel: false,/** 是否绘制横坐标刻度值 */
-		showAxisYLine: true,/** 是否绘制纵坐标轴 */
-		showAxisYLabel: true,/** 是否绘制纵坐标刻度值 */
-		gridLineDash: [5, 5],
-
-		axisYTickOffset: 10,/* 纵坐标刻度距离原点的位移 */
-
-		coordinateBackground: "#F0F0F0",
-		keepingColor: "blue"
+		lineColor: "#969696",
+		coordinateBackground: "transparent",
+		enclosedAreaBackground: new TradeChart2.LinearGradient(["0:rgba(241,242,244, 1)", "0.7:rgba(241,242,244, 0.7)","1:rgba(241,242,244, 0.1)"]),
 	};
 	var kVolumeConfig = {
 		height: "100%",
@@ -57,9 +50,9 @@ util.loadData(function(datas){
 		coordinateBackground: null
 	};
 
-	var candleCanvasObj = document.querySelector(".column .candle canvas"),
+	var trendCanvasObj = document.querySelector(".column .trend canvas"),
 		volumeCanvasObj = document.querySelector(".column .volume canvas"),
-		candleOperationCanvasObj = document.querySelector(".column .candle .operation"),
+		trendOperationCanvasObj = document.querySelector(".column .trend .operation"),
 		volumeOperationCanvasObj = document.querySelector(".column .volume .operation"),
 
 		dataDetailObj = document.querySelector(".data-detail");
@@ -72,11 +65,11 @@ util.loadData(function(datas){
 	window.kChart = kChart;
 
 	/* 蜡烛图 */
-	var subChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
-	var result_candle = subChart_candle.render(candleCanvasObj);
-	result_candle.initCanvas(candleOperationCanvasObj);
-	window.subChart_candle = subChart_candle;
-	window.result_candle = result_candle;
+	var subChart_trend = kChart.newSubChart(TradeChart2.SubChartTypes.K_TREND).setConfig(kTrendConfig);
+	var result_trend = subChart_trend.render(trendCanvasObj);
+	result_trend.initCanvas(trendOperationCanvasObj);
+	window.subChart_trend = subChart_trend;
+	window.result_trend = result_trend;
 
 	/* 量图 */
 	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
@@ -116,15 +109,15 @@ util.loadData(function(datas){
 				detailCtx.clearRect(left, 0, width, detailCtx.canvas.height);
 			};
 
-			f(candleOperationCanvasObj);
+			f(trendOperationCanvasObj);
 			f(volumeOperationCanvasObj);
 		},
 		dataDetailViewingAction: function(convertedData, dataMetadata){
 			drawLine(
-				candleOperationCanvasObj.getContext("2d"),
+				trendOperationCanvasObj.getContext("2d"),
 				dataMetadata.renderingHorizontalPosition,
-				TradeChart2.util.getLinePosition(result_candle.getConfigItem("paddingTop")),
-				TradeChart2.util.getLinePosition(result_candle.getKSubChartSketch().getCanvasHeight())
+				TradeChart2.util.getLinePosition(result_trend.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(result_trend.getKSubChartSketch().getCanvasHeight())
 			);
 			drawLine(
 				volumeOperationCanvasObj.getContext("2d"),
@@ -137,6 +130,6 @@ util.loadData(function(datas){
 		}
 	};
 
-	util.addKSubChartOperationSupport(candleOperationCanvasObj, result_candle, ops);
+	util.addKSubChartOperationSupport(trendOperationCanvasObj, result_trend, ops);
 	util.addKSubChartOperationSupport(volumeOperationCanvasObj, result_volume, ops);
 });

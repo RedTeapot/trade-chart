@@ -77,7 +77,7 @@ var concatK = function(){
 			"KChartDataTypes.js",
 
 			"KChartSketch.js",
-			"KDataSketch.js",
+			"DataSketch.js",
 
 			"CommonDataManager.js",
 			"KChartConfig.js",

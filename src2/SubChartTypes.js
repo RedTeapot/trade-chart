@@ -11,6 +11,9 @@
 		/** 蜡烛图 */
 		K_CANDLE: "k_candle",
 
+		/** 趋势图 */
+		K_TREND: "k_trend",
+
 		/** 量图 */
 		K_VOLUME: "k_volume",
 

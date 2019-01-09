@@ -161,6 +161,10 @@
 					kSubChart = new TradeChart2.KSubChart_CandleChart(this);
 					break;
 
+				case TradeChart2.SubChartTypes.K_TREND:
+					kSubChart = new TradeChart2.KSubChart_TrendChart(this);
+					break;
+
 				case TradeChart2.SubChartTypes.K_VOLUME:
 					kSubChart = new TradeChart2.KSubChart_VolumeChart(this);
 					break;

@@ -7,15 +7,6 @@
 	var numBig = function(big){
 		return Number(big.toString());
 	};
-	var roundBig = function(big){
-		return Math.round(numBig(big));
-	};
-	var ceilBig = function(big){
-		return Math.ceil(numBig(big));
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
 
 	/**
 	 * @constructor
@@ -27,7 +18,7 @@
 		var self = this;
 
 		var kSubChartSketch,
-			kDataSketch;
+			DataSketch;
 
 		/**
 		 * 获取绘制所使用的指定名称的配置项取值
@@ -74,19 +65,19 @@
 
 		/**
 		 * 设置K线数据素描
-		 * @param {KDataSketch} _kDataSketch K线数据素描
+		 * @param {DataSketch} _DataSketch K线数据素描
 		 * @returns {KSubChartRenderResult}
 		 */
-		this.setKDataSketch = function(_kDataSketch){
-			kDataSketch = _kDataSketch;
+		this.setDataSketch = function(_DataSketch){
+			DataSketch = _DataSketch;
 			return this;
 		};
 		/**
 		 * 获取K线数据素描
-		 * @returns {KDataSketch} K线数据素描
+		 * @returns {DataSketch} K线数据素描
 		 */
-		this.getKDataSketch = function(){
-			return kDataSketch
+		this.getDataSketch = function(){
+			return DataSketch
 		};
 
 		/**
