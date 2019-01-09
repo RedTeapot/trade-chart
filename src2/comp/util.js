@@ -470,9 +470,18 @@
 	 */
 	var addKSubChartOperationSupport = function(operationCanvasObj, kSubChartRenderResult, ops){
 		ops = setDftValue(ops, {
-			dataDetailViewingRevertAction: function(){
+			dataDetailViewingRevertAction: function(lastMetadata){
 				var detailCtx = operationCanvasObj.getContext("2d");
-				detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+
+				var left = 0, width = detailCtx.canvas.width;
+				if(null != lastMetadata){
+					var x = lastMetadata.renderingHorizontalPosition;
+					var len = 5;
+					left = Math.max(0, x - len);
+					width = 2 * len;
+				}
+
+				detailCtx.clearRect(left, 0, width, detailCtx.canvas.height);
 			},
 			dataDetailViewingAction: (function(){
 				var f = function(convertedData, dataMetadata){
@@ -519,7 +528,8 @@
 
 
 		var isModeViewDetail = true,
-			lastX = 0;
+			lastX = 0,
+			lastMetadata = null;
 
 		var kChart = kSubChartRenderResult.getKChart(),
 			canvasObj = kSubChartRenderResult.getCanvasDomElement(),
@@ -530,19 +540,23 @@
 
 		var viewDetail = function(e){
 			var x = e.layerX;
-			try2Call(dataDetailViewingRevertAction);
+			try2Call(dataDetailViewingRevertAction, null, lastMetadata);
+
+			var dataIndex = kSubChartRenderResult.getRenderingDataIndex(x);
+			if(-1 == dataIndex)
+				return;
 
 			var convertedData = kSubChartRenderResult.getConvertedRenderingData(x),
-				dataIndex = kSubChartRenderResult.getRenderingDataIndex(x),
 				position = kSubChartRenderResult.getRenderingHorizontalPosition(dataIndex);
 
 			var metadata = {
 				dataIndex: dataIndex,
-				renderingHorizontalPosition: position,
+				renderingHorizontalPosition: -1 === dataIndex? 0: position,
 				convertedData: convertedData,
 				originalData: kSubChartRenderResult.getRenderingData(x)
 			};
 
+			lastMetadata = metadata;
 			try2Call(dataDetailViewingAction, operationCanvasObj, convertedData, metadata);
 		};
 

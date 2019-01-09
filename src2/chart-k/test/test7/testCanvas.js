@@ -103,14 +103,25 @@ util.loadData(function(datas){
 	};
 
 	var ops = {
-		dataDetailViewingRevertAction: function(){
-			var detailCtx = candleOperationCanvasObj.getContext("2d");
-			detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+		dataDetailViewingRevertAction: function(lastMetadata){
+			var f = function(canvasObj){
+				var detailCtx = canvasObj.getContext("2d");
+				var left = 0, width = detailCtx.canvas.width;
+				if(null != lastMetadata){
+					var x = lastMetadata.renderingHorizontalPosition;
+					var len = 5;
+					left = Math.max(0, x - len);
+					width = 2 * len;
+				}
+				detailCtx.clearRect(left, 0, width, detailCtx.canvas.height);
+			};
 
-			detailCtx = volumeOperationCanvasObj.getContext("2d");
-			detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+			f(candleOperationCanvasObj);
+			f(volumeOperationCanvasObj);
 		},
 		dataDetailViewingAction: function(convertedData, dataMetadata){
+			console.log('-->', dataMetadata);
+
 			drawLine(
 				candleOperationCanvasObj.getContext("2d"),
 				dataMetadata.renderingHorizontalPosition,
