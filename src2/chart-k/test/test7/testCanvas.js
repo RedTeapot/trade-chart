@@ -105,7 +105,7 @@ util.loadData(function(datas){
 		dataDetailViewingRevertAction: function(){
 			var detailCtx = candleOperationCanvasObj.getContext("2d");
 			detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
-			
+
 			detailCtx = volumeOperationCanvasObj.getContext("2d");
 			detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
 		},
