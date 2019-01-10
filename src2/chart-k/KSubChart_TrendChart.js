@@ -93,18 +93,12 @@
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
-			/* 蜡烛一半的宽度 */
-			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
 
 			/* 横坐标位置 */
-			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
-				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
+			var xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
 				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
-				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
-				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
-
-				$yTop_axisY = config_paddingTop,/* 整数使用$开头*/
+				xLeftEdge_axisX_content = xLeft_axisX_content,
+				xRightEdge_axisX_content = xRight_axisX_content,
 				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
 			/**
@@ -179,8 +173,19 @@
 					ctx.arc(dots[0][0], dots[0][1], ctx.lineWidth * 2, 0, 2*Math.PI);
 					ctx.fillStyle = config_lineColor;
 					ctx.fill();
+
+					ctx.restore();
 					return;
 				}
+
+				/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
+				var leftX = 0,
+					leftY = dots[dots.length - 1][1],
+
+					rightX = xRightEdge_axisX_content + 1,
+					rightY = dots[0][1];
+				var leftOldImgData = ctx.getImageData(leftX, leftY, xLeftEdge_axisX_content, kSubChartSketch.getContentHeight()),
+					rightOldImgData = ctx.getImageData(rightX, rightY, config_width - xRightEdge_axisX_content - 1, kSubChartSketch.getContentHeight());
 
 				/* 绘制折线 */
 				ctx.strokeWidth = 0.5;
@@ -197,7 +202,6 @@
 					dots.unshift([dots[0][0], y_axisX]);
 					dots.push([dots[dots.length - 1][0], y_axisX]);
 
-					ctx.save();
 					ctx.beginPath();
 					ctx.moveTo(dots[0][0], dots[0][1]);
 					for(i = 1; i < dots.length; i++)
@@ -209,13 +213,10 @@
 					}else
 						ctx.fillStyle = bg;
 					ctx.fill();
-					ctx.restore();
 				}
 
 				/* 绘制均线 */
 				if(config_ifShowAverageLine && avgDots.length > 1){
-					ctx.save();
-
 					ctx.strokeWidth = 0.5;
 					ctx.strokeStyle = config_ifShowAverageLine_lineColor;
 
@@ -224,9 +225,11 @@
 					for(var i = 1; i < avgDots.length; i++)
 						ctx.lineTo(avgDots[i][0], avgDots[i][1]);
 					ctx.stroke();
-
-					ctx.restore();
 				}
+
+				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
+				ctx.putImageData(leftOldImgData, leftX, leftY);
+				ctx.putImageData(rightOldImgData, rightX, rightY);
 
 				ctx.restore();
 			})();

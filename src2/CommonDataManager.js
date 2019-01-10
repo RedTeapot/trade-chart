@@ -36,7 +36,8 @@
 			return null;
 		}
 
-		data[attrName_dataAttachContext] = data[attrName_dataAttachContext] || {};
+		if(!(attrName_dataAttachContext in data))
+			Object.defineProperty(data, attrName_dataAttachContext, {value: {}, writable: false, configurable: false, enumerable: false});
 		return data[attrName_dataAttachContext];
 	};
 
