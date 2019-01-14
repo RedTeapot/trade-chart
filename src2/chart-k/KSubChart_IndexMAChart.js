@@ -165,7 +165,7 @@
 
 					var k = "closePrice";
 					var closePrice = CommonDataManager.getAttachedData(d, k);
-					if(null != close())
+					if(null != closePrice)
 						continue;
 
 					closePrice = +kDataManager.getConvertedData(d).closePrice;
