@@ -157,32 +157,43 @@
 			/* 计算并附加MA数据 */
 			(function(){
 				/* 缓存需要被反复使用的收盘价，降低计算量 */
-				for(var i = 0; i < dataList.length; i++){
-					var d = dataList[i];
+				var _dataList = kDataManager.getDataList();
+				for(var i = 0; i < _dataList.length; i++){
+					var d = _dataList[i];
 					if(null == d || typeof d !== "object")
 						continue;
 
-					var closePrice = +kDataManager.getConvertedData(d).closePrice;
-					CommonDataManager.setAttachedData(d, "closePrice", closePrice);
+					var k = "closePrice";
+					var closePrice = CommonDataManager.getAttachedData(d, k);
+					if(null != close())
+						continue;
+
+					closePrice = +kDataManager.getConvertedData(d).closePrice;
+					CommonDataManager.setAttachedData(d, k, closePrice);
 				}
 
 				/* 附加MA数据，供绘制时使用 */
 				if(maArray.length > 0){
 					var minMA = maArray[0];
 
-					for(var i = minMA - 1; i < dataList.length; i++){/* 为每个数据计算MA指标 */
-						var d = dataList[i];
+					for(var i = minMA - 1; i < _dataList.length; i++){/* 为每个数据计算MA指标 */
+						var d = _dataList[i];
 
 						for(var j = 0; j < maArray.length; j++){/* 计算每一个MA指标 */
 							var ma = maArray[j];
 							if(i < ma - 1)/* 检查数据跨度是否足够计算当前MA指标 */
 								break;/* ma按指标升序排序，如果当前索引所涵盖的数据个数不足以满足当下MA指标，则必然无法满足需要更大数据覆盖面的指标 */
 
+							var maKey = "MA" + ma;
+							var maAmount = CommonDataManager.getAttachedData(d, maKey);
+							if(null != maAmount)
+								continue;
+
 							var sum = 0;
 							for(var k = 0; k < ma; k++){
-								sum += CommonDataManager.getAttachedData(dataList[i - k], "closePrice") || 0;
+								sum += CommonDataManager.getAttachedData(_dataList[i - k], "closePrice") || 0;
 							}
-							CommonDataManager.setAttachedData(d, "MA" + ma, sum / ma);
+							CommonDataManager.setAttachedData(d, maKey, sum / ma);
 						}
 					}
 				}
@@ -193,19 +204,32 @@
 			(function(){
 				var maIndexColorMap = self.getConfigItem("maIndexColorMap") || {};
 
-				maArray.forEach(function(ma){
+				ctx.save();
+				ctx.lineWidth = 0.5;
+
+				/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
+				var leftX = 0,
+					leftY = 0,
+
+					rightX = xRightEdge_axisX_content + 1,
+					rightY = 0;
+				var leftOldImgData = ctx.getImageData(leftX, leftY, xLeftEdge_axisX_content, kSubChartSketch.getContentHeight()),
+					rightOldImgData = ctx.getImageData(rightX, rightY, config_width - xRightEdge_axisX_content - 1, kSubChartSketch.getContentHeight());
+
+				for(var k = 0; k < maArray.length; k++){
+					var ma = maArray[k];
 					var maKey = "MA" + ma;
 
-					ctx.save();
-					ctx.lineWidth = 0.5;
 					ctx.strokeStyle = maIndexColorMap[maKey];
 
 					var isFirstDot = true;
-					for(var i = ma - 1; i < dataList.length; i++){
-						var closePrice = CommonDataManager.removeAttachedData(dataList[i], maKey);
+					for(var i = 0; i < dataList.length; i++){
+						var maAmount = CommonDataManager.getAttachedData(dataList[i], maKey);
+						if(null == maAmount)
+							continue;
 
 						var x = util.getLinePosition(xPositionList[i]),
-							y = util.getLinePosition($yTop_axisY + calcHeight(closePrice));
+							y = util.getLinePosition($yTop_axisY + calcHeight(maAmount));
 						TradeChart2.showLog && console.log(maKey, i, x, y);
 
 						if(isFirstDot){
@@ -217,9 +241,13 @@
 						isFirstDot = false;
 					}
 					ctx.stroke();
+				}
 
-					ctx.restore();
-				});
+				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
+				ctx.putImageData(leftOldImgData, leftX, leftY);
+				ctx.putImageData(rightOldImgData, rightX, rightY);
+
+				ctx.restore();
 			})();
 
 			/* 绘制坐标系标签 */

@@ -503,7 +503,6 @@
 					var yTop = kSubChartRenderResult.getConfigItem("paddingTop"),
 						yBottom = kSubChartRenderResult.getKSubChartSketch().getCanvasHeight() - kSubChartRenderResult.getConfigItem("paddingBottom");
 
-					console.log(yTop, yBottom);
 					detailCtx.moveTo(x, util.getLinePosition(yTop));
 					detailCtx.lineTo(x, util.getLinePosition(yBottom));
 					detailCtx.stroke();
