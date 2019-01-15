@@ -512,6 +512,7 @@
 
 				// /**
 				//  * 借助附加属性的方式标记该方法是“专门服务于这几个参数组合的方法调用”的
+				//  * 以规避“同一ops连续调用两次，企图给画布应用，导致只在第一个画布上绘画”的故障
 				//  */
 				// f.operationCanvasObj = operationCanvasObj;
 				// f.kSubChartRenderResult = kSubChartRenderResult;

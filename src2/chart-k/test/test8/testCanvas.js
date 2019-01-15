@@ -78,20 +78,65 @@ util.loadData(function(datas){
 	window.subChart_volume = subChart_volume;
 	window.result_volume = result_volume;
 
-	var drawLine = function(detailCtx, x, top, bottom){
-		detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
-		if(-1 == x)
+	var drawHorizontalLineAndDot = function(dataMetadata){
+		var x = dataMetadata.renderingHorizontalPosition;
+		if(-1 === x)
 			return;
 
-		detailCtx.save();
+		var y = result_trend.calcYPosition(dataMetadata.convertedData.closePrice);
 
+		var trendCanvasCtx = trendOperationCanvasObj.getContext("2d");
+		trendCanvasCtx.save();
+
+		trendCanvasCtx.lineWidth = 0.5;
+		trendCanvasCtx.setLineDash([5, 5]);
+
+		/* 横线 */
+		var left = kChart.calcAxisXLeftPosition(),
+			right = kChart.calcAxisXRightPosition(trendCanvasCtx.canvas.width);
+		var dataSketch = result_trend.getDataSketch();
+		trendCanvasCtx.beginPath();
+		trendCanvasCtx.moveTo(left, y);
+		trendCanvasCtx.lineTo(right, y);
+		trendCanvasCtx.stroke();
+
+		/* 大圆点 */
+		var dotRadius = 10;
+		trendCanvasCtx.fillStyle = "black";
+		trendCanvasCtx.globalAlpha = 0.1;
+		trendCanvasCtx.beginPath();
+		trendCanvasCtx.moveTo(x, y);
+		trendCanvasCtx.arc(x, y, dotRadius, 2 * Math.PI, 0);
+		trendCanvasCtx.closePath();
+		trendCanvasCtx.fill();
+
+		/* 小圆点 */
+		trendCanvasCtx.globalAlpha = 0.2;
+		trendCanvasCtx.beginPath();
+		trendCanvasCtx.moveTo(x, y);
+		trendCanvasCtx.arc(x, y, dotRadius / 2, 2 * Math.PI, 0);
+		trendCanvasCtx.closePath();
+		trendCanvasCtx.fill();
+
+		trendCanvasCtx.restore();
+	};
+
+	var drawVerticalLine = function(canvasObj, dataMetadata, top, bottom){
+		var detailCtx = canvasObj.getContext("2d");
+		detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
+
+		var x = dataMetadata.renderingHorizontalPosition;
+		if(-1 === x)
+			return;
+
+		/* 竖线 */
+		detailCtx.save();
 		detailCtx.lineWidth = 0.5;
 		detailCtx.setLineDash([5, 5]);
 		detailCtx.beginPath();
 		detailCtx.moveTo(x, top);
 		detailCtx.lineTo(x, bottom);
 		detailCtx.stroke();
-
 		detailCtx.restore();
 	};
 
@@ -99,32 +144,27 @@ util.loadData(function(datas){
 		dataDetailViewingRevertAction: function(lastMetadata){
 			var f = function(canvasObj){
 				var detailCtx = canvasObj.getContext("2d");
-				var left = 0, width = detailCtx.canvas.width;
-				if(null != lastMetadata){
-					var x = lastMetadata.renderingHorizontalPosition;
-					var len = 5;
-					left = Math.max(0, x - len);
-					width = 2 * len;
-				}
-				detailCtx.clearRect(left, 0, width, detailCtx.canvas.height);
+				detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
 			};
 
 			f(trendOperationCanvasObj);
 			f(volumeOperationCanvasObj);
 		},
 		dataDetailViewingAction: function(convertedData, dataMetadata){
-			drawLine(
-				trendOperationCanvasObj.getContext("2d"),
-				dataMetadata.renderingHorizontalPosition,
-				TradeChart2.util.getLinePosition(result_trend.getConfigItem("paddingTop")),
-				TradeChart2.util.getLinePosition(result_trend.getKSubChartSketch().getCanvasHeight())
-			);
-			drawLine(
-				volumeOperationCanvasObj.getContext("2d"),
-				dataMetadata.renderingHorizontalPosition,
+			drawVerticalLine(
+				volumeOperationCanvasObj,
+				dataMetadata,
 				TradeChart2.util.getLinePosition(0),
 				TradeChart2.util.getLinePosition(result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItem("paddingBottom"))
 			);
+
+			drawVerticalLine(
+				trendOperationCanvasObj,
+				dataMetadata,
+				TradeChart2.util.getLinePosition(result_trend.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(result_trend.getKSubChartSketch().getCanvasHeight())
+			);
+			drawHorizontalLineAndDot(dataMetadata);
 
 			dataDetailObj.innerHTML = null == convertedData? "--": (dataMetadata.dataIndex + " --> " + JSON.stringify(convertedData));
 		}

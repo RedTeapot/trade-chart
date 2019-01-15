@@ -17,8 +17,9 @@
 	var KSubChartRenderResult = function(kSubChart, canvasObj){
 		var self = this;
 
-		var kSubChartSketch,
-			DataSketch;
+		var kChartSketch,
+			kSubChartSketch,
+			dataSketch;
 
 		/**
 		 * 获取绘制所使用的指定名称的配置项取值
@@ -65,11 +66,11 @@
 
 		/**
 		 * 设置K线数据素描
-		 * @param {DataSketch} _DataSketch K线数据素描
+		 * @param {DataSketch} _dataSketch K线数据素描
 		 * @returns {KSubChartRenderResult}
 		 */
-		this.setDataSketch = function(_DataSketch){
-			DataSketch = _DataSketch;
+		this.setDataSketch = function(_dataSketch){
+			dataSketch = _dataSketch;
 			return this;
 		};
 		/**
@@ -77,7 +78,7 @@
 		 * @returns {DataSketch} K线数据素描
 		 */
 		this.getDataSketch = function(){
-			return DataSketch
+			return dataSketch;
 		};
 
 		/**
@@ -264,6 +265,18 @@
 		 */
 		this.initCanvas = function(canvasObj){
 			return util.initCanvas(canvasObj, this.getConfigItem("width"), this.getConfigItem("height"));
+		};
+
+		/**
+		 * 根据给定的量计算其在画布上对应的纵坐标位置
+		 * @param {Number} amount 纵坐标量
+		 * @returns {*}
+		 */
+		this.calcYPosition = function(amount){
+			if(null == kSubChartSketch || null == dataSketch)
+				return null;
+
+			return util.getLinePosition(kSubChart.getConfigItem("paddingTop") + kSubChartSketch.calculateHeight(Math.abs(dataSketch.getAmountCeiling() - amount)));
 		};
 	};
 
