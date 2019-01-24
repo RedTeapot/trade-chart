@@ -4,11 +4,21 @@
 	var util = TradeChart2.util;
 
 	/**
+	 * @callback KChartConfig~axisXTickGenerateIndicator
+	 * @param {KData} convertedData 转换后的K线数据
+	 * @param {Object} env 当前的环境信息
+	 * @param {KChart} env.kChart 当前的K线图实例
+	 * @param {Number} env.dataOverallIndexFromRightToLeft 当前数据从右向左的全局索引
+	 * @returns {Boolean} 是否需要为当前数据生成横坐标刻度
+	 */
+
+	/**
 	 * @callback KChartConfig~axisXLabelGenerator
 	 * @param {KData} convertedData 转换后的K线数据
 	 * @param {Number} index 数据在渲染的数据列表中的索引
 	 * @param {KData} previousConvertedData 上一个标签对应的转换后的K线数据
 	 * @param {KData} nextConvertedData 下一个标签对应的转换后的K线数据
+	 * @returns {String}
 	 */
 
 	/**
@@ -27,6 +37,10 @@
 		axisLineColor: null,/** 坐标轴颜色 */
 		axisLineWidth: 0.5,/** 坐标轴线条宽度 */
 
+		axisXTickGenerateIndicator: function(convertedData, env){/* 特定数据对应的横坐标刻度绘制与否的指示器 */
+			var axisXLabelTickSpan = kChart.calcAxisXLabelTickSpan();
+			return env.dataOverallIndexFromRightToLeft % axisXLabelTickSpan === 0;
+		},
 		axisXTickOffset: 5,/** 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
 		axisXTickOffsetFromRight: 0,/** 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/** 横坐标标签距离坐标轴刻度线的距离 */

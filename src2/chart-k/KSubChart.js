@@ -347,6 +347,7 @@
 			var config_groupBarWidth = this.getConfigItem("groupBarWidth"),
 				config_groupGap = this.getConfigItem("groupGap"),
 				config_showAxisXLabel = this.getConfigItem("showAxisXLabel"),
+				config_axisXTickGenerateIndicator = this.getConfigItem("axisXTickGenerateIndicator"),
 				config_axisXLabelGenerator = this.getConfigItem("axisXLabelGenerator");
 
 			var xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
@@ -368,6 +369,11 @@
 			/* 上一个绘制的横坐标刻度对应的数据索引 */
 			var previousXTickDataIndex = null;
 
+			var axisXTickGenerateIndicatorEnv = {
+				kChart: kChart,
+				dataOverallIndexFromRightToLeft: 0,
+			};
+
 			/**
 			 * 根据提供的数据的索引位置获取刻度绘制点
 			 * @param {Number} i 从右向左方向的数据索引位置。索引为0的数据在最后
@@ -376,8 +382,11 @@
 				if(i < 0 || i >= groupCount)
 					return null;
 
-				var dataOverallIndexFromRightToLeft = kDataManager.getElapsedVisibleDataCount() + i;
-				var ifShowTick = dataOverallIndexFromRightToLeft % axisXLabelTickSpan === 0;
+				var dataIndex = groupCount - 1 - i;
+				var data = dataList[dataIndex];
+
+				axisXTickGenerateIndicatorEnv.dataOverallIndexFromRightToLeft = kDataManager.getElapsedVisibleDataCount() + i;
+				var ifShowTick = config_axisXTickGenerateIndicator(data, axisXTickGenerateIndicatorEnv);
 				if(!ifShowTick)
 					return null;
 
@@ -385,9 +394,6 @@
 				ifShowTick = tickX >= xLeft_axisX_content && tickX <= xRight_axisX_content;
 				if(!ifShowTick)
 					return null;
-
-				var dataIndex = groupCount - 1 - i;
-				var data = dataList[dataIndex];
 
 				/* 汇集刻度，用于图形绘制完毕后统一绘制 */
 				var label = (function(){

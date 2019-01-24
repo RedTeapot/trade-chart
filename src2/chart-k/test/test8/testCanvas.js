@@ -102,8 +102,8 @@ util.loadData(function(datas){
 
 		/* 大圆点 */
 		var dotRadius = 10;
-		trendCanvasCtx.fillStyle = "black";
-		trendCanvasCtx.globalAlpha = 0.1;
+		trendCanvasCtx.fillStyle = "#21E050";
+		trendCanvasCtx.globalAlpha = 0.3;
 		trendCanvasCtx.beginPath();
 		trendCanvasCtx.moveTo(x, y);
 		trendCanvasCtx.arc(x, y, dotRadius, 2 * Math.PI, 0);
@@ -111,7 +111,7 @@ util.loadData(function(datas){
 		trendCanvasCtx.fill();
 
 		/* 小圆点 */
-		trendCanvasCtx.globalAlpha = 0.2;
+		trendCanvasCtx.globalAlpha = 1;
 		trendCanvasCtx.beginPath();
 		trendCanvasCtx.moveTo(x, y);
 		trendCanvasCtx.arc(x, y, dotRadius / 2, 2 * Math.PI, 0);
