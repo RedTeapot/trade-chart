@@ -38,14 +38,15 @@
 		axisLineWidth: 0.5,/** 坐标轴线条宽度 */
 
 		axisXTickGenerateIndicator: function(convertedData, env){/* 特定数据对应的横坐标刻度绘制与否的指示器 */
-			var axisXLabelTickSpan = kChart.calcAxisXLabelTickSpan();
-			return env.dataOverallIndexFromRightToLeft % axisXLabelTickSpan === 0;
+			return env.dataOverallIndexFromRightToLeft % 10 === 0;
 		},
 		axisXTickOffset: 5,/** 横坐标刻度距离原点的位移（无论Y轴显示在哪侧，都应用在左侧） */
 		axisXTickOffsetFromRight: 0,/** 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/** 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/** 横坐标标签文字的长度（用于决定以何种方式绘制最后一个刻度：只绘制边界刻度，还是边界刻度和最后一个刻度都绘制） */
 		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/** 横坐标标签文字的输出方法 */
+			if(null == convertedData)
+				console.error(33, index);
 			return convertedData.time;
 		},
 		axisXLabelHorizontalAlign: function(i, n){/** 横坐标标签的水平对齐方式。start：左对齐；center：居中；end：右对齐 */

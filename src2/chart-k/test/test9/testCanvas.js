@@ -1,4 +1,15 @@
 util.loadData(function(datas){
+	window.gapSet = {
+		sum: function(){
+			return Object.values(window.gapSet).reduce(function(rst, v){
+				if(typeof v !== "number")
+					return rst;
+
+				return rst + v
+			}, 0);
+		}
+	};
+
 	var kChartConfig = {
 		width: "100%",/* 整体图形宽度 */
 
@@ -7,15 +18,30 @@ util.loadData(function(datas){
 
 		groupLineWidth: 3,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
 		groupBarWidth: 9,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
-		groupGap: 3,
+		groupGap: function(leftIndex, rightIndex){
+			var gap = 0;
+			if(rightIndex % 10 === 0)
+				gap = 21;
+			else if(rightIndex % 5 === 0)
+				gap = 11;
+			else
+				gap = 3;
 
+			window.gapSet[leftIndex + "-" + rightIndex] = gap;
+
+			return gap;
+		},
+
+		axisXTickGenerateIndicator: function(convertedData, env){/* 特定数据对应的横坐标刻度绘制与否的指示器 */
+			return env.dataOverallIndexFromRightToLeft % 10 === 0;
+		},
 		axisTickLineLength: 6,/* 坐标轴刻度线的长度 */
 		axisLabelOffset: 5,/* 坐标标签距离坐标轴刻度线的距离 */
 		axisLabelFont: null,
 		axisLabelColor: "#333",
 
-		axisXTickOffset: 10,/* 横坐标刻度距离原点的位移 */
-		axisXTickOffsetFromRight: 20,/* 横坐标右侧刻度距离原点的位移 */
+		axisXTickOffset: 0,/* 横坐标刻度距离原点的位移 */
+		axisXTickOffsetFromRight: 0,/* 横坐标右侧刻度距离原点的位移 */
 		axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 	};
 

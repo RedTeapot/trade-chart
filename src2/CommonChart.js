@@ -41,23 +41,34 @@
 			self.fire(evtName_renderingPositionChanges, null, false);
 		};
 
-		var setTotalRenderingOffset = function(v){
-			var h = self.calcHalfGroupBarWidth(),
-				g = self.getConfigItem("groupGap"),
-				b = self.getConfigItem("groupBarWidth");
-			var groupSize = b + g;
+		var setTotalRenderingOffsetFromLeft = function(v){
+			var config_groupBarWidth = self.getConfigItem("groupBarWidth");
 
-			var elapsedDataCount = Math.floor(v / groupSize);
-			var tmp = v % groupSize;
-			if(tmp < b){
-				elapsedDataCount += 0;
-				renderingOffset = tmp;
-			}else{
-				elapsedDataCount += 1;
-				renderingOffset = (g - (tmp - b)) * -1;
+			var rightMostRenderingDataIndex = dataManager.getRightMostRenderableDataIndex();
+			var elapsedDataCount = 0,
+				tmp = v;
+			while(true){
+				var rightIndex = rightMostRenderingDataIndex - elapsedDataCount;
+				var leftIndex = rightIndex - 1;
+				if(leftIndex < 0)
+					break;
+
+				var gap = self.getGroupGap(leftIndex, rightIndex);
+				var groupSize = gap + config_groupBarWidth;
+				if(tmp >= groupSize){
+					tmp -= groupSize;
+					elapsedDataCount += 1;
+				}else if(tmp < config_groupBarWidth){
+					renderingOffset = tmp;
+					break;
+				}else{
+					elapsedDataCount += 1;
+					renderingOffset = (gap - (tmp - config_groupBarWidth)) * -1;
+					break;
+				}
 			}
 
-			var ifChanges = totalRenderingOffset != v;
+			var ifChanges = totalRenderingOffset !== v;
 			totalRenderingOffset = v;
 			if(ifChanges)
 				fireEvent_renderingPositionChanges();
@@ -71,7 +82,7 @@
 			"appendDataList",
 			"getDataList",
 			"getConvertedDataList",
-			"getRenderingDataCount",
+			"getRenderingGroupCount",
 			"getRenderingDataList",
 			"getConvertedRenderingDataList",
 			"getData",
@@ -202,33 +213,82 @@
 		};
 
 		/**
+		 * 获取给定两个相邻索引对应的数据之间的间隙
+		 * @param {Number} leftDataIndex 间隙左侧数据的全局索引（从左向右）
+		 * @param {Number} rightDataIndex 间隙右侧数据的全局索引（从左向右）
+		 * @returns {*}
+		 */
+		this.getGroupGap = function(leftDataIndex, rightDataIndex){
+			var config_groupGap = this.getConfigItem("groupGap");
+			var t = typeof config_groupGap;
+			if(t === "number")
+				return config_groupGap;
+			else if(t === "function")
+				return util.try2Call(config_groupGap, null, leftDataIndex, rightDataIndex);
+			else{
+				console.error("Unknown group gap value: " + config_groupGap);
+				return t;
+			}
+		};
+
+		/**
+		 * 根据给定的最左侧数据索引和最右侧数据索引，计算两组数据之间的所有间隙空间总和
+		 * @param {Number} leftMostDataIndex 最左侧数据的全局索引（从左向右）
+		 * @param {Number} rightMostDataIndex 最右侧数据的全局索引（从左向右）
+		 * @returns {Number}
+		 */
+		this.calcTotalGap = function(leftMostDataIndex, rightMostDataIndex){
+			if(leftMostDataIndex < 0)
+				leftMostDataIndex = 0;
+
+			var index = this.getDataManager().getRenderableGroupCount() - 1;
+			if(rightMostDataIndex > index)
+				rightMostDataIndex = index;
+
+			if(rightMostDataIndex <= leftMostDataIndex)
+				return 0;
+
+			var config_groupGap = this.getConfigItem("groupGap");
+			var t = typeof config_groupGap;
+			if(t === "number")
+				return (rightMostDataIndex - leftMostDataIndex) * config_groupGap;
+			else if(t === "function"){
+				var gap = 0;
+				for(var i = leftMostDataIndex; i < rightMostDataIndex; i++)
+					gap += util.try2Call(config_groupGap, null, i, i + 1);
+
+				return gap;
+			}else{
+				console.error("Unknown group gap value: " + config_groupGap);
+				return 0;
+			}
+		};
+
+		/**
 		 * 计算可以达到左侧极限的最大位移量
 		 * @param {Number} canvasWidth 画布宽度
 		 */
 		var calculateMaxOffsetToReachLeftEdge = function(canvasWidth){
-			var h = self.calcHalfGroupBarWidth(),
-				b = self.getConfigItem("groupBarWidth"),
-				g = self.getConfigItem("groupGap");
+			var h = self._calcHalfGroupBarWidth(),
+				b = self.getConfigItem("groupBarWidth");
 
-			var dataCount = dataManager.getVisibleDataCount();
+			var dataCount = dataManager.getRenderableGroupCount();
 			if(dataCount <= 1)
 				return 0;
 
-			var gap = (dataCount - 1) * g,
-				bar = (dataCount - 2) * b + 2 * (h + 1);
+			var gap = self.calcTotalGap(0, dataManager.getRightMostRenderableDataIndex()),
+				bar = dataCount * b - 2 * h;
 
-			/* 剩余要渲染的数据全部绘制所需要占用的长度 */
+			/* 数据全部绘制所需要占用的长度 */
 			var totalLength = gap + bar;
 			/* 内容区域的横坐标长度 */
-			var axisXContentLength = self.calcAxisXContentRightPosition(canvasWidth) - self.calcAxisXContentLeftPosition() + 1;
+			var axisXContentLength = self._calcAxisXContentRightPosition(canvasWidth) - self._calcAxisXContentLeftPosition() + 1;
 
 			var rst = 0;
 			if(totalLength <= axisXContentLength)
 				rst = 0;
 			else
 				rst = totalLength - axisXContentLength;
-
-			// console.log("@@@", rst, axisXContentLength, totalLength);
 
 			return rst;
 		};
@@ -240,7 +300,7 @@
 		 * @returns {Boolean}
 		 */
 		var checkIfReachesLeftLimit = function(maxGroupCount, canvasWidth){
-			return dataManager.checkIfFirstVisibleDataIsShown(maxGroupCount) && totalRenderingOffset >= calculateMaxOffsetToReachLeftEdge(canvasWidth);
+			return dataManager.checkIfLeftMostRenderableGroupIsVisible(maxGroupCount) && totalRenderingOffset >= calculateMaxOffsetToReachLeftEdge(canvasWidth);
 		};
 
 		/**
@@ -248,7 +308,7 @@
 		 * @returns {Boolean}
 		 */
 		var checkIfReachesRightLimit = function(){
-			return dataManager.checkIfLastVisibleDataIsShown() && totalRenderingOffset <= 0;
+			return dataManager.checkIfRightMostRenderableGroupIsVisible() && totalRenderingOffset <= 0;
 		};
 
 		/**
@@ -265,35 +325,36 @@
 			if(0 === amount)
 				return this;
 
-			TradeChart2.showLog && console.debug("Rendering position ~ TotalRenderingOffset: " + totalRenderingOffset + ", renderingOffset: " + renderingOffset + ", elapsedDataCount: " + dataManager.getElapsedVisibleDataCount());
+			TradeChart2.showLog && console.debug("Rendering position ~ TotalRenderingOffset: " + totalRenderingOffset + ", renderingOffset: " + renderingOffset + ", elapsedDataCount: " + dataManager.getElapsedRenderableGroupCount());
 
 			var elapsedDataCount = 0, offset;
 			var ifMovingToRight = amount > 0;
 			if(ifMovingToRight){/* 向右拖动 */
 				/* 检查是否达到左侧临界处 */
 				var maxOffset = calculateMaxOffsetToReachLeftEdge(canvasWidth);
+				TradeChart2.showLog && console.debug("Max offset to reach left edge: " + maxOffset);
 				if(checkIfReachesLeftLimit(maxGroupCount, canvasWidth)){
 					TradeChart2.showLog && console.info("Reaches left edge, set total rendering offset to " + maxOffset);
-					elapsedDataCount = setTotalRenderingOffset(maxOffset);
-					dataManager.setElapsedDataCount(elapsedDataCount);
+					elapsedDataCount = setTotalRenderingOffsetFromLeft(maxOffset);
+					dataManager.setElapsedRenderableGroupCount(elapsedDataCount);
 					return this;
 				}
 
 				offset = Math.min(maxOffset, totalRenderingOffset + amount);
-				elapsedDataCount = setTotalRenderingOffset(offset);
-				dataManager.setElapsedDataCount(elapsedDataCount);
+				elapsedDataCount = setTotalRenderingOffsetFromLeft(offset);
+				dataManager.setElapsedRenderableGroupCount(elapsedDataCount);
 			}else{
 				/* 检查是否达到右侧临界处 */
 				if(checkIfReachesRightLimit()){
 					TradeChart2.showLog && console.info("Reaches right limit");
-					elapsedDataCount = setTotalRenderingOffset(0);
-					dataManager.setElapsedDataCount(elapsedDataCount);
+					elapsedDataCount = setTotalRenderingOffsetFromLeft(0);
+					dataManager.setElapsedRenderableGroupCount(elapsedDataCount);
 					return this;
 				}
 
 				offset = Math.max(0, totalRenderingOffset + amount);
-				elapsedDataCount = setTotalRenderingOffset(offset);
-				dataManager.setElapsedDataCount(elapsedDataCount);
+				elapsedDataCount = setTotalRenderingOffsetFromLeft(offset);
+				dataManager.setElapsedRenderableGroupCount(elapsedDataCount);
 			}
 
 			return this;
@@ -316,7 +377,7 @@
 		 * 计算横坐标左侧位置（坐标原点为：画布左上角）
 		 * @returns {Number}
 		 */
-		this.calcAxisXLeftPosition = function(){
+		this._calcAxisXLeftPosition = function(){
 			var config_paddingLeft = this.getConfigItem("paddingLeft");
 			return util.getLinePosition(config_paddingLeft);
 		};
@@ -326,8 +387,8 @@
 		 * @param {Number} canvasWidth 画布宽度
 		 * @returns {Number}
 		 */
-		this.calcAxisXRightPosition = function(canvasWidth){
-			var xLeft_axisX = this.calcAxisXLeftPosition();
+		this._calcAxisXRightPosition = function(canvasWidth){
+			var xLeft_axisX = this._calcAxisXLeftPosition();
 			var axisXWidth = canvasWidth - this.getConfigItem("paddingLeft") - this.getConfigItem("paddingRight");
 			if(axisXWidth <= 0)
 				return xLeft_axisX;
@@ -339,7 +400,7 @@
 		 * 根据给定的配置信息计算蜡烛一半的宽度
 		 * @returns {Number}
 		 */
-		this.calcHalfGroupBarWidth = function(){
+		this._calcHalfGroupBarWidth = function(){
 			return Math.floor(this.getConfigItem("groupBarWidth") / 2);
 		};
 
@@ -347,9 +408,6 @@
 		eventDrive(this);
 	};
 	CommonChart.prototype = Object.create(TradeChart2.prototype);
-
-	/* 内部状态位，用于控制是否输出日志，以辅助定位插件问题 */
-	CommonChart.showLog = true;
 
 	util.defineReadonlyProperty(TradeChart2, "CommonChart", CommonChart);
 })();

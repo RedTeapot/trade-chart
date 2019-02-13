@@ -529,7 +529,6 @@
 
 		initCanvas(operationCanvasObj, kSubChartRenderResult.getConfigItem("width"), kSubChartRenderResult.getConfigItem("height"));
 
-
 		var isModeViewDetail = true,
 			lastX = 0,
 			lastMetadata = null;
@@ -546,7 +545,7 @@
 			try2Call(dataDetailViewingRevertAction, null, lastMetadata);
 
 			var dataIndex = kSubChartRenderResult.getRenderingDataIndex(x);
-			if(-1 == dataIndex)
+			if(-1 === dataIndex)
 				return;
 
 			var convertedData = kSubChartRenderResult.getConvertedRenderingData(x),

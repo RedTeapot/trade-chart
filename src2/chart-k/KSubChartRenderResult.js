@@ -120,7 +120,7 @@
 		this.getRenderingGroupCount = function(){
 			var kChart = this.getKChart();
 			var maxGroupCount = this.getMaxGroupCount(),
-				dataCount = kChart.getRenderingDataCount();
+				dataCount = kChart.getRenderingGroupCount();
 			return Math.max(Math.min(maxGroupCount, dataCount), 0);
 		};
 
@@ -145,45 +145,7 @@
 		 * @returns {Number} 取值为正，代表图形正文向左偏移
 		 */
 		this.getChartContentHorizontalRenderingOffset = function(){
-			return kSubChart.getChartContentHorizontalRenderingOffset(kChartSketch);
-		};
-
-		/**
-		 * 根据给定的相对横坐标位置，获取距离右侧边界位置的空间中渲染的数据个数（包括给定位置所匹配的数据）
-		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
-		 */
-		var getRightSideDataCount = function(x){
-			var kChart = kSubChart.getKChart();
-			x -= kChart.getRenderingOffset();
-			x += self.getChartContentHorizontalRenderingOffset();
-
-			var h = kChart.calcHalfGroupBarWidth();
-			var minX = Math.floor(kChart.calcAxisXContentLeftPosition()) - h;
-			var maxX = minX + kChartSketch.getContentWidth() - 1 + 2 * h;
-
-			if (x < minX || x > maxX){
-				TradeChart2.showLog && console.warn("Not in region", x, minX, maxX);
-				return -1;
-			}
-
-			var kDataManager = kChart.getDataManager();
-			var firstIndex = kDataManager.getFirstRenderingDataIndexFromRight();
-			if(-1 === firstIndex){
-				TradeChart2.showLog && console.warn("No data rendered.");
-				return -1;
-			}
-
-			var b = self.getConfigItem("groupBarWidth"),
-				g = self.getConfigItem("groupGap");
-			var groupSize = b + g;
-
-			var tmpX = maxX - x;
-			var c = Math.floor(tmpX / groupSize),
-				t = tmpX % groupSize;
-			if(t >= b + Math.floor(g / 2))
-				c += 1;
-
-			return c;
+			return kSubChart._getChartContentHorizontalRenderingOffsetFromRight(kChartSketch);
 		};
 
 		/**
@@ -192,44 +154,75 @@
 		 * @returns {Number} 相对横坐标对应的数据索引。如果位置在区域左侧，则返回0；如果在区域右侧，则返回最后一条数据的索引。如果数据区域中没有任何数据，则返回-1
 		 */
 		this.getRenderingDataIndex = function(x){
-			var t = getRightSideDataCount(x);
-			if(-1 === t){
-				TradeChart2.showLog && console.warn("No data rendered on the right side");
+			var kChart = kSubChart.getKChart();
+
+			var h = kChart._calcHalfGroupBarWidth();
+			var minX = Math.floor(kChart._calcAxisXContentLeftPosition()) - h;
+			var maxX = (minX + h) + kChartSketch.getContentWidth() - 1 + h;
+
+			if (x < minX || x > maxX){
+				TradeChart2.showLog && console.warn("Not in region.", x, minX, maxX);
 				return -1;
 			}
 
-			var firstIndex = kSubChart.getKChart().getDataManager().getFirstRenderingDataIndexFromRight();
-			var index = firstIndex - t;
-			// console.log("getRenderingDataIndex:", x, index, firstIndex, t);
+			var dataManager = kChart.getDataManager();
+			var rightMostRenderingDataIndex = dataManager.getRightMostRenderingDataIndex();
+			if(-1 === rightMostRenderingDataIndex){
+				TradeChart2.showLog && console.warn("No data rendered.");
+				return -1;
+			}
+
+			var b = self.getConfigItem("groupBarWidth");
+
+			var rightMostDataPosition = kSubChart._getRightMostDataHorizontalRenderingPosition(self.getKChartSketch());
+			var tmpX = rightMostDataPosition - x, index = rightMostRenderingDataIndex;
+
+			while(true){
+				var leftIndex = index - 1;
+				if(leftIndex < 0)
+					break;
+
+				var gap = kChart.getGroupGap(leftIndex, index);
+				var halfGap = Math.ceil(gap / 2);
+				if(tmpX < h + halfGap)
+					break;
+
+				index -= 1;
+				tmpX -= gap + b;
+			}
+
 			return index;
 		};
 
 		/**
-		 * 根据给定的数据索引，获取其在画布上 的渲染位置（中心位置）
+		 * 根据给定的数据索引，获取其在画布上的渲染位置（中心位置）
 		 * @param {Number} dataIndex 被渲染的数据的索引位置（相对于整个数据）
 		 * @returns {Number} 渲染位置，亦即数据的中心位置在画布上的横坐标。坐标原点为画布的左上角。如果数据没有被渲染，则返回-1
 		 */
 		this.getRenderingHorizontalPosition = function(dataIndex){
 			var kChart = kSubChart.getKChart();
 
-			var firstIndex = kSubChart.getKChart().getDataManager().getFirstRenderingDataIndexFromRight();
-			if(firstIndex === -1){
+			var rightMostRenderingDataIndex = kSubChart.getKChart().getDataManager().getRightMostRenderingDataIndex();
+			if(rightMostRenderingDataIndex === -1){
 				TradeChart2.showLog && console.log("No data rendered");
 				return -1;
 			}
 
-			var lastIndex = firstIndex - this.getRenderingGroupCount() - 1;
-			if(dataIndex < lastIndex || dataIndex > firstIndex){
-				TradeChart2.showLog && console.warn("Not in data region ", dataIndex, firstIndex, lastIndex);
+			var leftMostRenderingDataIndex = rightMostRenderingDataIndex - this.getRenderingGroupCount() - 1;
+			if(dataIndex < leftMostRenderingDataIndex || dataIndex > rightMostRenderingDataIndex){
+				TradeChart2.showLog && console.warn("Not in data region for index: " + dataIndex + ". Max: " + rightMostRenderingDataIndex + ", min: " + leftMostRenderingDataIndex);
 				return -1;
 			}
 
-			var b = self.getConfigItem("groupBarWidth"),
-				g = self.getConfigItem("groupGap");
-			var groupSize = b + g;
+			var rightMostDataPosition = kSubChart._getRightMostDataHorizontalRenderingPosition(self.getKChartSketch());
+			var config_groupBarWidth = self.getConfigItem("groupBarWidth");
 
-			var x = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()) - (firstIndex - dataIndex) * groupSize + kChart.getRenderingOffset() - this.getChartContentHorizontalRenderingOffset();
-			return util.getLinePosition(x);
+			var totalGapSize = kChart.calcTotalGap(dataIndex, rightMostRenderingDataIndex),
+				totalBarSize = Math.abs(rightMostRenderingDataIndex - dataIndex) * config_groupBarWidth;
+
+			var position = util.getLinePosition(rightMostDataPosition - totalGapSize - totalBarSize);
+			// console.log(111, dataIndex, rightMostDataPosition, totalGapSize, totalBarSize, "->", position);
+			return position;
 		};
 
 		/**
@@ -272,7 +265,7 @@
 		 * @param {Number} amount 纵坐标量
 		 * @returns {*}
 		 */
-		this.calcYPosition = function(amount){
+		this._calcYPosition = function(amount){
 			if(null == kSubChartSketch || null == dataSketch)
 				return null;
 

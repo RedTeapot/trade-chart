@@ -64,15 +64,8 @@
 
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
-
-				config_paddingLeft = this.getConfigItem("paddingLeft"),
 				config_paddingTop = this.getConfigItem("paddingTop"),
-
-				config_axisYTickOffset = this.getConfigItem("axisYTickOffset"),
-
-				config_groupGap = this.getConfigItem("groupGap"),
-				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
-				config_groupLineWidth = this.getConfigItem("groupLineWidth");
+				config_axisYTickOffset = this.getConfigItem("axisYTickOffset");
 
 			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
 			config.setConfigItemConvertedValue("height", config_height);
@@ -83,20 +76,20 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_IndexMAChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
-			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
+			var xPositionList = self._getRenderingXPositionListFromRight(kChartSketch);
 			var kDataManager = kChart.getDataManager();
-			var dataList = kDataManager.getRenderingDataList(kChartSketch.getMaxGroupCount());
+			var dataList = kDataManager.getRenderingDataList(xPositionList.length);
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
 			/* 蜡烛一半的宽度 */
-			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
+			var halfGroupBarWidth = kChart._calcHalfGroupBarWidth();
 
 			/* 横坐标位置 */
-			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
-				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
-				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
+			var xLeft_axisX = kChart._calcAxisXLeftPosition(),
+				xRight_axisX = kChart._calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
+				xLeft_axisX_content = kChart._calcAxisXContentLeftPosition(),
+				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 
@@ -126,19 +119,19 @@
 				ctx.save();
 
 				/* 绘制坐标区域背景 */
-				self.renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
-
-				/* 绘制X轴、X轴刻度、网格竖线 */
-				finishRemainingAxisXRendering = self.renderAxisX(ctx, kChartSketch, kSubChartSketch);
+				self._renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
 
 				/* 绘制Y轴、Y轴刻度、网格横线 */
 				config_axisYTickOffset = util.parseAsNumber(config_axisYTickOffset, 0);
-				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, dataSketch, {
+				finishRemainingAxisYRendering = self._renderAxisY(ctx, kChartSketch, kSubChartSketch, dataSketch, {
 					axisYTickConverter: function(tick){
 						tick.y -= config_axisYTickOffset;
 						return tick;
 					}
 				});
+
+				/* 绘制X轴、X轴刻度、网格竖线 */
+				finishRemainingAxisXRendering = self._renderAxisX(ctx, kChartSketch, kSubChartSketch);
 
 				ctx.restore();
 			})();
@@ -230,7 +223,7 @@
 
 						var x = util.getLinePosition(xPositionList[i]),
 							y = util.getLinePosition($yTop_axisY + calcHeight(maAmount));
-						TradeChart2.showLog && console.log(maKey, i, x, y);
+						// TradeChart2.showLog && console.log(maKey, i, x, y);
 
 						if(isFirstDot){
 							ctx.beginPath();
@@ -254,10 +247,10 @@
 			finishRemainingAxisXRendering();
 			finishRemainingAxisYRendering();
 
-			var renderResult = this.getLatestRenderResult(canvasObj);
+			var renderResult = this._getLatestRenderResult(canvasObj);
 			if(null == renderResult){
 				renderResult = new KSubChart_IndexMARenderResult(this, canvasObj);
-				this.setLatestRenderResult(canvasObj, renderResult);
+				this._setLatestRenderResult(canvasObj, renderResult);
 			}
 			renderResult.setKChartSketch(kChartSketch)
 				.setKSubChartSketch(kSubChartSketch)

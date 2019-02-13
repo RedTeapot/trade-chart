@@ -5,17 +5,12 @@
 		CommonChart = TradeChart2.CommonChart,
 		KChartConfig = TradeChart2.KChartConfig,
 		CommonDataManager = TradeChart2.CommonDataManager,
+		CommonChartConfig = TradeChart2.CommonChartConfig,
 		KChartSketch = TradeChart2.KChartSketch,
 		eventDrive = TradeChart2.eventDrive;
 
 	var numBig = function(big){
 		return Number(big.toString());
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
-	var ceilBig = function(big){
-		return Math.ceil(numBig(big));
 	};
 
 	/**
@@ -65,6 +60,9 @@
 
 		util.defineReadonlyProperty(this, "id", util.randomString("k-", 3));
 
+
+		var super_updateRenderingOffsetBy = this.updateRenderingOffsetBy;
+
 		/**
 		 * 更新“绘制位置的横向位移”，使其在既有基础上累加上给定的偏移量
 		 * 绘制的起点位置，为图形右侧
@@ -73,7 +71,6 @@
 		 * @param {Number} canvasWidth 画布宽度
 		 * @returns {KChart}
 		 */
-		var super_updateRenderingOffsetBy = this.updateRenderingOffsetBy;
 		this.updateRenderingOffsetBy = function(amount, canvasWidth){
 			amount = util.parseAsNumber(amount, 0);
 			if(0 === amount)
@@ -95,13 +92,21 @@
 		};
 
 		/**
+		 * 获取相邻两组数据之间间隙的最大值
+		 * @returns {Number|null}
+		 */
+		this.getMaxGroupGap = function(){
+			return CommonChartConfig.getMaxGroupGap(config.getConfig());
+		};
+
+		/**
 		 * 计算横坐标正文区域左侧位置（坐标原点为：画布左上角）
 		 * @returns {Number}
 		 */
-		this.calcAxisXContentLeftPosition = function(){
+		this._calcAxisXContentLeftPosition = function(){
 			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset");
 
-			var xLeft_axisX = this.calcAxisXLeftPosition();
+			var xLeft_axisX = this._calcAxisXLeftPosition();
 			return xLeft_axisX + Math.floor(config_axisXTickOffset);
 		};
 
@@ -110,34 +115,10 @@
 		 * @param {Number} canvasWidth 画布宽度
 		 * @returns {Number}
 		 */
-		this.calcAxisXContentRightPosition = function(canvasWidth){
+		this._calcAxisXContentRightPosition = function(canvasWidth){
 			var config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
-			var xRight_axisX = this.calcAxisXRightPosition(canvasWidth);
+			var xRight_axisX = this._calcAxisXRightPosition(canvasWidth);
 			return xRight_axisX - Math.floor(config_axisXTickOffsetFromRight);
-		};
-
-		/**
-		 * 根据给定的配置信息计算一组数据绘制宽度的一半的宽度
-		 * @returns {Number}
-		 */
-		this.calcHalfGroupSize = function(){
-			var config_groupGap = this.getConfigItem("groupGap"),
-				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
-				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");
-
-			return Math.max((config_groupBarWidth + config_groupGap) / 2, config_axisXLabelSize / 2);
-		};
-
-		/**
-		 * 根据设定的配置，计算横坐标刻度标签的刻度跨度，亦即一个刻度覆盖几组数据
-		 * @returns {Number}
-		 */
-		this.calcAxisXLabelTickSpan = function(){
-			var config_groupGap = this.getConfigItem("groupGap"),
-				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
-				config_axisXLabelSize = this.getConfigItem("axisXLabelSize");
-
-			return Math.ceil(config_axisXLabelSize / (config_groupBarWidth + config_groupGap));
 		};
 	};
 	KChart.prototype = Object.create(CommonChart.prototype);

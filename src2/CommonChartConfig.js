@@ -3,6 +3,18 @@
 	var util = TradeChart2.util;
 
 	/**
+	 * @callback GroupGapCalculator~getMaxValue 自定义相邻两组数据之间的间隔时，间隙的可能最大值的获取方法
+	 * @returns {Number}
+	 */
+
+	/**
+	 * @callback GroupGapCalculator 相邻两组数据之间间隔的计算器
+	 * @param {Number} leftDataOverallIndex 间隙左侧数据从左向右的全局索引
+	 * @param {Number} rightDataOverallIndex 间隙右侧数据从左向右的全局索引
+	 * @returns {Number} 该组数据左方需要留下的，与左侧数据之间的间隔。单位：像素
+	 */
+
+	/**
 	 * 默认的，作用于所有类型图形的全局配置项
 	 */
 	var defaultConfig = {
@@ -13,9 +25,116 @@
 
 		groupLineWidth: 1,/** 绘制中间位置线的宽度。最好为奇数，从而使得线可以正好在正中间 */
 		groupBarWidth: 5,/** 绘制柱的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
-		groupGap: 3,/** 相邻两组数据之间的间隔 */
+
+		/**
+		 * 相邻两组数据之间的间隔
+		 * 1. {Number|GroupGapCalculator} 用于指定两组数据之间的固定间隔，如：1，function(){return 3;}等，单位：像素
+		 * 2. {String} autoDividedByGroupCount 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间。
+		 */
+		groupGap: 3,
 	};
 	Object.freeze && Object.freeze(defaultConfig);
+
+	var NameValueBinding = function(n, v){
+		util.defineReadonlyProperty(this, "name", n);
+
+		this.getValue = function(){
+			return v;
+		};
+
+		this.setValue = function(_v){
+			v = _v;
+			return this;
+		};
+	};
+
+	var NameValueBindingSet = function(setName, defaultValue){
+		var bindingList = [];
+
+		var getBinding = function(name){
+			for(var i = 0; i < bindingList.length; i++)
+				if(bindingList[i].name === name)
+					return bindingList[i];
+
+			return null;
+		};
+
+		util.defineReadonlyProperty(this, "name", setName);
+
+		this.has = function(name){
+			var binding = getBinding(name);
+			if(null === binding)
+				return false;
+
+			return true;
+		};
+
+		this.getValue = function(name){
+			if(arguments.length === 0)
+				return defaultValue;
+
+			var binding = getBinding(name);
+			if(null === binding)
+				return null;
+
+			return binding.getValue();
+		};
+
+		this.setValue = function(name, value){
+			if(arguments.length === 1){
+				defaultValue = arguments[0];
+			}else{
+				var binding = getBinding(name);
+				if(null === binding){
+					binding = new NameValueBinding(name, value);
+					bindingList.push(binding);
+				}
+
+				binding.setValue(value);
+				return this;
+			}
+		};
+	};
+
+	/**
+	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
+	 * @param {String} name 配置项名称
+	 * @param {KChartConfig} config 配置集合
+	 * @returns {*}
+	 */
+	var getConfigItem = function(name, config){
+		if(null != config && name in config)
+			return config[name];
+		else if(name in defaultConfig)
+			return defaultConfig[name];
+		else{
+			console.warn("Unknown configuration item: " + name);
+			return undefined;
+		}
+	};
+
+	/**
+	 * 获取相邻两组数据之间间隙的最大值
+	 * @param {KChartConfig} config 配置集合
+	 * @returns {Number|null}
+	 */
+	var getMaxGroupGap = function(config){
+		var config_groupGap = getConfigItem("groupGap", config);
+		var t = typeof config_groupGap;
+		if(t === "number")
+			return config_groupGap;
+		else if(t === "function"){
+			if(typeof t.getMaxValue === "function")
+				return util.try2Call(t.getMaxValue());
+			else{
+				console.error("No method of name: 'getMaxValue' found in given group gap calculator.");
+				return null;
+			}
+		}else{
+			console.error("Can not determine the max group gap by value: " + t);
+			return null;
+		}
+	};
 
 	/**
 	 * 绘制配置
@@ -34,13 +153,13 @@
 
 		/**
 		 * 取值被转换了的配置项集合。
-		 * 部分配置项因为需要对外开放，所以可能具有一定的语义，但不利于程序工作，
+		 * 部分配置项因为需要对外开放，所以可能具有一定的语义，但不利于程序工作。
 		 * 此时可借助配置项取值转换，将识别语义后得到的对应的量化数字暂存起来，当
 		 * 语义化的配置没有改变时，读取暂存的量化数字。
 		 * 例如：对外开放的配置项：width 可以设置为100%，代表“与父容器宽度相当”，
-		 * 但转换后的数字，即为具体的宽度像素值，如：1921。
+		 * 但转换后的数字，代表的是具体的宽度像素值，如：1921。
 		 *
-		 * @type {Object<String, *>}
+		 * @type {NameValueBindingSet}
 		 */
 		var convertedConfigValue = {};
 
@@ -85,13 +204,17 @@
 		};
 
 		/**
-		 * 获取指定名称对应的配置项取值
+		 * 获取指定名称对应的配置项取值。如果配置项取值的取值被做了转换，则返回转换后的值
 		 * @param {String} name 配置项名称
+		 * @param {String} [aspect=default] 配置项取值的转换方面
 		 * @returns {*}
 		 */
-		this.getConfigItemValue = function(name){
+		this.getConfigItemValue = function(name, aspect){
+			if(arguments.length < 2)
+				aspect = "default";
+
 			if(name in convertedConfigValue)
-				return convertedConfigValue[name];
+				return convertedConfigValue[name].getValue();
 			else if(name in config){
 				return config[name];
 			}else if(name in dftConfig)
@@ -104,6 +227,23 @@
 		};
 
 		/**
+		 * 获取指定名称对应的配置项的原始取值（转换之前的取值）
+		 * @param {String} name 配置项名称
+		 * @returns {*}
+		 */
+		this.getOriginalConfigItemValue = function(name){
+			if(name in config){
+				return config[name];
+			}else if(name in dftConfig)
+				return dftConfig[name];
+
+			if(null != upstreamConfig)
+				return upstreamConfig.getOriginalConfigItemValue(name);
+			else
+				return null;
+		};
+
+		/**
 		 * 设置配置项取值
 		 * @param {String} name 配置项名称
 		 * @param {*} value 配置项取值
@@ -111,7 +251,7 @@
 		 */
 		this.setConfigItemValue = function(name, value){
 			if(!this.supportsConfigItem(name)){
-				console.warn("Unknown k chart config item: " + name);
+				console.warn("Unknown chart config item: " + name);
 			}
 
 			config[name] = value;
@@ -122,14 +262,21 @@
 		 * 设置被转换了的配置项取值
 		 * @param {String} name 配置项名称
 		 * @param {*} convertedValue 转换后的配置项取值
+		 * @param {String} [aspect=default] 配置项取值的转换方面
 		 * @returns {CommonChartConfig}
 		 */
-		this.setConfigItemConvertedValue = function(name, convertedValue){
+		this.setConfigItemConvertedValue = function(name, convertedValue, aspect){
+			if(arguments.length < 3)
+				aspect = "default";
+
 			if(!this.supportsConfigItem(name)){
 				console.warn("Unknown k chart config item: " + name);
 			}
 
-			convertedConfigValue[name] = convertedValue;
+			if(!(name in convertedConfigValue))
+				convertedConfigValue[name] = new NameValueBindingSet(name, arguments.length < 3? convertedValue: null);
+			convertedConfigValue[name].setValue(aspect, convertedValue);
+
 			return this;
 		};
 
@@ -203,6 +350,13 @@
 			return upstreamConfig;
 		};
 	};
+
+	/**
+	 * 获取相邻两组数据之间间隙的最大值
+	 * @param {KChartConfig} config 配置集合
+	 * @returns {Number|null}
+	 */
+	CommonChartConfig.getMaxGroupGap = getMaxGroupGap;
 
 	util.defineReadonlyProperty(TradeChart2, "CommonChartConfig", CommonChartConfig);
 	util.defineReadonlyProperty(TradeChart2, "COMMON_DEFAULT_CONFIG", defaultConfig);

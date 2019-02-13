@@ -61,8 +61,6 @@
 		this.implRender = function(canvasObj, env){
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
-
-				config_paddingLeft = this.getConfigItem("paddingLeft"),
 				config_paddingTop = this.getConfigItem("paddingTop"),
 
 				config_axisYTickOffset = this.getConfigItem("axisYTickOffset"),
@@ -71,7 +69,6 @@
 				config_appreciatedColor = this.getConfigItem("appreciatedColor"),
 				config_depreciatedColor = this.getConfigItem("depreciatedColor"),
 
-				config_groupGap = this.getConfigItem("groupGap"),
 				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
 				config_groupLineWidth = this.getConfigItem("groupLineWidth");
 
@@ -84,19 +81,19 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
-			var xPositionList = self.getRenderingXPositionListFromRight(kChartSketch);
-			var dataList = kChart.getDataManager().getConvertedRenderingDataList(kChartSketch.getMaxGroupCount());
+			var xPositionList = self._getRenderingXPositionListFromRight(kChartSketch);
+			var dataList = kChart.getDataManager().getConvertedRenderingDataList(xPositionList.length);
 
 			/* 绘制的数据个数 */
 			var groupCount = dataList.length;
 			/* 蜡烛一半的宽度 */
-			var halfGroupBarWidth = kChart.calcHalfGroupBarWidth();
+			var halfGroupBarWidth = kChart._calcHalfGroupBarWidth();
 
 			/* 横坐标位置 */
-			var xLeft_axisX = kChart.calcAxisXLeftPosition(),
-				xRight_axisX = kChart.calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
-				xLeft_axisX_content = kChart.calcAxisXContentLeftPosition(),
-				xRight_axisX_content = kChart.calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
+			var xLeft_axisX = kChart._calcAxisXLeftPosition(),
+				xRight_axisX = kChart._calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
+				xLeft_axisX_content = kChart._calcAxisXContentLeftPosition(),
+				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
 
@@ -126,19 +123,19 @@
 				ctx.save();
 
 				/* 绘制坐标区域背景 */
-				self.renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
-
-				/* 绘制X轴、X轴刻度、网格竖线 */
-				finishRemainingAxisXRendering = self.renderAxisX(ctx, kChartSketch, kSubChartSketch);
+				self._renderBackground(ctx, kChartSketch.getAxisXWidth(), kSubChartSketch.getAxisYHeight());
 
 				/* 绘制Y轴、Y轴刻度、网格横线 */
 				config_axisYTickOffset = util.parseAsNumber(config_axisYTickOffset, 0);
-				finishRemainingAxisYRendering = self.renderAxisY(ctx, kChartSketch, kSubChartSketch, dataSketch, {
+				finishRemainingAxisYRendering = self._renderAxisY(ctx, kChartSketch, kSubChartSketch, dataSketch, {
 					axisYTickConverter: function(tick){
 						tick.y -= config_axisYTickOffset;
 						return tick;
 					}
 				});
+
+				/* 绘制X轴、X轴刻度、网格竖线 */
+				finishRemainingAxisXRendering = self._renderAxisX(ctx, kChartSketch, kSubChartSketch);
 
 				ctx.restore();
 			})();
@@ -179,23 +176,6 @@
 					if(barHeight < 1)
 						barHeight = 1;
 
-					if(i === 0 || i === groupCount - 1){
-						/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
-						var minY = Math.min(lineYTop, barY),
-							maxHeight = Math.max(lineYBottom - lineYTop, barHeight) + 4;
-						if(minY > 1)
-							minY -= 2;
-						else if(minY > 0)
-							minY -= 1;
-
-						var oldImgData;
-
-						if(i === 0)
-							oldImgData = ctx.getImageData(xRightEdge_axisX_content + 1, minY, config_width - xRightEdge_axisX_content - 1, maxHeight);
-						else
-							oldImgData = ctx.getImageData(0, minY, xLeftEdge_axisX_content, maxHeight);
-					}
-
 					/* 绘制线 */
 					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
 					if(config_groupLineWidth > 1){
@@ -214,18 +194,20 @@
 					/* 绘制蜡烛 */
 					ctx.strokeWidth = 0;
 					ctx.fillRect(Math.floor(barX), Math.round(barY), config_groupBarWidth, Math.round(barHeight));
-
-					if(i === 0 || i === groupCount - 1){
-						/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
-						if(i === 0)
-							ctx.putImageData(oldImgData, xRightEdge_axisX_content + 1, minY);
-						else
-							ctx.putImageData(oldImgData, 0, minY);
-					}
 				};
 
-				for(var i = 0; i < groupCount; i++)
+				/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
+				var leftX = 0,
+					rightX = xRightEdge_axisX_content + 1;
+				var leftOldImgData = ctx.getImageData(leftX, config_paddingTop, xLeftEdge_axisX_content, kSubChartSketch.getContentHeight()),
+					rightOldImgData = ctx.getImageData(rightX, config_paddingTop, config_width - xRightEdge_axisX_content - 1, kSubChartSketch.getContentHeight());
+
+				for(var i = 0; i < groupCount && i < xPositionList.length; i++)
 					renderCandle(i);
+
+				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
+				ctx.putImageData(leftOldImgData, leftX, config_paddingTop);
+				ctx.putImageData(rightOldImgData, rightX, config_paddingTop);
 
 				ctx.restore();
 			})();
@@ -234,10 +216,10 @@
 			finishRemainingAxisXRendering();
 			finishRemainingAxisYRendering();
 
-			var renderResult = this.getLatestRenderResult(canvasObj);
+			var renderResult = this._getLatestRenderResult(canvasObj);
 			if(null == renderResult){
 				renderResult = new KSubChart_CandleRenderResult(this, canvasObj);
-				this.setLatestRenderResult(canvasObj, renderResult);
+				this._setLatestRenderResult(canvasObj, renderResult);
 			}
 			renderResult.setKChartSketch(kChartSketch)
 				.setKSubChartSketch(kSubChartSketch)
