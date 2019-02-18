@@ -78,11 +78,11 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
-			var xPositionList = self._getRenderingXPositionListFromRight(kChartSketch);
-			var dataList = kChart.getDataManager().getConvertedRenderingDataList(xPositionList.length);
+			var dataManager = kChart.getDataManager();
+			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
 
 			/* 绘制的数据个数 */
-			var groupCount = dataList.length;
+			var groupCount = xPositionAndDataIndexList.length;
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart._calcHalfGroupBarWidth();
 
@@ -139,9 +139,11 @@
 				 * @param {Number} i 数据索引（从右向左）
 				 */
 				var renderVolume = function(i){
+					var dp = xPositionAndDataIndexList[i];
+
 					var dataIndex = groupCount - 1 - i;
-					var data = dataList[dataIndex];
-					var x = xPositionList[i] - halfGroupBarWidth;
+					var data = dataManager.getConvertedData(dp.dataIndex);
+					var x = dp.x - halfGroupBarWidth;
 
 					if(i === 0){
 						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);
@@ -175,7 +177,7 @@
 				var leftOldImgData = ctx.getImageData(leftX, config_paddingTop, xLeftEdge_axisX_content, kSubChartSketch.getContentHeight()),
 					rightOldImgData = ctx.getImageData(rightX, config_paddingTop, config_width - xRightEdge_axisX_content - 1, kSubChartSketch.getContentHeight());
 
-				for(var i = 0; i < groupCount && i < xPositionList.length; i++)
+				for(var i = 0; i < xPositionAndDataIndexList.length; i++)
 					renderVolume(i);
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */

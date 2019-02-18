@@ -76,12 +76,11 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_IndexMAChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
-			var xPositionList = self._getRenderingXPositionListFromRight(kChartSketch);
-			var kDataManager = kChart.getDataManager();
-			var dataList = kDataManager.getRenderingDataList(xPositionList.length);
+			var dataManager = kChart.getDataManager();
+			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
 
 			/* 绘制的数据个数 */
-			var groupCount = dataList.length;
+			var groupCount = xPositionAndDataIndexList.length;
 			/* 蜡烛一半的宽度 */
 			var halfGroupBarWidth = kChart._calcHalfGroupBarWidth();
 
@@ -150,7 +149,7 @@
 			/* 计算并附加MA数据 */
 			(function(){
 				/* 缓存需要被反复使用的收盘价，降低计算量 */
-				var _dataList = kDataManager.getDataList();
+				var _dataList = dataManager.getDataList();
 				for(var i = 0; i < _dataList.length; i++){
 					var d = _dataList[i];
 					if(null == d || typeof d !== "object")
@@ -161,7 +160,7 @@
 					if(null != closePrice)
 						continue;
 
-					closePrice = +kDataManager.getConvertedData(d).closePrice;
+					closePrice = +dataManager.getConvertedData(d).closePrice;
 					CommonDataManager.setAttachedData(d, k, closePrice);
 				}
 
@@ -193,7 +192,7 @@
 			})();
 
 			/* 绘制MA图 */
-			xPositionList.reverse();
+			xPositionAndDataIndexList.reverse();
 			(function(){
 				var maIndexColorMap = self.getConfigItem("maIndexColorMap") || {};
 
@@ -216,12 +215,14 @@
 					ctx.strokeStyle = maIndexColorMap[maKey];
 
 					var isFirstDot = true;
-					for(var i = 0; i < dataList.length; i++){
-						var maAmount = CommonDataManager.getAttachedData(dataList[i], maKey);
+					for(var i = 0; i < groupCount; i++){
+						var dp = xPositionAndDataIndexList[i];
+
+						var maAmount = CommonDataManager.getAttachedData(dataManager.getData(dp.dataIndex), maKey);
 						if(null == maAmount)
 							continue;
 
-						var x = util.getLinePosition(xPositionList[i]),
+						var x = util.getLinePosition(dp.x),
 							y = util.getLinePosition($yTop_axisY + calcHeight(maAmount));
 						// TradeChart2.showLog && console.log(maKey, i, x, y);
 

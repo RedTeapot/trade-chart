@@ -83,12 +83,11 @@
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_TrendChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
-			var xPositionList = self._getRenderingXPositionListFromRight(kChartSketch);
+			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
 			var dataManager = kChart.getDataManager();
-			var dataList = dataManager.getRenderingDataList(xPositionList.length);
 
 			/* 绘制的数据个数 */
-			var groupCount = dataList.length;
+			var groupCount = xPositionAndDataIndexList.length;
 
 			/* 横坐标位置 */
 			var xLeft_axisX_content = kChart._calcAxisXContentLeftPosition(),
@@ -148,10 +147,12 @@
 				/* 确定折线点 */
 				var dots = [],
 					avgDots = [];
-				for(var i = 0; i < groupCount && i < xPositionList.length; i++){
-					var dataIndex = groupCount - 1 - i;
-					var data = dataList[dataIndex];
-					var x = util.getLinePosition(xPositionList[i]);
+				for(var i = 0; i < xPositionAndDataIndexList.length; i++){
+					var dp = xPositionAndDataIndexList[i];
+
+					var dataIndex = dp.dataIndex;
+					var data = dataManager.getData(dataIndex);
+					var x = util.getLinePosition(dp.x);
 
 					var closePrice = +dataManager.getConvertedData(data).closePrice;
 					var y = util.getLinePosition(config_paddingTop + Math.round(calcHeight(closePrice)));

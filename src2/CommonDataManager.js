@@ -88,6 +88,13 @@
 			}
 		};
 
+		/**
+		 * 获取数据总量
+		 * @returns {number}
+		 */
+		this.getDataCount = function(){
+			return dataList.length;
+		};
 
 		/**
 		 * 获取可以被渲染的数据量

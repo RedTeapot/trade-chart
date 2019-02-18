@@ -18,10 +18,17 @@
  * @typedef {Object} XTick 横坐标刻度描述
  * @property {Number} x 横坐标位置
  * @property {String} label 横坐标标签
+ * @property {Number} dataIndex 刻度对应的数据的全局索引
  */
 
 /**
  * @typedef {Object} YTick 纵坐标刻度描述
  * @property {Number} y 纵坐标位置
  * @property {String} label 纵坐标标签
+ */
+
+/**
+ * @typedef {Object} DataPosition 数据位置
+ * @property {Number} x 横坐标位置
+ * @property {Number} dataIndex 数据的全局索引
  */

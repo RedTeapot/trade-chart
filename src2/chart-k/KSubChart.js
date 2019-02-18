@@ -321,16 +321,15 @@
 			return xRight_axisX_content + renderingOffset - chartContentHorizontalRenderingOffsetFromRight;
 		};
 
-
 		/**
-		 * 获取右侧开始的，可被渲染的数据的渲染位置列表。用于使用统一的方法决定横坐标位置，而非各个子图自行计算。
+		 * 获取右侧开始的，可被渲染的数据的渲染位置及对应的数据索引列表。用于使用统一的方法决定横坐标位置及索引，而非各个子图自行计算。
 		 * 返回的位置，是渲染目的地的中心位置
 		 *
 		 * @param {KChartSketch} kChartSketch 图形概览
 		 * @param {Number} [groupCount=dataManager.getRenderingGroupCount(kChartSketch.getMaxGroupCount())+3] 数据群组个数
-		 * @returns {Number[]}
+		 * @returns {DataPosition[]}
 		 */
-		this._getRenderingXPositionListFromRight = function(kChartSketch, groupCount){
+		this._getRenderingXPositionAndDataIndexListFromRight = function(kChartSketch, groupCount){
 			var dataManager = kChart.getDataManager();
 
 			if(arguments.length < 2){
@@ -344,9 +343,6 @@
 			}
 
 			var config_groupBarWidth = this.getConfigItem("groupBarWidth");
-			var xLeft_axisX_content = kChart._calcAxisXContentLeftPosition(),
-				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth());
-
 			var rightMostPosition = this._getRightMostDataHorizontalRenderingPosition(kChartSketch),
 				rightMostRenderingDataIndex = dataManager.getRightMostRenderingDataIndex();
 
@@ -357,7 +353,10 @@
 			var arr = [];
 
 			var position = rightMostPosition;
-			arr.push(Math.floor(position));
+			arr.push({
+				x: Math.floor(position),
+				dataIndex: rightMostRenderingDataIndex
+			});
 
 			var totalGap = 0;
 			for(var i = 0; i < groupCount - 1; i++){
@@ -374,7 +373,10 @@
 				// if(position < xLeft_axisX_content || position > xRight_axisX_content)
 				// 	continue;
 
-				arr.push(Math.floor(position));
+				arr.push({
+					x: Math.floor(position),
+					dataIndex: leftIndex
+				});
 			}
 
 			// console.log(">>", arr.slice(0, 3), rightMostPosition);
@@ -397,11 +399,10 @@
 				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth());
 
 			var dataManager = kChart.getDataManager();
-			var xPositionList = this._getRenderingXPositionListFromRight(kChartSketch),
-				dataList = dataManager.getConvertedRenderingDataList(xPositionList.length);
+			var xPositionAndDataIndexList = this._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
 
 			/* 绘制的数据个数 */
-			var groupCount = dataList.length;
+			var groupCount = xPositionAndDataIndexList.length;
 			var rightMostPosition = this._getRightMostDataHorizontalRenderingPosition(kChartSketch);
 			var rightMostRenderingDataIndexFromRight = dataManager.getRightMostRenderingDataIndexFromRight();
 
@@ -417,11 +418,15 @@
 			var axisXTickList = [],
 				totalGap = 0;
 
-			axisXTickList = xPositionList.map(function(x, i){
-				var dataIndex = groupCount - 1 - i;
-				var data = dataList[dataIndex];
+			var totalDataCount = dataManager.getDataCount();
+			axisXTickList = xPositionAndDataIndexList.map(function(dp, i){
+				var x = dp.x,
+					dataIndex = dp.dataIndex;
 
-				axisXTickGenerateIndicatorEnv.dataOverallIndexFromRightToLeft = rightMostRenderingDataIndexFromRight + i;
+				var data = dataManager.getConvertedData(dataIndex);
+
+				var dataOverallIndexFromRightToLeft = rightMostRenderingDataIndexFromRight + i;
+				axisXTickGenerateIndicatorEnv.dataOverallIndexFromRightToLeft = dataOverallIndexFromRightToLeft;
 				var ifShowTick = config_axisXTickGenerateIndicator(data, axisXTickGenerateIndicatorEnv);
 				if(!ifShowTick)
 					return null;
@@ -439,7 +444,7 @@
 				})();
 				previousXTickDataIndex = i;
 
-				return {x: x, label: label};
+				return {x: x, label: label, dataIndex: dataIndex};
 			}).filter(function(item){
 				return null !== item;
 			});
