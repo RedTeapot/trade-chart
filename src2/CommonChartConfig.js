@@ -3,7 +3,7 @@
 	var util = TradeChart2.util;
 
 	/**
-	 * @callback GroupGapCalculator~getMaxValue 自定义相邻两组数据之间的间隔时，间隙的可能最大值的获取方法
+	 * @callback GroupGapCalculator~getMinValue 自定义相邻两组数据之间的间隔时，间隙的可能最小值的获取方法
 	 * @returns {Number}
 	 */
 
@@ -114,24 +114,24 @@
 	};
 
 	/**
-	 * 获取相邻两组数据之间间隙的最大值
+	 * 获取相邻两组数据之间间隙的最小值
 	 * @param {Object} config 配置集合
 	 * @returns {Number|null}
 	 */
-	var getMaxGroupGap = function(config){
+	var getMinGroupGap = function(config){
 		var config_groupGap = getConfigItem("groupGap", config);
 		var t = typeof config_groupGap;
 		if(t === "number")
 			return config_groupGap;
 		else if(t === "function"){
-			if(typeof t.getMaxValue === "function")
-				return util.try2Call(t.getMaxValue());
+			if(typeof t.getMinValue === "function")
+				return util.try2Call(t.getMinValue());
 			else{
-				console.error("No method of name: 'getMaxValue' found in given group gap calculator.");
+				console.error("No method of name: 'getMinValue' found in given group gap calculator.");
 				return null;
 			}
 		}else{
-			console.error("Can not determine the max group gap by value: " + t);
+			console.error("Can not determine the min group gap by value: " + t);
 			return null;
 		}
 	};
@@ -352,11 +352,11 @@
 	};
 
 	/**
-	 * 获取相邻两组数据之间间隙的最大值
+	 * 获取相邻两组数据之间间隙的最小值
 	 * @param {Object} config 配置集合
 	 * @returns {Number|null}
 	 */
-	CommonChartConfig.getMaxGroupGap = getMaxGroupGap;
+	CommonChartConfig.getMinGroupGap = getMinGroupGap;
 
 	util.defineReadonlyProperty(TradeChart2, "CommonChartConfig", CommonChartConfig);
 	util.defineReadonlyProperty(TradeChart2, "COMMON_DEFAULT_CONFIG", defaultConfig);

@@ -221,6 +221,10 @@
 				totalBarSize = Math.abs(rightMostRenderingDataIndex - dataIndex) * config_groupBarWidth;
 
 			var position = util.getLinePosition(rightMostDataPosition - totalGapSize - totalBarSize);
+			var xLeft_axisX = kChart._calcAxisXLeftPosition(),
+				xRight_axisX = kChart._calcAxisXRightPosition(kChartSketch.getCanvasWidth());
+			if(position < xLeft_axisX || position > xRight_axisX)
+				return -1;
 			// console.log(111, dataIndex, rightMostDataPosition, totalGapSize, totalBarSize, "->", position);
 			return position;
 		};

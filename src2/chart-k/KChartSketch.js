@@ -83,7 +83,7 @@
 			config_axisXTickOffsetFromRight = config.getConfigItemValue("axisXTickOffsetFromRight"),
 			config_groupBarWidth = config.getConfigItemValue("groupBarWidth");
 
-		var maxGroupGap = CommonChartConfig.getMaxGroupGap(config);
+		var minGroupGap = CommonChartConfig.getMinGroupGap(config);
 
 		// debugger;
 		var axisXWidth = (util.isValidNumber(width)? width: config_width) - config_paddingLeft - config_paddingRight;
@@ -92,7 +92,7 @@
 		/* 柱状图可以超越正文区域的边界并显示出柱子宽度的一半（两侧都可以） */
 		var newWidth = contentWidth + config_groupBarWidth - 1;
 
-		var L = newWidth, B = config_groupBarWidth, G = maxGroupGap;
+		var L = newWidth, B = config_groupBarWidth, G = minGroupGap;
 		return (function(){
 			if(L <= 0 || B <= 0)
 				return 0;

@@ -583,7 +583,7 @@
 			var axisXTickList = this._getRenderingXTickListFromRight(kChartSketch);
 			for(var i = 0; i < axisXTickList.length; i++){
 				var tickX = util.getLinePosition(axisXTickList[i].x);
-				if(tickX < xLeft_axisX)
+				if(tickX < xLeft_axisX || tickX > xRight_axisX)
 					continue;
 
 				ctx.beginPath();
@@ -599,7 +599,7 @@
 
 				for(var i = 0; i < axisXTickList.length; i++){
 					var tickX = util.getLinePosition(axisXTickList[i].x);
-					if(tickX < xLeft_axisX)
+					if(tickX < xLeft_axisX || tickX > xRight_axisX)
 						continue;
 
 					ctx.beginPath();
@@ -625,7 +625,7 @@
 						var tickX = util.getLinePosition(axisXTickList[i].x),
 							tickLabel = axisXTickList[i].label;
 
-						if(tickX < xLeft_axisX)
+						if(tickX < xLeft_axisX || tickX > xRight_axisX)
 							continue;
 
 						if(typeof config_axisXLabelHorizontalAlign === "function")
