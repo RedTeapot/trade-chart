@@ -63,7 +63,7 @@ util.loadData(function(datas){
 	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0));
 	window.kChart = kChart;
 
-	/* 蜡烛图 */
+	/* 走势图 */
 	var subChart_trend = kChart.newSubChart(TradeChart2.SubChartTypes.K_TREND).setConfig(kTrendConfig);
 	var result_trend = subChart_trend.render(trendCanvasObj);
 	result_trend.initCanvas(trendOperationCanvasObj);

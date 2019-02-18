@@ -3,7 +3,7 @@
 	var util = TradeChart2.util;
 
 	/**
-	 * @callback GroupGapCalculator~getMinValue 自定义相邻两组数据之间的间隔时，间隙的可能最小值的获取方法
+	 * @callback GroupGapCalculator~implGetMinValue 自定义相邻两组数据之间的间隔时，间隙的可能最小值的获取方法
 	 * @returns {Number}
 	 */
 
@@ -120,18 +120,19 @@
 	 */
 	var getMinGroupGap = function(config){
 		var config_groupGap = getConfigItem("groupGap", config);
+
 		var t = typeof config_groupGap;
 		if(t === "number")
 			return config_groupGap;
 		else if(t === "function"){
-			if(typeof t.getMinValue === "function")
-				return util.try2Call(t.getMinValue());
+			if(typeof config_groupGap.implGetMinValue === "function")
+				return util.try2Call(config_groupGap.implGetMinValue);
 			else{
-				console.error("No method of name: 'getMinValue' found in given group gap calculator.");
+				console.error("No method of name: 'implGetMinValue' found in given group gap calculator.", config_groupGap);
 				return null;
 			}
 		}else{
-			console.error("Can not determine the min group gap by value: " + t);
+			console.error("Can not determine the min group gap by value: " + config_groupGap);
 			return null;
 		}
 	};

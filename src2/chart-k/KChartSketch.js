@@ -83,7 +83,7 @@
 			config_axisXTickOffsetFromRight = config.getConfigItemValue("axisXTickOffsetFromRight"),
 			config_groupBarWidth = config.getConfigItemValue("groupBarWidth");
 
-		var minGroupGap = CommonChartConfig.getMinGroupGap(config);
+		var minGroupGap = CommonChartConfig.getMinGroupGap(config.getConfig());
 
 		// debugger;
 		var axisXWidth = (util.isValidNumber(width)? width: config_width) - config_paddingLeft - config_paddingRight;

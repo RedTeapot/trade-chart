@@ -18,19 +18,27 @@ util.loadData(function(datas){
 
 		groupLineWidth: 3,/** 蜡烛线的宽度。最好为奇数，从而使得线可以正好在正中间 */
 		groupBarWidth: 9,/** 蜡烛的宽度，必须大于等于线的宽度+2。最好为奇数，从而使得线可以正好在正中间 */
-		groupGap: function(leftIndex, rightIndex){
-			var gap = 0;
-			if(rightIndex % 10 === 0)
-				gap = 21;
-			else if(rightIndex % 5 === 0)
-				gap = 11;
-			else
-				gap = 3;
+		groupGap: (function(){
+			var calculator = function(leftIndex, rightIndex){
+				var gap = 0;
+				if(rightIndex % 10 === 0)
+					gap = 21;
+				else if(rightIndex % 5 === 0)
+					gap = 11;
+				else
+					gap = 3;
 
-			window.gapSet[leftIndex + "-" + rightIndex] = gap;
+				window.gapSet[leftIndex + "-" + rightIndex] = gap;
 
-			return gap;
-		},
+				return gap;
+			};
+
+			calculator.implGetMinValue = function(){
+				return 3;
+			};
+
+			return calculator;
+		})(),
 
 		axisXTickGenerateIndicator: function(convertedData, env){/* 特定数据对应的横坐标刻度绘制与否的指示器 */
 			return env.dataOverallIndexFromRightToLeft % 10 === 0;
@@ -89,7 +97,7 @@ util.loadData(function(datas){
 	var kChart = new KChart().setConfig(kChartConfig).setDataList(datas.slice(0));
 	window.kChart = kChart;
 
-	/* 蜡烛图 */
+	/* 走势图 */
 	var subChart_trend = kChart.newSubChart(TradeChart2.SubChartTypes.K_TREND).setConfig(kTrendConfig);
 	var result_trend = subChart_trend.render(trendCanvasObj);
 	result_trend.initCanvas(trendOperationCanvasObj);
