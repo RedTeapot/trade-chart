@@ -23,7 +23,7 @@
 	/**
 	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
 	 * @param {String} name 配置项名称
-	 * @param {KChartConfig} config 配置集合
+	 * @param {Object} config 配置集合
 	 * @returns {*}
 	 */
 	var getConfigItem = function(name, config){

@@ -92,14 +92,6 @@
 		};
 
 		/**
-		 * 获取相邻两组数据之间间隙的最大值
-		 * @returns {Number|null}
-		 */
-		this.getMaxGroupGap = function(){
-			return CommonChartConfig.getMaxGroupGap(config.getConfig());
-		};
-
-		/**
 		 * 计算横坐标正文区域左侧位置（坐标原点为：画布左上角）
 		 * @returns {Number}
 		 */

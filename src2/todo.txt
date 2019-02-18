@@ -45,4 +45,4 @@
     1) 总数据个数 total data group count = 不可绘制个数 irrenderable data group count + 可绘制个数 renderable data group count
     2) 可绘制个数 renderable data group count > 绘制了的数据个数 rendering data group count + 经过的数据个数 elapsed data group count
     3) 绘制了的数据个数 rendering data group count = 可见的绘制了的数据个数 visible rendering data group count + 被擦除的绘制了的数据个数 erased rendering data group count
-    - 2019.02.13 13:05 完成。
+    * 2019.02.13 13:05 完成。

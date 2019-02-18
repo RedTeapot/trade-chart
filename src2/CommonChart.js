@@ -232,6 +232,14 @@
 		};
 
 		/**
+		 * 获取相邻两组数据之间间隙的最大值
+		 * @returns {Number|null}
+		 */
+		this.getMaxGroupGap = function(){
+			return CommonChartConfig.getMaxGroupGap(this.getConfig().getConfig());
+		};
+
+		/**
 		 * 根据给定的最左侧数据索引和最右侧数据索引，计算两组数据之间的所有间隙空间总和
 		 * @param {Number} leftMostDataIndex 最左侧数据的全局索引（从左向右）
 		 * @param {Number} rightMostDataIndex 最右侧数据的全局索引（从左向右）
