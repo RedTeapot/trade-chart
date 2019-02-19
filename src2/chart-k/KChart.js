@@ -27,7 +27,7 @@
 		if(groupLineWidth % 2 === 0){
 			v = groupLineWidth + 1;
 			console.warn("K line with should be odd(supplied: " + groupLineWidth + "), auto adjust to " + v);
-			config.setConfigItemValue("groupLineWidth", groupLineWidth = v);
+			config.setOriginalConfigItemValue("groupLineWidth", groupLineWidth = v);
 		}
 
 		/* 柱宽需大于等于线宽+2 */
@@ -35,12 +35,12 @@
 		var tmp = groupLineWidth + 2;
 		if(groupBarWidth < tmp){
 			console.warn("K chart bar width should be greater than group line width plus 2, auto adjust to " + tmp + ". Configured bar width: " + groupBarWidth + ", configured line with: " + groupLineWidth);
-			config.setConfigItemValue("groupBarWidth", groupBarWidth = tmp);
+			config.setOriginalConfigItemValue("groupBarWidth", groupBarWidth = tmp);
 		}
 		if(groupBarWidth % 2 === 0){
 			v = groupBarWidth + 1;
 			console.warn("K bar width should odd(supplied: " + groupBarWidth + "), auto adjust to " + v);
-			config.setConfigItemValue("groupBarWidth", groupBarWidth = v);
+			config.setOriginalConfigItemValue("groupBarWidth", groupBarWidth = v);
 		}
 	};
 

@@ -27,7 +27,10 @@
     方案二：添加API：setDataList
     方案三：
       1) 添加配置项：axisXTickGenerateIndicator - 特定数据对应的横坐标刻度绘制与否的指示器
+      * 完成。
       2) 智能化配置项：groupGap，使得可以赋值function以动态决定两组数据之间的间隔
+      * 2019.02.18 17:57 完成。
+      3)
 
 4.  2019.01.09 14:21 - 需修复故障：测试用例test7中，将图形向右拉至最左侧时，即使将鼠标的悬浮位置在图形正文的左侧，程序也会错误地绘制出一条数据明细查阅线条
     * 2019.01.09 16:07 完成
@@ -47,3 +50,6 @@
     3) 绘制了的数据个数 rendering data group count = 可见的绘制了的数据个数 visible rendering data group count + 被擦除的绘制了的数据个数 erased rendering data group count
     * 2019.02.13 13:05 完成。
 11. 2019.02.18 15:28 - 需完善KSubChart#_getRenderingXTickListFromRight方法，使其返回的列表元素中同步告知对应的数据索引
+    * 2019.02.18 17:37 完成。
+12. 2019.02.19 09:15 - 需抽取集中的地方执行配置项取值的转换操作
+    * 2019.02.19 11:33 完成。

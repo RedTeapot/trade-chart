@@ -29,7 +29,7 @@
 		/**
 		 * 相邻两组数据之间的间隔
 		 * 1. {Number|GroupGapCalculator} 用于指定两组数据之间的固定间隔，如：1，function(){return 3;}等，单位：像素
-		 * 2. {String} autoDividedByGroupCount 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间。
+		 * 2. {String} autoDividedByFixedGroupCount 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间。
 		 */
 		groupGap: 3,
 	};
@@ -250,7 +250,7 @@
 		 * @param {*} value 配置项取值
 		 * @returns {CommonChartConfig}
 		 */
-		this.setConfigItemValue = function(name, value){
+		this.setOriginalConfigItemValue = function(name, value){
 			if(!this.supportsConfigItem(name)){
 				console.warn("Unknown chart config item: " + name);
 			}

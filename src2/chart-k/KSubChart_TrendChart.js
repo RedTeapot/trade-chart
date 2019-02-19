@@ -50,6 +50,28 @@
 		};
 
 		/**
+		 * 转换配置项取值，完成“由 用户语义贴切的配置值 向 技术可行的配置值 的转换”
+		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {DataSketch} dataSketch 数据概览
+		 *
+		 * @returns {KSubChart_TrendChart}
+		 */
+		this.convertConfigItemValues = function(canvasObj, dataSketch){
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
+
+				config_axisYPrecision = this.getConfigItem("axisYPrecision");
+
+			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
+			config.setConfigItemConvertedValue("height", config_height);
+
+			if("auto" === String(config_axisYPrecision).trim().toLowerCase())
+				config.setConfigItemConvertedValue("axisYPrecision", dataSketch.getAmountPrecision());
+
+			return this;
+		};
+
+		/**
 		 * @override
 		 *
 		 * 渲染图形，并呈现至指定的画布中
@@ -74,14 +96,14 @@
 				config_ifShowAverageLine = this.getConfigItem("ifShowAverageLine"),
 				config_ifShowAverageLine_lineColor = this.getConfigItem("ifShowAverageLine_lineColor");
 
-			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
-			config.setConfigItemConvertedValue("height", config_height);
-
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 
 			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_TrendDataSketch.sketch)(kChart, this.getConfig()),
 				kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = KSubChartSketch_TrendChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
+
+			/* 转换配置项取值 */
+			this.convertConfigItemValues(canvasObj, dataSketch);
 
 			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
 			var dataManager = kChart.getDataManager();

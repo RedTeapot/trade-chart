@@ -47,7 +47,13 @@
 		 */
 		var lastRenderingCanvasObj = NOT_SUPPLIED;
 
-		/* 渲染配置 */
+		/**
+		 * 渲染配置。
+		 * 该实例对象不应该被直接使用，因为各个子图在集成该类的时候，均会提供各自的配置对象，
+		 * 需要使用this.getConfig()动态获取
+		 *
+		 * @type {CommonChartConfig}
+		 */
 		var config = new KSubChartConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
 
 		/**
@@ -471,10 +477,6 @@
 			var axisYAmountInterval = (dataSketch.getAmountCeiling() - dataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
 			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
-			var isAxisYPrecisionAuto = "auto" === String(config_axisYPrecision).trim().toLowerCase();
-
-			if(isAxisYPrecisionAuto)
-				config.setConfigItemConvertedValue("axisYPrecision", dataSketch.getAmountPrecision());
 
 			/**
 			 * 要绘制的纵坐标刻度集合
@@ -490,7 +492,7 @@
 			for(var i = 0; i <= maxAxisYTickIndex; i++){
 				var tickAmount = dataSketch.getAmountFloor() + axisYAmountInterval * i,
 					tickY = y_axisX - Math.round(axisYHeightInterval * i);
-				var tickLabel = config_axisYFormatter(tickAmount, config);
+				var tickLabel = config_axisYFormatter(tickAmount, this.getConfig());
 
 				for(var j = 0; j < axisYTickList.length; j++){
 					var tick = axisYTickList[j];
@@ -517,10 +519,10 @@
 						break;
 				}
 
-				var precision = config.getConfigItemValue("axisYPrecision");
+				var precision = this.getConfig().getConfigItemValue("axisYPrecision");
 				if(ifExistsDuplicateLabel && precision < 20){/* 最多保留20位精度 */
 					precision += 1;
-					config.setConfigItemConvertedValue("axisYPrecision", precision);
+					this.getConfig().setConfigItemConvertedValue("axisYPrecision", precision);
 					for(var i = 0; i < axisYTickList.length; i++)
 						axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].amount, config);
 					ifExistsDuplicateLabel = false;/* 假定精度+1后不会出现相同取值的刻度，然后开始验证/检测 */
