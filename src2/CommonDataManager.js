@@ -92,7 +92,7 @@
 		 * 获取数据总量
 		 * @returns {number}
 		 */
-		this.getDataCount = function(){
+		this.getTotalGroupCount = function(){
 			return dataList.length;
 		};
 

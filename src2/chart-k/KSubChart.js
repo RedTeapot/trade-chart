@@ -245,6 +245,100 @@
 		};
 
 		/**
+		 * 转换配置项取值，完成“由 用户语义贴切的配置值 向 技术可行的配置值 的转换”
+		 * @param {HTMLCanvasElement} canvasObj 画布
+		 * @param {DataSketch} dataSketch 数据概览
+		 *
+		 * @returns {KSubChart_TrendChart}
+		 */
+		this.convertConfigItemValues = function(canvasObj, dataSketch){
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
+
+				config_axisYPrecision = this.getConfigItem("axisYPrecision"),
+				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
+				config_groupLineWidth = this.getConfigItem("groupLineWidth"),
+				config_groupGap = this.getConfigItem("groupGap");
+
+			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
+
+			var subChartConfig = this.getConfig();
+			subChartConfig.setConfigItemConvertedValue("height", config_height);
+
+			if("auto" === String(config_axisYPrecision).trim().toLowerCase())
+				subChartConfig.setConfigItemConvertedValue("axisYPrecision", dataSketch.getAmountPrecision());
+
+			var tmp;
+			if(null != (tmp = /^autoDividedByFixedGroupCount:(\d+)$/.exec(String(config_groupGap).trim()))){
+				var totalCount = Number(tmp[1]);
+
+				var dataManager = kChart.getDataManager();
+				var isContentWidthEnough = false;
+
+				var groupLineWidth = config_groupLineWidth,
+					groupBarWidth = config_groupBarWidth;
+
+				var contentWidth = kChart._calcAxisXContentWidth(config_width);
+				if(contentWidth <= totalCount){/* 数据量过多，超出屏幕可显示范围 */
+					isContentWidthEnough = false;
+
+					groupLineWidth = 1;
+					groupBarWidth = 1;
+				}else{
+					isContentWidthEnough = true;
+
+					var len = contentWidth - totalCount;
+					var gapCount = totalCount - 1;
+					var avgGap = Math.floor(len / gapCount);
+					var remaining = len % gapCount;
+
+					/* 根据最小间隙自动调整groupLineWidth和groupBarWidth */
+					if(avgGap <= 2){
+						groupLineWidth = 1;
+						groupBarWidth = 1;
+					}else{
+						var m = Math.floor(avgGap / 2);
+						var n = avgGap - m;
+
+						var isMOdd = m % 2 !== 0,
+							isNOdd = n % 2 !== 0;
+
+						if(isMOdd && isNOdd){
+							m = m - 1;
+							n = n + 1;
+						}
+
+						var t = m % 2 === 0? m: n;
+						groupBarWidth = t + 1;
+						while(groupLineWidth > groupBarWidth)
+							groupLineWidth = groupLineWidth - 2;
+						groupLineWidth = Math.max(groupLineWidth, 1);
+
+						avgGap = avgGap - (groupBarWidth - 1);
+					}
+				}
+
+				TradeChart2.showLog && console.info("Auto adjust group width to " + groupBarWidth + ", group line width to " + groupLineWidth);
+
+				var config = this.getConfig();
+				config.setConfigItemConvertedValue("groupLineWidth", groupLineWidth);
+				config.setConfigItemConvertedValue("groupBarWidth", groupBarWidth);
+
+				subChartConfig.setConfigItemConvertedValue("groupGap", function(leftIndex, rightIndex){
+					if(isContentWidthEnough){
+						var gap = avgGap;
+						if(leftIndex < remaining)
+							gap = avgGap + 1;
+
+						return gap;
+					}
+				});
+			}
+
+			return this;
+		};
+
+		/**
 		 * 由子类实现的图形渲染方法
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @param {Object} env 当前环境信息
@@ -424,7 +518,7 @@
 			var axisXTickList = [],
 				totalGap = 0;
 
-			var totalDataCount = dataManager.getDataCount();
+			var totalDataCount = dataManager.getTotalGroupCount();
 			axisXTickList = xPositionAndDataIndexList.map(function(dp, i){
 				var x = dp.x,
 					dataIndex = dp.dataIndex;

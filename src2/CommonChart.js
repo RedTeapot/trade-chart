@@ -226,8 +226,8 @@
 			else if(t === "function")
 				return util.try2Call(config_groupGap, null, leftDataIndex, rightDataIndex);
 			else{
-				console.error("Unknown group gap value: " + config_groupGap);
-				return t;
+				console.error("Unknown group gap value: " + config_groupGap + ", using constant 0 instead.");
+				return 0;
 			}
 		};
 
@@ -402,6 +402,20 @@
 		 */
 		this._calcHalfGroupBarWidth = function(){
 			return Math.floor(this.getConfigItem("groupBarWidth") / 2);
+		};
+
+		/**
+		 * 计算横坐标坐标轴的宽度
+		 * @param {Number} [canvasWidth] 绘制宽度（当配置中指定的宽度为百分比字符串时使用）
+		 * @returns {number}
+		 */
+		this._calcAxisXWidth = function(canvasWidth){
+			var config_width = this.getConfigItem("width"),
+				config_paddingLeft = this.getConfigItem("paddingLeft"),
+				config_paddingRight = this.getConfigItem("paddingRight");
+
+			canvasWidth = util.isValidNumber(canvasWidth)? canvasWidth: config_width;
+			return canvasWidth - config_paddingLeft - config_paddingRight;
 		};
 
 

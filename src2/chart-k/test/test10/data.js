@@ -1,0 +1,1385 @@
+[{
+	"time": "13:00",
+	"openPrice": "0.0249",
+	"closePrice": "0.025",
+	"highPrice": "0.025",
+	"lowPrice": "0.0249",
+	"volume": "12000",
+	"index": 0
+}, {
+	"time": "14:00",
+	"openPrice": "0.025",
+	"closePrice": "0.0247",
+	"highPrice": "0.0251",
+	"lowPrice": "0.0245",
+	"volume": "52044.7",
+	"index": 1
+}, {
+	"time": "15:00",
+	"openPrice": "0.0247",
+	"closePrice": "0.0248",
+	"highPrice": "0.025",
+	"lowPrice": "0.0247",
+	"volume": "37206",
+	"index": 2
+}, {
+	"time": "16:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.025",
+	"highPrice": "0.0251",
+	"lowPrice": "0.0248",
+	"volume": "45819",
+	"index": 3
+}, {
+	"time": "17:00",
+	"openPrice": "0.025",
+	"closePrice": "0.0251",
+	"highPrice": "0.0252",
+	"lowPrice": "0.025",
+	"volume": "30145",
+	"index": 4
+}, {
+	"time": "18:00",
+	"openPrice": "0.025",
+	"closePrice": "0.0252",
+	"highPrice": "0.0255",
+	"lowPrice": "0.0245",
+	"volume": "118000",
+	"index": 5
+}, {
+	"time": "19:00",
+	"openPrice": "0.0252",
+	"closePrice": "0.0244",
+	"highPrice": "0.0253",
+	"lowPrice": "0.0244",
+	"volume": "145402",
+	"index": 6
+}, {
+	"time": "20:00",
+	"openPrice": "0.0244",
+	"closePrice": "0.0245",
+	"highPrice": "0.0246",
+	"lowPrice": "0.0242",
+	"volume": "109405",
+	"index": 7
+}, {
+	"time": "21:00",
+	"openPrice": "0.0245",
+	"closePrice": "0.0253",
+	"highPrice": "0.0254",
+	"lowPrice": "0.0241",
+	"volume": "90230",
+	"index": 8
+}, {
+	"time": "22:00",
+	"openPrice": "0.025",
+	"closePrice": "0.0253",
+	"highPrice": "0.0253",
+	"lowPrice": "0.025",
+	"volume": "54800",
+	"index": 9
+}, {
+	"time": "23:00",
+	"openPrice": "0.0253",
+	"closePrice": "0.0247",
+	"highPrice": "0.0253",
+	"lowPrice": "0.0245",
+	"volume": "146889",
+	"index": 10
+}, {
+	"time": "00:00",
+	"openPrice": "0.023",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.023",
+	"volume": "13385",
+	"index": 11
+}, {
+	"time": "01:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 12
+}, {
+	"time": "02:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 13
+}, {
+	"time": "03:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 14
+}, {
+	"time": "04:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 15
+}, {
+	"time": "05:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 16
+}, {
+	"time": "06:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 17
+}, {
+	"time": "07:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 18
+}, {
+	"time": "08:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 19
+}, {
+	"time": "09:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0235",
+	"highPrice": "0.0235",
+	"lowPrice": "0.0231",
+	"volume": "38834",
+	"index": 20
+}, {
+	"time": "10:00",
+	"openPrice": "0.0235",
+	"closePrice": "0.0241",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0235",
+	"volume": "49329",
+	"index": 21
+}, {
+	"time": "11:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0239",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0235",
+	"volume": "192840",
+	"index": 22
+}, {
+	"time": "12:00",
+	"openPrice": "0.0239",
+	"closePrice": "0.025",
+	"highPrice": "0.025",
+	"lowPrice": "0.0239",
+	"volume": "29600",
+	"index": 23
+}, {
+	"time": "13:00",
+	"openPrice": "0.025",
+	"closePrice": "0.0255",
+	"highPrice": "0.0255",
+	"lowPrice": "0.025",
+	"volume": "24411.32",
+	"index": 24
+}, {
+	"time": "14:00",
+	"openPrice": "0.0255",
+	"closePrice": "0.0256",
+	"highPrice": "0.0256",
+	"lowPrice": "0.0255",
+	"volume": "19788",
+	"index": 25
+}, {
+	"time": "15:00",
+	"openPrice": "0.0256",
+	"closePrice": "0.0252",
+	"highPrice": "0.0256",
+	"lowPrice": "0.0251",
+	"volume": "39060",
+	"index": 26
+}, {
+	"time": "16:00",
+	"openPrice": "0.0252",
+	"closePrice": "0.0249",
+	"highPrice": "0.0252",
+	"lowPrice": "0.0249",
+	"volume": "30993",
+	"index": 27
+}, {
+	"time": "17:00",
+	"openPrice": "0.0249",
+	"closePrice": "0.0248",
+	"highPrice": "0.0249",
+	"lowPrice": "0.0244",
+	"volume": "60914",
+	"index": 28
+}, {
+	"time": "18:00",
+	"openPrice": "0.0247",
+	"closePrice": "0.0238",
+	"highPrice": "0.0247",
+	"lowPrice": "0.0238",
+	"volume": "25235",
+	"index": 29
+}, {
+	"time": "19:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0234",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0234",
+	"volume": "17894",
+	"index": 30
+}, {
+	"time": "20:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0233",
+	"volume": "23645",
+	"index": 31
+}, {
+	"time": "21:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0239",
+	"highPrice": "0.0239",
+	"lowPrice": "0.0238",
+	"volume": "4191",
+	"index": 32
+}, {
+	"time": "22:00",
+	"openPrice": "0.0239",
+	"closePrice": "0.0243",
+	"highPrice": "0.0243",
+	"lowPrice": "0.0239",
+	"volume": "20371",
+	"index": 33
+}, {
+	"time": "23:00",
+	"openPrice": "0.0243",
+	"closePrice": "0.0245",
+	"highPrice": "0.0245",
+	"lowPrice": "0.0243",
+	"volume": "7568",
+	"index": 34
+}, {
+	"time": "00:00",
+	"openPrice": "0.0245",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0222",
+	"volume": "3066.43",
+	"index": 35
+}, {
+	"time": "01:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 36
+}, {
+	"time": "02:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 37
+}, {
+	"time": "03:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 38
+}, {
+	"time": "04:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 39
+}, {
+	"time": "05:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 40
+}, {
+	"time": "06:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 41
+}, {
+	"time": "07:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 42
+}, {
+	"time": "08:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0248",
+	"volume": "0",
+	"index": 43
+}, {
+	"time": "09:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0254",
+	"highPrice": "0.0254",
+	"lowPrice": "0.0248",
+	"volume": "44551",
+	"index": 44
+}, {
+	"time": "10:00",
+	"openPrice": "0.0254",
+	"closePrice": "0.0249",
+	"highPrice": "0.0254",
+	"lowPrice": "0.0248",
+	"volume": "45634",
+	"index": 45
+}, {
+	"time": "11:00",
+	"openPrice": "0.0249",
+	"closePrice": "0.0246",
+	"highPrice": "0.0251",
+	"lowPrice": "0.0246",
+	"volume": "57290",
+	"index": 46
+}, {
+	"time": "12:00",
+	"openPrice": "0.0246",
+	"closePrice": "0.0248",
+	"highPrice": "0.0248",
+	"lowPrice": "0.0246",
+	"volume": "28151",
+	"index": 47
+}, {
+	"time": "13:00",
+	"openPrice": "0.0248",
+	"closePrice": "0.0243",
+	"highPrice": "0.025",
+	"lowPrice": "0.0243",
+	"volume": "56652",
+	"index": 48
+}, {
+	"time": "14:00",
+	"openPrice": "0.0243",
+	"closePrice": "0.0241",
+	"highPrice": "0.0243",
+	"lowPrice": "0.0241",
+	"volume": "10816",
+	"index": 49
+}, {
+	"time": "15:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0242",
+	"highPrice": "0.0242",
+	"lowPrice": "0.0241",
+	"volume": "9999",
+	"index": 50
+}, {
+	"time": "16:00",
+	"openPrice": "0.0242",
+	"closePrice": "0.0247",
+	"highPrice": "0.0247",
+	"lowPrice": "0.0242",
+	"volume": "86072",
+	"index": 51
+}, {
+	"time": "17:00",
+	"openPrice": "0.0247",
+	"closePrice": "0.0252",
+	"highPrice": "0.0252",
+	"lowPrice": "0.0247",
+	"volume": "23562",
+	"index": 52
+}, {
+	"time": "18:00",
+	"openPrice": "0.0252",
+	"closePrice": "0.0249",
+	"highPrice": "0.0253",
+	"lowPrice": "0.0249",
+	"volume": "66695",
+	"index": 53
+}, {
+	"time": "19:00",
+	"openPrice": "0.0249",
+	"closePrice": "0.025",
+	"highPrice": "0.025",
+	"lowPrice": "0.0247",
+	"volume": "54000",
+	"index": 54
+}, {
+	"time": "20:00",
+	"openPrice": "0.025",
+	"closePrice": "0.0249",
+	"highPrice": "0.025",
+	"lowPrice": "0.0249",
+	"volume": "20000",
+	"index": 55
+}, {
+	"time": "21:00",
+	"openPrice": "0.025",
+	"closePrice": "0.025",
+	"highPrice": "0.0252",
+	"lowPrice": "0.0248",
+	"volume": "84000",
+	"index": 56
+}, {
+	"time": "22:00",
+	"openPrice": "0.0251",
+	"closePrice": "0.025",
+	"highPrice": "0.0252",
+	"lowPrice": "0.0249",
+	"volume": "55000",
+	"index": 57
+}, {
+	"time": "23:00",
+	"openPrice": "0.025",
+	"closePrice": "0.025",
+	"highPrice": "0.0252",
+	"lowPrice": "0.025",
+	"volume": "32000",
+	"index": 58
+}, {
+	"time": "00:00",
+	"openPrice": "0.023",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.023",
+	"volume": "12000",
+	"index": 59
+}, {
+	"time": "01:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 60
+}, {
+	"time": "02:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 61
+}, {
+	"time": "03:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 62
+}, {
+	"time": "04:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 63
+}, {
+	"time": "05:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 64
+}, {
+	"time": "06:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 65
+}, {
+	"time": "07:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 66
+}, {
+	"time": "08:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 67
+}, {
+	"time": "09:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0237",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0233",
+	"volume": "15559",
+	"index": 68
+}, {
+	"time": "10:00",
+	"openPrice": "0.0237",
+	"closePrice": "0.0238",
+	"highPrice": "0.024",
+	"lowPrice": "0.0237",
+	"volume": "19235",
+	"index": 69
+}, {
+	"time": "11:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0237",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0234",
+	"volume": "25045",
+	"index": 70
+}, {
+	"time": "12:00",
+	"openPrice": "0.0237",
+	"closePrice": "0.0232",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0232",
+	"volume": "17317",
+	"index": 71
+}, {
+	"time": "13:00",
+	"openPrice": "0.0232",
+	"closePrice": "0.0232",
+	"highPrice": "0.0232",
+	"lowPrice": "0.0231",
+	"volume": "11883",
+	"index": 72
+}, {
+	"time": "14:00",
+	"openPrice": "0.0232",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0232",
+	"volume": "18942",
+	"index": 73
+}, {
+	"time": "15:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0236",
+	"volume": "7249",
+	"index": 74
+}, {
+	"time": "16:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0233",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0233",
+	"volume": "12302",
+	"index": 75
+}, {
+	"time": "17:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.023",
+	"highPrice": "0.0233",
+	"lowPrice": "0.023",
+	"volume": "14552",
+	"index": 76
+}, {
+	"time": "18:00",
+	"openPrice": "0.0253",
+	"closePrice": "0.0251",
+	"highPrice": "0.0255",
+	"lowPrice": "0.0248",
+	"volume": "70696",
+	"index": 77
+}, {
+	"time": "19:00",
+	"openPrice": "0.0251",
+	"closePrice": "0.0249",
+	"highPrice": "0.0251",
+	"lowPrice": "0.0245",
+	"volume": "55269",
+	"index": 78
+}, {
+	"time": "20:00",
+	"openPrice": "0.0249",
+	"closePrice": "0.0246",
+	"highPrice": "0.025",
+	"lowPrice": "0.0245",
+	"volume": "50614",
+	"index": 79
+}, {
+	"time": "21:00",
+	"openPrice": "0.0246",
+	"closePrice": "0.0242",
+	"highPrice": "0.0247",
+	"lowPrice": "0.024",
+	"volume": "38187",
+	"index": 80
+}, {
+	"time": "22:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0238",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0236",
+	"volume": "59674",
+	"index": 81
+}, {
+	"time": "23:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0235",
+	"highPrice": "0.024",
+	"lowPrice": "0.0232",
+	"volume": "50102",
+	"index": 82
+}, {
+	"time": "00:00",
+	"openPrice": "0.0235",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0235",
+	"volume": "10101",
+	"index": 83
+}, {
+	"time": "01:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 84
+}, {
+	"time": "02:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 85
+}, {
+	"time": "03:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 86
+}, {
+	"time": "04:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 87
+}, {
+	"time": "05:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 88
+}, {
+	"time": "06:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 89
+}, {
+	"time": "07:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 90
+}, {
+	"time": "08:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0236",
+	"volume": "0",
+	"index": 91
+}, {
+	"time": "09:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.023",
+	"highPrice": "0.0238",
+	"lowPrice": "0.023",
+	"volume": "174405",
+	"index": 92
+}, {
+	"time": "10:00",
+	"openPrice": "0.023",
+	"closePrice": "0.023",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0226",
+	"volume": "112536",
+	"index": 93
+}, {
+	"time": "11:00",
+	"openPrice": "0.0229",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0226",
+	"volume": "141880",
+	"index": 94
+}, {
+	"time": "12:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0236",
+	"highPrice": "0.024",
+	"lowPrice": "0.0234",
+	"volume": "97017",
+	"index": 95
+}, {
+	"time": "13:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.024",
+	"lowPrice": "0.0236",
+	"volume": "117000",
+	"index": 96
+}, {
+	"time": "14:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0234",
+	"highPrice": "0.0239",
+	"lowPrice": "0.0234",
+	"volume": "133000",
+	"index": 97
+}, {
+	"time": "15:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0233",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0231",
+	"volume": "64999",
+	"index": 98
+}, {
+	"time": "16:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0226",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0226",
+	"volume": "109879",
+	"index": 99
+}, {
+	"time": "17:00",
+	"openPrice": "0.0227",
+	"closePrice": "0.0225",
+	"highPrice": "0.0227",
+	"lowPrice": "0.0224",
+	"volume": "96696",
+	"index": 100
+}, {
+	"time": "18:00",
+	"openPrice": "0.0226",
+	"closePrice": "0.0235",
+	"highPrice": "0.0235",
+	"lowPrice": "0.0226",
+	"volume": "46595",
+	"index": 101
+}, {
+	"time": "19:00",
+	"openPrice": "0.0235",
+	"closePrice": "0.0232",
+	"highPrice": "0.0235",
+	"lowPrice": "0.0232",
+	"volume": "22794",
+	"index": 102
+}, {
+	"time": "20:00",
+	"openPrice": "0.0232",
+	"closePrice": "0.0237",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0232",
+	"volume": "32824",
+	"index": 103
+}, {
+	"time": "21:00",
+	"openPrice": "0.0237",
+	"closePrice": "0.0234",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0234",
+	"volume": "29798",
+	"index": 104
+}, {
+	"time": "22:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0232",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0232",
+	"volume": "27114",
+	"index": 105
+}, {
+	"time": "23:00",
+	"openPrice": "0.0232",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0232",
+	"volume": "25590",
+	"index": 106
+}, {
+	"time": "00:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0236",
+	"volume": "12345",
+	"index": 107
+}, {
+	"time": "01:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 108
+}, {
+	"time": "02:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 109
+}, {
+	"time": "03:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 110
+}, {
+	"time": "04:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 111
+}, {
+	"time": "05:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 112
+}, {
+	"time": "06:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 113
+}, {
+	"time": "07:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 114
+}, {
+	"time": "08:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0238",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0238",
+	"volume": "0",
+	"index": 115
+}, {
+	"time": "09:00",
+	"openPrice": "0.0238",
+	"closePrice": "0.0239",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0238",
+	"volume": "50111",
+	"index": 116
+}, {
+	"time": "10:00",
+	"openPrice": "0.0239",
+	"closePrice": "0.0237",
+	"highPrice": "0.0239",
+	"lowPrice": "0.0237",
+	"volume": "11109",
+	"index": 117
+}, {
+	"time": "11:00",
+	"openPrice": "0.0239",
+	"closePrice": "0.0236",
+	"highPrice": "0.0239",
+	"lowPrice": "0.0235",
+	"volume": "19143",
+	"index": 118
+}, {
+	"time": "12:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0236",
+	"volume": "39452",
+	"index": 119
+}, {
+	"time": "13:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0231",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0231",
+	"volume": "25015",
+	"index": 120
+}, {
+	"time": "14:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0231",
+	"volume": "41541",
+	"index": 121
+}, {
+	"time": "15:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0234",
+	"volume": "49032",
+	"index": 122
+}, {
+	"time": "16:00",
+	"openPrice": "0.0235",
+	"closePrice": "0.0231",
+	"highPrice": "0.0235",
+	"lowPrice": "0.023",
+	"volume": "50880",
+	"index": 123
+}, {
+	"time": "17:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0232",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0231",
+	"volume": "44857",
+	"index": 124
+}, {
+	"time": "18:00",
+	"openPrice": "0.0232",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0231",
+	"volume": "17723",
+	"index": 125
+}, {
+	"time": "19:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0236",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0234",
+	"volume": "21439",
+	"index": 126
+}, {
+	"time": "20:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0234",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0234",
+	"volume": "9221",
+	"index": 127
+}, {
+	"time": "21:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0231",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0231",
+	"volume": "11713",
+	"index": 128
+}, {
+	"time": "22:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0231",
+	"volume": "4190",
+	"index": 129
+}, {
+	"time": "23:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0233",
+	"highPrice": "0.0233",
+	"lowPrice": "0.0233",
+	"volume": "0",
+	"index": 130
+}, {
+	"time": "00:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0233",
+	"volume": "4140",
+	"index": 131
+}, {
+	"time": "01:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 132
+}, {
+	"time": "02:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 133
+}, {
+	"time": "03:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 134
+}, {
+	"time": "04:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 135
+}, {
+	"time": "05:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 136
+}, {
+	"time": "06:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 137
+}, {
+	"time": "07:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 138
+}, {
+	"time": "08:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 139
+}, {
+	"time": "09:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0231",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0231",
+	"volume": "46000",
+	"index": 140
+}, {
+	"time": "10:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0234",
+	"highPrice": "0.0235",
+	"lowPrice": "0.023",
+	"volume": "35500",
+	"index": 141
+}, {
+	"time": "11:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0235",
+	"lowPrice": "0.0232",
+	"volume": "21000",
+	"index": 142
+}, {
+	"time": "12:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 143
+}, {
+	"time": "13:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0234",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0234",
+	"volume": "0",
+	"index": 144
+}, {
+	"time": "14:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.023",
+	"highPrice": "0.0234",
+	"lowPrice": "0.023",
+	"volume": "13122",
+	"index": 145
+}, {
+	"time": "15:00",
+	"openPrice": "0.023",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.023",
+	"volume": "26287",
+	"index": 146
+}, {
+	"time": "16:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0236",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0233",
+	"volume": "22464",
+	"index": 147
+}, {
+	"time": "17:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0234",
+	"highPrice": "0.0236",
+	"lowPrice": "0.0234",
+	"volume": "26593",
+	"index": 148
+}, {
+	"time": "18:00",
+	"openPrice": "0.0233",
+	"closePrice": "0.0236",
+	"highPrice": "0.0238",
+	"lowPrice": "0.0232",
+	"volume": "130252",
+	"index": 149
+}, {
+	"time": "19:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0237",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0235",
+	"volume": "134705",
+	"index": 150
+}, {
+	"time": "20:00",
+	"openPrice": "0.0237",
+	"closePrice": "0.0242",
+	"highPrice": "0.0243",
+	"lowPrice": "0.0237",
+	"volume": "146813",
+	"index": 151
+}, {
+	"time": "21:00",
+	"openPrice": "0.0242",
+	"closePrice": "0.0239",
+	"highPrice": "0.0242",
+	"lowPrice": "0.0236",
+	"volume": "67547",
+	"index": 152
+}, {
+	"time": "22:00",
+	"openPrice": "0.0239",
+	"closePrice": "0.0242",
+	"highPrice": "0.0244",
+	"lowPrice": "0.0239",
+	"volume": "50181",
+	"index": 153
+}, {
+	"time": "23:00",
+	"openPrice": "0.0242",
+	"closePrice": "0.024",
+	"highPrice": "0.0242",
+	"lowPrice": "0.024",
+	"volume": "29257",
+	"index": 154
+}, {
+	"time": "00:00",
+	"openPrice": "0.024",
+	"closePrice": "0.0241",
+	"highPrice": "0.0241",
+	"lowPrice": "0.024",
+	"volume": "5000",
+	"index": 155
+}, {
+	"time": "01:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0241",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0241",
+	"volume": "0",
+	"index": 156
+}, {
+	"time": "02:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0241",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0241",
+	"volume": "0",
+	"index": 157
+}, {
+	"time": "03:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0241",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0241",
+	"volume": "0",
+	"index": 158
+}, {
+	"time": "04:00",
+	"openPrice": "0.0241",
+	"closePrice": "0.0241",
+	"highPrice": "0.0241",
+	"lowPrice": "0.0241",
+	"volume": "0",
+	"index": 159
+}, {
+	"time": "05:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "199.6",
+	"index": 160
+}, {
+	"time": "06:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 161
+}, {
+	"time": "07:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 162
+}, {
+	"time": "08:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0231",
+	"lowPrice": "0.0231",
+	"volume": "0",
+	"index": 163
+}, {
+	"time": "09:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0231",
+	"highPrice": "0.0237",
+	"lowPrice": "0.023",
+	"volume": "157302.4",
+	"index": 164
+}, {
+	"time": "10:00",
+	"openPrice": "0.0231",
+	"closePrice": "0.0229",
+	"highPrice": "0.0232",
+	"lowPrice": "0.0226",
+	"volume": "94289",
+	"index": 165
+}, {
+	"time": "11:00",
+	"openPrice": "0.0229",
+	"closePrice": "0.023",
+	"highPrice": "0.023",
+	"lowPrice": "0.0221",
+	"volume": "76483",
+	"index": 166
+}, {
+	"time": "12:00",
+	"openPrice": "0.023",
+	"closePrice": "0.023",
+	"highPrice": "0.0234",
+	"lowPrice": "0.0227",
+	"volume": "104497",
+	"index": 167
+}, {
+	"time": "13:00",
+	"openPrice": "0.023",
+	"closePrice": "0.0236",
+	"highPrice": "0.0237",
+	"lowPrice": "0.023",
+	"volume": "98852",
+	"index": 168
+}, {
+	"time": "14:00",
+	"openPrice": "0.0236",
+	"closePrice": "0.0234",
+	"highPrice": "0.0237",
+	"lowPrice": "0.0231",
+	"volume": "77481",
+	"index": 169
+}, {
+	"time": "15:00",
+	"openPrice": "0.0234",
+	"closePrice": "0.0235",
+	"highPrice": "0.0235",
+	"lowPrice": "0.0232",
+	"volume": "66684",
+	"index": 170
+}, {
+	"time": "16:00",
+	"openPrice": "0.0235",
+	"closePrice": "0.0235",
+	"highPrice": "0.024",
+	"lowPrice": "0.0235",
+	"volume": "89519",
+	"index": 171
+}, {
+	"time": "17:00",
+	"openPrice": "0.0235",
+	"closePrice": "0.0234",
+	"highPrice": "0.0235",
+	"lowPrice": "0.0234",
+	"volume": "14314",
+	"index": 172
+}]

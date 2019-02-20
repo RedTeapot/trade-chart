@@ -112,6 +112,18 @@
 			var xRight_axisX = this._calcAxisXRightPosition(canvasWidth);
 			return xRight_axisX - Math.floor(config_axisXTickOffsetFromRight);
 		};
+
+		/**
+		 * 计算横坐标正文区域的宽度
+		 * @param {Number} [canvasWidth] 画布宽度
+		 */
+		this._calcAxisXContentWidth = function(canvasWidth){
+			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
+				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
+
+			var axisXWidth = this._calcAxisXWidth(canvasWidth);
+			return axisXWidth - config_axisXTickOffset - config_axisXTickOffsetFromRight;
+		};
 	};
 	KChart.prototype = Object.create(CommonChart.prototype);
 

@@ -29,7 +29,8 @@
 		/**
 		 * 相邻两组数据之间的间隔
 		 * 1. {Number|GroupGapCalculator} 用于指定两组数据之间的固定间隔，如：1，function(){return 3;}等，单位：像素
-		 * 2. {String} autoDividedByFixedGroupCount 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间。
+		 * 2. {String} 字面量：autoDividedByFixedGroupCount:n 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间，其中n等于数据的总群组个数。
+		 *    此时，将自动调整groupLineWidth和groupBarWidth，使得图形可以能够在一屏之内显示完全
 		 */
 		groupGap: 3,
 	};
@@ -128,12 +129,14 @@
 			if(typeof config_groupGap.implGetMinValue === "function")
 				return util.try2Call(config_groupGap.implGetMinValue);
 			else{
-				console.error("No method of name: 'implGetMinValue' found in given group gap calculator.", config_groupGap);
-				return null;
+				console.error("No method of name: 'implGetMinValue' found in given group gap calculator, using constant 0 instead.", config_groupGap);
+				return 0;
 			}
-		}else{
-			console.error("Can not determine the min group gap by value: " + config_groupGap);
-			return null;
+		}else if(/^autoDividedByFixedGroupCount:\d+$/.test(String(config_groupGap).trim()))
+			return 0;
+		else{
+			console.error("Can not determine the min group gap by value: " + config_groupGap + ", using constant 0 instead.");
+			return 0;
 		}
 	};
 
@@ -145,6 +148,8 @@
 	 * @constructor
 	 */
 	var CommonChartConfig = function(config, dftConfig){
+		var self = this;
+
 		config = config || {};
 		dftConfig = dftConfig || {};
 		util.setDftValue(config, dftConfig);
@@ -160,10 +165,9 @@
 		 * 例如：对外开放的配置项：width 可以设置为100%，代表“与父容器宽度相当”，
 		 * 但转换后的数字，代表的是具体的宽度像素值，如：1921。
 		 *
-		 * @type {NameValueBindingSet}
+		 * @type {Object<String, NameValueBindingSet>}
 		 */
 		var convertedConfigValue = {};
-
 
 
 		/**
@@ -179,7 +183,7 @@
 		};
 
 		/**
-		 * 获取配置集合
+		 * 获取当前实例绑定的配置集合
 		 * @returns {Object}
 		 */
 		this.getConfig = function(){
@@ -187,7 +191,7 @@
 		};
 
 		/**
-		 * 判断是否含有指定的配置项
+		 * 判断当前实例绑定的配置集合中是否含有指定的配置项
 		 * @param {String} name 配置项名称
 		 * @returns {Boolean}
 		 */
@@ -196,12 +200,37 @@
 		};
 
 		/**
-		 * 判断是否支持指定的配置项
+		 * 判断当前实例是否支持指定的配置项
 		 * @param {String} name 配置项名称
 		 * @returns {Boolean}
 		 */
 		this.supportsConfigItem = function(name){
 			return name in dftConfig;
+		};
+
+		/**
+		 * 获取当前实例绑定的取值转换了的配置项集合
+		 * @returns {Object<String, NameValueBindingSet>}
+		 */
+		this.getConvertedConfig = function(){
+			return convertedConfigValue;
+		};
+
+		/**
+		 * 从当前位置开始向上游查找支持给定配置项的配置实例。如果没有配置实例支持该配置项，则返回null
+		 * @param {String} name 配置项名称
+		 * @returns {CommonChartConfig}
+		 */
+		var getConfigInstanceThatSupportsConfigItem = function(name){
+			var t = self;
+			while(null != t){
+				if(t.supportsConfigItem(name))
+					return t;
+
+				t = t.getUpstreamConfigInstance();
+			}
+
+			return null;
 		};
 
 		/**
@@ -251,11 +280,14 @@
 		 * @returns {CommonChartConfig}
 		 */
 		this.setOriginalConfigItemValue = function(name, value){
-			if(!this.supportsConfigItem(name)){
-				console.warn("Unknown chart config item: " + name);
-			}
+			var instance = getConfigInstanceThatSupportsConfigItem(name);
 
-			config[name] = value;
+			if(null == instance){
+				console.warn("Unknown chart config item: " + name);
+				config[name] = value;
+			}else
+				instance.getConfig()[name] = value;
+
 			return this;
 		};
 
@@ -270,13 +302,18 @@
 			if(arguments.length < 3)
 				aspect = "default";
 
-			if(!this.supportsConfigItem(name)){
-				console.warn("Unknown k chart config item: " + name);
-			}
+			var instance = getConfigInstanceThatSupportsConfigItem(name);
+			var _convertedConfig;
 
-			if(!(name in convertedConfigValue))
-				convertedConfigValue[name] = new NameValueBindingSet(name, arguments.length < 3? convertedValue: null);
-			convertedConfigValue[name].setValue(aspect, convertedValue);
+			if(null == instance){
+				console.warn("Unknown chart config item: " + name);
+				_convertedConfig = convertedConfigValue;
+			}else
+				_convertedConfig = instance.getConvertedConfig();
+
+			if(!(name in _convertedConfig))
+				_convertedConfig[name] = new NameValueBindingSet(name, arguments.length < 3? convertedValue: null);
+			_convertedConfig[name].setValue(aspect, convertedValue);
 
 			return this;
 		};
@@ -287,11 +324,16 @@
 		 * @returns {CommonChartConfig}
 		 */
 		this.removeConfigItemConvertedValue = function(name){
-			if(!this.supportsConfigItem(name)){
-				console.warn("Unknown k chart config item: " + name);
-			}
+			var instance = getConfigInstanceThatSupportsConfigItem(name);
+			var _convertedConfig;
 
-			delete convertedConfigValue[name];
+			if(null == instance){
+				console.warn("Unknown chart config item: " + name);
+				_convertedConfig = convertedConfigValue;
+			}else
+				_convertedConfig = instance.getConvertedConfig();
+
+			delete _convertedConfig[name];
 			return this;
 		};
 
@@ -301,12 +343,20 @@
 		 * @returns {CommonChartConfig}
 		 */
 		this.resetConfigItemValueToDefault = function(name){
-			if(!this.supportsConfigItem(name)){
-				console.warn("Unknown k chart config item: " + name);
+			var instance = getConfigInstanceThatSupportsConfigItem(name);
+			var _convertedConfig, _config;
+
+			if(null == instance){
+				console.warn("Unknown chart config item: " + name);
+				_convertedConfig = convertedConfigValue;
+				_config = config;
+			}else{
+				_convertedConfig = instance.getConvertedConfig();
+				_config = instance.getConfig();
 			}
 
-			delete config[name];
-			delete convertedConfigValue[name];
+			delete _config[name];
+			delete _convertedConfig[name];
 			return this;
 		};
 
