@@ -87,21 +87,21 @@ util.loadData(function(datas){
 	var subChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
 	var rowResult_candle = subChart_candle.render(row_candleObj);
 	window.rowResult_candle = rowResult_candle;
-	rowResult_candle.initCanvas(row_candleDetailObj);
+	rowResult_candle.applyRenderingCanvasSettingTo(row_candleDetailObj);
 
 	var columnResult_candle = subChart_candle.render(column_candleObj);
 	window.columnResult_candle = columnResult_candle;
-	columnResult_candle.initCanvas(column_candleDetailObj);
+	columnResult_candle.applyRenderingCanvasSettingTo(column_candleDetailObj);
 
 	/* 量图 */
 	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
 	var rowResult_volume = subChart_volume.render(row_volumeObj);
 	window.rowResult_volume = rowResult_volume;
-	rowResult_volume.initCanvas(row_volumeDetailObj);
+	rowResult_volume.applyRenderingCanvasSettingTo(row_volumeDetailObj);
 
 	var columnResult_volume = subChart_volume.render(column_volumeObj);
 	window.columnResult_volume = columnResult_volume;
-	columnResult_volume.initCanvas(column_volumeDetailObj);
+	columnResult_volume.applyRenderingCanvasSettingTo(column_volumeDetailObj);
 
 	var drawLine4DataIndex = function(result, dataIndex, top, bottom){
 		var canvasObj = result.getCanvasDomElement();

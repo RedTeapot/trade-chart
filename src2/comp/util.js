@@ -209,9 +209,7 @@
 	};
 
 	/**
-	 * 生成随机字符串
-	 * @param {String} [prefix=""] 前缀
-	 * @param {Number} [len=10] 除前缀外，要随机生成的字符串的长度
+	 * 生成随机的唯一字符串
 	 */
 	var randomString = (function(){
 		var i = 0, tailLength = 2;
@@ -225,6 +223,11 @@
 			return s.substring(s.length -tailLength);
 		};
 
+		/**
+		 * 生成随机的唯一字符串
+		 * @param {String} [prefix=""] 前缀
+		 * @param {Number} [len=10] 除前缀外，要随机生成的字符串的长度
+		 */
 		return function(prefix, len){
 			if(arguments.length < 2)
 				len = 10;
@@ -346,7 +349,7 @@
 	var calcRenderingWidth = function(canvasObj, configuredWidth){
 		var width = configuredWidth;
 		var r = /%/;
-		if(r.test(configuredWidth) || !isValidNumber(configuredWidth))
+		if(r.test(configuredWidth))
 			width = canvasObj.parentElement.clientWidth * parseInt(configuredWidth.replace(r, "")) / 100;
 
 		return width;
@@ -361,7 +364,7 @@
 	var calcRenderingHeight = function(canvasObj, configuredHeight){
 		var height = configuredHeight;
 		var r = /%/;
-		if(r.test(configuredHeight) || !isValidNumber(configuredHeight))
+		if(r.test(configuredHeight))
 			height = canvasObj.parentElement.clientHeight * parseInt(configuredHeight.replace(r, "")) / 100;
 
 		return height;
@@ -448,16 +451,21 @@
 	})();
 
 	/**
-	 * @typedef {Object} DataMetadata
-	 * @property {Object} convertedData 被转换之后的数据
-	 * @property {*} originalData 被转换之前的原始数据
-	 * @property {Number} dataIndex 数据在数据列表中的索引位置
+	 * @typedef {Object} HighlightingMetadata 高亮动作的元数据描述
+	 * @property {Number} dataIndex 高亮的数据在数据列表中的索引位置
+	 * @property {Object} convertedData 高亮的格式转换之后的数据
+	 * @property {*} originalData 高亮的格式转换之前的数据
 	 */
 
 	/**
-	 * @callback DataDetailViewingAction 数据明细的查阅方法
+	 * @callback ActionToRevertViewingDataHighlighting 撤销查阅数据的高亮/标识效果时需要执行的方法
+	 * @param {HighlightingMetadata} lastDataMetadata 最后一次高亮动作的元数据描述
+	 */
+
+	/**
+	 * @callback ActionToHighlightViewingData 高亮/标识查阅的数据的方法
 	 * @param {Object} convertedData 被转换之后的数据
-	 * @param {DataMetadata} dataMetadata 数据的更多描述
+	 * @param {HighlightingMetadata} dataMetadata 数据查阅动作的元数据描述
 	 */
 
 	/**
@@ -465,25 +473,25 @@
 	 * @param {HTMLCanvasElement} operationCanvasObj 悬浮于绘制正文的画布之上的操作画布
 	 * @param {KSubChartRenderResult} kSubChartRenderResult
 	 * @param {Object} [ops] 控制选项
-	 * @param {Function} ops.dataDetailViewingRevertAction 数据明细的查阅方法
-	 * @param {DataDetailViewingAction} ops.dataDetailViewingAction 数据明细的查阅方法
+	 * @param {Function} [ops.revertDataHighlightAction] 撤销数据高亮效果所需要执行的方法
+	 * @param {ActionToHighlightViewingData} [ops.dataHighlightAction] 数据的高亮方法
 	 */
 	var addKSubChartOperationSupport = function(operationCanvasObj, kSubChartRenderResult, ops){
 		ops = setDftValue(ops, {
-			dataDetailViewingRevertAction: function(lastMetadata){
+			revertDataHighlightAction: function(lastMetadata){
 				var detailCtx = operationCanvasObj.getContext("2d");
 
 				var left = 0, width = detailCtx.canvas.width;
 				if(null != lastMetadata){
 					var x = lastMetadata.renderingHorizontalPosition;
-					var len = 5;
+					var len = 3;
 					left = Math.max(0, x - len);
 					width = 2 * len;
 				}
 
 				detailCtx.clearRect(left, 0, width, detailCtx.canvas.height);
 			},
-			dataDetailViewingAction: (function(){
+			dataHighlightAction: (function(){
 				var f = function(convertedData, dataMetadata){
 					// var kSubChartRenderResult = arguments.callee.kSubChartRenderResult,
 					// 	operationCanvasObj = arguments.callee.operationCanvasObj;
@@ -537,12 +545,12 @@
 			canvasObj = kSubChartRenderResult.getCanvasDomElement(),
 			detailCtx = operationCanvasObj.getContext("2d");
 
-		var dataDetailViewingAction = ops.dataDetailViewingAction,
-			dataDetailViewingRevertAction = ops.dataDetailViewingRevertAction;
+		var dataHighlightAction = ops.dataHighlightAction,
+			revertDataHighlightAction = ops.revertDataHighlightAction;
 
 		var viewDetail = function(e){
 			var x = e.layerX;
-			try2Call(dataDetailViewingRevertAction, null, lastMetadata);
+			try2Call(revertDataHighlightAction, null, lastMetadata);
 
 			var dataIndex = kSubChartRenderResult.getRenderingDataIndex(x);
 			if(-1 === dataIndex)
@@ -559,11 +567,11 @@
 			};
 
 			lastMetadata = metadata;
-			try2Call(dataDetailViewingAction, operationCanvasObj, convertedData, metadata);
+			try2Call(dataHighlightAction, operationCanvasObj, convertedData, metadata);
 		};
 
 		var viewHistory = function(e){
-			try2Call(dataDetailViewingRevertAction);
+			try2Call(revertDataHighlightAction);
 
 			var x = e.layerX;
 			var offsetX = x - lastX;

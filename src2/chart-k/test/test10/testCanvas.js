@@ -69,14 +69,14 @@ util.loadData(function(datas){
 	/* 走势图 */
 	var subChart_trend = kChart.newSubChart(TradeChart2.SubChartTypes.K_TREND).setConfig(kTrendConfig);
 	var result_trend = subChart_trend.render(trendCanvasObj);
-	result_trend.initCanvas(trendOperationCanvasObj);
+	result_trend.applyRenderingCanvasSettingTo(trendOperationCanvasObj);
 	window.subChart_trend = subChart_trend;
 	window.result_trend = result_trend;
 
 	/* 量图 */
 	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
 	var result_volume = subChart_volume.render(volumeCanvasObj);
-	result_volume.initCanvas(volumeOperationCanvasObj);
+	result_volume.applyRenderingCanvasSettingTo(volumeOperationCanvasObj);
 	window.subChart_volume = subChart_volume;
 	window.result_volume = result_volume;
 
@@ -143,7 +143,7 @@ util.loadData(function(datas){
 	};
 
 	var ops = {
-		dataDetailViewingRevertAction: function(lastMetadata){
+		revertDataHighlightAction: function(lastMetadata){
 			var f = function(canvasObj){
 				var detailCtx = canvasObj.getContext("2d");
 				detailCtx.clearRect(0, 0, detailCtx.canvas.width, detailCtx.canvas.height);
@@ -152,7 +152,7 @@ util.loadData(function(datas){
 			f(trendOperationCanvasObj);
 			f(volumeOperationCanvasObj);
 		},
-		dataDetailViewingAction: function(convertedData, dataMetadata){
+		dataHighlightAction: function(convertedData, dataMetadata){
 			drawVerticalLine(
 				volumeOperationCanvasObj,
 				dataMetadata,

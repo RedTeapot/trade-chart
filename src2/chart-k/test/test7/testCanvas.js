@@ -73,14 +73,14 @@ util.loadData(function(datas){
 	/* 蜡烛图 */
 	var subChart_candle = kChart.newSubChart(TradeChart2.SubChartTypes.K_CANDLE).setConfig(kCandleConfig);
 	var result_candle = subChart_candle.render(candleCanvasObj);
-	result_candle.initCanvas(candleOperationCanvasObj);
+	result_candle.applyRenderingCanvasSettingTo(candleOperationCanvasObj);
 	window.subChart_candle = subChart_candle;
 	window.result_candle = result_candle;
 
 	/* 量图 */
 	var subChart_volume = kChart.newSubChart(TradeChart2.SubChartTypes.K_VOLUME).setConfig(kVolumeConfig);
 	var result_volume = subChart_volume.render(volumeCanvasObj);
-	result_volume.initCanvas(volumeOperationCanvasObj);
+	result_volume.applyRenderingCanvasSettingTo(volumeOperationCanvasObj);
 	window.subChart_volume = subChart_volume;
 	window.result_volume = result_volume;
 
@@ -102,7 +102,7 @@ util.loadData(function(datas){
 	};
 
 	var ops = {
-		dataDetailViewingRevertAction: function(lastMetadata){
+		revertDataHighlightAction: function(lastMetadata){
 			var f = function(canvasObj){
 				var detailCtx = canvasObj.getContext("2d");
 				var left = 0, width = detailCtx.canvas.width;
@@ -118,7 +118,7 @@ util.loadData(function(datas){
 			f(candleOperationCanvasObj);
 			f(volumeOperationCanvasObj);
 		},
-		dataDetailViewingAction: function(convertedData, dataMetadata){
+		dataHighlightAction: function(convertedData, dataMetadata){
 			drawLine(
 				candleOperationCanvasObj.getContext("2d"),
 				dataMetadata.renderingHorizontalPosition,

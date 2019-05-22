@@ -256,11 +256,11 @@
 		};
 
 		/**
-		 * 使用渲染配置初始化给定的画布，用于实现“将呈现绘制结果的画布的属性同样应用到其它画布上，以辅助实现画布层叠显示需要”的效果
+		 * 将当前画布的渲染配置应用到给定的其它画布上，以辅助实现画布层叠显示需要
 		 * @param {HTMLCanvasElement} canvasObj 要被初始化的画布
 		 * @returns {CanvasRenderingContext2D} 被初始化的画布的上下文
 		 */
-		this.initCanvas = function(canvasObj){
+		this.applyRenderingCanvasSettingTo = function(canvasObj){
 			return util.initCanvas(canvasObj, this.getConfigItem("width"), this.getConfigItem("height"));
 		};
 
