@@ -591,6 +591,9 @@
 		});
 		["mouseup", "blur"].forEach(function(e){
 			document.addEventListener(e, function(evt){
+				if(evt.target !== operationCanvasObj)
+					return;
+
 				isModeViewDetail = true;
 				viewDetail(evt);
 			});
