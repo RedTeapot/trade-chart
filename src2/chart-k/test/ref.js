@@ -20,6 +20,7 @@
 	"KSubChartConfig.js",
 	"KSubChartSketch.js",
 	"KSubChartRenderResult.js",
+	"KSubChartOperationUtil.js",
 	"KSubChart.js",
 
 	"KSubChart_CandleRenderResult.js",

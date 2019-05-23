@@ -70,5 +70,5 @@ util.loadData(function(datas){
 	kSubChart_index_ma.setSpecifiedDataSketchMethod(TradeChart2.KSubChartSketch_CandleDataSketch.sketch);
 	var result_indexMA = kSubChart_index_ma.render(candleCanvasObj);
 
-	util.addKSubChartOperationSupport(candleOperationCanvasObj, result_candle);
+	TradeChart2.KSubChartOperationUtil.addKSubChartOperationSupport(candleOperationCanvasObj, result_candle);
 });

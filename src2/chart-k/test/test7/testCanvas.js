@@ -136,6 +136,6 @@ util.loadData(function(datas){
 		}
 	};
 
-	util.addKSubChartOperationSupport(candleOperationCanvasObj, result_candle, ops);
-	util.addKSubChartOperationSupport(volumeOperationCanvasObj, result_volume, ops);
+	TradeChart2.KSubChartOperationUtil.addKSubChartOperationSupport(candleOperationCanvasObj, result_candle, ops);
+	TradeChart2.KSubChartOperationUtil.addKSubChartOperationSupport(volumeOperationCanvasObj, result_volume, ops);
 });
