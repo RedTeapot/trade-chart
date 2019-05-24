@@ -74,35 +74,41 @@ var xpipe = function(){
 var concatK = function(){
 	return xpipe(
 		gulp.src([
-			"KChartDataTypes.js",
-
 			"KChartSketch.js",
-			"DataSketch.js",
 
-			"CommonDataManager.js",
 			"KChartConfig.js",
 			"KChart.js",
 
 			"KSubChartConfig.js",
-			"SubChartTypes.js",
 			"KSubChartSketch.js",
 			"KSubChartRenderResult.js",
+			"KSubChartOperationUtil.js",
 			"KSubChart.js",
 
 			"KSubChart_CandleRenderResult.js",
+			"KSubChart_TrendRenderResult.js",
 			"KSubChart_VolumeRenderResult.js",
+			"KSubChart_IndexMARenderResult.js",
 
 			"KSubChartConfig_CandleConfig.js",
+			"KSubChartConfig_TrendConfig.js",
 			"KSubChartConfig_VolumeConfig.js",
+			"KSubChartConfig_IndexMAConfig.js",
 
 			"KSubChartSketch_CandleDataSketch.js",
+			"KSubChartSketch_TrendDataSketch.js",
 			"KSubChartSketch_VolumeDataSketch.js",
+			"KSubChartSketch_IndexMADataSketch.js",
 
 			"KSubChartSketch_CandleChartSketch.js",
+			"KSubChartSketch_TrendChartSketch.js",
 			"KSubChartSketch_VolumeChartSketch.js",
+			"KSubChartSketch_IndexMAChartSketch.js",
 
 			"KSubChart_CandleChart.js",
+			"KSubChart_TrendChart.js",
 			"KSubChart_VolumeChart.js",
+			"KSubChart_IndexMAChart.js",
 		].map(function(f){return "../src2/chart-k/" + f;})),
 		concat("trade-chart2_k.js"),
 		prependCopyright()
@@ -134,6 +140,12 @@ var concatAllAndSave = function(min){
 	stream.add(gulp.src("../src2/comp/Big.js"));
 	stream.add(gulp.src("../src2/comp/LinearGradient.js"));
 	stream.add(gulp.src("../src2/CommonChartConfig.js"));
+	stream.add(gulp.src("../src2/CommonDataManager.js"));
+	stream.add(gulp.src("../src2/CommonChart.js"));
+	stream.add(gulp.src("../src2/ChartSketch.js"));
+	stream.add(gulp.src("../src2/DataSketch.js"));
+	stream.add(gulp.src("../src2/SubChart.js"));
+	stream.add(gulp.src("../src2/SubChartTypes.js"));
 	stream.add(concatK());
 
 	stream = xpipe(

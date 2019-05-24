@@ -172,15 +172,22 @@
 				/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
 				var leftX = 0,
 					rightX = xRightEdge_axisX_content + 1;
-				var leftOldImgData = ctx.getImageData(leftX, config_paddingTop, xLeftEdge_axisX_content, kSubChartSketch.getContentHeight()),
-					rightOldImgData = ctx.getImageData(rightX, config_paddingTop, config_width - xRightEdge_axisX_content - 1, kSubChartSketch.getContentHeight());
+				/* getImageData() 以及 putImageData() 方法不受变化影响，因而需要放大处理 */
+				var hScale = ctx.canvas.width / ctx.canvas.offsetWidth,
+					vScale = ctx.canvas.height / ctx.canvas.offsetHeight;
+				var imgDataHeight = kSubChartSketch.getContentHeight() * vScale,
+					imgDataTop = config_paddingTop * vScale,
+					leftImgDataLeft = leftX * hScale,
+					rightImgDataLeft = rightX * hScale;
+				var leftOldImgData = ctx.getImageData(leftImgDataLeft, config_paddingTop * vScale, (xLeftEdge_axisX_content - leftX) * hScale, imgDataHeight),
+					rightOldImgData = ctx.getImageData(rightImgDataLeft, config_paddingTop * vScale, (config_width - rightX) * hScale, imgDataHeight);
 
 				for(var i = 0; i < xPositionAndDataIndexList.length; i++)
 					renderVolume(i);
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
-				ctx.putImageData(leftOldImgData, leftX, config_paddingTop);
-				ctx.putImageData(rightOldImgData, rightX, config_paddingTop);
+				ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
+				ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
 
 				ctx.restore();
 			})();

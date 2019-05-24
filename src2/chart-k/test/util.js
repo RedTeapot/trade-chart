@@ -19,7 +19,7 @@
 	/**
 	 * 将给定的字符串自连n次后返回
 	 * @param str {String} 要重复的字符串单元
-	 * @param n {Integer} 要重复的次数
+	 * @param n {Number} 要重复的次数
 	 * @return {String} 重复连接后的字符串
 	 */
 	var repeatString = function(str, n){

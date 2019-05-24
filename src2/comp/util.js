@@ -337,6 +337,7 @@
 
 			/* 高分辨率适应 */
 			var pr = pixelRatio();
+			// pr = 1;
 			if(pr > 1){
 				canvasObj.style.width = width + "px";
 				canvasObj.style.height = height + "px";
@@ -350,6 +351,7 @@
 			}
 
 			ctx.scale(pr, pr);
+			canvasObj.scale = pr;
 			canvasObj.initFlag = true;
 
 			return ctx;

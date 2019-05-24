@@ -241,11 +241,30 @@
 		};
 	};
 
+	var defaultLayerXRetrieveMethod = function(e){
+		if(!e.changedTouches)
+			return e.layerX;
+
+		var x = e.changedTouches[0].clientX;
+		var target = e.changedTouches[0].target;
+
+		var left = 0;
+		while(true){
+			left += target.offsetLeft;
+			target = target.offsetParent;
+			if(null == target)
+				break;
+		}
+
+		return x - left;
+	};
+
 	/**
 	 * 为K线图子图添加图形交互支持
 	 * @param {HTMLCanvasElement} operationCanvasObj 悬浮于绘制正文的画布之上的操作画布
 	 * @param {KSubChartRenderResult} kSubChartRenderResult
 	 * @param {Object} [ops] 控制选项
+	 * @param {Function} [ops.layerXRetrieveMethod] 根据点击位置确定要查阅的数据时，“点击位置相对于画布左上角的横坐标”的获取方法
 	 * @param {ActionToRevertViewingDataHighlighting} [ops.revertDataHighlightAction] 撤销数据高亮效果所需要执行的方法
 	 * @param {ActionToHighlightViewingData} [ops.dataHighlightAction] 数据的高亮方法
 	 */
@@ -295,8 +314,14 @@
 			}
 		}
 
+		var layerXRetrieveMethod;
+		if(typeof ops.layerXRetrieveMethod === "function")
+			layerXRetrieveMethod = ops.layerXRetrieveMethod;
+		else
+			layerXRetrieveMethod = defaultLayerXRetrieveMethod;
+
 		var viewDetail = function(e){
-			var x = e.layerX;
+			var x = layerXRetrieveMethod(e);
 			util.try2Call(revertDataHighlightAction, null, lastMetadata);
 
 			var dataIndex = kSubChartRenderResult.getRenderingDataIndex(x);
@@ -318,13 +343,12 @@
 			lastMetadata = metadata;
 		};
 
-		var viewHistory = function(e){
+		var viewHistory = function(layerX){
 			util.try2Call(revertDataHighlightAction);
 
-			var x = e.layerX;
-			var offsetX = x - lastX;
+			var offsetX = layerX - lastX;
 			kChart.updateRenderingOffsetBy(offsetX, canvasObj.width);
-			lastX = x;
+			lastX = layerX;
 		};
 
 		operationCanvasObj.addEventListener("mousedown", function(e){
@@ -333,13 +357,20 @@
 		});
 		operationCanvasObj.addEventListener("mousemove", function(e){
 			if(!isModeViewDetail)
-				viewHistory(e);
+				viewHistory(e.layerX);
 			else
 				viewDetail(e);
 		});
 		operationCanvasObj.addEventListener("mouseout", function(e){
 			util.try2Call(revertDataHighlightAction);
 		});
+
+		operationCanvasObj.addEventListener("touchstart", function(e){
+			viewDetail(e);
+		}, {passive: true});
+		operationCanvasObj.addEventListener("touchmove", function(e){
+			viewDetail(e);
+		}, {passive: true});
 		document.addEventListener("mouseup", function(evt){
 			if(evt.target !== operationCanvasObj)
 				return;
