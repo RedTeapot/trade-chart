@@ -1,1 +1,1 @@
-@call gulp --gulpfile gulpfile2.js concat --min %1
+@call gulp --gulpfile gulpfile2.js concat --min %1 --withVersion %2

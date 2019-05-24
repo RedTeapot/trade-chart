@@ -127,9 +127,10 @@ var concatKAndSave = function(){
 
 /**
  * 合并并保存文件
- * @param {Boolean} min 是否压缩筹划
+ * @param {Boolean} [min=true] 是否压缩丑化
+ * @param {Boolean} [ifReflectVersionInFileName=true] 是否在文件名中体现版本号
  */
-var concatAllAndSave = function(min){
+var concatAllAndSave = function(min, ifReflectVersionInFileName){
 	if(arguments.length < 1)
 		min = true;
 
@@ -150,7 +151,7 @@ var concatAllAndSave = function(min){
 
 	stream = xpipe(
 		stream,
-		concat("trade-chart." + getVersion() + (min? ".min": "") + ".js")
+		concat("trade-chart" + (ifReflectVersionInFileName? ("." + getVersion()): "") + (min? ".min": "") + ".js")
 	);
 
 	if(min)
@@ -167,8 +168,11 @@ var concatAllAndSave = function(min){
 };
 
 gulp.task('concat', function(){
-	var min = getParameter("min") || "false";
-	var ifMin = "true" === String(min).trim().toLowerCase();
+	var min = getParameter("min") || "false",
+		withVersion = getParameter("withVersion") || "true";
 
-	concatAllAndSave(ifMin);
+	var ifMin = "true" === String(min).trim().toLowerCase(),
+		ifReflectVersionInFileName = "true" === String(withVersion).trim().toLowerCase();
+
+	concatAllAndSave(ifMin, ifReflectVersionInFileName);
 });

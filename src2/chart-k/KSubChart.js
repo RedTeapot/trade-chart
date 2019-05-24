@@ -331,7 +331,8 @@
 							gap = avgGap + 1;
 
 						return gap;
-					}
+					}else
+						return 0;
 				});
 			}
 
