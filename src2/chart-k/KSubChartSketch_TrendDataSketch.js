@@ -99,7 +99,7 @@
 				previousClosePrice = closePrice;
 			}
 			var len = dataList.length;
-			dataSketch_origin_avgVariation = len > 0? (variationSum / len): 0;
+			dataSketch_origin_avgVariation = len > 1? (variationSum / (len - 1)): dataSketch_origin_avgVariation;
 
 			var tmp = dataSketch_origin_avgVariation / 2;
 

@@ -141,6 +141,9 @@
 
 					var dataIndex = groupCount - 1 - i;
 					var data = dataManager.getConvertedData(dp.dataIndex);
+					if(null == data)
+						return;
+
 					var x = dp.x - halfGroupBarWidth;
 
 					if(i === 0){
@@ -173,8 +176,9 @@
 				var leftX = 0,
 					rightX = xRightEdge_axisX_content + 1;
 				/* getImageData() 以及 putImageData() 方法不受变化影响，因而需要放大处理 */
-				var hScale = ctx.canvas.width / ctx.canvas.offsetWidth,
-					vScale = ctx.canvas.height / ctx.canvas.offsetHeight;
+				var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
+				var hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / ctx.canvas.offsetWidth),
+					vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / ctx.canvas.offsetHeight);
 				var imgDataHeight = kSubChartSketch.getContentHeight() * vScale,
 					imgDataTop = config_paddingTop * vScale,
 					leftImgDataLeft = leftX * hScale,

@@ -16,7 +16,6 @@ util.loadData(function(datas){
 
 		axisXTickOffset: 10,/* 横坐标刻度距离原点的位移 */
 		axisXTickOffsetFromRight: 20,/* 横坐标右侧刻度距离原点的位移 */
-		axisXTickInterval: 30,/** 横坐标刻度之间相差的点的个数 */
 	};
 
 	var kCandleConfig = {

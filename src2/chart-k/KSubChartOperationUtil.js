@@ -68,6 +68,9 @@
 	 * @param {HTMLCanvasElement} operationCanvasObj 悬浮于渲染画布之上提供操作支持的画布
 	 * @param {KSubChartRenderResult} kSubChartRenderResult 图形渲染结果
 	 * @param {Object} [ops] 控制选项
+	 * @param {Boolean} [ops.lineWidth=0.5] 线条宽度
+	 * @param {Boolean} [ops.lineColor=#4C9FE3] 线条颜色
+	 * @param {Boolean} [ops.lineDash=[5,5]] 线条的虚线构造方法。如果需要用实线，则用 [1] 表示
 	 * @param {Boolean} [ops.renderHorizontalLine=true] 是否绘制横线
 	 * @param {Boolean} [ops.verticalLineTop] 竖线的顶部位置
 	 * @param {Boolean} [ops.verticalLineBottom] 竖线的底部位置
@@ -75,6 +78,10 @@
 	 */
 	var newDataHighlightAction_4CandleChart = function(operationCanvasObj, kSubChartRenderResult, ops){
 		ops = util.setDftValue(ops, {
+			lineWidth: 0.5,
+			lineColor: "#4C9FE3",
+			lineDash: [5, 5],
+
 			renderHorizontalLine: true,
 			verticalLineTop: kSubChartRenderResult.getConfigItem("paddingTop"),
 			verticalLineBottom: kSubChartRenderResult.getKSubChartSketch().getCanvasHeight() - kSubChartRenderResult.getConfigItem("paddingBottom")
@@ -89,8 +96,9 @@
 
 			detailCtx.save();
 
-			detailCtx.lineWidth = 0.5;
-			detailCtx.setLineDash([5, 5]);
+			detailCtx.lineWidth = ops.lineWidth || 0.5;
+			detailCtx.strokeStyle = ops.lineColor || "#4C9FE3";
+			detailCtx.setLineDash(ops.lineDash || [5, 5]);
 			detailCtx.beginPath();
 
 			var yTop = ops.verticalLineTop,
@@ -153,12 +161,33 @@
 	 * @param {HTMLCanvasElement} operationCanvasObj 悬浮于渲染画布之上提供操作支持的画布
 	 * @param {KSubChartRenderResult} kSubChartRenderResult 图形渲染结果
 	 * @param {Object} [ops] 控制选项
+	 * @param {Boolean} [ops.lineWidth=0.5] 线条宽度
+	 * @param {Boolean} [ops.lineColor=#4C9FE3] 线条颜色
+	 * @param {Boolean} [ops.lineDash=[5,5]] 线条的虚线构造方法。如果需要用实线，则用 [1] 表示
+	 * @param {Boolean} [ops.outerDotRadius=10] 外层圆的半径
+	 * @param {Boolean} [ops.outerDotColor=#21E050] 外层圆的填充颜色
+	 * @param {Boolean} [ops.outerDotAlpha=0.3] 外层圆的透明度
+	 * @param {Boolean} [ops.innerDotRadius=5] 内层圆的半径
+	 * @param {Boolean} [ops.innerDotColor=#21E050] 内层圆的填充颜色
+	 * @param {Boolean} [ops.innerDotAlpha=1] 内层圆的透明度
 	 * @param {Boolean} [ops.verticalLineTop] 竖线的顶部位置
 	 * @param {Boolean} [ops.verticalLineBottom] 竖线的底部位置
 	 * @returns {Function}
 	 */
 	var newDataHighlightAction_4TrendChart = function(operationCanvasObj, kSubChartRenderResult, ops){
 		ops = util.setDftValue(ops, {
+			lineWidth: 0.5,
+			lineColor: "#4C9FE3",
+			lineDash: [5, 5],
+
+			outerDotRadius: 10,
+			outerDotColor: "#21E050",
+			outerDotAlpha: 0.3,
+
+			innerDotRadius: 5,
+			innerDotColor: "#21E050",
+			innerDotAlpha: 1,
+
 			verticalLineTop: kSubChartRenderResult.getConfigItem("paddingTop"),
 			verticalLineBottom: kSubChartRenderResult.getKSubChartSketch().getCanvasHeight() - kSubChartRenderResult.getConfigItem("paddingBottom")
 		});
@@ -173,12 +202,13 @@
 			var trendCanvasCtx = operationCanvasObj.getContext("2d");
 			trendCanvasCtx.save();
 
-			trendCanvasCtx.lineWidth = 0.5;
-			trendCanvasCtx.setLineDash([5, 5]);
+			trendCanvasCtx.lineWidth = ops.lineWidth || 0.5;
+			trendCanvasCtx.strokeStyle = ops.lineColor || "#4C9FE3";
+			trendCanvasCtx.setLineDash(ops.lineDash || [5, 5]);
 
 			/* 横线 */
-			var left = kChart._calcAxisXLeftPosition(),
-				right = kChart._calcAxisXRightPosition(trendCanvasCtx.canvas.width);
+			var left = kSubChartRenderResult.getKChart()._calcAxisXLeftPosition(),
+				right = kSubChartRenderResult.getKChart()._calcAxisXRightPosition(trendCanvasCtx.canvas.width);
 			var dataSketch = kSubChartRenderResult.getDataSketch();
 			trendCanvasCtx.beginPath();
 			trendCanvasCtx.moveTo(left, y);
@@ -195,9 +225,9 @@
 			trendCanvasCtx.stroke();
 
 			/* 大圆点 */
-			var dotRadius = 10;
-			trendCanvasCtx.fillStyle = "#21E050";
-			trendCanvasCtx.globalAlpha = 0.3;
+			var dotRadius = ops.outerDotRadius || 10;
+			trendCanvasCtx.fillStyle = ops.outerDotColor || "#21E050";
+			trendCanvasCtx.globalAlpha = ops.outerDotAlpha || 0.3;
 			trendCanvasCtx.beginPath();
 			trendCanvasCtx.moveTo(x, y);
 			trendCanvasCtx.arc(x, y, dotRadius, 2 * Math.PI, 0);
@@ -205,10 +235,12 @@
 			trendCanvasCtx.fill();
 
 			/* 小圆点 */
-			trendCanvasCtx.globalAlpha = 1;
+			dotRadius = ops.innerDotRadius || (dotRadius / 2);
+			trendCanvasCtx.fillStyle = ops.innerDotColor || "#21E050";
+			trendCanvasCtx.globalAlpha = ops.innerDotAlpha || 1;
 			trendCanvasCtx.beginPath();
 			trendCanvasCtx.moveTo(x, y);
-			trendCanvasCtx.arc(x, y, dotRadius / 2, 2 * Math.PI, 0);
+			trendCanvasCtx.arc(x, y, dotRadius, 2 * Math.PI, 0);
 			trendCanvasCtx.closePath();
 			trendCanvasCtx.fill();
 

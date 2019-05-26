@@ -9,6 +9,7 @@
 	var defaultConfig = {
 		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移，取值为正则向上偏移 */
 
+		lineWidth: 0.5,/* 走势线的线条宽度 */
 		lineColor: "#999999",/* 走势线的线条颜色 */
 		enclosedAreaBackground: null,/* 折线与X轴围绕而成的封闭区域的背景色 */
 

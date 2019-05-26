@@ -80,6 +80,7 @@
 		[
 			"prependDataList",
 			"appendDataList",
+			"getDataCount",
 			"getDataList",
 			"getConvertedDataList",
 			"getRenderingGroupCount",

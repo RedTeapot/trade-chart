@@ -70,6 +70,7 @@
 
 				config_axisYTickOffset = this.getConfigItem("axisYTickOffset"),
 
+				config_lineWidth = this.getConfigItem("lineWidth"),
 				config_lineColor = this.getConfigItem("lineColor"),
 				config_enclosedAreaBackground = this.getConfigItem("enclosedAreaBackground"),
 
@@ -87,6 +88,7 @@
 
 			var dataManager = kChart.getDataManager();
 			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
+
 
 			/* 绘制的数据个数 */
 			var groupCount = xPositionAndDataIndexList.length;
@@ -154,6 +156,9 @@
 
 					var dataIndex = dp.dataIndex;
 					var data = dataManager.getData(dataIndex);
+					if(null == data)
+						continue;
+
 					var x = util.getLinePosition(dp.x);
 
 					var closePrice = +dataManager.getConvertedData(data).closePrice;
@@ -191,8 +196,9 @@
 				// ctx.restore();
 
 				/* getImageData() 以及 putImageData() 方法不受变化影响，因而需要放大处理 */
-				var hScale = ctx.canvas.width / ctx.canvas.offsetWidth,
-					vScale = ctx.canvas.height / ctx.canvas.offsetHeight;
+				var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
+				var hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / ctx.canvas.offsetWidth),
+					vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / ctx.canvas.offsetHeight);
 				var imgDataHeight = kSubChartSketch.getContentHeight() * vScale,
 					imgDataTop = config_paddingTop * vScale,
 					leftImgDataLeft = leftX * hScale,
@@ -206,10 +212,11 @@
 				// return;
 
 				/* 绘制折线 */
-				ctx.strokeWidth = 0.5;
+				ctx.lineWidth = config_lineWidth || 0.5;
 				ctx.strokeStyle = config_lineColor;
 				ctx.beginPath();
-				ctx.moveTo(dots[0][0], dots[0][1]);
+				if(dots.length > 0)
+					ctx.moveTo(dots[0][0], dots[0][1]);
 				for(var i = 1; i < dots.length; i++)
 					ctx.lineTo(dots[i][0], dots[i][1]);
 				ctx.stroke();
@@ -217,11 +224,14 @@
 				/* 绘制分时图背景 */
 				var bg = config_enclosedAreaBackground;
 				if(null != bg){
-					dots.unshift([dots[0][0], y_axisX]);
-					dots.push([dots[dots.length - 1][0], y_axisX]);
+					if(dots.length > 0){
+						dots.unshift([dots[0][0], y_axisX]);
+						dots.push([dots[dots.length - 1][0], y_axisX]);
+					}
 
 					ctx.beginPath();
-					ctx.moveTo(dots[0][0], dots[0][1]);
+					if(dots.length > 0)
+						ctx.moveTo(dots[0][0], dots[0][1]);
 					for(i = 1; i < dots.length; i++)
 						ctx.lineTo(dots[i][0], dots[i][1]);
 

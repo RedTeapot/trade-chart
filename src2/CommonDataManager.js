@@ -273,9 +273,10 @@
 				return this;
 			}
 
-			if(_datas !== dataList)
-				this.fire(evtName_storedDataChanges, null, false);
+			var ifDataChanges = _datas !== dataList;
 			dataList = _datas;
+			if(ifDataChanges)
+				this.fire(evtName_storedDataChanges, null, false);
 
 			var ifChanges = false;
 			if(elapsedRenderableDataCount !== 0)
@@ -288,6 +289,14 @@
 			unrenderableGroupCount = 0;
 
 			return this;
+		};
+
+		/**
+		 * 获取设置的数据源中的数据个数
+		 * @returns {number}
+		 */
+		this.getDataCount = function(){
+			return dataList.length;
 		};
 
 		/**

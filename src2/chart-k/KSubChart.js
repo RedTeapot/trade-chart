@@ -225,7 +225,7 @@
 
 				canvasObj = document.createElement("canvas");
 				var detailCanvasObj = document.createElement("canvas");
-				detailCanvasObj.className = "detail";
+				detailCanvasObj.className = "operation";
 
 				chartObj.appendChild(canvasObj);
 				chartObj.appendChild(detailCanvasObj);
@@ -242,6 +242,33 @@
 
 
 			return this.render(canvasObj);
+		};
+
+		/**
+		 * 判断给定的位置是否需要附加间隙以实现均匀分散间隙的目的
+		 * @param {Number} totalGapCount 总间隙个数
+		 * @param {Number} remainingSpace 不能整除的需要均匀分配的额外间隙
+		 * @param {Number} index 间隙索引
+		 * @returns {boolean}
+		 */
+		var checkIfAddGap = function(totalGapCount, remainingSpace, index){
+			if(remainingSpace <= 0)
+				return false;
+			else if(remainingSpace % totalGapCount === 0)
+				return true;
+
+			if(index == 0)
+				return false;
+
+			var decimal = remainingSpace / totalGapCount;
+
+			var c = index + 1;
+			var s1 = (c - 1) * decimal;
+			var s2 = c * decimal;
+
+			if(index == totalGapCount - 1 && s2 < remainingSpace)
+				return true;
+			return Math.floor(s2) > Math.floor(s1);
 		};
 
 		/**
@@ -291,6 +318,7 @@
 					var gapCount = totalCount - 1;
 					var avgGap = Math.floor(len / gapCount);
 					var remaining = len % gapCount;
+					var extraGapAllocateInterval = Math.floor(gapCount / remaining);
 
 					/* 根据最小间隙自动调整groupLineWidth和groupBarWidth */
 					if(avgGap <= 2){
@@ -327,7 +355,9 @@
 				subChartConfig.setConfigItemConvertedValue("groupGap", function(leftIndex, rightIndex){
 					if(isContentWidthEnough){
 						var gap = avgGap;
-						if(leftIndex < remaining)
+						// if(leftIndex < remaining)
+						// if(leftIndex % extraGapAllocateInterval === 0)
+						if(checkIfAddGap(gapCount, remaining, leftIndex))
 							gap = avgGap + 1;
 
 						return gap;
@@ -454,10 +484,11 @@
 			var arr = [];
 
 			var position = rightMostPosition;
-			arr.push({
-				x: Math.floor(position),
-				dataIndex: rightMostRenderingDataIndex
-			});
+			if(-1 !== rightMostRenderingDataIndex)
+				arr.push({
+					x: Math.floor(position),
+					dataIndex: rightMostRenderingDataIndex
+				});
 
 			var totalGap = 0;
 			for(var i = 0; i < groupCount - 1; i++){
@@ -525,7 +556,6 @@
 					dataIndex = dp.dataIndex;
 
 				var data = dataManager.getConvertedData(dataIndex);
-
 				var dataOverallIndexFromRightToLeft = rightMostRenderingDataIndexFromRight + i;
 				axisXTickGenerateIndicatorEnv.dataOverallIndexFromRightToLeft = dataOverallIndexFromRightToLeft;
 				var ifShowTick = config_axisXTickGenerateIndicator(data, axisXTickGenerateIndicatorEnv);
@@ -541,7 +571,7 @@
 					if(null != previousXTickDataIndex)
 						previousData = dataManager.getConvertedData(previousXTickDataIndex);
 
-					return config_axisXLabelGenerator(data, i, previousData, previousXTickDataIndex);
+					return config_axisXLabelGenerator(data, dp.dataIndex, previousData, previousXTickDataIndex);
 				})();
 				previousXTickDataIndex = i;
 
@@ -915,8 +945,8 @@
 
 		var timer;
 		var evtRenderAction = function(e){
-			lastArgs_getRenderingXPositionListFromRight = NOT_SUPPLIED;
-			lastResult_getRenderingXPositionListFromRight = NOT_SUPPLIED;
+			if(NOT_SUPPLIED === lastRenderingCanvasObj)
+				return;
 
 			TradeChart2.showLog && console.debug("Auto render for " + self.id + " by event: " + e.type);
 			self.render();

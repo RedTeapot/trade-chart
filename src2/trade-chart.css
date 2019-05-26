@@ -7,7 +7,7 @@
 	display: block;
 	margin: 0 auto;
 }
-.trade-chart[data-sub-type] canvas.detail{
+.trade-chart[data-sub-type] canvas.operation{
 	position: absolute;
 	z-index: 1;
 	left: 0;
