@@ -311,6 +311,9 @@
 
 					groupLineWidth = 1;
 					groupBarWidth = 1;
+				}else if(totalCount < 2){
+					groupLineWidth = groupLineWidth || 1;
+					groupBarWidth = config_groupBarWidth || 1;
 				}else{
 					isContentWidthEnough = true;
 
