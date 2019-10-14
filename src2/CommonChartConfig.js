@@ -30,7 +30,7 @@
 		 * 相邻两组数据之间的间隔
 		 * 1. {Number|GroupGapCalculator} 用于指定两组数据之间的固定间隔，如：1，function(){return 3;}等，单位：像素
 		 * 2. {String} 字面量：autoDividedByFixedGroupCount:n 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间，其中n等于数据的总群组个数。
-		 *    此时，将自动调整groupLineWidth和groupBarWidth，使得图形可以能够在一屏之内显示完全
+		 *    此时，将自动调整groupLineWidth和groupBarWidth，使得图形可以能够在一屏之内显示完全。如果n被忽略，则将n视为当前数据的总个数
 		 */
 		groupGap: 3,
 	};
@@ -132,7 +132,7 @@
 				console.error("No method of name: 'implGetMinValue' found in given group gap calculator, using constant 0 instead.", config_groupGap);
 				return 0;
 			}
-		}else if(/^autoDividedByFixedGroupCount:\d+$/.test(String(config_groupGap).trim()))
+		}else if(/^autoDividedByFixedGroupCount(?::\d+)?$/.test(String(config_groupGap).trim()))
 			return 0;
 		else{
 			console.error("Can not determine the min group gap by value: " + config_groupGap + ", using constant 0 instead.");

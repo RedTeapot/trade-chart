@@ -296,10 +296,16 @@
 				subChartConfig.setConfigItemConvertedValue("axisYPrecision", dataSketch.getAmountPrecision());
 
 			var tmp;
-			if(null != (tmp = /^autoDividedByFixedGroupCount:(\d+)$/.exec(String(config_groupGap).trim()))){
-				var totalCount = Number(tmp[1]);
-
+			if(null != (tmp = /^autoDividedByFixedGroupCount(?::(\d+))?$/.exec(String(config_groupGap).trim()))){
 				var dataManager = kChart.getDataManager();
+
+				var totalCount = 0;
+				if(null == tmp[1]){
+					totalCount = dataManager.getRenderableGroupCount();
+					TradeChart2.showLog && console.info("Auto adjust group gap to 'autoDividedByFixedGroupCount:" + totalCount + "' where " + totalCount + " is the current rendering data count");
+				}else
+					totalCount = Number(tmp[1]);
+
 				var isContentWidthEnough = false;
 
 				var groupLineWidth = config_groupLineWidth,
