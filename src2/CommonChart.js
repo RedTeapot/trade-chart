@@ -6,7 +6,7 @@
 		CommonChartConfig = TradeChart2.CommonChartConfig;
 
 	/**
-	 * 事件名称：渲染位置发生了变更
+	 * 事件名称：图形渲染位置发生了变更
 	 * @type {string}
 	 */
 	var evtName_renderingPositionChanges = "renderingpositionchange";
@@ -24,14 +24,12 @@
 		/** 与该实例相关联的数据管理器 */
 		var dataManager = new CommonDataManager();
 
-		/** 附加的K线子图列表 */
-		var attachedKSubCharts = [];
-
 		/**
 		 * 从初次绘制开始到现在，用户通过拖拉的方式达到的“绘制位置的横向位移”
-		 * 取值为正，则代表图形向右移动；取值为负，则代表图形向左移动。
+		 * 取值为正，则代表图形向右偏移；取值为负，则代表图形向左偏移。
 		 */
 		var renderingOffset = 0;
+
 		/**
 		 * 图形向右移动的累计位移
 		 */
@@ -41,35 +39,47 @@
 			self.fire(evtName_renderingPositionChanges, null, false);
 		};
 
-		var setTotalRenderingOffsetFromLeft = function(v){
-			var config_groupBarWidth = self.getConfigItem("groupBarWidth");
+		/**
+		 * 根据给定的位移量，计算对应可以略过的数据群组个数，以及渲染偏移量
+		 * @param {Number} newTotalRenderingOffset 位移量
+		 * @returns {Number} 略过的数据群组个数
+		 */
+		var setTotalRenderingOffsetFromLeft = function(newTotalRenderingOffset){
+			var config_groupBarWidth = self.getConfigItemValue("groupBarWidth");
 
 			var rightMostRenderingDataIndex = dataManager.getRightMostRenderableDataIndex();
 			var elapsedDataCount = 0,
-				tmp = v;
+				tmp = newTotalRenderingOffset;
 			while(true){
 				var rightIndex = rightMostRenderingDataIndex - elapsedDataCount;
 				var leftIndex = rightIndex - 1;
 				if(leftIndex < 0)
 					break;
 
+				/**
+				 * 不同数据之间的间隙可能是不同的，需要分别计算、累加
+				 */
 				var gap = self.getGroupGap(leftIndex, rightIndex);
 				var groupSize = gap + config_groupBarWidth;
-				if(tmp >= groupSize){
+
+				if(tmp >= groupSize){/* 位移量超过1组数据 */
 					tmp -= groupSize;
 					elapsedDataCount += 1;
-				}else if(tmp < config_groupBarWidth){
+				}else if(tmp < config_groupBarWidth){/* 位移量不足柱宽 */
 					renderingOffset = tmp;
 					break;
-				}else{
+				}else{/* 位移量超过柱宽，但间隙不足 */
 					elapsedDataCount += 1;
+
+					/* 记录剩余间隙，用于横向偏移整个图形，从而保持图形的渲染位置与鼠标拖动位移一直 */
 					renderingOffset = (gap - (tmp - config_groupBarWidth)) * -1;
 					break;
 				}
 			}
 
-			var ifChanges = totalRenderingOffset !== v;
-			totalRenderingOffset = v;
+			/* 更新渲染偏移量 */
+			var ifChanges = totalRenderingOffset !== newTotalRenderingOffset;
+			totalRenderingOffset = newTotalRenderingOffset;
 			if(ifChanges)
 				fireEvent_renderingPositionChanges();
 
@@ -112,18 +122,20 @@
 		 */
 		this.setDataList = function(dataList){
 			if(!Array.isArray(dataList)){
-				console.warn("Supplied k data should be an array.");
+				console.warn("Illegal argument. Type of 'Object[]' is required.");
 				return this;
 			}
 
-			dataManager.setDataList(dataList);
-
+			/**
+			 * 设置数据后需要重新渲染，因而需要检测并发起“渲染位置发生改变”事件
+			 */
 			if(totalRenderingOffset !== 0){
-				fireEvent_renderingPositionChanges();
-
 				totalRenderingOffset = 0;
 				renderingOffset = 0;
-			}
+
+				dataManager.setDataList(dataList, evtName_renderingPositionChanges);
+			}else
+				dataManager.setDataList(dataList);
 
 			return this;
 		};
@@ -135,16 +147,16 @@
 		 */
 		this.setConfig = function(_config){
 			if(null == _config || typeof _config !== "object"){
-				console.warn("Invalid config");
+				console.warn("Illegal argument. Type of 'Object' is required.");
 				return this;
 			}
 
-			this.getConfig().setConfig(_config);
+			this.getConfig().setConfigContent(_config);
 			return this;
 		};
 
 		/**
-		 * 获取图形绘制配置
+		 * 获取图形绘制配置实例
 		 * @returns {CommonChartConfig}
 		 */
 		this.getConfig = function(){
@@ -153,56 +165,12 @@
 		};
 
 		/**
-		 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
+		 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回null
 		 * @param {String} name 配置项名称
 		 * @returns {*}
 		 */
-		this.getConfigItem = function(name){
+		this.getConfigItemValue = function(name){
 			return this.getConfig().getConfigItemValue(name);
-		};
-
-		/**
-		 * 为该K线图创建指定类型的子图
-		 * @param {SubChartTypes} subChartType 要创建的K线子图类型
-		 * @returns {SubChart}
-		 */
-		this.newSubChart = function(subChartType){
-			var kSubChart;
-			switch(String(subChartType).trim().toLowerCase()){
-				case TradeChart2.SubChartTypes.K_CANDLE:
-					kSubChart = new TradeChart2.KSubChart_CandleChart(this);
-					break;
-
-				case TradeChart2.SubChartTypes.K_TREND:
-					kSubChart = new TradeChart2.KSubChart_TrendChart(this);
-					break;
-
-				case TradeChart2.SubChartTypes.K_VOLUME:
-					kSubChart = new TradeChart2.KSubChart_VolumeChart(this);
-					break;
-
-				case TradeChart2.SubChartTypes.K_INDEX_MA:
-					kSubChart = new TradeChart2.KSubChart_IndexMAChart(this);
-					break;
-
-				default:
-					throw new Error("Unknown sub chart type: " + subChartType);
-			}
-			attachedKSubCharts.push(kSubChart);
-
-			return kSubChart;
-		};
-
-		/**
-		 * 移除子图
-		 * @param {KSubChart} subChart 要移除的子图
-		 */
-		this.removeSubChart = function(subChart){
-			var index = attachedKSubCharts.indexOf(subChart);
-			if(index !== -1)
-				attachedKSubCharts.splice(index, 1);
-
-			return this;
 		};
 
 		/**
@@ -214,22 +182,21 @@
 		};
 
 		/**
+		 * 获取相邻两组数据之间间隙的最小值
+		 * @returns {Number|null}
+		 */
+		this.getMinGroupGap = function(){
+			return CommonChart.getMinGroupGap(this.getConfig());
+		};
+
+		/**
 		 * 获取给定两个相邻索引对应的数据之间的间隙
 		 * @param {Number} leftDataIndex 间隙左侧数据的全局索引（从左向右）
 		 * @param {Number} rightDataIndex 间隙右侧数据的全局索引（从左向右）
 		 * @returns {*}
 		 */
 		this.getGroupGap = function(leftDataIndex, rightDataIndex){
-			var config_groupGap = this.getConfigItem("groupGap");
-			var t = typeof config_groupGap;
-			if(t === "number")
-				return config_groupGap;
-			else if(t === "function")
-				return util.try2Call(config_groupGap, null, leftDataIndex, rightDataIndex);
-			else{
-				console.error("Unknown group gap value: " + config_groupGap + ", using constant 0 instead.");
-				return 0;
-			}
+			return CommonChart.getGroupGap(this, leftDataIndex, rightDataIndex);
 		};
 
 		/**
@@ -238,7 +205,7 @@
 		 * @param {Number} rightMostDataIndex 最右侧数据的全局索引（从左向右）
 		 * @returns {Number}
 		 */
-		this.calcTotalGap = function(leftMostDataIndex, rightMostDataIndex){
+		this.sumGroupGap = function(leftMostDataIndex, rightMostDataIndex){
 			if(leftMostDataIndex < 0)
 				leftMostDataIndex = 0;
 
@@ -249,7 +216,7 @@
 			if(rightMostDataIndex <= leftMostDataIndex)
 				return 0;
 
-			var config_groupGap = this.getConfigItem("groupGap");
+			var config_groupGap = this.getConfigItemValue("groupGap");
 			var t = typeof config_groupGap;
 			if(t === "number")
 				return (rightMostDataIndex - leftMostDataIndex) * config_groupGap;
@@ -260,29 +227,30 @@
 
 				return gap;
 			}else{
-				console.error("Unknown group gap value: " + config_groupGap);
+				console.error("Unknown group gap('groupGap') value: " + config_groupGap);
 				return 0;
 			}
 		};
 
 		/**
-		 * 计算可以达到左侧极限的最大位移量
+		 * 计算可以拖动图形达到左侧极限的最大位移量。单位：像素
 		 * @param {Number} canvasWidth 画布宽度
+		 * @returns {Number}
 		 */
 		var calculateMaxOffsetToReachLeftEdge = function(canvasWidth){
 			var h = self._calcHalfGroupBarWidth(),
-				b = self.getConfigItem("groupBarWidth");
+				b = self.getConfigItemValue("groupBarWidth");
 
 			var dataCount = dataManager.getRenderableGroupCount();
 			if(dataCount <= 1)
 				return 0;
 
-			var gap = self.calcTotalGap(0, dataManager.getRightMostRenderableDataIndex()),
+			var gap = self.sumGroupGap(0, dataManager.getRightMostRenderableDataIndex()),
 				bar = dataCount * b - 2 * h;
 
 			/* 数据全部绘制所需要占用的长度 */
 			var totalLength = gap + bar;
-			/* 内容区域的横坐标长度 */
+			/* 内容区域的横坐标长度。+1 是因为虽然 2-1=1，但 1~2 共2个像素可渲染 */
 			var axisXContentLength = self._calcAxisXContentRightPosition(canvasWidth) - self._calcAxisXContentLeftPosition() + 1;
 
 			var rst = 0;
@@ -301,7 +269,8 @@
 		 * @returns {Boolean}
 		 */
 		var checkIfReachesLeftLimit = function(maxGroupCount, canvasWidth){
-			return dataManager.checkIfLeftMostRenderableGroupIsVisible(maxGroupCount) && totalRenderingOffset >= calculateMaxOffsetToReachLeftEdge(canvasWidth);
+			return dataManager.checkIfLeftMostRenderableGroupIsVisible(maxGroupCount)
+				&& totalRenderingOffset >= calculateMaxOffsetToReachLeftEdge(canvasWidth);
 		};
 
 		/**
@@ -326,7 +295,7 @@
 			if(0 === amount)
 				return this;
 
-			TradeChart2.showLog && console.debug("Rendering position ~ TotalRenderingOffset: " + totalRenderingOffset + ", renderingOffset: " + renderingOffset + ", elapsedDataCount: " + dataManager.getElapsedRenderableGroupCount());
+			TradeChart2.showLog && console.debug("Rendering position ~ TotalRenderingOffset: " + totalRenderingOffset + ", renderingOffset: " + renderingOffset + ", elapsedDataCount: " + dataManager.getElapsedRenderableGroupCount() + ".");
 
 			var elapsedDataCount = 0, offset;
 			var ifMovingToRight = amount > 0;
@@ -374,12 +343,22 @@
 			return this;
 		};
 
+
+
+		/**
+		 * 根据给定的配置信息计算蜡烛一半的宽度
+		 * @returns {Number}
+		 */
+		this._calcHalfGroupBarWidth = function(){
+			return Math.floor(this.getConfigItemValue("groupBarWidth") / 2);
+		};
+
 		/**
 		 * 计算横坐标左侧位置（坐标原点为：画布左上角）
 		 * @returns {Number}
 		 */
 		this._calcAxisXLeftPosition = function(){
-			var config_paddingLeft = this.getConfigItem("paddingLeft");
+			var config_paddingLeft = this.getConfigItemValue("paddingLeft");
 			return util.getLinePosition(config_paddingLeft);
 		};
 
@@ -390,19 +369,11 @@
 		 */
 		this._calcAxisXRightPosition = function(canvasWidth){
 			var xLeft_axisX = this._calcAxisXLeftPosition();
-			var axisXWidth = canvasWidth - this.getConfigItem("paddingLeft") - this.getConfigItem("paddingRight");
+			var axisXWidth = canvasWidth - this.getConfigItemValue("paddingLeft") - this.getConfigItemValue("paddingRight");
 			if(axisXWidth <= 0)
 				return xLeft_axisX;
 
 			return xLeft_axisX + Math.floor(axisXWidth - 1);/* xLeft_axis占据1像素 */
-		};
-
-		/**
-		 * 根据给定的配置信息计算蜡烛一半的宽度
-		 * @returns {Number}
-		 */
-		this._calcHalfGroupBarWidth = function(){
-			return Math.floor(this.getConfigItem("groupBarWidth") / 2);
 		};
 
 		/**
@@ -411,9 +382,9 @@
 		 * @returns {number}
 		 */
 		this._calcAxisXWidth = function(canvasWidth){
-			var config_width = this.getConfigItem("width"),
-				config_paddingLeft = this.getConfigItem("paddingLeft"),
-				config_paddingRight = this.getConfigItem("paddingRight");
+			var config_width = this.getConfigItemValue("width"),
+				config_paddingLeft = this.getConfigItemValue("paddingLeft"),
+				config_paddingRight = this.getConfigItemValue("paddingRight");
 
 			canvasWidth = util.isValidNumber(canvasWidth)? canvasWidth: config_width;
 			return canvasWidth - config_paddingLeft - config_paddingRight;
@@ -423,6 +394,52 @@
 		eventDrive(this);
 	};
 	CommonChart.prototype = Object.create(TradeChart2.prototype);
+
+	/**
+	 * 获取相邻两组数据之间间隙的最小值
+	 * @param {CommonChartConfig} config 配置集合
+	 * @returns {Number|null}
+	 */
+	CommonChart.getMinGroupGap = function(config){
+		var config_groupGap = config.getConfigItemValue("groupGap");
+		var t = typeof config_groupGap;
+		if(t === "number")
+			return config_groupGap;
+		else if(t === "function"){
+			if(typeof config_groupGap.implGetMinValue === "function")
+				return util.try2Call(config_groupGap.implGetMinValue);
+			else{
+				console.error("No method of name: 'implGetMinValue' found in given group gap('groupGap') calculator, using constant 0 instead.", config_groupGap);
+				return 0;
+			}
+		}else if(/^autoDividedByFixedGroupCount(?::\d+)?$/.test(String(config_groupGap).trim()))
+			return 0;
+		else{
+			console.error("Can not determine the min group gap('groupGap') by value: " + config_groupGap + ", using constant 0 instead.");
+			return 0;
+		}
+	};
+
+	/**
+	 * 获取给定两个相邻索引对应的数据之间的间隙
+	 * @param {CommonChartConfig} config 配置集合
+	 * @param {Number} leftDataIndex 间隙左侧数据的全局索引（从左向右）
+	 * @param {Number} rightDataIndex 间隙右侧数据的全局索引（从左向右）
+	 * @returns {*}
+	 */
+	CommonChart.getGroupGap = function(config, leftDataIndex, rightDataIndex){
+		var config_groupGap = config.getConfigItemValue("groupGap");
+		var t = typeof config_groupGap;
+		if(t === "number")
+			return config_groupGap;
+		else if(t === "function")
+			return util.try2Call(config_groupGap, null, leftDataIndex, rightDataIndex);
+		else{
+			console.error("Unknown group gap('groupGap') value: " + config_groupGap + ", using constant 0 instead.");
+			return 0;
+		}
+	};
+
 
 	util.defineReadonlyProperty(TradeChart2, "CommonChart", CommonChart);
 })();

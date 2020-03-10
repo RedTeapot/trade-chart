@@ -187,13 +187,13 @@ util.loadData(function(datas){
 				volumeOperationCanvasObj,
 				dataMetadata,
 				TradeChart2.util.getLinePosition(0),
-				TradeChart2.util.getLinePosition(result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItem("paddingBottom"))
+				TradeChart2.util.getLinePosition(result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItemValue("paddingBottom"))
 			);
 
 			drawVerticalLine(
 				trendOperationCanvasObj,
 				dataMetadata,
-				TradeChart2.util.getLinePosition(result_trend.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(result_trend.getConfigItemValue("paddingTop")),
 				TradeChart2.util.getLinePosition(result_trend.getKSubChartSketch().getCanvasHeight())
 			);
 			drawHorizontalLineAndDot(dataMetadata);

@@ -1,6 +1,6 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var DataSketch = TradeChart2.DataSketch,
+	var CommonDataSketch = TradeChart2.CommonDataSketch,
 		util = TradeChart2.util,
 		Big = TradeChart2.Big,
 		CommonDataManager = TradeChart2.CommonDataManager;
@@ -11,14 +11,14 @@
 
 	/**
 	 * @constructor
-	 * @augments DataSketch
+	 * @augments CommonDataSketch
 	 *
 	 * K线子图：“指标：MA图”图数据概览
 	 */
 	var KSubChartSketch_IndexMADataSketch = function(){
-		DataSketch.apply(this, arguments);
+		CommonDataSketch.apply(this, arguments);
 	};
-	KSubChartSketch_IndexMADataSketch.prototype = Object.create(DataSketch.prototype);
+	KSubChartSketch_IndexMADataSketch.prototype = Object.create(CommonDataSketch.prototype);
 
 	/**
 	 * 从给定的配置集合中获取指定名称的配置项取值。
@@ -33,7 +33,7 @@
 		if(config.supportsConfigItem(name))
 			return config.getConfigItemValue(name);
 
-		return kChart.getConfigItem(name);
+		return kChart.getConfigItemValue(name);
 	};
 
 	/**
@@ -83,7 +83,7 @@
 					continue;
 
 				var closePrice = +kDataManager.getConvertedData(d).closePrice;
-				CommonDataManager.setAttachedData(d, "closePrice", closePrice);
+				CommonDataManager.attachData(d, "closePrice", closePrice);
 			}
 
 			/* 附加MA数据，供绘制时使用 */
@@ -102,7 +102,7 @@
 						for(var k = 0; k < ma; k++){
 							sum += CommonDataManager.getAttachedData(dataList[i - k], "closePrice") || 0;
 						}
-						CommonDataManager.setAttachedData(d, "MA" + ma, sum / ma);
+						CommonDataManager.attachData(d, "MA" + ma, sum / ma);
 					}
 				}
 			}

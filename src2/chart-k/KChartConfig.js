@@ -64,6 +64,8 @@
 	 */
 	var KChartConfig = function(config){
 		var dftConfig = util.setDftValue(null, defaultConfig);
+
+		/* 合并通用配置，使得KChartConfig能够以“最顶级配置”的角色存在 */
 		util.setDftValue(dftConfig, TradeChart2["COMMON_DEFAULT_CONFIG"]);
 
 		config = config || {};

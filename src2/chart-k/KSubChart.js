@@ -52,7 +52,7 @@
 		 * 该实例对象不应该被直接使用，因为各个子图在集成该类的时候，均会提供各自的配置对象，
 		 * 需要使用this.getConfig()动态获取
 		 *
-		 * @type {CommonChartConfig}
+		 * @type {KSubChartConfig}
 		 */
 		var config = new KSubChartConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
 
@@ -75,7 +75,7 @@
 		var latestRenderResultList = [];
 
 
-		util.defineReadonlyProperty(this, "id", util.randomString("k-" + type + "-", 5));
+		util.defineReadonlyProperty(this, "id", util.randomString(type + "-", 5));
 
 		/**
 		 * 获取该子图的子图类型
@@ -103,11 +103,11 @@
 
 		/**
 		 * 设置配置
-		 * @param {Object} _config 配置项集合
+		 * @param {Object} configContent 配置项集合
 		 * @returns {KSubChart}
 		 */
-		this.setConfig = function(_config){
-			this.getConfig().setConfig(_config);
+		this.setConfig = function(configContent){
+			this.getConfig().setConfigContent(configContent);
 			return this;
 		};
 
@@ -116,7 +116,7 @@
 		 * @param {String} name 配置项名称
 		 * @returns {*}
 		 */
-		this.getConfigItem = function(name){
+		this.getConfigItemValue = function(name){
 			return this.getConfig().getConfigItemValue(name);
 		};
 
@@ -134,7 +134,7 @@
 		 */
 		this.setSpecifiedDataSketchMethod = function(method){
 			if(typeof method !== "function"){
-				console.warn("Data sketch method should be of type: 'Function'.");
+				console.warn("Illegal argument. Type of 'Function' is required.");
 				return this;
 			}
 
@@ -151,10 +151,16 @@
 			if(arguments.length < 1 && NOT_SUPPLIED !== lastRenderingCanvasObj)
 				canvasObj = lastRenderingCanvasObj;
 
-			for(var i = 0; i < latestRenderResultList.length; i++)
-				if(latestRenderResultList[i].canvas === canvasObj && latestRenderResultList[i].subChartType === type){
-					return latestRenderResultList[i].renderResult;
+			if(null == canvasObj)
+				return null;
+
+			for(var i = 0; i < latestRenderResultList.length; i++){
+				var rst = latestRenderResultList[i];
+
+				if(rst.canvas === canvasObj && rst.subChartType === type){
+					return rst.renderResult;
 				}
+			}
 
 			return null;
 		};
@@ -166,11 +172,11 @@
 		 * @returns {KSubChart}
 		 */
 		this._setLatestRenderResult = function(canvasObj, renderResult){
-			for(var i = 0; i < latestRenderResultList.length; i++)
-				if(latestRenderResultList[i].canvas === canvasObj && latestRenderResultList[i].subChartType === type){
-					latestRenderResultList[i].renderResult = renderResult;
-					return this;
-				}
+			var rst = this._getLatestRenderResult(canvasObj);
+			if(null != rst){
+				rst.renderResult = renderResult;
+				return this;
+			}
 
 			latestRenderResultList.push({
 				canvas: canvasObj,
@@ -189,16 +195,17 @@
 		this.render = function(canvasObj){
 			if(!(canvasObj instanceof HTMLCanvasElement)){
 				if(NOT_SUPPLIED !== lastRenderingCanvasObj){
+					TradeChart2.showLog && console.info("Using last canvas to render onto.");
 					canvasObj = lastRenderingCanvasObj;
 				}else{
-					throw new Error("No canvas element supplied to render onto");
+					throw new Error("No canvas element supplied to render onto.");
 				}
 			}else
 				lastRenderingCanvasObj = canvasObj;
 
 			/* 记录画布上画质的图形类型，实现“第一个图形绘画时清空画布既有内容，后续图形绘画时，叠加绘制” */
-			canvasObj.renderingSubChartTypes = canvasObj.renderingSubChartTypes || [];
-			var subTypes = canvasObj.renderingSubChartTypes;
+			var subTypes = canvasObj.renderingSubChartTypes || [];
+			canvasObj.renderingSubChartTypes = subTypes;
 			subTypes.push(this.getType());
 
 			return self.implRender.call(self, canvasObj, {
@@ -231,15 +238,12 @@
 				chartObj.appendChild(detailCanvasObj);
 				containerObj.appendChild(chartObj);
 
-				var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
-					config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height"));
+				var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
+					config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height"));
 
 				util.initCanvas(canvasObj, config_width, config_height);
 				util.initCanvas(detailCanvasObj, config_width, config_height);
-			}else{
-				canvasObj.querySelector("canvas:not(.detail)");
 			}
-
 
 			return this.render(canvasObj);
 		};
@@ -274,18 +278,18 @@
 		/**
 		 * 转换配置项取值，完成“由 用户语义贴切的配置值 向 技术可行的配置值 的转换”
 		 * @param {HTMLCanvasElement} canvasObj 画布
-		 * @param {DataSketch} dataSketch 数据概览
+		 * @param {CommonDataSketch} dataSketch 数据概览
 		 *
 		 * @returns {KSubChart_TrendChart}
 		 */
 		this.convertConfigItemValues = function(canvasObj, dataSketch){
-			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
-				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 
-				config_axisYPrecision = this.getConfigItem("axisYPrecision"),
-				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
-				config_groupLineWidth = this.getConfigItem("groupLineWidth"),
-				config_groupGap = this.getConfigItem("groupGap");
+				config_axisYPrecision = this.getConfigItemValue("axisYPrecision"),
+				config_groupBarWidth = this.getConfigItemValue("groupBarWidth"),
+				config_groupLineWidth = this.getConfigItemValue("groupLineWidth"),
+				config_groupGap = this.getConfigItemValue("groupGap");
 
 			kChart.getConfig().setConfigItemConvertedValue("width", config_width);
 
@@ -302,77 +306,113 @@
 				var totalCount = 0;
 				if(null == tmp[1]){
 					totalCount = dataManager.getRenderableGroupCount();
-					TradeChart2.showLog && console.info("Auto adjust group gap to 'autoDividedByFixedGroupCount:" + totalCount + "' where " + totalCount + " is the current rendering data count");
+					TradeChart2.showLog && console.info("Auto adjust group gap('groupGap') to 'autoDividedByFixedGroupCount:" + totalCount + "' where " + totalCount + " is the current rendering data count.");
 				}else
 					totalCount = Number(tmp[1]);
 
+				if(totalCount < 2){
+					totalCount = 2;
+					TradeChart2.showLog && console.info("Auto adjust group gap('groupGap') to 'autoDividedByFixedGroupCount:" + totalCount);
+				}
+
+				/**
+				 * 计算绘制空间是否足以绘制所有数据
+				 * @type {boolean}
+				 */
 				var isContentWidthEnough = false;
 
 				var groupLineWidth = config_groupLineWidth,
 					groupBarWidth = config_groupBarWidth;
 
 				var contentWidth = kChart._calcAxisXContentWidth(config_width);
-				if(contentWidth <= totalCount){/* 数据量过多，超出屏幕可显示范围 */
+				if(contentWidth <= totalCount){/* 数据量过多，即时1组数据用1个像素渲染也会超出屏幕可显示范围 */
 					isContentWidthEnough = false;
 
 					groupLineWidth = 1;
 					groupBarWidth = 1;
-				}else if(totalCount < 2){
-					groupLineWidth = groupLineWidth || 1;
-					groupBarWidth = config_groupBarWidth || 1;
 				}else{
+					/**
+					 * 当柱宽为1像素时，空间足够。此时需要根据空间的大小自动探测比1大的、协调的柱宽
+					 * @type {boolean}
+					 */
 					isContentWidthEnough = true;
 
-					var len = contentWidth - totalCount;
-					var gapCount = totalCount - 1;
-					var avgGap = Math.floor(len / gapCount);
-					var remaining = len % gapCount;
-					var extraGapAllocateInterval = Math.floor(gapCount / remaining);
+					/**
+					 * 由于空间不足，需要压缩groupBarWidth为1像素。
+					 * 此时，总空间减去数据个数即为间隙的总空间
+					 * @type {Number}
+					 */
+					var availableTotalGapSpace = contentWidth - totalCount;
 
-					/* 根据最小间隙自动调整groupLineWidth和groupBarWidth */
-					if(avgGap <= 2){
+					var gapCount = totalCount - 1;
+					var avgGap = Math.floor(availableTotalGapSpace / gapCount);
+
+					/**
+					 * 不能整除，需要离散分散（至avgGap）的剩余空间
+					 * @type {Number}
+					 */
+					var remainingExtraGap = availableTotalGapSpace % gapCount;
+					var extraGapAllocateInterval = Math.floor(gapCount / remainingExtraGap);
+
+					if(avgGap <= 2){/* 0-2像素的间隙与1像素的柱宽可以认为显示协调，不需要再调整柱宽和线宽 */
 						groupLineWidth = 1;
 						groupBarWidth = 1;
-					}else{
+					}else{/* 1像素的柱宽和>2像素的间隙显示不协调，需要根据剩余空间自动探测合适的柱宽和线宽 */
+
+						/**
+						 * 调整规则：
+						 * 1. 根据柱宽调整线宽
+						 * 2. 柱宽的一半调整为间隙的一少半（一大半将会超出间隙的可用空间），并保证为奇数
+						 */
+
+						/* 根据间隙计算间隙的一少半 */
 						var m = Math.floor(avgGap / 2);
 						var n = avgGap - m;
-
 						var isMOdd = m % 2 !== 0,
 							isNOdd = n % 2 !== 0;
-
 						if(isMOdd && isNOdd){
 							m = m - 1;
 							n = n + 1;
 						}
 
+						/* 确保柱宽为奇数 */
 						var t = m % 2 === 0? m: n;
 						groupBarWidth = t + 1;
+
+						/* 根据柱宽得线宽 */
 						while(groupLineWidth > groupBarWidth)
 							groupLineWidth = groupLineWidth - 2;
 						groupLineWidth = Math.max(groupLineWidth, 1);
 
+						/* 根据调整后的柱宽重新计算间隙 */
 						avgGap = avgGap - (groupBarWidth - 1);
 					}
 				}
 
-				TradeChart2.showLog && console.info("Auto adjust group width to " + groupBarWidth + ", group line width to " + groupLineWidth);
+				TradeChart2.showLog && console.info("Auto adjust group width('groupBarWidth') to " + groupBarWidth + ", group line width('groupLineWidth') to " + groupLineWidth);
 
 				var config = this.getConfig();
 				config.setConfigItemConvertedValue("groupLineWidth", groupLineWidth);
 				config.setConfigItemConvertedValue("groupBarWidth", groupBarWidth);
 
-				subChartConfig.setConfigItemConvertedValue("groupGap", function(leftIndex, rightIndex){
-					if(isContentWidthEnough){
+				var groupGap = !isContentWidthEnough? 0: (function(){
+					var groupGapCalculator = function(leftIndex, rightIndex){
 						var gap = avgGap;
-						// if(leftIndex < remaining)
+						// if(leftIndex < remainingExtraGap)
 						// if(leftIndex % extraGapAllocateInterval === 0)
-						if(checkIfAddGap(gapCount, remaining, leftIndex))
+						if(checkIfAddGap(gapCount, remainingExtraGap, leftIndex))
 							gap = avgGap + 1;
 
 						return gap;
-					}else
-						return 0;
-				});
+					};
+
+					groupGapCalculator.implGetMinValue = function(){
+						return avgGap;
+					};
+
+					return groupGapCalculator;
+				})();
+				subChartConfig.setConfigItemConvertedValue("groupGap", groupGap);
 			}
 
 			return this;
@@ -398,7 +438,7 @@
 		 * @returns {Number} 取值为正，代表图形正文向左偏移
 		 */
 		this._getChartContentHorizontalRenderingOffsetFromRight = function(kChartSketch){
-			var config_groupBarWidth = self.getConfigItem("groupBarWidth");
+			var config_groupBarWidth = self.getConfigItemValue("groupBarWidth");
 
 			var maxGroupCount = kChartSketch.getMaxGroupCount(),
 				halfGroupBarSize = kChart._calcHalfGroupBarWidth(),
@@ -406,7 +446,7 @@
 
 			var offset = 0;
 			if(groupCount < maxGroupCount && groupCount !== 0){
-				var length_gap = kChart.calcTotalGap(0, groupCount - 1);
+				var length_gap = kChart.sumGroupGap(0, groupCount - 1);
 				var length_bar = (groupCount >= 2? (groupCount - 2) * config_groupBarWidth: 0) + 2 * (halfGroupBarSize + 1);
 				var totalLength = length_gap + length_bar;
 
@@ -414,33 +454,6 @@
 			}
 
 			return offset;
-		};
-
-		/**
-		 * 绘制图形区域背景
-		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
-		 * @param {Number} width 图形区域的宽度
-		 * @param {Number} height 图形区域的高度
-		 */
-		this._renderBackground = function(ctx, width, height){
-			var config_bg = this.getConfigItem("coordinateBackground");
-			if(util.isEmptyString(config_bg))
-				return;
-
-			var config_paddingLeft = Math.floor(this.getConfigItem("paddingLeft")),
-				config_paddingTop = Math.floor(this.getConfigItem("paddingTop"));
-
-			ctx.save();
-			ctx.beginPath();
-			ctx.rect(config_paddingLeft, config_paddingTop, width, height);
-
-			if(config_bg instanceof TradeChart2.LinearGradient){
-				config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + height);
-			}else
-				ctx.fillStyle = config_bg;
-
-			ctx.fill();
-			ctx.restore();
 		};
 
 		/**
@@ -455,7 +468,7 @@
 
 			var xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth());
 			var renderingOffset = kChart.getRenderingOffset(),
-				chartContentHorizontalRenderingOffsetFromRight = this._getChartContentHorizontalRenderingOffsetFromRight(kChartSketch);/* 数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧 */
+				chartContentHorizontalRenderingOffsetFromRight = this._getChartContentHorizontalRenderingOffsetFromRight(kChartSketch);
 
 			// console.log("###", kChartSketch.getCanvasWidth(), xRight_axisX_content, renderingOffset, chartContentHorizontalRenderingOffsetFromRight);
 			return xRight_axisX_content + renderingOffset - chartContentHorizontalRenderingOffsetFromRight;
@@ -466,7 +479,7 @@
 		 * 返回的位置，是渲染目的地的中心位置
 		 *
 		 * @param {KChartSketch} kChartSketch 图形概览
-		 * @param {Number} [groupCount=dataManager.getRenderingGroupCount(kChartSketch.getMaxGroupCount())+3] 数据群组个数
+		 * @param {Number} [groupCount] 数据群组个数
 		 * @returns {DataPosition[]}
 		 */
 		this._getRenderingXPositionAndDataIndexListFromRight = function(kChartSketch, groupCount){
@@ -474,15 +487,15 @@
 
 			if(arguments.length < 2){
 				/**
-				 * 超出左侧边界可绘制范围，仍然需要绘制的额外数据的个数（用于辅助实现图形向右拖动过程中，界面渲染的连续性）
-				 * @type {number}
+				 * 超出左侧边界可绘制范围，仍然需要绘制的额外数据的个数（用于辅助实现图形向右拖动过程中，图形渲染的连续性）
+				 * @type {Mumber}
 				 */
 				var outOfLeftBoundDataGroupCount = 2;
 				var expectedTotalRenderingGroupCount = dataManager.getRenderingGroupCount(kChartSketch.getMaxGroupCount()) + outOfLeftBoundDataGroupCount;
 				groupCount = dataManager.getRenderingGroupCount(expectedTotalRenderingGroupCount);
 			}
 
-			var config_groupBarWidth = this.getConfigItem("groupBarWidth");
+			var config_groupBarWidth = this.getConfigItemValue("groupBarWidth");
 			var rightMostPosition = this._getRightMostDataHorizontalRenderingPosition(kChartSketch),
 				rightMostRenderingDataIndex = dataManager.getRightMostRenderingDataIndex();
 
@@ -532,9 +545,9 @@
 		 * @returns {XTick[]}
 		 */
 		this._getRenderingXTickListFromRight = function(kChartSketch){
-			var config_showAxisXLabel = this.getConfigItem("showAxisXLabel"),
-				config_axisXTickGenerateIndicator = this.getConfigItem("axisXTickGenerateIndicator"),
-				config_axisXLabelGenerator = this.getConfigItem("axisXLabelGenerator");
+			var config_showAxisXLabel = this.getConfigItemValue("showAxisXLabel"),
+				config_axisXTickGenerateIndicator = this.getConfigItemValue("axisXTickGenerateIndicator"),
+				config_axisXLabelGenerator = this.getConfigItemValue("axisXLabelGenerator");
 
 			var xLeft_axisX_content = kChart._calcAxisXContentLeftPosition(),
 				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth());
@@ -549,18 +562,17 @@
 
 			var axisXTickGenerateIndicatorEnv = {
 				kChart: kChart,
-				dataOverallIndexFromRightToLeft: 0,
+				dataOverallIndexFromRightToLeft: 0
 			};
 
 			/* 上一个绘制的横坐标刻度对应的数据索引 */
 			var previousXTickDataIndex = null;
 
 			/* 绘制X轴刻度 */
-			var axisXTickList = [],
-				totalGap = 0;
+			var axisXTickList = [];
+			for(var i = 0; i < xPositionAndDataIndexList.length; i++){
+				var dp = xPositionAndDataIndexList[i];
 
-			var totalDataCount = dataManager.getTotalGroupCount();
-			axisXTickList = xPositionAndDataIndexList.map(function(dp, i){
 				var x = dp.x,
 					dataIndex = dp.dataIndex;
 
@@ -569,7 +581,7 @@
 				axisXTickGenerateIndicatorEnv.dataOverallIndexFromRightToLeft = dataOverallIndexFromRightToLeft;
 				var ifShowTick = config_axisXTickGenerateIndicator(data, axisXTickGenerateIndicatorEnv);
 				if(!ifShowTick)
-					return null;
+					continue;
 
 				/* 汇集刻度，用于图形绘制完毕后统一绘制 */
 				var label = (function(){
@@ -582,12 +594,11 @@
 
 					return config_axisXLabelGenerator(data, dp.dataIndex, previousData, previousXTickDataIndex);
 				})();
+
 				previousXTickDataIndex = i;
 
-				return {x: x, label: label, dataIndex: dataIndex};
-			}).filter(function(item){
-				return null !== item;
-			});
+				axisXTickList.push({x: x, label: label, dataIndex: dataIndex});
+			}
 
 			return axisXTickList;
 		};
@@ -595,15 +606,18 @@
 		/**
 		 * 获取自下而上顺序的Y轴刻度列表
 		 * @param {KSubChartSketch} kSubChartSketch 子图概览
-		 * @param {DataSketch} dataSketch 数据概览
+		 * @param {CommonDataSketch} dataSketch 数据概览
 		 * @returns {YTick[]}
 		 */
 		this._getRenderingYTickListFromBottom = function(kSubChartSketch, dataSketch){
-			var config_paddingTop = this.getConfigItem("paddingTop"),
-				config_axisYPrecision = this.getConfigItem("axisYPrecision"),
-				config_axisYMidTickQuota = this.getConfigItem("axisYMidTickQuota"),
-				config_horizontalGridLineColor = this.getConfigItem("horizontalGridLineColor"),
-				config_axisYFormatter = this.getConfigItem("axisYFormatter");
+			var config_paddingTop = this.getConfigItemValue("paddingTop"),
+				config_axisYPrecision = this.getConfigItemValue("axisYPrecision"),
+				originalConfig_axisYPrecision = this.getConfig().getOriginalConfigItemValue("axisYPrecision"),
+				config_axisYMidTickQuota = this.getConfigItemValue("axisYMidTickQuota"),
+				config_horizontalGridLineColor = this.getConfigItemValue("horizontalGridLineColor"),
+				config_axisYFormatter = this.getConfigItemValue("axisYFormatter");
+
+			var ifSuppliedAxisYFormatter = typeof config_axisYFormatter === "function";
 
 			var y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
@@ -623,48 +637,85 @@
 			 * 如果相同位置，或相同标签的刻度已经存在，则不再添加
 			 */
 			var maxAxisYTickIndex = config_axisYMidTickQuota + 1;
-			for(var i = 0; i <= maxAxisYTickIndex; i++){
+			for(var i = 0; i <= maxAxisYTickIndex; i++){/* 自下而上生成刻度 */
 				var tickAmount = dataSketch.getAmountFloor() + axisYAmountInterval * i,
 					tickY = y_axisX - Math.round(axisYHeightInterval * i);
-				var tickLabel = config_axisYFormatter(tickAmount, this.getConfig());
+				var tickLabel = ifSuppliedAxisYFormatter? config_axisYFormatter(tickAmount, this.getConfig()): tickAmount.toFixed(config_axisYPrecision);
 
-				for(var j = 0; j < axisYTickList.length; j++){
-					var tick = axisYTickList[j];
-					if(tick.label === tickLabel || Math.abs(tick.y - tickY) < 1){
-						console.warn("Found potential existing tick while adding tick: " + tickLabel + "(" + tickAmount + ") at " + tickY, JSON.stringify(tick));
-					}
-				}
+				// /* 检查可能重叠显示的刻度 */
+				// if(axisYTickList.length > 0){
+				// 	var tick = axisYTickList[axisYTickList.length - 1];
+				// 	if(tick.label === tickLabel || Math.abs(tick.y - tickY) <= 1){
+				// 		console.warn("Found potential existing tick while adding tick: " + tickLabel + "(" + tickAmount + ") at " + tickY, JSON.stringify(tick));
+				// 		continue;
+				// 	}
+				// }
 
 				axisYTickList.push({y: tickY, amount: tickAmount, label: tickLabel});
 			}
 
-			/* 检测汇集的Y轴刻度，规避多个刻度使用相同取值的情况 */
-			var ifExistsDuplicateLabel = false;
-			do{
-				for(var i = 0; i < axisYTickList.length - 1; i++){
-					for(var j = i + 1; j < axisYTickList.length; j++){
-						if(axisYTickList[i].label === axisYTickList[j].label){
-							ifExistsDuplicateLabel = true;
-							break;
+			/**
+			 * 检测汇集的Y轴刻度，规避多个刻度使用相同取值的情况。
+			 * 仅当 axisYPrecision 配置为 'auto'，且没有指定 axisYFormatter 时执行
+			 */
+			if(
+				String(originalConfig_axisYPrecision).trim().toLowerCase() === "auto"
+				&& !ifSuppliedAxisYFormatter
+			){
+				var ifExistsDuplicateLabel = false;
+				do{
+					for(var i = 0; i < axisYTickList.length - 1; i++){
+						for(var j = i + 1; j < axisYTickList.length; j++){
+							if(axisYTickList[i].label === axisYTickList[j].label){
+								ifExistsDuplicateLabel = true;
+								break;
+							}
 						}
+
+						if(ifExistsDuplicateLabel)
+							break;
 					}
 
-					if(ifExistsDuplicateLabel)
+					var precision = this.getConfig().getConfigItemValue("axisYPrecision");
+					if(ifExistsDuplicateLabel && precision < 20){/* 最多保留20位精度 */
+						precision += 1;
+						this.getConfig().setConfigItemConvertedValue("axisYPrecision", precision);
+						for(var i = 0; i < axisYTickList.length; i++)
+							axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].amount, config);
+						ifExistsDuplicateLabel = false;/* 假定精度+1后不会出现相同取值的刻度，然后开始验证/检测 */
+					}else
 						break;
-				}
-
-				var precision = this.getConfig().getConfigItemValue("axisYPrecision");
-				if(ifExistsDuplicateLabel && precision < 20){/* 最多保留20位精度 */
-					precision += 1;
-					this.getConfig().setConfigItemConvertedValue("axisYPrecision", precision);
-					for(var i = 0; i < axisYTickList.length; i++)
-						axisYTickList[i].label = config_axisYFormatter(axisYTickList[i].amount, config);
-					ifExistsDuplicateLabel = false;/* 假定精度+1后不会出现相同取值的刻度，然后开始验证/检测 */
-				}else
-					break;
-			}while(ifExistsDuplicateLabel);
+				}while(ifExistsDuplicateLabel);
+			}
 
 			return axisYTickList;
+		};
+
+		/**
+		 * 绘制图形区域背景
+		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
+		 * @param {Number} width 图形区域的宽度
+		 * @param {Number} height 图形区域的高度
+		 */
+		this._renderBackground = function(ctx, width, height){
+			var config_bg = this.getConfigItemValue("coordinateBackground");
+			if(util.isEmptyString(config_bg))
+				return;
+
+			var config_paddingLeft = Math.floor(this.getConfigItemValue("paddingLeft")),
+				config_paddingTop = Math.floor(this.getConfigItemValue("paddingTop"));
+
+			ctx.save();
+			ctx.beginPath();
+			ctx.rect(config_paddingLeft, config_paddingTop, width, height);
+
+			if(config_bg instanceof TradeChart2.LinearGradient){
+				config_bg.apply(ctx, config_paddingLeft, config_paddingTop, config_paddingLeft, config_paddingTop + height);
+			}else
+				ctx.fillStyle = config_bg;
+
+			ctx.fill();
+			ctx.restore();
 		};
 
 		/**
@@ -688,22 +739,22 @@
 			 */
 			var finishRemainingAxisXRendering = function(){};
 
-			var config_showAxisXLine = this.getConfigItem("showAxisXLine");
+			var config_showAxisXLine = this.getConfigItemValue("showAxisXLine");
 			if(!config_showAxisXLine)
 				return finishRemainingAxisXRendering;
 
-			var config_axisLineWidth = this.getConfigItem("axisLineWidth"),
-				config_axisLineColor = this.getConfigItem("axisLineColor"),
-				config_axisLabelFont = this.getConfigItem("axisLabelFont"),
-				config_axisLabelColor = this.getConfigItem("axisLabelColor"),
-				config_showVerticalGridLine = this.getConfigItem("showVerticalGridLine"),
-				config_verticalGridLineColor = this.getConfigItem("verticalGridLineColor"),
-				config_gridLineDash = this.getConfigItem("gridLineDash"),
-				config_axisTickLineLength = this.getConfigItem("axisTickLineLength"),
-				config_axisXLabelOffset = this.getConfigItem("axisXLabelOffset"),
-				config_showAxisXLabel = this.getConfigItem("showAxisXLabel"),
-				config_axisXLabelHorizontalAlign = this.getConfigItem("axisXLabelHorizontalAlign"),
-				config_paddingTop = this.getConfigItem("paddingTop");
+			var config_axisLineWidth = this.getConfigItemValue("axisLineWidth"),
+				config_axisLineColor = this.getConfigItemValue("axisLineColor"),
+				config_axisLabelFont = this.getConfigItemValue("axisLabelFont"),
+				config_axisLabelColor = this.getConfigItemValue("axisLabelColor"),
+				config_showVerticalGridLine = this.getConfigItemValue("showVerticalGridLine"),
+				config_verticalGridLineColor = this.getConfigItemValue("verticalGridLineColor"),
+				config_gridLineDash = this.getConfigItemValue("gridLineDash"),
+				config_axisTickLineLength = this.getConfigItemValue("axisTickLineLength"),
+				config_axisXLabelOffset = this.getConfigItemValue("axisXLabelOffset"),
+				config_showAxisXLabel = this.getConfigItemValue("showAxisXLabel"),
+				config_axisXLabelHorizontalAlign = this.getConfigItemValue("axisXLabelHorizontalAlign"),
+				config_paddingTop = this.getConfigItemValue("paddingTop");
 
 			var xLeft_axisX = kChart._calcAxisXLeftPosition(),
 				xRight_axisX = kChart._calcAxisXRightPosition(kChartSketch.getCanvasWidth()),/* 闭区间，亦即此像素点仍然是坐标轴的一部分 */
@@ -788,14 +839,14 @@
 		 * @param {CanvasRenderingContext2D} ctx 画布绘图上下文
 		 * @param {KChartSketch} kChartSketch 图形概览
 		 * @param {KSubChartSketch} kSubChartSketch 子图图形概览
-		 * @param {DataSketch} DataSketch 数据概览
+		 * @param {CommonDataSketch} dataSketch 数据概览
 		 *
 		 * @param {Object} [ops] 控制选项
 		 * @param {Function} [ops.axisYTickConverter] 总坐标刻度转换器（用于辅助子图实现纵坐标刻度调整，如位置向上偏移等）
 		 *
 		 * @returns {Function} 完成剩余的Y轴绘制工作，子图在其图形正文绘制完成后调用
 		 */
-		this._renderAxisY = function(ctx, kChartSketch, kSubChartSketch, DataSketch, ops){
+		this._renderAxisY = function(ctx, kChartSketch, kSubChartSketch, dataSketch, ops){
 			/**
 			 * 完成剩余的Y轴绘制工作。
 			 * 为达到良好的视觉效果，图形绘制的先后顺序，应为：
@@ -809,31 +860,31 @@
 			 */
 			var finishRemainingAxisYRendering = function(){};
 
-			var config_showAxisYLine = this.getConfigItem("showAxisYLine");
+			var config_showAxisYLine = this.getConfigItemValue("showAxisYLine");
 			if(!config_showAxisYLine)
 				return finishRemainingAxisYRendering;
 
-			var config_paddingTop = this.getConfigItem("paddingTop"),
-				config_axisLineWidth = this.getConfigItem("axisLineWidth"),
-				config_axisLineColor = this.getConfigItem("axisLineColor"),
-				config_axisLabelFont = this.getConfigItem("axisLabelFont"),
-				config_axisLabelColor = this.getConfigItem("axisLabelColor"),
-				config_axisYLabelFont = this.getConfigItem("axisYLabelFont"),
-				config_axisYLabelColor = this.getConfigItem("axisYLabelColor"),
-				config_showHorizontalGridLine = this.getConfigItem("showHorizontalGridLine"),
-				config_horizontalGridLineColor = this.getConfigItem("horizontalGridLineColor"),
-				config_gridLineDash = this.getConfigItem("gridLineDash"),
-				config_axisTickLineLength = this.getConfigItem("axisTickLineLength"),
-				config_axisYLabelOffset = this.getConfigItem("axisYLabelOffset"),
-				config_axisYMidTickQuota = this.getConfigItem("axisYMidTickQuota"),
-				config_showAxisYLabel = this.getConfigItem("showAxisYLabel"),
-				config_axisYLabelVerticalOffset = this.getConfigItem("axisYLabelVerticalOffset"),
-				config_axisYAmountFloorLabelFont = this.getConfigItem("axisYAmountFloorLabelFont"),
-				config_axisYAmountFloorLabelColor = this.getConfigItem("axisYAmountFloorLabelColor"),
-				config_axisYAmountCeilingLabelFont = this.getConfigItem("axisYAmountCeilingLabelFont"),
-				config_axisYAmountCeilingLabelColor = this.getConfigItem("axisYAmountCeilingLabelColor"),
-				config_axisYPosition = this.getConfigItem("axisYPosition"),
-				config_axisYLabelPosition = this.getConfigItem("axisYLabelPosition");
+			var config_paddingTop = this.getConfigItemValue("paddingTop"),
+				config_axisLineWidth = this.getConfigItemValue("axisLineWidth"),
+				config_axisLineColor = this.getConfigItemValue("axisLineColor"),
+				config_axisLabelFont = this.getConfigItemValue("axisLabelFont"),
+				config_axisLabelColor = this.getConfigItemValue("axisLabelColor"),
+				config_axisYLabelFont = this.getConfigItemValue("axisYLabelFont"),
+				config_axisYLabelColor = this.getConfigItemValue("axisYLabelColor"),
+				config_showHorizontalGridLine = this.getConfigItemValue("showHorizontalGridLine"),
+				config_horizontalGridLineColor = this.getConfigItemValue("horizontalGridLineColor"),
+				config_gridLineDash = this.getConfigItemValue("gridLineDash"),
+				config_axisTickLineLength = this.getConfigItemValue("axisTickLineLength"),
+				config_axisYLabelOffset = this.getConfigItemValue("axisYLabelOffset"),
+				config_axisYMidTickQuota = this.getConfigItemValue("axisYMidTickQuota"),
+				config_showAxisYLabel = this.getConfigItemValue("showAxisYLabel"),
+				config_axisYLabelVerticalOffset = this.getConfigItemValue("axisYLabelVerticalOffset"),
+				config_axisYAmountFloorLabelFont = this.getConfigItemValue("axisYAmountFloorLabelFont"),
+				config_axisYAmountFloorLabelColor = this.getConfigItemValue("axisYAmountFloorLabelColor"),
+				config_axisYAmountCeilingLabelFont = this.getConfigItemValue("axisYAmountCeilingLabelFont"),
+				config_axisYAmountCeilingLabelColor = this.getConfigItemValue("axisYAmountCeilingLabelColor"),
+				config_axisYPosition = this.getConfigItemValue("axisYPosition"),
+				config_axisYLabelPosition = this.getConfigItemValue("axisYLabelPosition");
 
 			var ifShowAxisYLeft = "left" === String(config_axisYPosition).toLowerCase(),
 				ifShowAxisYLabelOutside = "outside" === String(config_axisYLabelPosition).toLowerCase();
@@ -871,7 +922,7 @@
 			ctx.stroke();
 
 			/* 绘制Y轴刻度线 */
-			var axisYTickList = this._getRenderingYTickListFromBottom(kSubChartSketch, DataSketch);
+			var axisYTickList = this._getRenderingYTickListFromBottom(kSubChartSketch, dataSketch);
 
 			/* 辅助子图实现纵坐标刻度调整，如向上偏移等 */
 			if(null != ops && typeof ops.axisYTickConverter === "function")
@@ -957,13 +1008,13 @@
 			if(NOT_SUPPLIED === lastRenderingCanvasObj)
 				return;
 
-			TradeChart2.showLog && console.debug("Auto render for " + self.id + " by event: " + e.type);
+			TradeChart2.showLog && console.debug("Auto render [" + self.id + "] on event: " + e.type + ".");
 			self.render();
 		};
 		kChart.on("renderingpositionchange", evtRenderAction);
 		kChart.getDataManager().on("storeddatachange, renderingdatachange", evtRenderAction);
 
-		TradeChart2.showLog && console.info("Create k sub chart: " + this.id);
+		TradeChart2.showLog && console.info("Create k sub chart: " + this.id + ".");
 	};
 	KSubChart.prototype = Object.create(SubChart.prototype);
 

@@ -1,6 +1,6 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var DataSketch = TradeChart2.DataSketch;
+	var CommonDataSketch = TradeChart2.CommonDataSketch;
 	var util = TradeChart2.util;
 	var Big = TradeChart2.Big;
 
@@ -10,14 +10,14 @@
 
 	/**
 	 * @constructor
-	 * @augments DataSketch
+	 * @augments CommonDataSketch
 	 *
 	 * K线子图：蜡烛图数据概览
 	 */
 	var KSubChartSketch_VolumeDataSketch = function(){
-		DataSketch.apply(this, arguments);
+		CommonDataSketch.apply(this, arguments);
 	};
-	KSubChartSketch_VolumeDataSketch.prototype = Object.create(DataSketch.prototype);
+	KSubChartSketch_VolumeDataSketch.prototype = Object.create(CommonDataSketch.prototype);
 
 	/**
 	 * 从给定的配置集合中获取指定名称的配置项取值。
@@ -32,7 +32,7 @@
 		if(config.supportsConfigItem(name))
 			return config.getConfigItemValue(name);
 
-		return kChart.getConfigItem(name);
+		return kChart.getConfigItemValue(name);
 	};
 
 	/**

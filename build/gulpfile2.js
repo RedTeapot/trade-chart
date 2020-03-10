@@ -143,8 +143,8 @@ var concatAllAndSave = function(min, ifReflectVersionInFileName){
 	stream.add(gulp.src("../src2/CommonChartConfig.js"));
 	stream.add(gulp.src("../src2/CommonDataManager.js"));
 	stream.add(gulp.src("../src2/CommonChart.js"));
-	stream.add(gulp.src("../src2/ChartSketch.js"));
-	stream.add(gulp.src("../src2/DataSketch.js"));
+	stream.add(gulp.src("../src2/CommonChartSketch.js"));
+	stream.add(gulp.src("../src2/CommonDataSketch.js"));
 	stream.add(gulp.src("../src2/SubChart.js"));
 	stream.add(gulp.src("../src2/SubChartTypes.js"));
 	stream.add(concatK());

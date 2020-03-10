@@ -212,6 +212,18 @@
 	};
 
 	/**
+	 * 将多个动作绑定为一个动作
+	 * @param {Function[]} actions
+	 * @returns {Function}
+	 */
+	var bindActions = function(actions){
+		return function(){
+			for(var i = 0; i < actions.length; i++)
+				util.try2Apply(actions[i], null, arguments);
+		};
+	};
+
+	/**
 	 * 将给定的字符串自连n次后返回
 	 * @param str {String} 要重复的字符串单元
 	 * @param n {Number} 要重复的次数
@@ -484,6 +496,7 @@
 		randomString: randomString,
 		try2Call: try2Call,
 		try2Apply: try2Apply,
+		bindActions: bindActions,
 		parseAsNumber: parseAsNumber,
 		getPrecision: getPrecision,
 		initCanvas: initCanvas,

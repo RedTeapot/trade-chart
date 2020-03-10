@@ -56,16 +56,16 @@
 		 * @returns {KSubChart_VolumeRenderResult} 绘制的K线图
 		 */
 		this.implRender = function(canvasObj, env){
-			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
-				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 
-				config_paddingTop = this.getConfigItem("paddingTop"),
+				config_paddingTop = this.getConfigItemValue("paddingTop"),
 
-				config_keepingColor = this.getConfigItem("keepingColor"),
-				config_appreciatedColor = this.getConfigItem("appreciatedColor"),
-				config_depreciatedColor = this.getConfigItem("depreciatedColor"),
+				config_keepingColor = this.getConfigItemValue("keepingColor"),
+				config_appreciatedColor = this.getConfigItemValue("appreciatedColor"),
+				config_depreciatedColor = this.getConfigItemValue("depreciatedColor"),
 
-				config_groupBarWidth = this.getConfigItem("groupBarWidth");
+				config_groupBarWidth = this.getConfigItemValue("groupBarWidth");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_VolumeDataSketch.sketch)(kChart, this.getConfig());
@@ -147,7 +147,7 @@
 					var x = dp.x - halfGroupBarWidth;
 
 					if(i === 0){
-						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id);
+						TradeChart2.showLog && console.info("First volume left position: " + x + " on sub chart: " + self.id + ".");
 					}
 
 					var volumeHeight = Math.ceil(calcHeight(data.volume));

@@ -123,12 +123,12 @@ util.loadData(function(datas){
 		var x = e.layerX;
 
 		drawLineAndShowDataDetail4X(result_candle, x,
-			result_candle.getConfigItem("paddingTop"),
-			TradeChart2.util.getLinePosition(result_candle.getConfigItem("height"))
+			result_candle.getConfigItemValue("paddingTop"),
+			TradeChart2.util.getLinePosition(result_candle.getConfigItemValue("height"))
 		);
 		drawLineAndShowDataDetail4X(result_volume, x,
 			TradeChart2.util.getLinePosition(0),
-			TradeChart2.util.getLinePosition(result_volume.getConfigItem("height") - result_volume.getConfigItem("paddingBottom"))
+			TradeChart2.util.getLinePosition(result_volume.getConfigItemValue("height") - result_volume.getConfigItemValue("paddingBottom"))
 		);
 	};
 

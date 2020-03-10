@@ -6,7 +6,7 @@
 	 * @constructor
 	 * 数据素描
 	 */
-	var DataSketch = function(){
+	var CommonDataSketch = function(){
 		/** 最小Y轴量 */
 		var minAmount;
 		/** 最大Y轴量 */
@@ -34,7 +34,7 @@
 		/**
 		 * 设置素描得出的最小Y轴量
 		 * @param {Number} amount 素描得出的最小Y轴量
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setMinAmount = function(amount){
 			minAmount = amount;
@@ -51,7 +51,7 @@
 		/**
 		 * 设置素描得出的最大Y轴量
 		 * @param {Number} v 素描得出的最大Y轴量
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setMaxAmount = function(v){
 			maxAmount = v;
@@ -68,7 +68,7 @@
 		/**
 		 * 设置Y轴量的平均变动幅度
 		 * @param {Number} v Y轴量的平均变动幅度
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setAvgAmountVariation = function(v){
 			avgAmountVariation = v;
@@ -85,7 +85,7 @@
 		/**
 		 * 设置Y轴量的最大变动幅度
 		 * @param {Number} v Y轴量的最大变动幅度
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setMaxAmountVariation = function(v){
 			maxAmountVariation = v;
@@ -102,7 +102,7 @@
 		/**
 		 * 设置Y轴量的最小值
 		 * @param {Number} v Y轴量的最小值
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setAmountFloor = function(v){
 			amountFloor = v;
@@ -119,7 +119,7 @@
 		/**
 		 * 设置Y轴量的最大值
 		 * @param {Number} v Y轴量的最大值
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setAmountCeiling = function(v){
 			amountCeiling = v;
@@ -136,7 +136,7 @@
 		/**
 		 * 设置Y轴量的精度
 		 * @param {Number} v Y轴量的精度
-		 * @returns {DataSketch}
+		 * @returns {CommonDataSketch}
 		 */
 		this.setAmountPrecision = function(v){
 			amountPrecision = v;
@@ -144,5 +144,5 @@
 		};
 	};
 
-	util.defineReadonlyProperty(TradeChart2, "DataSketch", DataSketch);
+	util.defineReadonlyProperty(TradeChart2, "CommonDataSketch", CommonDataSketch);
 })();

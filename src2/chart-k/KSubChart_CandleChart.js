@@ -59,18 +59,18 @@
 		 * @returns {KSubChart_CandleRenderResult} K线子图绘制结果
 		 */
 		this.implRender = function(canvasObj, env){
-			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
-				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
-				config_paddingTop = this.getConfigItem("paddingTop"),
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
+				config_paddingTop = this.getConfigItemValue("paddingTop"),
 
-				config_axisYTickOffset = this.getConfigItem("axisYTickOffset"),
+				config_axisYTickOffset = this.getConfigItemValue("axisYTickOffset"),
 
-				config_keepingColor = this.getConfigItem("keepingColor"),
-				config_appreciatedColor = this.getConfigItem("appreciatedColor"),
-				config_depreciatedColor = this.getConfigItem("depreciatedColor"),
+				config_keepingColor = this.getConfigItemValue("keepingColor"),
+				config_appreciatedColor = this.getConfigItemValue("appreciatedColor"),
+				config_depreciatedColor = this.getConfigItemValue("depreciatedColor"),
 
-				config_groupBarWidth = this.getConfigItem("groupBarWidth"),
-				config_groupLineWidth = this.getConfigItem("groupLineWidth");
+				config_groupBarWidth = this.getConfigItemValue("groupBarWidth"),
+				config_groupLineWidth = this.getConfigItemValue("groupLineWidth");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_CandleDataSketch.sketch)(kChart, this.getConfig());

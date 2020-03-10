@@ -138,12 +138,12 @@ util.loadData(function(datas){
 		var x = e.layerX;
 
 		drawLineAndShowDataDetail4X(columnResult_candle, x,
-			columnResult_candle.getConfigItem("paddingTop"),
-			TradeChart2.util.getLinePosition(columnResult_candle.getConfigItem("height"))
+			columnResult_candle.getConfigItemValue("paddingTop"),
+			TradeChart2.util.getLinePosition(columnResult_candle.getConfigItemValue("height"))
 		);
 		drawLineAndShowDataDetail4X(columnResult_volume, x,
 			TradeChart2.util.getLinePosition(0),
-			TradeChart2.util.getLinePosition(columnResult_volume.getConfigItem("height") - columnResult_volume.getConfigItem("paddingBottom"))
+			TradeChart2.util.getLinePosition(columnResult_volume.getConfigItemValue("height") - columnResult_volume.getConfigItemValue("paddingBottom"))
 		);
 	};
 	column_candleDetailObj.addEventListener("mousemove", f);
@@ -153,12 +153,12 @@ util.loadData(function(datas){
 		var x = e.layerX;
 
 		drawLineAndShowDataDetail4X(rowResult_candle, x,
-			columnResult_candle.getConfigItem("paddingTop"),
-			TradeChart2.util.getLinePosition(rowResult_candle.getConfigItem("height") - rowResult_candle.getConfigItem("paddingBottom"))
+			columnResult_candle.getConfigItemValue("paddingTop"),
+			TradeChart2.util.getLinePosition(rowResult_candle.getConfigItemValue("height") - rowResult_candle.getConfigItemValue("paddingBottom"))
 		);
 		drawLineAndShowDataDetail4X(rowResult_volume, x,
-			columnResult_candle.getConfigItem("paddingTop"),
-			TradeChart2.util.getLinePosition(rowResult_volume.getConfigItem("height") - rowResult_volume.getConfigItem("paddingBottom"))
+			columnResult_candle.getConfigItemValue("paddingTop"),
+			TradeChart2.util.getLinePosition(rowResult_volume.getConfigItemValue("height") - rowResult_volume.getConfigItemValue("paddingBottom"))
 		);
 	};
 	row_candleDetailObj.addEventListener("mousemove", g);

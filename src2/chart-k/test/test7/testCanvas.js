@@ -121,14 +121,14 @@ util.loadData(function(datas){
 			drawLine(
 				candleOperationCanvasObj.getContext("2d"),
 				dataMetadata.renderingHorizontalPosition,
-				TradeChart2.util.getLinePosition(result_candle.getConfigItem("paddingTop")),
+				TradeChart2.util.getLinePosition(result_candle.getConfigItemValue("paddingTop")),
 				TradeChart2.util.getLinePosition(result_candle.getKSubChartSketch().getCanvasHeight())
 			);
 			drawLine(
 				volumeOperationCanvasObj.getContext("2d"),
 				dataMetadata.renderingHorizontalPosition,
 				TradeChart2.util.getLinePosition(0),
-				TradeChart2.util.getLinePosition(result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItem("paddingBottom"))
+				TradeChart2.util.getLinePosition(result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItemValue("paddingBottom"))
 			);
 
 			dataDetailObj.innerHTML = null == convertedData? "--": (dataMetadata.dataIndex + " --> " + JSON.stringify(convertedData));

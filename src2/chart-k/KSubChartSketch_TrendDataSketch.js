@@ -1,6 +1,6 @@
 ;(function(){
 	var TradeChart2 = window.TradeChart2;
-	var DataSketch = TradeChart2.DataSketch,
+	var CommonDataSketch = TradeChart2.CommonDataSketch,
 		CommonDataManager = TradeChart2.CommonDataManager,
 		util = TradeChart2.util,
 		Big = TradeChart2.Big;
@@ -11,14 +11,14 @@
 
 	/**
 	 * @constructor
-	 * @augments DataSketch
+	 * @augments CommonDataSketch
 	 *
 	 * K线子图：走势图数据概览
 	 */
 	var KSubChartSketch_TrendDataSketch = function(){
-		DataSketch.apply(this, arguments);
+		CommonDataSketch.apply(this, arguments);
 	};
-	KSubChartSketch_TrendDataSketch.prototype = Object.create(DataSketch.prototype);
+	KSubChartSketch_TrendDataSketch.prototype = Object.create(CommonDataSketch.prototype);
 
 	/**
 	 * 从给定的配置集合中获取指定名称的配置项取值。
@@ -33,7 +33,7 @@
 		if(config.supportsConfigItem(name))
 			return config.getConfigItemValue(name);
 
-		return kChart.getConfigItem(name);
+		return kChart.getConfigItemValue(name);
 	};
 
 	/**
@@ -74,7 +74,7 @@
 				/* 计算并暂存均线数值，用于绘制均线 */
 				if(ifShowAverageLine){
 					sum += closePrice;
-					CommonDataManager.setAttachedData(d, "averagePrice", sum / (i + 1));
+					CommonDataManager.attachData(d, "averagePrice", sum / (i + 1));
 				}
 
 				/* 数据精度确定 */

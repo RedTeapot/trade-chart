@@ -62,20 +62,20 @@
 		 * @returns {KSubChart_TrendRenderResult} K线子图绘制结果
 		 */
 		this.implRender = function(canvasObj, env){
-			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
-				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 
-				config_paddingLeft = this.getConfigItem("paddingLeft"),
-				config_paddingTop = this.getConfigItem("paddingTop"),
+				config_paddingLeft = this.getConfigItemValue("paddingLeft"),
+				config_paddingTop = this.getConfigItemValue("paddingTop"),
 
-				config_axisYTickOffset = this.getConfigItem("axisYTickOffset"),
+				config_axisYTickOffset = this.getConfigItemValue("axisYTickOffset"),
 
-				config_lineWidth = this.getConfigItem("lineWidth"),
-				config_lineColor = this.getConfigItem("lineColor"),
-				config_enclosedAreaBackground = this.getConfigItem("enclosedAreaBackground"),
+				config_lineWidth = this.getConfigItemValue("lineWidth"),
+				config_lineColor = this.getConfigItemValue("lineColor"),
+				config_enclosedAreaBackground = this.getConfigItemValue("enclosedAreaBackground"),
 
-				config_ifShowAverageLine = this.getConfigItem("ifShowAverageLine"),
-				config_ifShowAverageLine_lineColor = this.getConfigItem("ifShowAverageLine_lineColor");
+				config_ifShowAverageLine = this.getConfigItemValue("ifShowAverageLine"),
+				config_ifShowAverageLine_lineColor = this.getConfigItemValue("ifShowAverageLine_lineColor");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_TrendDataSketch.sketch)(kChart, this.getConfig());

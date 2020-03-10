@@ -23,7 +23,7 @@
 	 * 附加至数据对象的，代表关联的其它数据存取上下文的属性名称
 	 * @type {string}
 	 */
-	var attrName_dataAttachContext = "_trade-chart2.data-attach-context__";
+	var attrName_dataAttachContext = "__trade-chart2.data-attach-context__";
 
 	/**
 	 * 为给定的数据对象创建用于附加其它关联数据的存取上下文
@@ -38,6 +38,7 @@
 
 		if(!(attrName_dataAttachContext in data))
 			Object.defineProperty(data, attrName_dataAttachContext, {value: {}, writable: false, configurable: false, enumerable: false});
+
 		return data[attrName_dataAttachContext];
 	};
 
@@ -142,6 +143,7 @@
 		/**
 		 * 设置“向右拖动时经过的，不再可见的较新的数据个数”
 		 * @param {Number} _elapsedRenderableGroupCount 个数
+		 * @returns {CommonDataManager}
 		 */
 		this.setElapsedRenderableGroupCount = function(_elapsedRenderableGroupCount){
 			if(elapsedRenderableDataCount !== _elapsedRenderableGroupCount){
@@ -158,7 +160,7 @@
 		/**
 		 * 获取当前自右向左第一个可以被绘制的数据的，自左向右的全局索引位置。
 		 * 如果数据列表为空，则返回-1
-		 * @returns {Number|null}
+		 * @returns {Number}
 		 */
 		this.getRightMostRenderableDataIndex = function(){
 			if(0 === dataList.length)
@@ -171,7 +173,7 @@
 		/**
 		 * 获取当前自右向左第一个当前被渲染的数据的，自左向右的全局索引位置。
 		 * 如果数据列表为空，则返回-1
-		 * @returns {Number|null}
+		 * @returns {Number}
 		 */
 		this.getRightMostRenderingDataIndex = function(){
 			var index = this.getRightMostRenderableDataIndex();
@@ -184,7 +186,7 @@
 		/**
 		 * 获取当前自右向左第一个被渲染的数据的，自右向左的全局索引位置。
 		 * 如果数据列表为空，则返回-1
-		 * @returns {Number|null}
+		 * @returns {Number}
 		 */
 		this.getRightMostRenderingDataIndexFromRight = function(){
 			if(0 === dataList.length)
@@ -246,44 +248,75 @@
 				return this;
 			}
 
+			var ifFireEvent_renderingDataChanges = false;
+
 			dataList = dataList.concat(datas);
 			if(!ifResetsElapsedDataCount){
 				unrenderableGroupCount += datas.length;
 			}else{
-				var flag = elapsedRenderableDataCount !== 0;
+				var isRenderingLatestData = elapsedRenderableDataCount !== 0;
+
 				elapsedRenderableDataCount = 0;
 				unrenderableGroupCount = 0;
 
-				if(flag)
-					this.fire(evtName_renderingDataChanges, null, false);
+				/**
+				 * 如果当前展现的数据是最新数据（追加前），则触发事件，
+				 * 使得应用程序可以实现“最新数据发生变化时，能够通过简
+				 * 单地更新数据实现自动重绘”的效果
+				 */
+				if(isRenderingLatestData)
+					ifFireEvent_renderingDataChanges = true;
 			}
-			this.fire(evtName_storedDataChanges, null, false);
+
+			/**
+			 * 将多个事件放在一个fire方法中调用，可以规避同一个监听器的连续多次执行。
+			 * 如果监听器是图形绘制，则避免冗余绘制动作，提升绘制效率。
+			 */
+			if(ifFireEvent_renderingDataChanges)
+				this.fire([evtName_renderingDataChanges, evtName_storedDataChanges], null, false);
+			else
+				this.fire(evtName_storedDataChanges, null, false);
 
 			return this;
 		};
 
 		/**
 		 * 设置数据源
-		 * @param {Array<UserSuppliedData>} _datas 数据源
+		 * @param {Array<UserSuppliedData>} _dataList 数据源
+		 * @param {String|String[]} [firingEventNames] 要同步发起的事件名称列表
 		 * @returns {CommonDataManager}
 		 */
-		this.setDataList = function(_datas){
-			if(!Array.isArray(_datas)){
+		this.setDataList = function(_dataList, firingEventNames){
+			if(!Array.isArray(_dataList)){
 				console.warn("Supplied chart data should be an array.");
 				return this;
 			}
 
-			var ifDataChanges = _datas !== dataList;
-			dataList = _datas;
-			if(ifDataChanges)
-				this.fire(evtName_storedDataChanges, null, false);
+			if(arguments.length > 1 && !Array.isArray(firingEventNames))
+				firingEventNames = [String(firingEventNames)];
 
-			var ifChanges = false;
-			if(elapsedRenderableDataCount !== 0)
-				ifChanges = true;
+			var ifDataChanges = _dataList !== dataList;
+			if(!ifDataChanges)
+				return this;
 
-			if(ifChanges)
-				this.fire(evtName_renderingDataChanges, null, false);/* 数据发生变更，回到初始位置 */
+			dataList = _dataList;
+
+			/**
+			 * 将多个事件放在一个fire方法中调用，可以规避同一个监听器的连续多次执行。
+			 * 如果监听器是图形绘制，则避免冗余绘制动作，提升绘制效率。
+			 */
+			var eventNames = [evtName_renderingDataChanges, evtName_storedDataChanges];
+			if(Array.isArray(firingEventNames) && firingEventNames.length > 0){
+				for(var i = 0; i < firingEventNames.length; i++){
+					var firingEventName = firingEventNames[i];
+					if(util.isEmptyString(firingEventName))
+						continue;
+
+					if(eventNames.indexOf(firingEventName) === -1)
+						eventNames.push(firingEventName);
+				}
+			}
+			this.fire(eventNames, null, false);
 
 			elapsedRenderableDataCount = 0;
 			unrenderableGroupCount = 0;
@@ -349,7 +382,7 @@
 
 		/**
 		 * 获取指定索引对应的原始数据
-		 * @param {Number} index 要获取的数据的索引
+		 * @param {Number} index 要获取的数据的索引（自左向右）
 		 * @returns {Object}
 		 */
 		this.getData = function(index){
@@ -367,7 +400,7 @@
 
 		/**
 		 * 获取指定索引或原始数据对应的，被转换后的数据
-		 * @param {Number|Object} index 要获取的数据的索引，或原始数据
+		 * @param {Number|Object} index 要获取的数据的索引（自左向右），或原始数据
 		 * @returns {Object}
 		 */
 		this.getConvertedData = function(index){
@@ -380,7 +413,7 @@
 			}else if(null != index && typeof index === 'object')
 				return convertData(index);
 			else
-				console.warn("Illegal argument!", index);
+				console.warn("Illegal argument. Type of 'Number' or 'Object' is required.", index);
 		};
 
 		/**
@@ -390,7 +423,7 @@
 		 */
 		this.setDataParser = function(parser){
 			if(typeof parser !== "function"){
-				console.warn("Data parser should be of type: 'Function'.");
+				console.warn("Illegal argument. Type of 'Function' is required.");
 				return this;
 			}
 
@@ -410,6 +443,19 @@
 	};
 
 	/**
+	 * 附加关联数据至给定的数据对象上
+	 * @param {Object} data 要附加其它数据的数据对象
+	 * @param {String} key 关联数据的唯一性标识
+	 * @param {*} value 附加的数据内容
+	 */
+	CommonDataManager.attachData = function(data, key, value){
+		if(null == data || typeof data !== "object")
+			throw new Error("Attach target should be of type 'Object'.");
+
+		buildDataAttachContext(data)[key] = value;
+	};
+
+	/**
 	 * 从给定的数据上获取附加的其它关联数据
 	 * @param {Object} data 附加了其它关联数据的数据对象
 	 * @param {String} key 关联数据的唯一性标识
@@ -417,24 +463,11 @@
 	 */
 	CommonDataManager.getAttachedData = function(data, key){
 		if(null == data || typeof data !== "object"){
-			console.warn("Attach target should be of type 'Object'");
+			console.warn("Attach target should be of type 'Object'.");
 			return null;
 		}
 
 		return buildDataAttachContext(data)[key];
-	};
-
-	/**
-	 * 附加关联数据至给定的数据对象上
-	 * @param {Object} data 要附加其它数据的数据对象
-	 * @param {String} key 关联数据的唯一性标识
-	 * @param {*} value 附加的数据内容
-	 */
-	CommonDataManager.setAttachedData = function(data, key, value){
-		if(null == data || typeof data !== "object")
-			throw new Error("Attach target should be of type 'Object'");
-
-		buildDataAttachContext(data)[key] = value;
 	};
 
 	/**

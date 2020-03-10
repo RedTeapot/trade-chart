@@ -7,8 +7,8 @@
 	"../CommonChartConfig.js",
 	"../CommonDataManager.js",
 	"../CommonChart.js",
-	"../ChartSketch.js",
-	"../DataSketch.js",
+	"../CommonChartSketch.js",
+	"../CommonDataSketch.js",
 	"../SubChart.js",
 	"../SubChartTypes.js",
 

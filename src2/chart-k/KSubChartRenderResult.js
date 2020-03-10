@@ -26,8 +26,8 @@
 		 * @param {String} name 配置项名称
 		 * @returns {*}
 		 */
-		this.getConfigItem = function(name){
-			return kSubChart.getConfigItem(name);
+		this.getConfigItemValue = function(name){
+			return kSubChart.getConfigItemValue(name);
 		};
 
 		/**
@@ -66,7 +66,7 @@
 
 		/**
 		 * 设置K线数据素描
-		 * @param {DataSketch} _dataSketch K线数据素描
+		 * @param {CommonDataSketch} _dataSketch K线数据素描
 		 * @returns {KSubChartRenderResult}
 		 */
 		this.setDataSketch = function(_dataSketch){
@@ -75,7 +75,7 @@
 		};
 		/**
 		 * 获取K线数据素描
-		 * @returns {DataSketch} K线数据素描
+		 * @returns {CommonDataSketch} K线数据素描
 		 */
 		this.getDataSketch = function(){
 			return dataSketch;
@@ -90,14 +90,6 @@
 		};
 
 		/**
-		 * 获取关联的，生成绘制结果的K线子图实例
-		 * @returns {KSubChart}
-		 */
-		this.getKSubChart = function(){
-			return kSubChart;
-		};
-
-		/**
 		 * 获取关联的，持有“生成绘制结果的K线子图”的K线图实例
 		 * @returns {KChart}
 		 */
@@ -106,11 +98,19 @@
 		};
 
 		/**
+		 * 获取关联的，生成绘制结果的K线子图实例
+		 * @returns {KSubChart}
+		 */
+		this.getKSubChart = function(){
+			return kSubChart;
+		};
+
+		/**
 		 * 获取可以渲染的最多的数据个数
 		 * @returns {Number}
 		 */
 		this.getMaxGroupCount = function(){
-			return KChartSketch.calcMaxGroupCount(this.getKChart().getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItem("width")));
+			return KChartSketch.calcMaxGroupCount(this.getKChart().getConfig(), util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")));
 		};
 
 		/**
@@ -172,7 +172,7 @@
 				return -1;
 			}
 
-			var b = self.getConfigItem("groupBarWidth");
+			var b = self.getConfigItemValue("groupBarWidth");
 
 			var rightMostDataPosition = kSubChart._getRightMostDataHorizontalRenderingPosition(self.getKChartSketch());
 			var tmpX = rightMostDataPosition - x, index = rightMostRenderingDataIndex;
@@ -215,9 +215,9 @@
 			}
 
 			var rightMostDataPosition = kSubChart._getRightMostDataHorizontalRenderingPosition(self.getKChartSketch());
-			var config_groupBarWidth = self.getConfigItem("groupBarWidth");
+			var config_groupBarWidth = self.getConfigItemValue("groupBarWidth");
 
-			var totalGapSize = kChart.calcTotalGap(dataIndex, rightMostRenderingDataIndex),
+			var totalGapSize = kChart.sumGroupGap(dataIndex, rightMostRenderingDataIndex),
 				totalBarSize = Math.abs(rightMostRenderingDataIndex - dataIndex) * config_groupBarWidth;
 
 			var position = util.getLinePosition(rightMostDataPosition - totalGapSize - totalBarSize);
@@ -261,7 +261,7 @@
 		 * @returns {CanvasRenderingContext2D} 被初始化的画布的上下文
 		 */
 		this.applyRenderingCanvasSettingTo = function(canvasObj){
-			return util.initCanvas(canvasObj, this.getConfigItem("width"), this.getConfigItem("height"));
+			return util.initCanvas(canvasObj, this.getConfigItemValue("width"), this.getConfigItemValue("height"));
 		};
 
 		/**
@@ -273,7 +273,7 @@
 			if(null == kSubChartSketch || null == dataSketch)
 				return null;
 
-			return util.getLinePosition(kSubChart.getConfigItem("paddingTop") + kSubChartSketch.calculateHeight(Math.abs(dataSketch.getAmountCeiling() - amount)));
+			return util.getLinePosition(kSubChart.getConfigItemValue("paddingTop") + kSubChartSketch.calculateHeight(Math.abs(dataSketch.getAmountCeiling() - amount)));
 		};
 	};
 

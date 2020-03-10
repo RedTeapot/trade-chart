@@ -24,6 +24,7 @@
 /**
  * @typedef {Object} YTick 纵坐标刻度描述
  * @property {Number} y 纵坐标位置
+ * @property {Number} amount 纵坐标对应的数值
  * @property {String} label 纵坐标标签
  */
 

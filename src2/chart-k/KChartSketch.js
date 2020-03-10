@@ -2,8 +2,8 @@
 	var TradeChart2 = window.TradeChart2;
 	var util = TradeChart2.util,
 		Big = TradeChart2.Big,
-		CommonChartConfig = TradeChart2.CommonChartConfig,
-		ChartSketch = TradeChart2.ChartSketch;
+		CommonChart = TradeChart2.CommonChart,
+		CommonChartSketch = TradeChart2.CommonChartSketch;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -13,12 +13,12 @@
 	 * K线图形素描
 	 *
 	 * @constructor
-	 * @augments {ChartSketch}
+	 * @augments {CommonChartSketch}
 	 */
 	var KChartSketch = function(){
-		ChartSketch.apply(this, arguments);
+		CommonChartSketch.apply(this, arguments);
 	};
-	KChartSketch.prototype = Object.create(ChartSketch.prototype);
+	KChartSketch.prototype = Object.create(CommonChartSketch.prototype);
 
 	/**
 	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
@@ -83,7 +83,7 @@
 			config_axisXTickOffsetFromRight = config.getConfigItemValue("axisXTickOffsetFromRight"),
 			config_groupBarWidth = config.getConfigItemValue("groupBarWidth");
 
-		var minGroupGap = CommonChartConfig.getMinGroupGap(config.getConfig());
+		var minGroupGap = CommonChart.getMinGroupGap(config);
 
 		// debugger;
 		var axisXWidth = (util.isValidNumber(width)? width: config_width) - config_paddingLeft - config_paddingRight;
@@ -103,6 +103,7 @@
 			if(t === 0)
 				return 0;
 
+			//TODO 待优化：降低运算量
 			/* 从右向左逐个扣除柱子和间隙所占据的空间，进而得出可渲染的最大数据个数 */
 			var i = 0, n = 0, tmp = L;
 			while(true){

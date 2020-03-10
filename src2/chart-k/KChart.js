@@ -26,7 +26,7 @@
 			groupLineWidth = 1;
 		if(groupLineWidth % 2 === 0){
 			v = groupLineWidth + 1;
-			console.warn("K line with should be odd(supplied: " + groupLineWidth + "), auto adjust to " + v);
+			console.warn("K line with('groupLineWidth') should be odd(supplied: " + groupLineWidth + "), auto adjust to " + v);
 			config.setOriginalConfigItemValue("groupLineWidth", groupLineWidth = v);
 		}
 
@@ -34,7 +34,7 @@
 		var groupBarWidth = config.getConfigItemValue("groupBarWidth");
 		var tmp = groupLineWidth + 2;
 		if(groupBarWidth < tmp){
-			console.warn("K chart bar width should be greater than group line width plus 2, auto adjust to " + tmp + ". Configured bar width: " + groupBarWidth + ", configured line with: " + groupLineWidth);
+			console.warn("K chart bar width('groupBarWidth') should be >= group line width('groupLineWidth') + 2, auto adjust to " + tmp + ". Configured bar width: " + groupBarWidth + ", configured line with: " + groupLineWidth);
 			config.setOriginalConfigItemValue("groupBarWidth", groupBarWidth = tmp);
 		}
 		if(groupBarWidth % 2 === 0){
@@ -56,6 +56,9 @@
 
 		/** 绘制配置 */
 		var config = new KChartConfig();
+
+		/** 附加的K线子图列表 */
+		var attachedKSubCharts = [];
 
 
 		util.defineReadonlyProperty(this, "id", util.randomString("k-", 3));
@@ -92,11 +95,55 @@
 		};
 
 		/**
+		 * 为该K线图创建指定类型的子图
+		 * @param {SubChartTypes} subChartType 要创建的K线子图类型
+		 * @returns {SubChart}
+		 */
+		this.newSubChart = function(subChartType){
+			var kSubChart;
+			switch(String(subChartType).trim().toLowerCase()){
+				case TradeChart2.SubChartTypes.K_CANDLE:
+					kSubChart = new TradeChart2.KSubChart_CandleChart(this);
+					break;
+
+				case TradeChart2.SubChartTypes.K_TREND:
+					kSubChart = new TradeChart2.KSubChart_TrendChart(this);
+					break;
+
+				case TradeChart2.SubChartTypes.K_VOLUME:
+					kSubChart = new TradeChart2.KSubChart_VolumeChart(this);
+					break;
+
+				case TradeChart2.SubChartTypes.K_INDEX_MA:
+					kSubChart = new TradeChart2.KSubChart_IndexMAChart(this);
+					break;
+
+				default:
+					throw new Error("Unknown sub chart type: " + subChartType);
+			}
+			attachedKSubCharts.push(kSubChart);
+
+			return kSubChart;
+		};
+
+		/**
+		 * 移除子图
+		 * @param {KSubChart} subChart 要移除的子图
+		 */
+		this.removeSubChart = function(subChart){
+			var index = attachedKSubCharts.indexOf(subChart);
+			if(index !== -1)
+				attachedKSubCharts.splice(index, 1);
+
+			return this;
+		};
+
+		/**
 		 * 计算横坐标正文区域左侧位置（坐标原点为：画布左上角）
 		 * @returns {Number}
 		 */
 		this._calcAxisXContentLeftPosition = function(){
-			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset");
+			var config_axisXTickOffset = this.getConfigItemValue("axisXTickOffset");
 
 			var xLeft_axisX = this._calcAxisXLeftPosition();
 			return xLeft_axisX + Math.floor(config_axisXTickOffset);
@@ -108,7 +155,7 @@
 		 * @returns {Number}
 		 */
 		this._calcAxisXContentRightPosition = function(canvasWidth){
-			var config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
+			var config_axisXTickOffsetFromRight = this.getConfigItemValue("axisXTickOffsetFromRight");
 			var xRight_axisX = this._calcAxisXRightPosition(canvasWidth);
 			return xRight_axisX - Math.floor(config_axisXTickOffsetFromRight);
 		};
@@ -118,8 +165,8 @@
 		 * @param {Number} [canvasWidth] 画布宽度
 		 */
 		this._calcAxisXContentWidth = function(canvasWidth){
-			var config_axisXTickOffset = this.getConfigItem("axisXTickOffset"),
-				config_axisXTickOffsetFromRight = this.getConfigItem("axisXTickOffsetFromRight");
+			var config_axisXTickOffset = this.getConfigItemValue("axisXTickOffset"),
+				config_axisXTickOffsetFromRight = this.getConfigItemValue("axisXTickOffsetFromRight");
 
 			var axisXWidth = this._calcAxisXWidth(canvasWidth);
 			return axisXWidth - config_axisXTickOffset - config_axisXTickOffsetFromRight;

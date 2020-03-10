@@ -30,11 +30,13 @@
 		 * 相邻两组数据之间的间隔
 		 * 1. {Number|GroupGapCalculator} 用于指定两组数据之间的固定间隔，如：1，function(){return 3;}等，单位：像素
 		 * 2. {String} 字面量：autoDividedByFixedGroupCount:n 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间，其中n等于数据的总群组个数。
-		 *    此时，将自动调整groupLineWidth和groupBarWidth，使得图形可以能够在一屏之内显示完全。如果n被忽略，则将n视为当前数据的总个数
+		 *    此时，将自动调整groupLineWidth和groupBarWidth，使得图形可以能够在一屏之内显示完全。如果n被忽略，则自动将n视为当前数据的总个数
 		 */
-		groupGap: 3,
+		groupGap: 3
 	};
 	Object.freeze && Object.freeze(defaultConfig);
+
+
 
 	var NameValueBinding = function(n, v){
 		util.defineReadonlyProperty(this, "name", n);
@@ -49,7 +51,15 @@
 		};
 	};
 
+	/**
+	 * 一个key可以在多个方面有不同的取值
+	 * @param {String} setName 名称
+	 * @param {*} defaultValue 没有指定方面时要返回的默认值
+	 * @constructor
+	 */
 	var NameValueBindingSet = function(setName, defaultValue){
+		util.defineReadonlyProperty(this, "name", setName);
+
 		var bindingList = [];
 
 		var getBinding = function(name){
@@ -60,34 +70,32 @@
 			return null;
 		};
 
-		util.defineReadonlyProperty(this, "name", setName);
-
-		this.has = function(name){
-			var binding = getBinding(name);
+		this.has = function(aspect){
+			var binding = getBinding(aspect);
 			if(null === binding)
 				return false;
 
 			return true;
 		};
 
-		this.getValue = function(name){
+		this.getValue = function(aspect){
 			if(arguments.length === 0)
 				return defaultValue;
 
-			var binding = getBinding(name);
+			var binding = getBinding(aspect);
 			if(null === binding)
 				return null;
 
 			return binding.getValue();
 		};
 
-		this.setValue = function(name, value){
-			if(arguments.length === 1){
+		this.setValue = function(aspect, value){
+			if(arguments.length === 1){/* setValue(defaultValue) */
 				defaultValue = arguments[0];
 			}else{
-				var binding = getBinding(name);
+				var binding = getBinding(aspect);
 				if(null === binding){
-					binding = new NameValueBinding(name, value);
+					binding = new NameValueBinding(aspect, value);
 					bindingList.push(binding);
 				}
 
@@ -95,64 +103,35 @@
 				return this;
 			}
 		};
-	};
 
-	/**
-	 * 获取指定名称的配置项取值。如果配置项并没有声明，则返回对应的默认配置。如果配置项无法识别，则返回undefined
-	 * @param {String} name 配置项名称
-	 * @param {Object} config 配置集合
-	 * @returns {*}
-	 */
-	var getConfigItem = function(name, config){
-		if(null != config && name in config)
-			return config[name];
-		else if(name in defaultConfig)
-			return defaultConfig[name];
-		else{
-			console.warn("Unknown configuration item: " + name);
-			return undefined;
-		}
-	};
+		this.removeValue = function(aspect){
+			var index = -1;
+			for(var i = 0; i < bindingList.length; i++)
+				if(bindingList[i].name === aspect){
+					index = i;
+					break;
+				}
 
-	/**
-	 * 获取相邻两组数据之间间隙的最小值
-	 * @param {Object} config 配置集合
-	 * @returns {Number|null}
-	 */
-	var getMinGroupGap = function(config){
-		var config_groupGap = getConfigItem("groupGap", config);
+			if(index > -1)
+				bindingList.splice(index, 1);
 
-		var t = typeof config_groupGap;
-		if(t === "number")
-			return config_groupGap;
-		else if(t === "function"){
-			if(typeof config_groupGap.implGetMinValue === "function")
-				return util.try2Call(config_groupGap.implGetMinValue);
-			else{
-				console.error("No method of name: 'implGetMinValue' found in given group gap calculator, using constant 0 instead.", config_groupGap);
-				return 0;
-			}
-		}else if(/^autoDividedByFixedGroupCount(?::\d+)?$/.test(String(config_groupGap).trim()))
-			return 0;
-		else{
-			console.error("Can not determine the min group gap by value: " + config_groupGap + ", using constant 0 instead.");
-			return 0;
-		}
+			return this;
+		};
 	};
 
 	/**
 	 * 绘制配置
-	 * @param {Object} config 绘制配置
-	 * @param {Object} dftConfig 默认绘制配置
+	 * @param {Object} configContent 绘制配置
+	 * @param {Object} dftConfigContent 默认绘制配置
 	 *
 	 * @constructor
 	 */
-	var CommonChartConfig = function(config, dftConfig){
+	var CommonChartConfig = function(configContent, dftConfigContent){
 		var self = this;
 
-		config = config || {};
-		dftConfig = dftConfig || {};
-		util.setDftValue(config, dftConfig);
+		configContent = configContent || {};
+		dftConfigContent = dftConfigContent || {};
+		util.setDftValue(configContent, dftConfigContent);
 
 		/* 上游配置 */
 		var upstreamConfig = null;
@@ -171,12 +150,12 @@
 
 
 		/**
-		 * 批量设置配置
-		 * @param {Object} _config 绘制配置
+		 * 批量设置配置内容
+		 * @param {Object} _configContent 绘制配置
 		 * @returns {CommonChartConfig}
 		 */
-		this.setConfig = function(_config){
-			config = util.setDftValue(_config, dftConfig);
+		this.setConfigContent = function(_configContent){
+			configContent = util.setDftValue(_configContent, dftConfigContent);
 			convertedConfigValue = {};
 
 			return this;
@@ -186,17 +165,17 @@
 		 * 获取当前实例绑定的配置集合
 		 * @returns {Object}
 		 */
-		this.getConfig = function(){
-			return config;
+		this.getConfigContent = function(){
+			return configContent;
 		};
 
 		/**
 		 * 判断当前实例绑定的配置集合中是否含有指定的配置项
-		 * @param {String} name 配置项名称
+		 * @param {String} configItemName 配置项名称
 		 * @returns {Boolean}
 		 */
-		this.hasConfigItem = function(name){
-			return name in config;
+		this.isItemConfigured = function(configItemName){
+			return configItemName in configContent;
 		};
 
 		/**
@@ -205,7 +184,7 @@
 		 * @returns {Boolean}
 		 */
 		this.supportsConfigItem = function(name){
-			return name in dftConfig;
+			return name in dftConfigContent;
 		};
 
 		/**
@@ -221,7 +200,7 @@
 		 * @param {String} name 配置项名称
 		 * @returns {CommonChartConfig}
 		 */
-		var getConfigInstanceThatSupportsConfigItem = function(name){
+		var getConfigInstanceThatSupportsConfigItemOfName = function(name){
 			var t = self;
 			while(null != t){
 				if(t.supportsConfigItem(name))
@@ -244,16 +223,16 @@
 				aspect = "default";
 
 			if(name in convertedConfigValue)
-				return convertedConfigValue[name].getValue();
-			else if(name in config){
-				return config[name];
-			}else if(name in dftConfig)
-				return dftConfig[name];
+				return convertedConfigValue[name].getValue(aspect);
+			else if(name in configContent){
+				return configContent[name];
+			}else if(name in dftConfigContent)
+				return dftConfigContent[name];
 
 			if(null != upstreamConfig)
-				return upstreamConfig.getConfigItemValue(name);
+				return upstreamConfig.getConfigItemValue(name, aspect);
 			else
-				return null;
+				return undefined;
 		};
 
 		/**
@@ -262,10 +241,10 @@
 		 * @returns {*}
 		 */
 		this.getOriginalConfigItemValue = function(name){
-			if(name in config){
-				return config[name];
-			}else if(name in dftConfig)
-				return dftConfig[name];
+			if(name in configContent){
+				return configContent[name];
+			}else if(name in dftConfigContent)
+				return dftConfigContent[name];
 
 			if(null != upstreamConfig)
 				return upstreamConfig.getOriginalConfigItemValue(name);
@@ -280,13 +259,13 @@
 		 * @returns {CommonChartConfig}
 		 */
 		this.setOriginalConfigItemValue = function(name, value){
-			var instance = getConfigInstanceThatSupportsConfigItem(name);
+			var instance = getConfigInstanceThatSupportsConfigItemOfName(name);
 
 			if(null == instance){
 				console.warn("Unknown chart config item: " + name);
-				config[name] = value;
+				configContent[name] = value;
 			}else
-				instance.getConfig()[name] = value;
+				instance.getConfigContent()[name] = value;
 
 			return this;
 		};
@@ -302,7 +281,7 @@
 			if(arguments.length < 3)
 				aspect = "default";
 
-			var instance = getConfigInstanceThatSupportsConfigItem(name);
+			var instance = getConfigInstanceThatSupportsConfigItemOfName(name);
 			var _convertedConfig;
 
 			if(null == instance){
@@ -321,10 +300,14 @@
 		/**
 		 * 移除设置的被转换了的配置项取值
 		 * @param {String} name 配置项名称
+		 * @param {String} [aspect=default] 配置项取值的转换方面
 		 * @returns {CommonChartConfig}
 		 */
-		this.removeConfigItemConvertedValue = function(name){
-			var instance = getConfigInstanceThatSupportsConfigItem(name);
+		this.removeConfigItemConvertedValue = function(name, aspect){
+			if(arguments.length < 3)
+				aspect = "default";
+
+			var instance = getConfigInstanceThatSupportsConfigItemOfName(name);
 			var _convertedConfig;
 
 			if(null == instance){
@@ -333,7 +316,10 @@
 			}else
 				_convertedConfig = instance.getConvertedConfig();
 
-			delete _convertedConfig[name];
+			if(!(name in _convertedConfig))
+				return this;
+
+			_convertedConfig[name].removeValue(aspect);
 			return this;
 		};
 
@@ -343,16 +329,16 @@
 		 * @returns {CommonChartConfig}
 		 */
 		this.resetConfigItemValueToDefault = function(name){
-			var instance = getConfigInstanceThatSupportsConfigItem(name);
+			var instance = getConfigInstanceThatSupportsConfigItemOfName(name);
 			var _convertedConfig, _config;
 
 			if(null == instance){
 				console.warn("Unknown chart config item: " + name);
 				_convertedConfig = convertedConfigValue;
-				_config = config;
+				_config = configContent;
 			}else{
 				_convertedConfig = instance.getConvertedConfig();
-				_config = instance.getConfig();
+				_config = instance.getConfigContent();
 			}
 
 			delete _config[name];
@@ -401,13 +387,6 @@
 			return upstreamConfig;
 		};
 	};
-
-	/**
-	 * 获取相邻两组数据之间间隙的最小值
-	 * @param {Object} config 配置集合
-	 * @returns {Number|null}
-	 */
-	CommonChartConfig.getMinGroupGap = getMinGroupGap;
 
 	util.defineReadonlyProperty(TradeChart2, "CommonChartConfig", CommonChartConfig);
 	util.defineReadonlyProperty(TradeChart2, "COMMON_DEFAULT_CONFIG", defaultConfig);

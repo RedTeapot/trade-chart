@@ -60,10 +60,10 @@
 		 * @returns {KSubChart_IndexMARenderResult} K线子图绘制结果
 		 */
 		this.implRender = function(canvasObj, env){
-			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItem("width")),
-				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItem("height")),
-				config_paddingTop = this.getConfigItem("paddingTop"),
-				config_axisYTickOffset = this.getConfigItem("axisYTickOffset");
+			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
+				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
+				config_paddingTop = this.getConfigItemValue("paddingTop"),
+				config_axisYTickOffset = this.getConfigItemValue("axisYTickOffset");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_IndexMADataSketch.sketch)(kChart, this.getConfig());
@@ -134,7 +134,7 @@
 			})();
 
 			/* 确定MA指标 */
-			var maArray = self.getConfigItem("maIndexList") || [];
+			var maArray = self.getConfigItemValue("maIndexList") || [];
 			maArray = maArray.map(function(d){
 				return util.parseAsNumber(d.replace(/[^\d]/gm, ""), 0);
 			}).reduce(function(rst, d){
@@ -159,7 +159,7 @@
 						continue;
 
 					closePrice = +dataManager.getConvertedData(d).closePrice;
-					CommonDataManager.setAttachedData(d, k, closePrice);
+					CommonDataManager.attachData(d, k, closePrice);
 				}
 
 				/* 附加MA数据，供绘制时使用 */
@@ -183,7 +183,7 @@
 							for(var k = 0; k < ma; k++){
 								sum += CommonDataManager.getAttachedData(_dataList[i - k], "closePrice") || 0;
 							}
-							CommonDataManager.setAttachedData(d, maKey, sum / ma);
+							CommonDataManager.attachData(d, maKey, sum / ma);
 						}
 					}
 				}
@@ -192,7 +192,7 @@
 			/* 绘制MA图 */
 			xPositionAndDataIndexList.reverse();
 			(function(){
-				var maIndexColorMap = self.getConfigItem("maIndexColorMap") || {};
+				var maIndexColorMap = self.getConfigItemValue("maIndexColorMap") || {};
 
 				ctx.save();
 				ctx.lineWidth = 0.5;

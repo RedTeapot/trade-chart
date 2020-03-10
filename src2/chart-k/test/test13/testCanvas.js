@@ -75,7 +75,7 @@ util.loadData(function(datas){
 	var result_volume = subChart_volume.render(volumeCanvasObj);
 
 	var ops = {
-		revertDataHighlightAction: KSubChartOperationUtil.bindRevertDataHighlightAction(
+		revertDataHighlightAction: util.bindActions(
 			[
 				KSubChartOperationUtil.newRevertDataHighlightAction_4TrendChart(trendOperationCanvasObj, result_trend),
 				KSubChartOperationUtil.newRevertDataHighlightAction_4CandleChart(volumeOperationCanvasObj, result_volume, {
@@ -83,7 +83,7 @@ util.loadData(function(datas){
 				})
 			]
 		),
-		dataHighlightAction: KSubChartOperationUtil.bindDataHighlightAction(
+		dataHighlightAction: util.bindActions(
 			[
 				KSubChartOperationUtil.newDataHighlightAction_4TrendChart(trendOperationCanvasObj, result_trend, {
 					verticalLineBottom: result_trend.getKSubChartSketch().getCanvasHeight()
@@ -91,7 +91,7 @@ util.loadData(function(datas){
 				KSubChartOperationUtil.newDataHighlightAction_4CandleChart(volumeOperationCanvasObj, result_volume, {
 					renderHorizontalLine: false,
 					verticalLineTop: 0,
-					verticalLineBottom: result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItem("paddingBottom")
+					verticalLineBottom: result_volume.getKSubChartSketch().getCanvasHeight() - result_volume.getConfigItemValue("paddingBottom")
 				})
 			]
 		)
