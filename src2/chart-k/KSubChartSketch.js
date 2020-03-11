@@ -113,7 +113,7 @@
 
 		/**
 		 * 使用给定的数据概览更新图形概览
-		 * @param {KDataSketch} dataSketch 数据概览
+		 * @param {CommonDataSketch} dataSketch 数据概览
 		 * @returns {KSubChartSketch}
 		 */
 		this.updateByDataSketch = function(dataSketch){

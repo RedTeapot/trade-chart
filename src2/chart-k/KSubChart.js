@@ -34,7 +34,7 @@
 	 * @constructor
 	 * K线子图
 	 * @param {KChart} kChart 附加该子图的K线图
-	 * @param {SubChartTypes} type 子图类型。如：volume - 量图；
+	 * @param {SubChartTypes|String} type 子图类型。如：volume - 量图；
 	 */
 	var KSubChart = function(kChart, type){
 		SubChart.apply(this, arguments);

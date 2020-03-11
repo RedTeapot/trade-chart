@@ -3,12 +3,12 @@
 	var util = TradeChart2.util;
 	var Big = TradeChart2.Big;
 
-	var KChartSketch = TradeChart2.KChartSketch,
+	var KChart = TradeChart2.KChart,
+		KChartSketch = TradeChart2.KChartSketch,
 
 		SubChartTypes = TradeChart2.SubChartTypes,
-		KSubChartConfig_VolumeConfig = TradeChart2.KSubChartConfig_VolumeConfig,
-		KSubChart = TradeChart2.KSubChart,
-		KSubChart_VolumeRenderResult = TradeChart2.KSubChart_VolumeRenderResult,
+		KSubChartSketch = TradeChart2.KSubChartSketch,
+		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
 
 		KSubChartSketch_VolumeDataSketch = TradeChart2.KSubChartSketch_VolumeDataSketch,
 		KSubChartSketch_VolumeChartSketch = TradeChart2.KSubChartSketch_VolumeChartSketch;
@@ -20,42 +20,45 @@
 		return Math.ceil(numBig(big));
 	};
 
-	var NOT_SUPPLIED = {};
+	/**
+	 * 默认的，适用于K线图“量图”子图的配置项
+	 */
+	var defaultConfig = {
+	};
+	Object.freeze && Object.freeze(defaultConfig);
 
 	/**
-	 * @constructor
-	 * @augments KSubChart
-	 *
-	 * K线图子图：蜡烛图
-	 * @param {KChart} kChart 附加该子图的K线图
+	 * 根据给定的配置，生成素描
+	 * @param {KSubChartConfig} config 绘制配置
+	 * @param {Number} [height] 绘制高度（当配置中指定的高度为百分比字符串时使用）
+	 * @returns {KSubChartSketch}
 	 */
-	var KSubChart_VolumeChart = function(kChart){
-		KSubChart.call(this, kChart, SubChartTypes.K_VOLUME);
-		var self = this;
+	var getChartSketchByConfig = function(config, height){
+		var chartSketch = new KSubChartSketch();
 
-		/* 渲染配置 */
-		var config = new KSubChartConfig_VolumeConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
+		var config_height = config.getConfigItemValue("height"),
+			config_paddingTop = config.getConfigItemValue("paddingTop"),
+			config_paddingBottom = config.getConfigItemValue("paddingBottom");
 
-		/**
-		 * 获取配置项集合
-		 * @override
-		 * @returns {*}
-		 */
-		this.getConfig = function(){
-			return config;
-		};
+		var canvasHeight = util.isValidNumber(height)? height: config_height;
+		var axisYHeight = canvasHeight - config_paddingTop - config_paddingBottom;
+		chartSketch.setCanvasHeight(canvasHeight)
+			.setAxisYHeight(Math.max(axisYHeight, 0))
+			.setContentHeight(chartSketch.getAxisYHeight());
 
-		/**
-		 * @override
-		 *
-		 * 渲染图形，并呈现至指定的画布中
-		 * @param {HTMLCanvasElement} canvasObj 画布
-		 * @param {Object} env 当前环境信息
-		 * @param {Number} env.drawingOrderIndex 当前子图在该画布上的绘制顺序索引。第一个被绘制：0
-		 *
-		 * @returns {KSubChart_VolumeRenderResult} 绘制的K线图
-		 */
-		this.implRender = function(canvasObj, env){
+		return chartSketch;
+	};
+
+	/**
+	 * K线图子图：量图
+	 */
+	KChart.implSubChart(SubChartTypes.K_VOLUME, {
+		defaultConfig: defaultConfig,
+
+		renderAction: function(canvasObj, env){
+			var self = this;
+			var kChart = this.getKChart();
+
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 
@@ -74,7 +77,7 @@
 			this.convertConfigItemValues(canvasObj, dataSketch);
 
 			var kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch_VolumeChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
+				kSubChartSketch = getChartSketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
 			var dataManager = kChart.getDataManager();
 			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
@@ -202,16 +205,13 @@
 
 			var renderResult = this._getLatestRenderResult(canvasObj);
 			if(null == renderResult){
-				renderResult = new KSubChart_VolumeRenderResult(this, canvasObj);
+				renderResult = new KSubChartRenderResult(this, canvasObj);
 				this._setLatestRenderResult(canvasObj, renderResult);
 			}
 			renderResult.setKChartSketch(kChartSketch)
 				.setKSubChartSketch(kSubChartSketch)
 				.setDataSketch(dataSketch);
 			return renderResult;
-		};
-	};
-	KSubChart_VolumeChart.prototype = Object.create(KSubChart.prototype);
-
-	util.defineReadonlyProperty(TradeChart2, "KSubChart_VolumeChart", KSubChart_VolumeChart);
+		}
+	});
 })();

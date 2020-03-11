@@ -3,15 +3,14 @@
 	var util = TradeChart2.util;
 	var Big = TradeChart2.Big;
 
-	var KChartSketch = TradeChart2.KChartSketch,
+	var KChart = TradeChart2.KChart,
+		KChartSketch = TradeChart2.KChartSketch,
 
 		SubChartTypes = TradeChart2.SubChartTypes,
-		KSubChartConfig_CandleConfig = TradeChart2.KSubChartConfig_CandleConfig,
-		KSubChart = TradeChart2.KSubChart,
-		KSubChart_CandleRenderResult = TradeChart2.KSubChart_CandleRenderResult,
+		KSubChartSketch = TradeChart2.KSubChartSketch,
+		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
 
-		KSubChartSketch_CandleDataSketch = TradeChart2.KSubChartSketch_CandleDataSketch,
-		KSubChartSketch_CandleChartSketch = TradeChart2.KSubChartSketch_CandleChartSketch;
+		KSubChartSketch_CandleDataSketch = TradeChart2.KSubChartSketch_CandleDataSketch;
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -23,42 +22,48 @@
 		return Math.floor(numBig(big));
 	};
 
-	var NOT_SUPPLIED = {};
+	/**
+	 * 默认的，适用于K线图“蜡烛图”子图的配置项
+	 */
+	var defaultConfig = {
+		axisYTickOffset: 0/* 纵坐标刻度距离原点的位移，取值为正则向上偏移 */
+	};
+	Object.freeze && Object.freeze(defaultConfig);
 
 	/**
-	 * @constructor
-	 * @augments KSubChart
-	 *
-	 * K线图子图：蜡烛图
-	 * @param {KChart} kChart 附加该子图的K线图
+	 * 根据给定的配置，生成素描
+	 * @param {KSubChartConfig} config 绘制配置
+	 * @param {Number} [height] 绘制高度（当配置中指定的高度为百分比字符串时使用）
+	 * @returns {KSubChartSketch}
 	 */
-	var KSubChart_CandleChart = function(kChart){
-		KSubChart.call(this, kChart, SubChartTypes.K_CANDLE);
-		var self = this;
+	var getChartSketchByConfig = function(config, height){
+		var chartSketch = new KSubChartSketch();
 
-		/* 渲染配置 */
-		var config = new KSubChartConfig_CandleConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
+		var config_height = config.getConfigItemValue("height"),
+			config_paddingTop = config.getConfigItemValue("paddingTop"),
+			config_paddingBottom = config.getConfigItemValue("paddingBottom"),
+			config_axisYTickOffset = config.getConfigItemValue("axisYTickOffset");
 
-		/**
-		 * 获取配置项集合
-		 * @override
-		 * @returns {KSubChartConfig_CandleConfig}
-		 */
-		this.getConfig = function(){
-			return config;
-		};
+		var canvasHeight = util.isValidNumber(height)? height: config_height;
+		var axisYHeight = canvasHeight - config_paddingTop - config_paddingBottom;
+		var contentHeight = axisYHeight - config_axisYTickOffset;
+		chartSketch.setCanvasHeight(canvasHeight)
+			.setAxisYHeight(Math.max(axisYHeight, 0))
+			.setContentHeight(Math.max(contentHeight, 0));
 
-		/**
-		 * @override
-		 *
-		 * 渲染图形，并呈现至指定的画布中
-		 * @param {HTMLCanvasElement} canvasObj 画布
-		 * @param {Object} env 当前环境信息
-		 * @param {Number} env.drawingOrderIndex 当前子图在该画布上的绘制顺序索引。第一个被绘制：0
-		 *
-		 * @returns {KSubChart_CandleRenderResult} K线子图绘制结果
-		 */
-		this.implRender = function(canvasObj, env){
+		return chartSketch;
+	};
+
+	/**
+	 * K线图子图：蜡烛图
+	 */
+	KChart.implSubChart(SubChartTypes.K_CANDLE, {
+		defaultConfig: defaultConfig,
+
+		renderAction: function(canvasObj, env){
+			var self = this;
+			var kChart = this.getKChart();
+
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 				config_paddingTop = this.getConfigItemValue("paddingTop"),
@@ -79,7 +84,7 @@
 			this.convertConfigItemValues(canvasObj, dataSketch);
 
 			var kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
-				kSubChartSketch = KSubChartSketch_CandleChartSketch.sketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
+				kSubChartSketch = getChartSketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
 			var dataManager = kChart.getDataManager();
 			var xPositionAndDataListList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
@@ -232,16 +237,13 @@
 
 			var renderResult = this._getLatestRenderResult(canvasObj);
 			if(null == renderResult){
-				renderResult = new KSubChart_CandleRenderResult(this, canvasObj);
+				renderResult = new KSubChartRenderResult(this, canvasObj);
 				this._setLatestRenderResult(canvasObj, renderResult);
 			}
 			renderResult.setKChartSketch(kChartSketch)
 				.setKSubChartSketch(kSubChartSketch)
 				.setDataSketch(dataSketch);
 			return renderResult;
-		};
-	};
-	KSubChart_CandleChart.prototype = Object.create(KSubChart.prototype);
-
-	util.defineReadonlyProperty(TradeChart2, "KSubChart_CandleChart", KSubChart_CandleChart);
+		}
+	});
 })();

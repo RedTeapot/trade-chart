@@ -7,7 +7,14 @@
 		CommonDataManager = TradeChart2.CommonDataManager,
 		CommonChartConfig = TradeChart2.CommonChartConfig,
 		KChartSketch = TradeChart2.KChartSketch,
+		KSubChart = TradeChart2.KSubChart,
 		eventDrive = TradeChart2.eventDrive;
+
+	/**
+	 * K线子图实现
+	 * @enum {KSubChart}
+	 */
+	var subChartImplementations = {};
 
 	var numBig = function(big){
 		return Number(big.toString());
@@ -96,31 +103,18 @@
 
 		/**
 		 * 为该K线图创建指定类型的子图
-		 * @param {SubChartTypes} subChartType 要创建的K线子图类型
+		 * @param {String} subChartType 要创建的K线子图类型
 		 * @returns {SubChart}
 		 */
 		this.newSubChart = function(subChartType){
-			var kSubChart;
-			switch(String(subChartType).trim().toLowerCase()){
-				case TradeChart2.SubChartTypes.K_CANDLE:
-					kSubChart = new TradeChart2.KSubChart_CandleChart(this);
-					break;
+			subChartType = String(subChartType).trim().toLowerCase();
+			if(util.isEmptyString(subChartType))
+				throw new Error("Illegal argument. Sub chart type should not be empty.");
 
-				case TradeChart2.SubChartTypes.K_TREND:
-					kSubChart = new TradeChart2.KSubChart_TrendChart(this);
-					break;
+			if(!(subChartType in subChartImplementations))
+				throw new Error("K sub chart: '" + subChartType + "' is not implemented yet.");
 
-				case TradeChart2.SubChartTypes.K_VOLUME:
-					kSubChart = new TradeChart2.KSubChart_VolumeChart(this);
-					break;
-
-				case TradeChart2.SubChartTypes.K_INDEX_MA:
-					kSubChart = new TradeChart2.KSubChart_IndexMAChart(this);
-					break;
-
-				default:
-					throw new Error("Unknown sub chart type: " + subChartType);
-			}
+			var kSubChart = new subChartImplementations[subChartType](this);
 			attachedKSubCharts.push(kSubChart);
 
 			return kSubChart;
@@ -173,6 +167,82 @@
 		};
 	};
 	KChart.prototype = Object.create(CommonChart.prototype);
+
+	/**
+	 * 定义子图，提供子图的实现
+	 * @param {String} subChartType 子图类型
+	 * @param {KSubChartImplementationMetadata} metadata 实现的元数据描述
+	 */
+	KChart.implSubChart = function(subChartType, metadata){
+		subChartType = String(subChartType).trim().toLowerCase();
+		if(util.isEmptyString(subChartType))
+			throw new Error("Illegal argument. Sub chart type should not be empty.");
+		if(subChartType in subChartImplementations)
+			throw new Error("K sub chart: '" + subChartType + "' was implemented already.");
+
+		if(null == metadata || typeof metadata !== "object")
+			throw new Error("Illegal argument. Sub chart implementation metadata should be of type: 'Object'.");
+		var k = "renderAction";
+		if(typeof metadata[k] !== "function")
+			throw new Error("Illegal implementation metadata. No valid '" + k + "' property of type: 'Function' found.");
+
+		var defaultConfig = metadata.defaultConfig || {};
+
+		/**
+		 * 默认的，适用于K线图子图的配置项
+		 * @param {Object} config
+		 *
+		 * @constructor
+		 * @augments CommonChartConfig
+		 */
+		var ImplConfig = function(config){
+			var dftConfig = util.setDftValue(null, defaultConfig);
+			util.setDftValue(dftConfig, TradeChart2["K_SUB_DEFAULT_CONFIG"]);
+
+			config = config || {};
+			CommonChartConfig.call(this, config, dftConfig);
+		};
+		ImplConfig.prototype = Object.create(CommonChartConfig.prototype);
+
+		/**
+		 * @constructor
+		 * @augments KSubChart
+		 *
+		 * K线图子图
+		 * @param {KChart} kChart 附加该子图的K线图
+		 */
+		var Impl = function(kChart){
+			KSubChart.call(this, kChart, subChartType);
+
+			var config = new ImplConfig().setUpstreamConfigInstance(kChart.getConfig(), true);
+
+			/**
+			 * 获取配置项集合
+			 * @override
+			 * @returns {KSubChartConfig}
+			 */
+			this.getConfig = function(){
+				return config;
+			};
+
+			/**
+			 * @override
+			 *
+			 * 渲染图形，并呈现至指定的画布中
+			 * @param {HTMLCanvasElement} canvasObj 画布
+			 * @param {Object} env 当前环境信息
+			 * @param {Number} env.drawingOrderIndex 当前子图在该画布上的绘制顺序索引。第一个被绘制：0
+			 *
+			 * @returns {KSubChartRenderResult} K线子图绘制结果
+			 */
+			this.implRender = function(canvasObj, env){
+				return metadata.renderAction.apply(this, arguments);
+			};
+		};
+		Impl.prototype = Object.create(KSubChart.prototype);
+
+		subChartImplementations[subChartType] = Impl;
+	};
 
 	util.defineReadonlyProperty(TradeChart2, "KChart", KChart);
 })();

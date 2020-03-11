@@ -4,7 +4,6 @@
 
 	/**
 	 * 支持的K线子图类型
-	 * @readonly
 	 * @enum {String}
 	 */
 	var SubChartTypes = {
@@ -18,7 +17,7 @@
 		K_VOLUME: "k_volume",
 
 		/** 指标：MA */
-		K_INDEX_MA: "k_index_ma",
+		K_INDEX_MA: "k_index_ma"
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "SubChartTypes", SubChartTypes);

@@ -27,7 +27,7 @@
 	 *
 	 * @param {KChart} kChart K线图实例
 	 * @param {String} name 配置项名称
-	 * @param {KSubChartConfig_TrendConfig} config K线子图渲染配置
+	 * @param {KSubChartConfig} config K线子图渲染配置
 	 */
 	var _getConfigItem = function(kChart, name, config){
 		if(config.supportsConfigItem(name))
@@ -39,7 +39,7 @@
 	/**
 	 * 扫描给定的K线图实例和K线子图渲染配置，根据K线图实例中的数据生成素描
 	 * @param {KChart} kChart K线图实例
-	 * @param {KSubChartConfig_TrendConfig} kSubChartConfig K线子图渲染配置
+	 * @param {KSubChartConfig} kSubChartConfig K线子图渲染配置
 	 * @returns {KSubChartSketch_TrendDataSketch}
 	 */
 	KSubChartSketch_TrendDataSketch.sketch = function(kChart, kSubChartConfig){

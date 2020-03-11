@@ -170,7 +170,7 @@
 		};
 
 		/**
-		 * 判断当前实例绑定的配置集合中是否含有指定的配置项
+		 * 判断当前实例绑定的配置集合中是否含有指定的配置项，不包括上游配置
 		 * @param {String} configItemName 配置项名称
 		 * @returns {Boolean}
 		 */
@@ -179,12 +179,21 @@
 		};
 
 		/**
-		 * 判断当前实例是否支持指定的配置项
+		 * 判断当前实例是否支持指定的配置项，不包括上游配置
 		 * @param {String} name 配置项名称
 		 * @returns {Boolean}
 		 */
 		this.supportsConfigItem = function(name){
 			return name in dftConfigContent;
+		};
+
+		/**
+		 * 获取当前实例支持的配置项名称列表，不包括上游配置
+		 * @returns {String[]}
+		 */
+		this.getSupportedConfigItemNames = function(){
+			var names = Object.keys(dftConfigContent);
+			return names;
 		};
 
 		/**
@@ -213,7 +222,7 @@
 		};
 
 		/**
-		 * 获取指定名称对应的配置项取值。如果配置项取值的取值被做了转换，则返回转换后的值
+		 * 获取指定名称对应的配置项取值。如果配置项取值的取值被做了转换，则返回转换后的值。配置项查找范围包括上游配置
 		 * @param {String} name 配置项名称
 		 * @param {String} [aspect=default] 配置项取值的转换方面
 		 * @returns {*}
@@ -236,7 +245,7 @@
 		};
 
 		/**
-		 * 获取指定名称对应的配置项的原始取值（转换之前的取值）
+		 * 获取指定名称对应的配置项的原始取值（转换之前的取值）。配置项查找范围包括上游配置
 		 * @param {String} name 配置项名称
 		 * @returns {*}
 		 */
@@ -253,7 +262,7 @@
 		};
 
 		/**
-		 * 设置配置项取值
+		 * 设置配置项取值。配置项查找范围包括上游配置
 		 * @param {String} name 配置项名称
 		 * @param {*} value 配置项取值
 		 * @returns {CommonChartConfig}
@@ -271,7 +280,7 @@
 		};
 
 		/**
-		 * 设置被转换了的配置项取值
+		 * 设置被转换了的配置项取值。配置项查找范围包括上游配置
 		 * @param {String} name 配置项名称
 		 * @param {*} convertedValue 转换后的配置项取值
 		 * @param {String} [aspect=default] 配置项取值的转换方面
@@ -298,7 +307,7 @@
 		};
 
 		/**
-		 * 移除设置的被转换了的配置项取值
+		 * 移除设置的被转换了的配置项取值。配置项查找范围包括上游配置
 		 * @param {String} name 配置项名称
 		 * @param {String} [aspect=default] 配置项取值的转换方面
 		 * @returns {CommonChartConfig}
@@ -324,7 +333,7 @@
 		};
 
 		/**
-		 * 重置指定的配置项取值为默认取值
+		 * 重置指定的配置项取值为默认取值。配置项查找范围包括上游配置
 		 * @param {String} name 配置项名称
 		 * @returns {CommonChartConfig}
 		 */
@@ -385,6 +394,43 @@
 		 */
 		this.getUpstreamConfigInstance = function(){
 			return upstreamConfig;
+		};
+
+		/**
+		 * 判断当前实例的配置是否与给定实例的配置等价
+		 * @param {CommonChartConfig} configInstance 要比较的实例
+		 * @param {String[]} [comparingConfigItemNames] 要比较的配置项名称列表。如果没有提供，或为空数组，则使用各自的局部配置进行比较，不包括上游配置
+		 * @returns {Boolean}
+		 */
+		this.equalTo = function(configInstance, comparingConfigItemNames){
+			if(configInstance === this)
+				return true;
+			if(!(configInstance instanceof CommonChartConfig))
+				return false;
+
+			if(!Array.isArray(comparingConfigItemNames) || comparingConfigItemNames.length === 0){
+				var keys1 = this.getSupportedConfigItemNames(),
+					keys2 = configInstance.getSupportedConfigItemNames();
+
+				if(keys1.length !== keys2.length)
+					return false;
+
+				comparingConfigItemNames = keys1;
+				for(var i = 0; i < keys2.length; i++){
+					var k = keys2[i];
+					if(comparingConfigItemNames.indexOf(k) === -1)
+						comparingConfigItemNames.push(k);
+				}
+			}
+
+			for(var i = 0; i < comparingConfigItemNames.length; i++){
+				var name = comparingConfigItemNames[i];
+
+				if(this.getConfigItemValue(name) !== configInstance.getConfigItemValue(name))
+					return false;
+			}
+
+			return true;
 		};
 	};
 
