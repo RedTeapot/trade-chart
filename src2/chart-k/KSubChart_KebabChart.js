@@ -5,26 +5,18 @@
 
 	var KChart = TradeChart2.KChart,
 		KChartSketch = TradeChart2.KChartSketch,
-		CommonDataManager = TradeChart2.CommonDataManager,
 
 		SubChartTypes = TradeChart2.SubChartTypes,
 		KSubChartSketch = TradeChart2.KSubChartSketch,
 		KSubChartRenderResult = TradeChart2.KSubChartRenderResult,
 
-		KSubChartSketch_IndexMADataSketch = TradeChart2.KSubChartSketch_IndexMADataSketch;
+		KSubChartSketch_KebabDataSketch = TradeChart2.KSubChartSketch_KebabDataSketch;
 
 	/**
-	 * 默认的，适用于K线图“指标：MA图”子图的配置项
+	 * 默认的，适用于K线图“烤串图”子图的配置项
 	 */
 	var defaultConfig = {
-		axisYTickOffset: 0,/* 纵坐标刻度距离原点的位移，取值为正则向上偏移 */
-		maIndexList: ["MA5", "MA10", "MA20", "MA30"],/* MA指标列表 */
-		maIndexColorMap: {/* MA指标对应的线条颜色列表 */
-			"MA5": "orange",
-			"MA10": "blue",
-			"MA20": "purple",
-			"MA30": "black"
-		}
+		axisYTickOffset: 0/* 纵坐标刻度距离原点的位移，取值为正则向上偏移 */
 	};
 
 	/**
@@ -52,15 +44,13 @@
 	};
 
 	/**
-	 * K线图子图：MA指标图
+	 * K线图子图：烤串图
 	 */
-	KChart.implSubChart(SubChartTypes.K_INDEX_MA, {
+	KChart.implSubChart(SubChartTypes.K_KEBAB, {
 		defaultConfig: defaultConfig,
 
 		dataSketchMethod: function(originalDataList){
-			var kDataManager = this.getKChart().getDataManager();
-
-			var dataList = originalDataList;
+			var dataList = this.getKChart().getDataManager().getConvertedData(originalDataList);
 			var dataSketch_origin_max = -Infinity,/* 最大价格 */
 				dataSketch_origin_min = Infinity,/* 最小价格 */
 				dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */
@@ -68,76 +58,31 @@
 
 				dataSketch_extended_pricePrecision = 0;/* 坐标中价格的精度 */
 
-			/* 确定MA指标 */
-			var maArray = this.getConfigItemValue("maIndexList");
-			maArray = maArray.map(function(d){
-				return util.parseAsNumber(d.replace(/[^\d]/gm, ""), 0);
-			}).reduce(function(rst, d){
-				if(isFinite(d) && d > 0 && rst.indexOf(d) === -1)
-					rst.push(d);
-
-				return rst;
-			}, []).sort(function(a, b){
-				return a > b? 1: -1;
-			});
-
-			/* 缓存需要被反复使用的收盘价，降低计算量 */
+			var variationSum = 0;
 			for(var i = 0; i < dataList.length; i++){
 				var d = dataList[i];
 				if(null == d || typeof d !== "object")
 					continue;
 
-				var closePrice = +kDataManager.getConvertedData(d).closePrice;
-				CommonDataManager.attachData(d, "closePrice", closePrice);
-			}
-
-			/* 附加MA数据，供绘制时使用 */
-			if(maArray.length > 0){
-				var minMA = maArray[0];
-
-				for(var i = minMA - 1; i < dataList.length; i++){/* 为每个数据计算MA指标 */
-					var d = dataList[i];
-
-					for(var j = 0; j < maArray.length; j++){/* 计算每一个MA指标 */
-						var ma = maArray[j];
-						if(i < ma - 1)/* 检查数据跨度是否足够计算当前MA指标 */
-							break;/* ma按指标升序排序，如果当前索引所涵盖的数据个数不足以满足当下MA指标，则必然无法满足需要更大数据覆盖面的指标 */
-
-						var sum = 0;
-						for(var k = 0; k < ma; k++){
-							sum += CommonDataManager.getAttachedData(dataList[i - k], "closePrice") || 0;
-						}
-						CommonDataManager.attachData(d, "MA" + ma, sum / ma);
-					}
-				}
-			}
-
-			var previousClosePrice = null;
-			var variationSum = 0;
-			for(var i = 0; i < dataList.length; i++){
-				var d = dataList[i];
-				var closePrice = +kDataManager.getConvertedData(d).closePrice;
-
 				/* 数据精度确定 */
 				dataSketch_extended_pricePrecision = Math.max(
 					dataSketch_extended_pricePrecision,
-					util.getPrecision(closePrice)
+					util.getMaxPrecision(d.priceList)
 				);
 
-				if(closePrice > dataSketch_origin_max)
-					dataSketch_origin_max = closePrice;
-				if(closePrice < dataSketch_origin_min)
-					dataSketch_origin_min = closePrice;
+				var minAndMax = util.minAndMax(d.priceList);
+				var max = minAndMax.max,
+					min = minAndMax.min;
+				if(max > dataSketch_origin_max)
+					dataSketch_origin_max = max;
+				if(min < dataSketch_origin_min)
+					dataSketch_origin_min = min;
 
 				/* 确定更大的变动幅度 */
-				if(null !== previousClosePrice){
-					var variation = Math.abs(closePrice - previousClosePrice);
-					if(variation > dataSketch_origin_maxVariation)
-						dataSketch_origin_maxVariation = variation;
-					variationSum += variation;
-				}
-
-				previousClosePrice = closePrice;
+				var variation = Math.abs(max - min);
+				if(variation > dataSketch_origin_maxVariation)
+					dataSketch_origin_maxVariation = variation;
+				variationSum += variation;
 			}
 			var len = dataList.length;
 			dataSketch_origin_avgVariation = len > 0? (variationSum / len): 0;
@@ -158,7 +103,11 @@
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 				config_paddingTop = this.getConfigItemValue("paddingTop"),
-				config_axisYTickOffset = this.getConfigItemValue("axisYTickOffset");
+
+				config_axisYTickOffset = this.getConfigItemValue("axisYTickOffset"),
+
+				config_groupBarWidth = this.getConfigItemValue("groupBarWidth"),
+				config_groupLineWidth = this.getConfigItemValue("groupLineWidth");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
 			var dataSketch = this.sketchData();
@@ -170,11 +119,11 @@
 				kSubChartSketch = getChartSketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
 
 			var dataManager = kChart.getDataManager();
-			var xPositionAndDataIndexList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
+			var xPositionAndDataListList = self._getRenderingXPositionAndDataIndexListFromRight(kChartSketch);
 
 			/* 绘制的数据个数 */
-			var groupCount = xPositionAndDataIndexList.length;
-			/* 蜡烛一半的宽度 */
+			var groupCount = xPositionAndDataListList.length;
+			/* 柱宽一半的宽度 */
 			var halfGroupBarWidth = kChart._calcHalfGroupBarWidth();
 
 			/* 横坐标位置 */
@@ -188,9 +137,9 @@
 				$yTop_axisY = config_paddingTop;
 
 			/**
-			 * 获取指定价钱对应的物理高度
-			 * @param {Number} price1 价钱1
-			 * @param {Number} [price2=dataSketch.getAmountCeiling()] 价钱2
+			 * 获取指定价格对应的物理高度
+			 * @param {Number} price1 价格1
+			 * @param {Number} [price2=dataSketch.getAmountCeiling()] 价格2
 			 * @returns {Number} 物理高度
 			 */
 			var calcHeight = function(price1, price2){
@@ -228,69 +177,65 @@
 				ctx.restore();
 			})();
 
-			/* 确定MA指标 */
-			var maArray = self.getConfigItemValue("maIndexList") || [];
-			maArray = maArray.map(function(d){
-				return util.parseAsNumber(d.replace(/[^\d]/gm, ""), 0);
-			}).reduce(function(rst, d){
-				if(isFinite(d) && d > 0 && rst.indexOf(d) === -1)
-					rst.push(d);
-
-				return rst;
-			}, []);
-
-			/* 计算并附加MA数据 */
+			/* 绘制蜡烛图 */
 			(function(){
-				/* 缓存需要被反复使用的收盘价，降低计算量 */
-				var _dataList = dataManager.getDataList();
-				for(var i = 0; i < _dataList.length; i++){
-					var d = _dataList[i];
-					if(null == d || typeof d !== "object")
-						continue;
-
-					var k = "closePrice";
-					var closePrice = CommonDataManager.getAttachedData(d, k);
-					if(null != closePrice)
-						continue;
-
-					closePrice = +dataManager.getConvertedData(d).closePrice;
-					CommonDataManager.attachData(d, k, closePrice);
-				}
-
-				/* 附加MA数据，供绘制时使用 */
-				if(maArray.length > 0){
-					var minMA = maArray[0];
-
-					for(var i = minMA - 1; i < _dataList.length; i++){/* 为每个数据计算MA指标 */
-						var d = _dataList[i];
-
-						for(var j = 0; j < maArray.length; j++){/* 计算每一个MA指标 */
-							var ma = maArray[j];
-							if(i < ma - 1)/* 检查数据跨度是否足够计算当前MA指标 */
-								break;/* ma按指标升序排序，如果当前索引所涵盖的数据个数不足以满足当下MA指标，则必然无法满足需要更大数据覆盖面的指标 */
-
-							var maKey = "MA" + ma;
-							var maAmount = CommonDataManager.getAttachedData(d, maKey);
-							if(null != maAmount)
-								continue;
-
-							var sum = 0;
-							for(var k = 0; k < ma; k++){
-								sum += CommonDataManager.getAttachedData(_dataList[i - k], "closePrice") || 0;
-							}
-							CommonDataManager.attachData(d, maKey, sum / ma);
-						}
-					}
-				}
-			})();
-
-			/* 绘制MA图 */
-			xPositionAndDataIndexList.reverse();
-			(function(){
-				var maIndexColorMap = self.getConfigItemValue("maIndexColorMap") || {};
-
 				ctx.save();
-				ctx.lineWidth = 0.5;
+
+				var linePosition = Math.floor((config_groupBarWidth - config_groupLineWidth) / 2);
+
+				/**
+				 * 绘制给定索引对应的数据的蜡烛
+				 * @param {Number} i 数据索引（从右向左）
+				 */
+				var renderCandle = function(i){
+					var dp = xPositionAndDataListList[i];
+
+					var data = dataManager.getConvertedData(dp.dataIndex);
+					if(null == data)
+						return;
+
+					var x = dp.x - halfGroupBarWidth;
+
+					if(i === 0){
+						TradeChart2.showLog && console.info("First candle left position: " + x + " on sub chart: " + self.id);
+					}
+
+					var isAppreciated = data.closePrice > data.openPrice,
+						isKeeping = Math.abs(data.closePrice - data.openPrice) < 1e-8;
+					var maxLinePrice = Math.max(data.highPrice, data.lowPrice),
+						maxBarPrice = Math.max(data.openPrice, data.closePrice);
+
+					var lineX = x + linePosition,
+						lineYTop = $yTop_axisY + calcHeight(maxLinePrice);
+					var lineYBottom = lineYTop + calcHeight(data.highPrice, data.lowPrice);
+					if(Math.abs(lineYBottom - lineYTop) < 1)
+						lineYBottom += 1;
+
+					var barX = x,
+						barY = $yTop_axisY + calcHeight(maxBarPrice);
+					var barHeight = calcHeight(data.openPrice, data.closePrice);
+					if(barHeight < 1)
+						barHeight = 1;
+
+					/* 绘制线 */
+					ctx.fillStyle = ctx.strokeStyle = isKeeping? config_keepingColor: (isAppreciated? config_appreciatedColor: config_depreciatedColor);
+					if(config_groupLineWidth > 1){
+						ctx.strokeWidth = 0;
+						ctx.fillRect(Math.floor(lineX), Math.round(lineYTop), config_groupLineWidth, Math.round(Math.abs(lineYBottom - lineYTop)));
+					}else{
+						lineX = util.getLinePosition(lineX);
+
+						ctx.strokeWidth = 1;
+						ctx.beginPath();
+						ctx.moveTo(lineX, util.getLinePosition(lineYTop));
+						ctx.lineTo(lineX, util.getLinePosition(lineYBottom));
+						ctx.stroke();
+					}
+
+					/* 绘制蜡烛 */
+					ctx.strokeWidth = 0;
+					ctx.fillRect(Math.floor(barX), Math.round(barY), config_groupBarWidth, Math.round(barHeight));
+				};
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
 				var leftX = 0,
@@ -309,55 +254,29 @@
 					rightOldImgData = null;
 				try{
 					leftOldImgData = ctx.getImageData(
-						leftImgDataLeft,
-						0,
-						xLeftEdge_axisX_content - leftX,
+						leftX,
+						config_paddingTop * vScale,
+						(xLeftEdge_axisX_content - leftX) * hScale,
 						imgDataHeight
 					);
 					rightOldImgData = ctx.getImageData(
-						rightImgDataLeft,
-						0,
-						config_width - rightX,
+						rightX,
+						config_paddingTop * vScale,
+						(config_width - rightX) * hScale,
 						imgDataHeight
 					);
 				}catch(e){
 					console.error(e);
 				}
 
-				for(var k = 0; k < maArray.length; k++){
-					var ma = maArray[k];
-					var maKey = "MA" + ma;
-
-					ctx.strokeStyle = maIndexColorMap[maKey];
-
-					var isFirstDot = true;
-					for(var i = 0; i < groupCount; i++){
-						var dp = xPositionAndDataIndexList[i];
-
-						var maAmount = CommonDataManager.getAttachedData(dataManager.getData(dp.dataIndex), maKey);
-						if(null == maAmount)
-							continue;
-
-						var x = util.getLinePosition(dp.x),
-							y = util.getLinePosition($yTop_axisY + calcHeight(maAmount));
-						// TradeChart2.showLog && console.log(maKey, i, x, y);
-
-						if(isFirstDot){
-							ctx.beginPath();
-							ctx.moveTo(x, y);
-						}else
-							ctx.lineTo(x, y);
-
-						isFirstDot = false;
-					}
-					ctx.stroke();
-				}
+				for(var i = 0; i < xPositionAndDataListList.length; i++)
+					renderCandle(i);
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
 				if(null != leftOldImgData)
-					ctx.putImageData(leftOldImgData, leftImgDataLeft, 0);
+					ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
 				if(null != rightOldImgData)
-					ctx.putImageData(rightOldImgData, rightImgDataLeft, 0);
+					ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
 
 				ctx.restore();
 			})();

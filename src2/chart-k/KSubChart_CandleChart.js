@@ -12,23 +12,16 @@
 
 		KSubChartSketch_CandleDataSketch = TradeChart2.KSubChartSketch_CandleDataSketch;
 
-	var numBig = function(big){
-		return Number(big.toString());
-	};
-	var roundBig = function(big){
-		return Math.round(numBig(big));
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
-
 	/**
 	 * 默认的，适用于K线图“蜡烛图”子图的配置项
 	 */
 	var defaultConfig = {
+		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		keepingColor: "#DEDEDE",/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+
 		axisYTickOffset: 0/* 纵坐标刻度距离原点的位移，取值为正则向上偏移 */
 	};
-	Object.freeze && Object.freeze(defaultConfig);
 
 	/**
 	 * 根据给定的配置，生成素描
@@ -60,6 +53,57 @@
 	KChart.implSubChart(SubChartTypes.K_CANDLE, {
 		defaultConfig: defaultConfig,
 
+		dataSketchMethod: function(originalDataList){
+			var dataList = this.getKChart().getDataManager().getConvertedData(originalDataList);
+			var dataSketch_origin_max = -Infinity,/* 最大价格 */
+				dataSketch_origin_min = Infinity,/* 最小价格 */
+				dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */
+				dataSketch_origin_maxVariation = 0,/* 价格的最大变动幅度 */
+
+				dataSketch_extended_pricePrecision = 0;/* 坐标中价格的精度 */
+
+			var variationSum = 0;
+			for(var i = 0; i < dataList.length; i++){
+				var d = dataList[i];
+				if(null == d || typeof d !== "object")
+					continue;
+
+				var openPrice = +d.openPrice,
+					highPrice = +d.highPrice,
+					lowPrice = +d.lowPrice,
+					closePrice = +d.closePrice;
+
+				/* 数据精度确定 */
+				dataSketch_extended_pricePrecision = Math.max(
+					dataSketch_extended_pricePrecision,
+					util.getMaxPrecision([openPrice, highPrice, lowPrice, closePrice])
+				);
+
+				var max = Math.max(openPrice, highPrice, lowPrice, closePrice),
+					min = Math.min(openPrice, highPrice, lowPrice, closePrice);
+				if(max > dataSketch_origin_max)
+					dataSketch_origin_max = max;
+				if(min < dataSketch_origin_min)
+					dataSketch_origin_min = min;
+
+				/* 确定更大的变动幅度 */
+				var variation = Math.abs(max - min);
+				if(variation > dataSketch_origin_maxVariation)
+					dataSketch_origin_maxVariation = variation;
+				variationSum += variation;
+			}
+			var len = dataList.length;
+			dataSketch_origin_avgVariation = len > 0? (variationSum / len): 0;
+
+			return {
+				origin_min: dataSketch_origin_min,
+				origin_max: dataSketch_origin_max,
+				origin_avgVariation: dataSketch_origin_avgVariation,
+				origin_maxVariation: dataSketch_origin_maxVariation,
+				extended_pricePrecision: dataSketch_extended_pricePrecision
+			};
+		},
+
 		renderAction: function(canvasObj, env){
 			var self = this;
 			var kChart = this.getKChart();
@@ -78,7 +122,7 @@
 				config_groupLineWidth = this.getConfigItemValue("groupLineWidth");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
-			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_CandleDataSketch.sketch)(kChart, this.getConfig());
+			var dataSketch = this.sketchData();
 
 			/* 转换配置项取值 */
 			this.convertConfigItemValues(canvasObj, dataSketch);
@@ -105,9 +149,9 @@
 				$yTop_axisY = config_paddingTop;
 
 			/**
-			 * 获取指定价钱对应的物理高度
-			 * @param {Number} price1 价钱1
-			 * @param {Number} [price2=dataSketch.getAmountCeiling()] 价钱2
+			 * 获取指定价格对应的物理高度
+			 * @param {Number} price1 价格1
+			 * @param {Number} [price2=dataSketch.getAmountCeiling()] 价格2
 			 * @returns {Number} 物理高度
 			 */
 			var calcHeight = function(price1, price2){
@@ -218,15 +262,33 @@
 					leftImgDataLeft = leftX * hScale,
 					rightImgDataLeft = rightX * hScale;
 
-				var leftOldImgData = ctx.getImageData(leftX, config_paddingTop * vScale, (xLeftEdge_axisX_content - leftX) * hScale, imgDataHeight),
-					rightOldImgData = ctx.getImageData(rightX, config_paddingTop * vScale, (config_width - rightX) * hScale, imgDataHeight);
+				var leftOldImgData = null,
+					rightOldImgData = null;
+				try{
+					leftOldImgData = ctx.getImageData(
+						leftX,
+						config_paddingTop * vScale,
+						(xLeftEdge_axisX_content - leftX) * hScale,
+						imgDataHeight
+					);
+					rightOldImgData = ctx.getImageData(
+						rightX,
+						config_paddingTop * vScale,
+						(config_width - rightX) * hScale,
+						imgDataHeight
+					);
+				}catch(e){
+					console.error(e);
+				}
 
 				for(var i = 0; i < xPositionAndDataListList.length; i++)
 					renderCandle(i);
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
-				ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
-				ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
+				if(null != leftOldImgData)
+					ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
+				if(null != rightOldImgData)
+					ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
 
 				ctx.restore();
 			})();

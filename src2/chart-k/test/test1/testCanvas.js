@@ -60,7 +60,7 @@ util.loadData(function(datas){
 	row_volumeObj.detailCanvas = row_volumeDetailObj;
 
 	var KChart = TradeChart2.KChart;
-	var kChart = new KChart().setDataParser(function(d, i){
+	var kChart = new KChart().setDataParser(function(d){
 		var obj = {time: util.formatDate(new Date(d.i * 1000), "HH:mm"), openPrice: d.o, closePrice: d.c, highPrice: d.h, lowPrice: d.l, volume: d.a};
 		if(isNaN(obj.openPrice)){
 			console.error(d, i, obj.openPrice);

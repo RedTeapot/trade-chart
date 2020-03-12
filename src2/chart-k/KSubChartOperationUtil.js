@@ -387,6 +387,7 @@
 			viewDetail(evt);
 		});
 		document.addEventListener("blur", function(evt){
+			isModeViewDetail = true;
 			util.try2Call(revertDataHighlightAction);
 		});
 	};

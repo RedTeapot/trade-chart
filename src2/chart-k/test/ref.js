@@ -23,11 +23,6 @@
 	"KChartConfig.js",
 	"KChart.js",
 
-	"KSubChartSketch_CandleDataSketch.js",
-	"KSubChartSketch_TrendDataSketch.js",
-	"KSubChartSketch_VolumeDataSketch.js",
-	"KSubChartSketch_IndexMADataSketch.js",
-
 	"KSubChart_CandleChart.js",
 	"KSubChart_TrendChart.js",
 	"KSubChart_VolumeChart.js",

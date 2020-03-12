@@ -73,10 +73,6 @@
 		axisYAmountCeiling: null,/** 纵坐标的最大值 */
 		axisYAmountCeilingLabelFont: null,/** 纵坐标最大值的坐标标签字体 */
 		axisYAmountCeilingLabelColor: null,/** 纵坐标最大值的坐标标签颜色 */
-
-		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
-		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
-		keepingColor: "#DEDEDE",/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 	};
 	Object.freeze && Object.freeze(defaultConfig);
 

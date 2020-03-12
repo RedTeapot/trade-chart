@@ -61,35 +61,7 @@
 			dataSketch_origin_avgVolumeVariation = 0;
 			dataSketch_origin_maxVolumeVariation = 0;
 		}else{
-			var previousVolume = 0;
-			var variationSum = 0, volumeVariationSum = 0;
-			for(var i = 0; i < dataList.length; i++){
-				var d = dataList[i];
-				if(null == d || typeof d !== "object")
-					continue;
 
-				var volume = util.parseAsNumber(d.volume, 0);
-
-				/* 数据精度确定 */
-				dataSketch_extended_volumePrecision = Math.max(
-					dataSketch_extended_volumePrecision,
-					util.getPrecision(volume)
-				);
-
-				if(volume > dataSketch_origin_maxVolume)
-					dataSketch_origin_maxVolume = volume;
-				if(volume < dataSketch_origin_minVolume)
-					dataSketch_origin_minVolume = volume;
-
-				/* 确定更大的变动幅度 */
-				var volumeVariation = Math.abs(volume - previousVolume);
-				if(volumeVariation > dataSketch_origin_maxVolumeVariation)
-					dataSketch_origin_maxVolumeVariation = volumeVariation;
-
-				volumeVariationSum += volumeVariation;
-			}
-			var len = dataList.length;
-			dataSketch_origin_avgVolumeVariation = len > 0? volumeVariationSum / len: 0;
 
 			var tmp = dataSketch_origin_avgVolumeVariation / 2;
 
@@ -100,14 +72,13 @@
 
 			/* 确定Y轴最大值 */
 			dataSketch_extended_volumeCeiling = util.parseAsNumber(dataSketch_origin_maxVolume, 0) + tmp;
-			if(dataSketch_extended_volumeCeiling < dataSketch_origin_maxVolume)
-				dataSketch_extended_volumeCeiling = dataSketch_origin_maxVolume;
 			if(!isFinite(dataSketch_extended_volumeCeiling) || dataSketch_extended_volumeCeiling < 0)
 				dataSketch_extended_volumeCeiling = dataSketch_extended_volumeFloor;
 
 			/* 确保最大值与最小值不同 */
-			if(Math.abs(dataSketch_extended_volumeCeiling - dataSketch_extended_volumeFloor) < 1e-8)
-				dataSketch_extended_volumeCeiling = dataSketch_extended_volumeFloor < 1e-8? 1: dataSketch_extended_volumeFloor * 1.3;
+			var threshold = 1e-8;
+			if(Math.abs(dataSketch_extended_volumeCeiling - dataSketch_extended_volumeFloor) < threshold)
+				dataSketch_extended_volumeCeiling = dataSketch_extended_volumeFloor * 1.3;
 		}
 		instance.setMinAmount(dataSketch_origin_minVolume)
 			.setMaxAmount(dataSketch_origin_maxVolume)

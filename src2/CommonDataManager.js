@@ -56,7 +56,10 @@
 		/** 数据数组 */
 		var dataList = [];
 
-		/** 数据转换方法，用于将提供的数据数组转为本图表兼容的格式 */
+		/**
+		 * 数据转换方法，用于将提供的数据数组转为本图表兼容的格式
+		 * @type {DataParser}
+		 */
 		var dataParser;
 
 		/**
@@ -79,9 +82,8 @@
 			if(typeof dataParser !== "function")
 				return d;
 
-			var index = dataList.indexOf(d);
 			try{
-				return dataParser(d, index, dataList);
+				return dataParser(d);
 			}catch(e){
 				console.error("Fail to convert data of index: " + index + " using supplied data parser.", d);
 				console.error(e);
@@ -400,25 +402,30 @@
 
 		/**
 		 * 获取指定索引或原始数据对应的，被转换后的数据
-		 * @param {Number|Object} index 要获取的数据的索引（自左向右），或原始数据
-		 * @returns {Object}
+		 * @param {Number|Object|[]} dataIndexOrOriginalData 要获取的数据的索引（自左向右），或原始数据，或原始数据列表
+		 * @returns {Object|Object[]|null}
 		 */
-		this.getConvertedData = function(index){
-			if(typeof index === "number"){
-				var data = this.getData(index);
+		this.getConvertedData = function(dataIndexOrOriginalData){
+			if(typeof dataIndexOrOriginalData === "number"){
+				var data = this.getData(dataIndexOrOriginalData);
 				if(null == data)
 					return data;
 
 				return convertData(data);
-			}else if(null != index && typeof index === 'object')
-				return convertData(index);
-			else
-				console.warn("Illegal argument. Type of 'Number' or 'Object' is required.", index);
+			}else if(null != dataIndexOrOriginalData && typeof dataIndexOrOriginalData === 'object')
+				if(!Array.isArray(dataIndexOrOriginalData))
+					return convertData(dataIndexOrOriginalData);
+				else
+					return dataIndexOrOriginalData.map(convertData);
+			else{
+				console.warn("Illegal argument. Type of 'Number' or 'Object' is required.", dataIndexOrOriginalData);
+				return null;
+			}
 		};
 
 		/**
 		 * 设置数据转换方法，当要扫描的数据是其它格式的数据时，用于指导本插件解析数据的解析器
-		 * @param parser {Function} 数据转换方法
+		 * @param {DataParser} parser 数据转换方法
 		 * @returns {CommonDataManager}
 		 */
 		this.setDataParser = function(parser){
@@ -433,7 +440,7 @@
 
 		/**
 		 * 获取数据转换方法
-		 * @returns {Function} 数据转换方法
+		 * @returns {DataParser} 数据转换方法
 		 */
 		this.getDataParser = function(){
 			return dataParser;

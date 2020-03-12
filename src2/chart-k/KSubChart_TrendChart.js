@@ -14,16 +14,6 @@
 		KSubChartSketch_TrendDataSketch = TradeChart2.KSubChartSketch_TrendDataSketch,
 		KSubChartSketch_TrendChartSketch = TradeChart2.KSubChartSketch_TrendChartSketch;
 
-	var numBig = function(big){
-		return Number(big.toString());
-	};
-	var roundBig = function(big){
-		return Math.round(numBig(big));
-	};
-	var floorBig = function(big){
-		return Math.floor(numBig(big));
-	};
-
 	/**
 	 * 默认的，适用于K线图“走势图”子图的配置项
 	 */
@@ -37,7 +27,6 @@
 		ifShowAverageLine: true,/* 是否绘制均线 */
 		ifShowAverageLine_lineColor: "#e06600"/* 绘制均线时所采用的线条颜色 */
 	};
-	Object.freeze && Object.freeze(defaultConfig);
 
 	/**
 	 * 根据给定的配置，生成素描
@@ -69,6 +58,64 @@
 	KChart.implSubChart(SubChartTypes.K_TREND, {
 		defaultConfig: defaultConfig,
 
+		dataSketchMethod: function(originalDataList){
+			var kDataManager = this.getKChart().getDataManager();
+
+			var dataList = originalDataList;
+			var dataSketch_origin_max = -Infinity,/* 最大价格 */
+				dataSketch_origin_min = Infinity,/* 最小价格 */
+				dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */
+				dataSketch_origin_maxVariation = 0,/* 价格的最大变动幅度 */
+
+				dataSketch_extended_pricePrecision = 0;/* 坐标中价格的精度 */
+
+			var ifShowAverageLine = this.getConfigItemValue("ifShowAverageLine");
+
+			var previousClosePrice = null;
+			var variationSum = 0, sum = 0;
+			for(var i = 0; i < dataList.length; i++){
+				var d = dataList[i];
+				var closePrice = +kDataManager.getConvertedData(d).closePrice;
+
+				/* 计算并暂存均线数值，用于绘制均线 */
+				if(ifShowAverageLine){
+					sum += closePrice;
+					CommonDataManager.attachData(d, "averagePrice", sum / (i + 1));
+				}
+
+				/* 数据精度确定 */
+				dataSketch_extended_pricePrecision = Math.max(
+					dataSketch_extended_pricePrecision,
+					util.getPrecision(closePrice)
+				);
+
+				if(closePrice > dataSketch_origin_max)
+					dataSketch_origin_max = closePrice;
+				if(closePrice < dataSketch_origin_min)
+					dataSketch_origin_min = closePrice;
+
+				/* 确定更大的变动幅度 */
+				if(null !== previousClosePrice){
+					var variation = Math.abs(closePrice - previousClosePrice);
+					if(variation > dataSketch_origin_maxVariation)
+						dataSketch_origin_maxVariation = variation;
+					variationSum += variation;
+				}
+
+				previousClosePrice = closePrice;
+			}
+			var len = dataList.length;
+			dataSketch_origin_avgVariation = len > 1? (variationSum / (len - 1)): dataSketch_origin_avgVariation;
+
+			return {
+				origin_min: dataSketch_origin_min,
+				origin_max: dataSketch_origin_max,
+				origin_avgVariation: dataSketch_origin_avgVariation,
+				origin_maxVariation: dataSketch_origin_maxVariation,
+				extended_pricePrecision: dataSketch_extended_pricePrecision
+			};
+		},
+
 		renderAction: function(canvasObj, env){
 			var self = this;
 			var kChart = this.getKChart();
@@ -89,7 +136,7 @@
 				config_ifShowAverageLine_lineColor = this.getConfigItemValue("ifShowAverageLine_lineColor");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
-			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_TrendDataSketch.sketch)(kChart, this.getConfig());
+			var dataSketch = this.sketchData();
 
 			/* 转换配置项取值 */
 			this.convertConfigItemValues(canvasObj, dataSketch);
@@ -214,8 +261,25 @@
 					imgDataTop = config_paddingTop * vScale,
 					leftImgDataLeft = leftX * hScale,
 					rightImgDataLeft = rightX * hScale;
-				var leftOldImgData = ctx.getImageData(leftImgDataLeft, config_paddingTop * vScale, (xLeftEdge_axisX_content - leftX) * hScale, imgDataHeight),
-					rightOldImgData = ctx.getImageData(rightImgDataLeft, config_paddingTop * vScale, (config_width - rightX) * hScale, imgDataHeight);
+
+				var leftOldImgData = null,
+					rightOldImgData = null;
+				try{
+					leftOldImgData = ctx.getImageData(
+						leftImgDataLeft,
+						config_paddingTop * vScale,
+						(xLeftEdge_axisX_content - leftX) * hScale,
+						imgDataHeight
+					);
+					rightOldImgData = ctx.getImageData(
+						rightImgDataLeft,
+						config_paddingTop * vScale,
+						(config_width - rightX) * hScale,
+						imgDataHeight
+					);
+				}catch(e){
+					console.error(e);
+				}
 
 				// /* 调测裁剪位置及裁剪尺寸 */
 				// console.log(rightOldImgData.width, rightOldImgData.height);
@@ -267,8 +331,10 @@
 				}
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
-				ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
-				ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
+				if(null != leftOldImgData)
+					ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
+				if(null != rightOldImgData)
+					ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
 
 				ctx.restore();
 			})();

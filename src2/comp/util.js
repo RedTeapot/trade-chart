@@ -61,26 +61,30 @@
 
 	/**
 	 * 克隆对象
-	 * @param obj {Object} 要克隆的对象
-	 * @param keepType {Boolean} 是否保持对象类型。默认为：true
+	 * @param {Object} obj 要克隆的对象
+	 * @param {Boolean} [deep=false] 是否深度克隆。深度克隆时，对象将会被拆解重新定义
 	 */
-	var cloneObject = function(obj, keepType){
+	var cloneObject = function(obj, deep){
 		if(null === obj)
 			return null;
 		if(undefined === obj)
 			return undefined;
 
 		if(arguments.length < 2)
-			keepType = true;
+			deep = false;
 
 		var newObj = {};
 		for(var p in obj){
 			var v = obj[p];
 
-			if((typeof v === "object") && !keepType){
-				newObj[p] = cloneObject(v, true);
-			}else
+			if(null == v || typeof v !== "object")
 				newObj[p] = v;
+			else{
+				if(!deep)
+					newObj[p] = v;
+				else
+					newObj[p] = cloneObject(v, true);
+			}
 		}
 
 		return newObj;
@@ -314,7 +318,7 @@
 
 	/**
 	 * 从给定的数字中获取该数字所使用的精度
-	 * @param {Number} num 数字精度
+	 * @param {Number} num 数字
 	 * @returns {Number}
 	 */
 	var getPrecision = function(num){
@@ -324,6 +328,72 @@
 			return 0;
 
 		return tmp.length - 1 - lastDotIndex;
+	};
+
+	/**
+	 * 从给定的数字列表中获取最大的精度
+	 * @param {Number[]} nums 数字列表
+	 * @returns {Number}
+	 */
+	var getMaxPrecision = function(nums){
+		var max = 0;
+		for(var i = 0; i < nums.length; i++){
+			var p = getPrecision(nums[i]);
+			if(p > max)
+				max = p;
+		}
+
+		return max;
+	};
+
+	/**
+	 * 从给定的数字列表中检索最小的数字并返回
+	 * @param {Number[]} nums 数字列表
+	 * @returns {Number}
+	 */
+	var min = function(nums){
+		var min = Infinity;
+		for(var i = 0; i < nums.length; i++){
+			var p = parseAsNumber(nums[i], 0);
+			if(p < min)
+				min = p;
+		}
+
+		return min;
+	};
+
+	/**
+	 * 从给定的数字列表中检索最大的数字并返回
+	 * @param {Number[]} nums 数字列表
+	 * @returns {Number}
+	 */
+	var max = function(nums){
+		var max = -Infinity;
+		for(var i = 0; i < nums.length; i++){
+			var p = parseAsNumber(nums[i], 0);
+			if(p > max)
+				max = p;
+		}
+
+		return max;
+	};
+
+	/**
+	 * 从给定的数字列表中检索最小和最大的数字并返回
+	 * @param {Number[]} nums 数字列表
+	 * @returns {{min: Number, max: Number}}
+	 */
+	var minAndMax = function(nums){
+		var min = Infinity, max = -Infinity;
+		for(var i = 0; i < nums.length; i++){
+			var p = parseAsNumber(nums[i], 0);
+			if(p < min)
+				min = p;
+			if(p > max)
+				max = p;
+		}
+
+		return {min: min, max: max};
 	};
 
 	/**
@@ -490,15 +560,23 @@
 		formatDate: formatDate,
 		setAttributes: setAttributes,
 		pixelRatio: pixelRatio,
+
 		isValidNumber: isValidNumber,
+		parseAsNumber: parseAsNumber,
+		getPrecision: getPrecision,
+		getMaxPrecision: getMaxPrecision,
+		max: max,
+		min: min,
+		minAndMax: minAndMax,
+
 		isEmptyString: isEmptyString,
 		repeatString: repeatString,
 		randomString: randomString,
+
 		try2Call: try2Call,
 		try2Apply: try2Apply,
 		bindActions: bindActions,
-		parseAsNumber: parseAsNumber,
-		getPrecision: getPrecision,
+
 		initCanvas: initCanvas,
 		calcRenderingWidth: calcRenderingWidth,
 		calcRenderingHeight: calcRenderingHeight,

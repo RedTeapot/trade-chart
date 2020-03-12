@@ -143,6 +143,14 @@
 		};
 
 		/**
+		 * 根据K线图实例中的数据生成素描
+		 * @returns {CommonDataSketch}
+		 */
+		this.sketchData = function(){
+			return TradeChart2.KChart.sketchData(this, specifiedDataSketchMethod);
+		};
+
+		/**
 		 * 获取给定画布上的最后一次绘制结果
 		 * @param {HTMLCanvasElement} [canvasObj] 画布。如果没有提供该参数，则使用 lastRenderingCanvasObj
 		 * @returns {KSubChartRenderResult|null}

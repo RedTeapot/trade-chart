@@ -17,7 +17,10 @@
 		K_VOLUME: "k_volume",
 
 		/** 指标：MA */
-		K_INDEX_MA: "k_index_ma"
+		K_INDEX_MA: "k_index_ma",
+
+		/** 烤串图 */
+		K_KEBAB: "k_kebab"
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "SubChartTypes", SubChartTypes);

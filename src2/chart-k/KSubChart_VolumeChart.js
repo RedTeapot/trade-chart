@@ -13,19 +13,14 @@
 		KSubChartSketch_VolumeDataSketch = TradeChart2.KSubChartSketch_VolumeDataSketch,
 		KSubChartSketch_VolumeChartSketch = TradeChart2.KSubChartSketch_VolumeChartSketch;
 
-	var numBig = function(big){
-		return Number(big.toString());
-	};
-	var ceilBig = function(big){
-		return Math.ceil(numBig(big));
-	};
-
 	/**
 	 * 默认的，适用于K线图“量图”子图的配置项
 	 */
 	var defaultConfig = {
+		appreciatedColor: "#d58c2a",/** 收盘价大于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		depreciatedColor: "#21CB21",/** 收盘价小于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
+		keepingColor: "#DEDEDE",/** 收盘价等于开盘价时，绘制蜡烛和线时用的画笔或油漆桶颜色 */
 	};
-	Object.freeze && Object.freeze(defaultConfig);
 
 	/**
 	 * 根据给定的配置，生成素描
@@ -55,6 +50,54 @@
 	KChart.implSubChart(SubChartTypes.K_VOLUME, {
 		defaultConfig: defaultConfig,
 
+		dataSketchMethod: function(originalDataList){
+			var dataList = this.getKChart().getDataManager().getConvertedData(originalDataList);
+			var dataSketch_origin_max = -Infinity,/* 最大价格 */
+				dataSketch_origin_min = Infinity,/* 最小价格 */
+				dataSketch_origin_avgVariation = 0,/* 价格的平均变动幅度 */
+				dataSketch_origin_maxVariation = 0,/* 价格的最大变动幅度 */
+
+				dataSketch_extended_amountPrecision = 0;/* 坐标中价格的精度 */
+
+			var previousVolume = 0;
+			var variationSum = 0, volumeVariationSum = 0;
+			for(var i = 0; i < dataList.length; i++){
+				var d = dataList[i];
+				if(null == d || typeof d !== "object")
+					continue;
+
+				var volume = util.parseAsNumber(d.volume, 0);
+
+				/* 数据精度确定 */
+				dataSketch_extended_amountPrecision = Math.max(
+					dataSketch_extended_amountPrecision,
+					util.getPrecision(volume)
+				);
+
+				if(volume > dataSketch_origin_max)
+					dataSketch_origin_max = volume;
+				if(volume < dataSketch_origin_min)
+					dataSketch_origin_min = volume;
+
+				/* 确定更大的变动幅度 */
+				var volumeVariation = Math.abs(volume - previousVolume);
+				if(volumeVariation > dataSketch_origin_maxVariation)
+					dataSketch_origin_maxVariation = volumeVariation;
+
+				volumeVariationSum += volumeVariation;
+			}
+			var len = dataList.length;
+			dataSketch_origin_avgVariation = len > 0? volumeVariationSum / len: 0;
+
+			return {
+				origin_min: dataSketch_origin_min,
+				origin_max: dataSketch_origin_max,
+				origin_avgVariation: dataSketch_origin_avgVariation,
+				origin_maxVariation: dataSketch_origin_maxVariation,
+				extended_pricePrecision: dataSketch_extended_amountPrecision
+			};
+		},
+
 		renderAction: function(canvasObj, env){
 			var self = this;
 			var kChart = this.getKChart();
@@ -71,7 +114,7 @@
 				config_groupBarWidth = this.getConfigItemValue("groupBarWidth");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
-			var dataSketch = (this.getSpecifiedDataSketchMethod() || KSubChartSketch_VolumeDataSketch.sketch)(kChart, this.getConfig());
+			var dataSketch = this.sketchData();
 
 			/* 转换配置项取值 */
 			this.convertConfigItemValues(canvasObj, dataSketch);
@@ -186,15 +229,34 @@
 					imgDataTop = config_paddingTop * vScale,
 					leftImgDataLeft = leftX * hScale,
 					rightImgDataLeft = rightX * hScale;
-				var leftOldImgData = ctx.getImageData(leftImgDataLeft, config_paddingTop * vScale, (xLeftEdge_axisX_content - leftX) * hScale, imgDataHeight),
-					rightOldImgData = ctx.getImageData(rightImgDataLeft, config_paddingTop * vScale, (config_width - rightX) * hScale, imgDataHeight);
+
+				var leftOldImgData = null,
+					rightOldImgData = null;
+				try{
+					leftOldImgData = ctx.getImageData(
+						leftImgDataLeft,
+						config_paddingTop * vScale,
+						(xLeftEdge_axisX_content - leftX) * hScale,
+						imgDataHeight
+					);
+					rightOldImgData = ctx.getImageData(
+						rightImgDataLeft,
+						config_paddingTop * vScale,
+						(config_width - rightX) * hScale,
+						imgDataHeight
+					);
+				}catch(e){
+					console.error(e);
+				}
 
 				for(var i = 0; i < xPositionAndDataIndexList.length; i++)
 					renderVolume(i);
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
-				ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
-				ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
+				if(null != leftOldImgData)
+					ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
+				if(null != rightOldImgData)
+					ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
 
 				ctx.restore();
 			})();
