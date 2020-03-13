@@ -288,11 +288,14 @@
 		 * @param {HTMLCanvasElement} canvasObj 画布
 		 * @param {CommonDataSketch} dataSketch 数据概览
 		 *
-		 * @returns {KSubChart_TrendChart}
+		 * @returns {KSubChart}
 		 */
 		this.convertConfigItemValues = function(canvasObj, dataSketch){
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
+
+				config_paddingLeft = this.getConfigItemValue("paddingLeft"),
+				config_paddingRight = this.getConfigItemValue("paddingRight"),
 
 				config_axisYPrecision = this.getConfigItemValue("axisYPrecision"),
 				config_groupBarWidth = this.getConfigItemValue("groupBarWidth"),
@@ -304,11 +307,26 @@
 			var subChartConfig = this.getConfig();
 			subChartConfig.setConfigItemConvertedValue("height", config_height);
 
-			if("auto" === String(config_axisYPrecision).trim().toLowerCase())
-				subChartConfig.setConfigItemConvertedValue("axisYPrecision", dataSketch.getAmountPrecision());
-
 			var tmp;
-			if(null != (tmp = /^autoDividedByFixedGroupCount(?::(\d+))?$/.exec(String(config_groupGap).trim()))){
+			if(null != (tmp = /^auto(?::(\d+))?$/i.exec(String(config_axisYPrecision).trim()))){
+				var extend = 1;
+				if(null != tmp[1])
+					extend = util.parseAsNumber(tmp[1], 1);
+
+				/**
+				 * 如果Y轴刻度线之间量差的精度比数据本身的精度大，则需要加大精度，使得刻度值更为准确
+				 */
+				if(extend > 0){
+					var precision = dataSketch.getAmountPrecision();
+					var amountIntervalPrecision = util.getPrecision(this._getAxisYAmountInterval(dataSketch));
+
+					if(amountIntervalPrecision > precision)
+						precision += extend;
+					subChartConfig.setConfigItemConvertedValue("axisYPrecision", precision);
+				}
+			}
+
+			if(null != (tmp = /^autoDividedByFixedGroupCount(?::(\d+))?$/i.exec(String(config_groupGap).trim()))){
 				var dataManager = kChart.getDataManager();
 
 				var totalCount = 0;
@@ -316,7 +334,7 @@
 					totalCount = dataManager.getRenderableGroupCount();
 					TradeChart2.showLog && console.info("Auto adjust group gap('groupGap') to 'autoDividedByFixedGroupCount:" + totalCount + "' where " + totalCount + " is the current rendering data count.");
 				}else
-					totalCount = Number(tmp[1]);
+					totalCount = util.parseAsNumber(tmp[1], dataManager.getRenderableGroupCount());
 
 				if(totalCount < 2){
 					totalCount = 2;
@@ -386,6 +404,18 @@
 						/* 确保柱宽为奇数 */
 						var t = m % 2 === 0? m: n;
 						groupBarWidth = t + 1;
+
+						/**
+						 * 如果计算出来的柱宽超过了 paddingLeft 与 paddingRight 最小值 m 的 2倍 + 1，则图形会超出画布绘制，
+						 * 此时需要使用重新调整宽度，使其等于 2m + 1。
+						 * 如果最小值 m 为 0，则允许超出画布绘制。
+						 */
+						var minPadding = Math.min(config_paddingLeft, config_paddingRight);
+						if(minPadding > 0){
+							var maxGroupBarWidth = 2 * minPadding + 1;
+							if(groupBarWidth > maxGroupBarWidth)
+								groupBarWidth = maxGroupBarWidth;
+						}
 
 						/* 根据柱宽得线宽 */
 						while(groupLineWidth > groupBarWidth)
@@ -612,6 +642,16 @@
 		};
 
 		/**
+		 * 根据给定的数据概览计算Y轴刻度之间的量差
+		 * @param {CommonDataSketch} dataSketch 数据概览
+		 * @returns {Number}
+		 */
+		this._getAxisYAmountInterval = function(dataSketch){
+			var config_axisYMidTickQuota = this.getConfigItemValue("axisYMidTickQuota");
+			return (dataSketch.getAmountCeiling() - dataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
+		};
+
+		/**
 		 * 获取自下而上顺序的Y轴刻度列表
 		 * @param {KSubChartSketch} kSubChartSketch 子图概览
 		 * @param {CommonDataSketch} dataSketch 数据概览
@@ -629,8 +669,8 @@
 
 			var y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
 
-			/** 相邻两个纵坐标刻度之间的价格悬差 */
-			var axisYAmountInterval = (dataSketch.getAmountCeiling() - dataSketch.getAmountFloor()) / (config_axisYMidTickQuota + 1);
+			/** 相邻两个纵坐标刻度之间的量差 */
+			var axisYAmountInterval = this._getAxisYAmountInterval(dataSketch);
 			/** 相邻两个纵坐标刻度之间的高度悬差 */
 			var axisYHeightInterval = kSubChartSketch.calculateHeight(axisYAmountInterval);
 
@@ -648,16 +688,7 @@
 			for(var i = 0; i <= maxAxisYTickIndex; i++){/* 自下而上生成刻度 */
 				var tickAmount = dataSketch.getAmountFloor() + axisYAmountInterval * i,
 					tickY = y_axisX - Math.round(axisYHeightInterval * i);
-				var tickLabel = ifSuppliedAxisYFormatter? config_axisYFormatter(tickAmount, this.getConfig()): tickAmount.toFixed(config_axisYPrecision);
-
-				// /* 检查可能重叠显示的刻度 */
-				// if(axisYTickList.length > 0){
-				// 	var tick = axisYTickList[axisYTickList.length - 1];
-				// 	if(tick.label === tickLabel || Math.abs(tick.y - tickY) <= 1){
-				// 		console.warn("Found potential existing tick while adding tick: " + tickLabel + "(" + tickAmount + ") at " + tickY, JSON.stringify(tick));
-				// 		continue;
-				// 	}
-				// }
+				var tickLabel = ifSuppliedAxisYFormatter? config_axisYFormatter(tickAmount, this.getConfig()): util.cropPrecision(tickAmount, config_axisYPrecision);
 
 				axisYTickList.push({y: tickY, amount: tickAmount, label: tickLabel});
 			}
@@ -923,6 +954,19 @@
 			ctx.lineWidth = config_axisLineWidth;
 			ctx.strokeStyle = config_axisLineColor;
 
+			/**
+			 * 由于 _getRenderingYTickListFromBottom() 方法在计算刻度线之间的高度差时使用了 Math.floor() 方法
+			 * 向下取整，因而很容易因为误差累计，导致最高的刻度线并不能绘制在Y轴的最上方。
+			 * 处理办法：
+			 * 如果刻度线列表不为空，亦即存在有效刻度，则调整Y轴线的顶点位置，使其等于最高刻度线的纵坐标（如此间接增加了paddingTop）
+			 */
+			var axisYTickList = this._getRenderingYTickListFromBottom(kSubChartSketch, dataSketch);
+			/* 辅助子图实现纵坐标刻度调整，如向上偏移等 */
+			if(null != ops && typeof ops.axisYTickConverter === "function")
+				axisYTickList = axisYTickList.map(ops.axisYTickConverter);
+			if(axisYTickList.length > 0)
+				yTop_axisY = axisYTickList[axisYTickList.length - 1].y;
+
 			/* 绘制Y轴坐标线 */
 			ctx.beginPath();
 			ctx.moveTo(x_axisY, yTop_axisY);
@@ -930,12 +974,6 @@
 			ctx.stroke();
 
 			/* 绘制Y轴刻度线 */
-			var axisYTickList = this._getRenderingYTickListFromBottom(kSubChartSketch, dataSketch);
-
-			/* 辅助子图实现纵坐标刻度调整，如向上偏移等 */
-			if(null != ops && typeof ops.axisYTickConverter === "function")
-				axisYTickList.map(ops.axisYTickConverter);
-
 			for(var i = 0; i < axisYTickList.length; i++){
 				var tickY = util.getLinePosition(axisYTickList[i].y);
 

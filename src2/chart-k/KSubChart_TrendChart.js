@@ -120,6 +120,11 @@
 			var self = this;
 			var kChart = this.getKChart();
 
+			var dataSketch = this.sketchData();
+
+			/* 转换配置项取值 */
+			this.convertConfigItemValues(canvasObj, dataSketch);
+
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 
@@ -136,10 +141,6 @@
 				config_ifShowAverageLine_lineColor = this.getConfigItemValue("ifShowAverageLine_lineColor");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
-			var dataSketch = this.sketchData();
-
-			/* 转换配置项取值 */
-			this.convertConfigItemValues(canvasObj, dataSketch);
 
 			var kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = getChartSketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
@@ -156,17 +157,19 @@
 				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
 				xLeftEdge_axisX_content = xLeft_axisX_content,
 				xRightEdge_axisX_content = xRight_axisX_content,
-				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight());
+				y_axisX = util.getLinePosition(config_paddingTop + kSubChartSketch.getAxisYHeight()),
+
+				yBottom_axisY = config_paddingTop + kSubChartSketch.getAxisYHeight();
 
 			/**
 			 * 获取指定价钱对应的物理高度
 			 * @param {Number} price1 价钱1
-			 * @param {Number} [price2=dataSketch.getAmountCeiling()] 价钱2
+			 * @param {Number} [price2] 价钱2
 			 * @returns {Number} 物理高度
 			 */
 			var calcHeight = function(price1, price2){
 				if(arguments.length < 2)
-					price2 = dataSketch.getAmountCeiling();
+					price2 = dataSketch.getAmountFloor();
 
 				return kSubChartSketch.calculateHeight(Math.abs(price2 - price1));
 			};
@@ -220,12 +223,12 @@
 					var x = util.getLinePosition(dp.x);
 
 					var closePrice = +dataManager.getConvertedData(data).closePrice;
-					var y = util.getLinePosition(config_paddingTop + Math.round(calcHeight(closePrice)));
+					var y = util.getLinePosition(yBottom_axisY - Math.round(calcHeight(closePrice)));
 					dots.push([x, y]);
 
 					if(config_ifShowAverageLine){
 						var averagePrice = CommonDataManager.getAttachedData(data, "averagePrice");
-						var averageY = config_paddingTop + Math.round(calcHeight(averagePrice));
+						var averageY = yBottom_axisY - Math.round(calcHeight(averagePrice));
 						avgDots.push([x, util.getLinePosition(averageY)]);
 					}
 				}
@@ -253,33 +256,31 @@
 				// ctx.stroke();
 				// ctx.restore();
 
-				/* getImageData() 以及 putImageData() 方法不受变化影响，因而需要放大处理 */
-				var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
-				var hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / ctx.canvas.offsetWidth),
-					vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / ctx.canvas.offsetHeight);
-				var imgDataHeight = kSubChartSketch.getContentHeight() * vScale,
-					imgDataTop = config_paddingTop * vScale,
-					leftImgDataLeft = leftX * hScale,
-					rightImgDataLeft = rightX * hScale;
+				var imgDataHeight = kSubChartSketch.getContentHeight() + 5,
+					imgDataTop = config_paddingTop,
+					leftImgDataLeft = leftX,
+					leftImgDataWidth = Math.floor(xLeftEdge_axisX_content - leftX),
+					rightImgDataLeft = rightX,
+					rightImgDataWidth = Math.floor(config_width - rightX);
 
 				var leftOldImgData = null,
 					rightOldImgData = null;
-				try{
-					leftOldImgData = ctx.getImageData(
+				if(leftImgDataWidth > 0)
+					leftOldImgData = util.getCanvasImageData(
+						ctx,
 						leftImgDataLeft,
-						config_paddingTop * vScale,
-						(xLeftEdge_axisX_content - leftX) * hScale,
+						imgDataTop,
+						leftImgDataWidth,
 						imgDataHeight
 					);
-					rightOldImgData = ctx.getImageData(
+				if(rightImgDataWidth > 0)
+					rightOldImgData = util.getCanvasImageData(
+						ctx,
 						rightImgDataLeft,
-						config_paddingTop * vScale,
-						(config_width - rightX) * hScale,
+						imgDataTop,
+						rightImgDataWidth,
 						imgDataHeight
 					);
-				}catch(e){
-					console.error(e);
-				}
 
 				// /* 调测裁剪位置及裁剪尺寸 */
 				// console.log(rightOldImgData.width, rightOldImgData.height);

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<meta name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, width = device-width">
+	
+	<style type = "text/css">
+	html, body {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+	}
+	body{
+		padding: 20px;
+		box-sizing: border-box;
+	}
+
+	.test, .test2{
+		position: relative;
+		outline: solid 1px black;
+	}
+	.test2{
+		margin-left: 10px;
+	}
+	img{
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<input type = "file"/>
+	<canvas class = "test"></canvas>
+	<canvas class = "test2"></canvas>
+
+	<div style = "clear: both;"></div>
+
+	<script type = "text/javascript">
+		var inputObj = document.querySelector("input"),
+			canvas1 = document.querySelector(".test"),
+			canvas2 = document.querySelector(".test2");
+		var ctx1 = canvas1.getContext("2d"),
+			ctx2 = canvas2.getContext("2d");
+
+		var size = 200,
+
+			ctxScaleX = 3,
+			ctxScaleY = 2,
+
+			cssScaleX = 3,
+			cssScaleY = 2;
+
+		canvas1.width = cssScaleX * size;
+		canvas1.height = cssScaleY * size;
+		/* 画布尺寸的变更会重置scale，因而需要在设定尺寸之后再设置scale */
+		ctx1.scale(ctxScaleX, ctxScaleY);
+		// ctx2.scale(ctxScaleX, ctxScaleY);
+
+		if(cssScaleX > 1){
+			canvas1.style.width = size + "px";
+		}
+		if(cssScaleY > 1){
+			canvas1.style.height = size + "px";
+		}
+
+		canvas2.width = size;
+		canvas2.height = size;
+
+		inputObj.addEventListener("change", function(){
+			var url = URL.createObjectURL(this.files[0]);
+			var img = new Image();
+			img.onload = function(){
+				URL.revokeObjectURL(url);
+
+				ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+				ctx1.drawImage(img, 0, 0);
+			};
+			img.src = url;
+		});
+
+		var getCanvasImageData = function(ctx, sx, sy, sw, sh){
+			var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
+			var hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / canvasOffsetWidth),
+				vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / canvasOffsetHeight);
+
+			return ctx.getImageData(sx * hScale, sy * vScale, sw * hScale, sh * vScale);
+		};
+
+		var startX, startY,
+			capturedCssScaleX,
+			capturedCssScaleY;
+		canvas1.addEventListener("mousedown", function(e){
+			startX = e.layerX;
+			startY = e.layerY;
+
+			capturedCssScaleX = canvas1.width / canvas1.offsetWidth;
+			capturedCssScaleY = canvas1.height / canvas1.offsetHeight;
+
+			// console.log(startX, startY);
+
+			ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+		});
+		canvas1.addEventListener("mouseup", function(e){
+			var endX = e.layerX,
+				endY = e.layerY;
+
+			var x = Math.min(startX, endX),
+				y = Math.min(startY, endY),
+				w = Math.abs(startX - endX),
+				h = Math.abs(startY - endY);
+
+			if(w < 1 || h < 1)
+				return;
+
+			var imageData = getCanvasImageData(ctx1, x, y, w, h);
+			ctx2.putImageData(imageData, x, y);
+		});
+	</script>
+</body>
+</html>

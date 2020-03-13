@@ -44,7 +44,11 @@
 		axisXTickOffsetFromRight: 0,/** 最后一个横坐标刻度距离横坐标结束位置的位移 */
 		axisXLabelOffset: 5,/** 横坐标标签距离坐标轴刻度线的距离 */
 		axisXLabelSize: 55,/** 横坐标标签文字的长度（用于决定以何种方式绘制最后一个刻度：只绘制边界刻度，还是边界刻度和最后一个刻度都绘制） */
-		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){/** 横坐标标签文字的输出方法 */
+		/**
+		 * 横坐标标签文字的输出方法
+		 * 索引方向：从右向左
+		 */
+		axisXLabelGenerator: function(convertedData, index, previousConvertedData, nextConvertedData){
 			if(null == convertedData)
 				console.error("!", index);
 			return convertedData.time;

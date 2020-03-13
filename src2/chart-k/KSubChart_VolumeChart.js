@@ -102,6 +102,11 @@
 			var self = this;
 			var kChart = this.getKChart();
 
+			var dataSketch = this.sketchData();
+
+			/* 转换配置项取值 */
+			this.convertConfigItemValues(canvasObj, dataSketch);
+
 			var config_width = util.calcRenderingWidth(canvasObj, this.getConfigItemValue("width")),
 				config_height = util.calcRenderingHeight(canvasObj, this.getConfigItemValue("height")),
 
@@ -114,10 +119,6 @@
 				config_groupBarWidth = this.getConfigItemValue("groupBarWidth");
 
 			var ctx = util.initCanvas(canvasObj, config_width, config_height);
-			var dataSketch = this.sketchData();
-
-			/* 转换配置项取值 */
-			this.convertConfigItemValues(canvasObj, dataSketch);
 
 			var kChartSketch = KChartSketch.sketchByConfig(kChart.getConfig(), config_width),
 				kSubChartSketch = getChartSketchByConfig(this.getConfig(), config_height).updateByDataSketch(dataSketch);
@@ -135,9 +136,11 @@
 				xRight_axisX = kChart._calcAxisXRightPosition(kChartSketch.getCanvasWidth()),
 				xLeft_axisX_content = kChart._calcAxisXContentLeftPosition(),
 				xRight_axisX_content = kChart._calcAxisXContentRightPosition(kChartSketch.getCanvasWidth()),
-				xLeftEdge_axisX_content = xLeft_axisX_content - halfGroupBarWidth,
+				xLeftEdge_axisX_content = Math.max(xLeft_axisX_content - halfGroupBarWidth, 0),
 				xRightEdge_axisX_content = xRight_axisX_content + halfGroupBarWidth,
-				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getAxisYHeight());
+				y_axisX = Math.floor(config_paddingTop + kSubChartSketch.getAxisYHeight()),
+
+				yBottom_axisY = config_paddingTop + kSubChartSketch.getAxisYHeight();
 
 			/**
 			 * 获取指定成交量对应的物理高度
@@ -221,28 +224,24 @@
 				/* 裁剪掉蜡烛中越界的部分 - 步骤一：备份可能被覆盖区域的原始像素值 */
 				var leftX = 0,
 					rightX = xRightEdge_axisX_content + 1;
-				/* getImageData() 以及 putImageData() 方法不受变化影响，因而需要放大处理 */
-				var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
-				var hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / ctx.canvas.offsetWidth),
-					vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / ctx.canvas.offsetHeight);
-				var imgDataHeight = kSubChartSketch.getContentHeight() * vScale,
-					imgDataTop = config_paddingTop * vScale,
-					leftImgDataLeft = leftX * hScale,
-					rightImgDataLeft = rightX * hScale;
+				var imgDataHeight = kSubChartSketch.getContentHeight() + 5,
+					imgDataTop = config_paddingTop,
+					leftImgDataLeft = leftX,
+					rightImgDataLeft = rightX;
 
 				var leftOldImgData = null,
 					rightOldImgData = null;
 				try{
 					leftOldImgData = ctx.getImageData(
 						leftImgDataLeft,
-						config_paddingTop * vScale,
-						(xLeftEdge_axisX_content - leftX) * hScale,
+						imgDataTop,
+						xLeftEdge_axisX_content - leftX,
 						imgDataHeight
 					);
 					rightOldImgData = ctx.getImageData(
 						rightImgDataLeft,
-						config_paddingTop * vScale,
-						(config_width - rightX) * hScale,
+						imgDataTop,
+						config_width - rightX,
 						imgDataHeight
 					);
 				}catch(e){

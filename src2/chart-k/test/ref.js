@@ -27,6 +27,7 @@
 	"KSubChart_TrendChart.js",
 	"KSubChart_VolumeChart.js",
 	"KSubChart_IndexMAChart.js",
+	"KSubChart_KebabChart.js"
 ].forEach(function(f){
 	document.write('<script type = "text/javascript" src = "../../' + f + '"></script>');
 });

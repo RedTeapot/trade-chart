@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset = "UTF-8"/>
+	<meta name = "viewport" content = "initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, width = device-width">
+	
+	<style type = "text/css">
+	html, body {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+	}
+	body{
+		padding: 20px;
+		box-sizing: border-box;
+	}
+	.chart-container{
+		position: relative;
+	}
+	.chart-container.kebab{
+		height: 300px;
+	}
+	.trade-chart{
+		height: 100%;
+	}
+	.chart-container canvas{
+		position: absolute;
+		display: block;
+		margin: 0 auto;
+		width: 100%;
+		height: 100%;
+	}
+	canvas.operation{
+		z-index: 1;
+	}
+	.data-detail{
+		font-family: courier, sans-serif;
+		margin: 20px 0;
+		font-size: 12px;
+		word-wrap: break-word;
+		line-height: 1em;
+		height: 1em;
+	}
+
+	.test, .test2{
+		position: relative;
+		outline: solid 1px black;
+	}
+	.test2{
+		margin-left: 10px;
+	}
+	img{
+		display: block;
+	}
+	</style>
+</head>
+<body>
+	<div>
+		<div class = "chart-container kebab"></div>
+	</div>
+	<div class = "data-detail"></div>
+
+	<script type = "text/javascript" src = "../ref.js"></script>
+	<script type = "text/javascript" src = "../util.js"></script>
+	<script type = "text/javascript" src = "testCanvas.js"></script>
+</body>
+</html>

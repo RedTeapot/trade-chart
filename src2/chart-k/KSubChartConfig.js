@@ -62,7 +62,15 @@
 			return 0;
 		},
 		axisYMidTickQuota: 3,/** 纵坐标刻度个数（不包括最小值和最大值） */
-		axisYPrecision: "auto",/** 纵坐标的数字精度（仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值）。auto：根据给定的数据自动检测 */
+		/**
+		 * 纵坐标的数字精度。仅在没有指定配置项：axisYFormatter时有效。如果指定了axisYFormatter，将直接使用指定的格式化方法返回的值。
+		 * 1. {Number} 用于指定固定取值
+		 * 2. {String} 字面量：auto[:n] 根据给定的数据自动检测。
+		 *    其中，n为“Y轴刻度之间的量差精度比检测到数据精度大”时动态扩展的，用于提升刻度值准确性的精度幅度。
+		 *    如果n被忽略，则自动将n视为1。
+		 *    例如：如果检测到数据本身的精度为1，制定配置值为: 'auto:2'，则精度可能为 3
+		 */
+		axisYPrecision: "auto:1",
 		axisYFormatter: function(price, config){/** 纵坐标数字格式化方法 */
 			/** price：价格；config：配置 */
 			return util.formatMoney(price, config.getConfigItemValue("axisYPrecision") || defaultConfig.axisYPrecision || 0);

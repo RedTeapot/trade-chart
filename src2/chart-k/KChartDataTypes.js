@@ -104,3 +104,10 @@
  * @property {DataSketchMethod} dataSketchMethod 默认的子图数据概览的生成方法。子图实例可以另外单独设置
  * @property {KSubChartRenderAction} renderAction 子图的渲染方法
  */
+
+/**
+ * @callback KSubChart_Kebab_GroupItemBackgroundGenerator K线子图：kebab图中，每个数据条目背景色的生成器
+ * @param {Object} convertedData 转换后的数据
+ * @param {Number} index 数据在渲染列表中的索引。索引方向：从右向左
+ * @returns {String|null}
+ */

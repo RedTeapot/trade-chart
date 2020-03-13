@@ -52,10 +52,10 @@
 
 			for(var i = 0; i < arr.length; i++){
 				if(amount >= arr[i][0])
-					return (amount / arr[i][0]).toFixed(precision).replace(/(\.[^0])0+/, "$1") + arr[i][1];
+					return util.cropPrecision(amount / arr[i][0], precision).replace(/(\.[^0])0+/, "$1") + arr[i][1];
 			}
 
-			return amount.toFixed(precision).replace(/(\.[^0])0+$/, "$1");
+			return util.cropPrecision(amount, precision).replace(/(\.[^0])0+$/, "$1");
 		};
 	})();
 
@@ -223,7 +223,7 @@
 	var bindActions = function(actions){
 		return function(){
 			for(var i = 0; i < actions.length; i++)
-				util.try2Apply(actions[i], null, arguments);
+				try2Apply(actions[i], null, arguments);
 		};
 	};
 
@@ -317,11 +317,28 @@
 	};
 
 	/**
+	 * 解析给定的参数将其以有穷数字形式返回
+	 * @param {Big|*} tar 要解析的参数
+	 * @param {Number} [dftValue] 如果要解析的参数不是一个合法的数字或不是有穷数字时，要返回的默认数字
+	 * @returns {*}
+	 */
+	var parseAsFiniteNumber = function(tar, dftValue){
+		tar = arguments.length > 1? parseAsNumber(tar, dftValue): parseAsNumber(tar);
+		if(!isFinite(tar) && arguments.length > 1)
+			return dftValue;
+
+		return tar;
+	};
+
+	/**
 	 * 从给定的数字中获取该数字所使用的精度
 	 * @param {Number} num 数字
 	 * @returns {Number}
 	 */
 	var getPrecision = function(num){
+		if(null === num || undefined === num)
+			return 0;
+
 		var tmp = String(num);
 		var lastDotIndex = tmp.lastIndexOf(".");
 		if(-1 === lastDotIndex)
@@ -333,9 +350,12 @@
 	/**
 	 * 从给定的数字列表中获取最大的精度
 	 * @param {Number[]} nums 数字列表
-	 * @returns {Number}
+	 * @returns {Number|null}
 	 */
 	var getMaxPrecision = function(nums){
+		if(!Array.isArray(nums))
+			return null;
+
 		var max = 0;
 		for(var i = 0; i < nums.length; i++){
 			var p = getPrecision(nums[i]);
@@ -347,11 +367,44 @@
 	};
 
 	/**
+	 * 根据给定的精度截取给定数字的小数位
+	 * @param {Number} num 要截取的数字
+	 * @param {Number} [precision=0] 要保留的精度
+	 * @returns {String}
+	 */
+	var cropPrecision = function(num, precision){
+		if(arguments.length < 2)
+			precision = 0;
+
+		var str = String(num);
+		var dotIndex = str.indexOf(".");
+		if(-1 === dotIndex){
+			if(precision === 0)
+				return str;
+			else
+				return str + "." + repeatString("0", precision);
+		}else{
+			var d = str.substring(0, dotIndex);
+			if(precision === 0)
+				return d;
+
+			str += repeatString("0", precision);
+			return d + str.substring(dotIndex, dotIndex + 1 + precision);
+		}
+
+
+		return "";
+	};
+
+	/**
 	 * 从给定的数字列表中检索最小的数字并返回
 	 * @param {Number[]} nums 数字列表
-	 * @returns {Number}
+	 * @returns {Number|null}
 	 */
 	var min = function(nums){
+		if(!Array.isArray(nums) || nums.length === 0)
+			return null;
+
 		var min = Infinity;
 		for(var i = 0; i < nums.length; i++){
 			var p = parseAsNumber(nums[i], 0);
@@ -365,9 +418,12 @@
 	/**
 	 * 从给定的数字列表中检索最大的数字并返回
 	 * @param {Number[]} nums 数字列表
-	 * @returns {Number}
+	 * @returns {Number|null}
 	 */
 	var max = function(nums){
+		if(!Array.isArray(nums) || nums.length === 0)
+			return null;
+
 		var max = -Infinity;
 		for(var i = 0; i < nums.length; i++){
 			var p = parseAsNumber(nums[i], 0);
@@ -381,9 +437,12 @@
 	/**
 	 * 从给定的数字列表中检索最小和最大的数字并返回
 	 * @param {Number[]} nums 数字列表
-	 * @returns {{min: Number, max: Number}}
+	 * @returns {{min: Number, max: Number}|null}
 	 */
 	var minAndMax = function(nums){
+		if(!Array.isArray(nums) || nums.length === 0)
+			return null;
+
 		var min = Infinity, max = -Infinity;
 		for(var i = 0; i < nums.length; i++){
 			var p = parseAsNumber(nums[i], 0);
@@ -398,47 +457,63 @@
 
 	/**
 	 * 使用给定的尺寸初始化画布
+	 * @param {HTMLCanvasElement} canvasObj 要初始化的画布
+	 * @param {Number} width 画布要呈现的宽度
+	 * @param {Number} height 画布要呈现的高度
+	 *
+	 * @returns {CanvasRenderingContext2D}
 	 */
-	var initCanvas = (function(){
-		var initFlag = randomString("CANVAS_TRADE_CHART_INIT_FLAG");
+	var canvasInitFlag = randomString("CANVAS_TRADE_CHART_INIT_FLAG");
+	var initCanvas = function(canvasObj, width, height){
+		var ctx = canvasObj.getContext("2d");
 
-		/**
-		 * 使用给定的尺寸初始化画布
-		 * @param {HTMLCanvasElement} canvasObj 要初始化的画布
-		 * @param {Number} width 画布要呈现的宽度
-		 * @param {Number} height 画布要呈现的高度
-		 *
-		 * @returns {CanvasRenderingContext2D}
-		 */
-		return function(canvasObj, width, height){
-			var ctx = canvasObj.getContext("2d");
-
-			if(canvasObj.initFlag){
-				return ctx;
-			}
-
-			/* 高分辨率适应 */
-			var pr = pixelRatio();
-			// pr = 1;
-			if(pr > 1){
-				canvasObj.style.width = width + "px";
-				canvasObj.style.height = height + "px";
-
-				setAttributes(canvasObj, {width: pr * width, height: pr * height});
-			}else{
-				canvasObj.style.width = "";
-				canvasObj.style.height = "";
-
-				setAttributes(canvasObj, {width: width, height: height});
-			}
-
-			ctx.scale(pr, pr);
-			canvasObj.scale = pr;
-			canvasObj.initFlag = true;
-
+		if(canvasObj[canvasInitFlag]){
 			return ctx;
-		};
-	})();
+		}
+
+		/* 高分辨率适应 */
+		var pr = pixelRatio();
+		// pr = 1;
+		if(pr > 1){
+			canvasObj.style.width = width + "px";
+			canvasObj.style.height = height + "px";
+
+			setAttributes(canvasObj, {width: pr * width, height: pr * height});
+		}else{
+			canvasObj.style.width = "";
+			canvasObj.style.height = "";
+
+			setAttributes(canvasObj, {width: width, height: height});
+		}
+
+		ctx.scale(pr, pr);
+		canvasObj.scale = pr;
+		canvasObj[canvasInitFlag] = true;
+
+		return ctx;
+	};
+
+	/**
+	 * 获取画布特定区域的图像数据
+	 * @param {CanvasRenderingContext2D} ctx 绘画上下文
+	 * @param {Number} sx
+	 * @param {Number} sy
+	 * @param {Number} sw
+	 * @param {Number} sh
+	 * @returns {ImageData}
+	 */
+	var getCanvasImageData = function(ctx, sx, sy, sw, sh){
+		var hScale, vScale;
+		if(ctx.canvas[canvasInitFlag] && ctx.canvas.scale){
+			hScale = vScale = ctx.canvas.scale;
+		}else{
+			var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
+			hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / canvasOffsetWidth);
+			vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / canvasOffsetHeight);
+		}
+
+		return ctx.getImageData(sx * hScale, sy * vScale, sw * hScale, sh * vScale);
+	};
 
 	/**
 	 * 计算给定画布的渲染宽度
@@ -563,11 +638,13 @@
 
 		isValidNumber: isValidNumber,
 		parseAsNumber: parseAsNumber,
+		parseAsFiniteNumber: parseAsFiniteNumber,
 		getPrecision: getPrecision,
 		getMaxPrecision: getMaxPrecision,
 		max: max,
 		min: min,
 		minAndMax: minAndMax,
+		cropPrecision: cropPrecision,
 
 		isEmptyString: isEmptyString,
 		repeatString: repeatString,
@@ -578,6 +655,7 @@
 		bindActions: bindActions,
 
 		initCanvas: initCanvas,
+		getCanvasImageData: getCanvasImageData,
 		calcRenderingWidth: calcRenderingWidth,
 		calcRenderingHeight: calcRenderingHeight,
 		getLinePosition: getLinePosition,

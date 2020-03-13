@@ -29,7 +29,7 @@
 		/**
 		 * 相邻两组数据之间的间隔
 		 * 1. {Number|GroupGapCalculator} 用于指定两组数据之间的固定间隔，如：1，function(){return 3;}等，单位：像素
-		 * 2. {String} 字面量：autoDividedByFixedGroupCount:n 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间，其中n等于数据的总群组个数。
+		 * 2. {String} 字面量：autoDividedByFixedGroupCount[:n] 用于将可用绘制空间自动计算后平均分摊至要呈现的，固定总组数的数据之间，其中n等于数据的总群组个数。
 		 *    此时，将自动调整groupLineWidth和groupBarWidth，使得图形可以能够在一屏之内显示完全。如果n被忽略，则自动将n视为当前数据的总个数
 		 */
 		groupGap: 3

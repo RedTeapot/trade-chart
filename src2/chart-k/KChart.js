@@ -292,12 +292,13 @@
 				dataSketch_origin_maxVariation = 0;
 			}else if(typeof dataSketchMethod === "function"){
 				var _sketch = dataSketchMethod.call(kSubChart, dataList);/* 使用原始数据获取扫描结果 */
+
 				if(null != _sketch){
-					dataSketch_origin_min = _sketch.origin_min || 0;
-					dataSketch_origin_max = _sketch.origin_max || 0;
-					dataSketch_origin_avgVariation = _sketch.origin_avgVariation || 0;
-					dataSketch_origin_maxVariation = _sketch.origin_maxVariation || 0;
-					dataSketch_extended_pricePrecision = _sketch.extended_pricePrecision || 0;
+					dataSketch_origin_min = util.parseAsFiniteNumber(_sketch.origin_min || 0, 0);
+					dataSketch_origin_max = util.parseAsFiniteNumber(_sketch.origin_max || 0, 0);
+					dataSketch_origin_avgVariation = util.parseAsFiniteNumber(_sketch.origin_avgVariation || 0, 0);
+					dataSketch_origin_maxVariation = util.parseAsFiniteNumber(_sketch.origin_maxVariation || 0, 0);
+					dataSketch_extended_pricePrecision = util.parseAsFiniteNumber(_sketch.extended_pricePrecision || 0, 0);
 
 					/* 确定Y轴最小值 */
 					var tmp = dataSketch_origin_avgVariation / 2;

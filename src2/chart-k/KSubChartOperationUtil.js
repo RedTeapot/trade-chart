@@ -285,8 +285,7 @@
 			lastMetadata = null;
 
 		var kChart = kSubChartRenderResult.getKChart(),
-			canvasObj = kSubChartRenderResult.getCanvasDomElement(),
-			detailCtx = operationCanvasObj.getContext("2d");
+			canvasObj = kSubChartRenderResult.getCanvasDomElement();
 
 		var dataHighlightAction, revertDataHighlightAction;
 		if(typeof ops.dataHighlightAction === "function")
@@ -297,9 +296,6 @@
 				dataHighlightAction = newDataHighlightAction_4TrendChart(operationCanvasObj, kSubChartRenderResult);
 				break;
 
-			case SubChartTypes.K_CANDLE:
-			case SubChartTypes.K_VOLUME:
-			case SubChartTypes.K_INDEX_MA:
 			default:
 				dataHighlightAction = newDataHighlightAction_4CandleChart(operationCanvasObj, kSubChartRenderResult);
 				break;
@@ -313,9 +309,6 @@
 				revertDataHighlightAction = newRevertDataHighlightAction_4TrendChart(operationCanvasObj, kSubChartRenderResult);
 				break;
 
-			case SubChartTypes.K_CANDLE:
-			case SubChartTypes.K_VOLUME:
-			case SubChartTypes.K_INDEX_MA:
 			default:
 				revertDataHighlightAction = newRevertDataHighlightAction_4CandleChart(operationCanvasObj, kSubChartRenderResult);
 				break;
@@ -366,8 +359,10 @@
 		operationCanvasObj.addEventListener("mousemove", function(e){
 			if(!isModeViewDetail)
 				viewHistory(e.layerX);
-			else
+			else{
 				viewDetail(e);
+			}
+
 		});
 		operationCanvasObj.addEventListener("mouseout", function(e){
 			util.try2Call(revertDataHighlightAction);

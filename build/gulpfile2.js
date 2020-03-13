@@ -85,15 +85,11 @@ var concatK = function(){
 			"KChartConfig.js",
 			"KChart.js",
 
-			"KSubChartSketch_CandleDataSketch.js",
-			"KSubChartSketch_TrendDataSketch.js",
-			"KSubChartSketch_VolumeDataSketch.js",
-			"KSubChartSketch_IndexMADataSketch.js",
-
 			"KSubChart_CandleChart.js",
 			"KSubChart_TrendChart.js",
 			"KSubChart_VolumeChart.js",
 			"KSubChart_IndexMAChart.js",
+			"KSubChart_KebabChart.js"
 		].map(function(f){return "../src2/chart-k/" + f;})),
 		concat("trade-chart2_k.js"),
 		prependCopyright()
