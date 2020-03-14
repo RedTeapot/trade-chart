@@ -227,26 +227,28 @@
 				var imgDataHeight = kSubChartSketch.getContentHeight() + 5,
 					imgDataTop = config_paddingTop,
 					leftImgDataLeft = leftX,
-					rightImgDataLeft = rightX;
+					leftImgDataWidth = Math.floor(xLeftEdge_axisX_content - leftX),
+					rightImgDataLeft = rightX,
+					rightImgDataWidth = Math.floor(config_width - rightX);
 
 				var leftOldImgData = null,
 					rightOldImgData = null;
-				try{
-					leftOldImgData = ctx.getImageData(
+				if(leftImgDataWidth > 0 && imgDataHeight > 0)
+					leftOldImgData = util.getCanvasImageData(
+						ctx,
 						leftImgDataLeft,
 						imgDataTop,
-						xLeftEdge_axisX_content - leftX,
+						leftImgDataWidth,
 						imgDataHeight
 					);
-					rightOldImgData = ctx.getImageData(
+				if(rightImgDataWidth > 0 && imgDataHeight > 0)
+					rightOldImgData = util.getCanvasImageData(
+						ctx,
 						rightImgDataLeft,
 						imgDataTop,
-						config_width - rightX,
+						rightImgDataWidth,
 						imgDataHeight
 					);
-				}catch(e){
-					console.error(e);
-				}
 
 				for(var i = 0; i < xPositionAndDataIndexList.length; i++)
 					renderVolume(i);

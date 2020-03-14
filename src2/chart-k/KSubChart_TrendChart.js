@@ -265,7 +265,7 @@
 
 				var leftOldImgData = null,
 					rightOldImgData = null;
-				if(leftImgDataWidth > 0)
+				if(leftImgDataWidth > 0 && imgDataHeight > 0)
 					leftOldImgData = util.getCanvasImageData(
 						ctx,
 						leftImgDataLeft,
@@ -273,7 +273,7 @@
 						leftImgDataWidth,
 						imgDataHeight
 					);
-				if(rightImgDataWidth > 0)
+				if(rightImgDataWidth > 0 && imgDataHeight > 0)
 					rightOldImgData = util.getCanvasImageData(
 						ctx,
 						rightImgDataLeft,
