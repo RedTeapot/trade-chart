@@ -369,10 +369,11 @@
 		});
 
 		operationCanvasObj.addEventListener("touchstart", function(e){
+			lastX = e.changedTouches[0].screenX;
 			viewDetail(e);
 		}, {passive: true});
 		operationCanvasObj.addEventListener("touchmove", function(e){
-			viewDetail(e);
+			viewHistory(e.changedTouches[0].screenX);
 		}, {passive: true});
 		document.addEventListener("mouseup", function(evt){
 			if(evt.target !== operationCanvasObj)
