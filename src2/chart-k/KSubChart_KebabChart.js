@@ -307,7 +307,7 @@
 				if(leftImgDataWidth > 0 && imgDataHeight > 0)
 					leftOldImgData = util.getCanvasImageData(
 						ctx,
-						leftX,
+						leftImgDataLeft,
 						imgDataTop,
 						leftImgDataWidth,
 						imgDataHeight
@@ -315,7 +315,7 @@
 				if(rightImgDataWidth > 0 && imgDataHeight > 0)
 					rightOldImgData = util.getCanvasImageData(
 						ctx,
-						rightX,
+						rightImgDataLeft,
 						imgDataTop,
 						rightImgDataWidth,
 						imgDataHeight
@@ -326,9 +326,9 @@
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
 				if(null != leftOldImgData)
-					ctx.putImageData(leftOldImgData, leftImgDataLeft, imgDataTop);
+					util.putCanvasImageData(ctx, leftOldImgData, leftImgDataLeft, imgDataTop);
 				if(null != rightOldImgData)
-					ctx.putImageData(rightOldImgData, rightImgDataLeft, imgDataTop);
+					util.putCanvasImageData(ctx, rightOldImgData, rightImgDataLeft, imgDataTop);
 
 				ctx.restore();
 			})();

@@ -353,9 +353,9 @@
 
 				/* 裁剪掉蜡烛中越界的部分 - 步骤二：将备份的像素值重新覆盖到绘制的蜡烛上 */
 				if(null != leftOldImgData)
-					ctx.putImageData(leftOldImgData, leftImgDataLeft, 0);
+					util.putCanvasImageData(ctx, leftOldImgData, leftImgDataLeft, 0);
 				if(null != rightOldImgData)
-					ctx.putImageData(rightOldImgData, rightImgDataLeft, 0);
+					util.putCanvasImageData(ctx, rightOldImgData, rightImgDataLeft, 0);
 
 				ctx.restore();
 			})();

@@ -140,4 +140,7 @@ util.loadData(function(datas){
 	window.kChart = kChart;
 	window.subChart_kebab = subChart_kebab;
 	window.result_kebab = result_kebab;
+
+	window.ctx1 = kebabContainerObj.querySelector("canvas").getContext("2d");
+	window.ctx2 = kebabContainerObj.querySelector(".operation").getContext("2d");
 });

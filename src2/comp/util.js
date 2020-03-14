@@ -103,6 +103,8 @@
 				ctx.backingStorePixelRatio || 1;
 		var ratio = dpr / bspr;
 
+		ratio = 2;
+
 		return function(){
 			return ratio;
 		};
@@ -512,7 +514,35 @@
 			vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / canvasOffsetHeight);
 		}
 
-		return ctx.getImageData(sx * hScale, sy * vScale, sw * hScale, sh * vScale);
+		sx *= hScale;
+		sy *= vScale;
+		sw *= hScale;
+		sh *= vScale;
+
+		return ctx.getImageData(sx, sy, sw, sh);
+	};
+
+	/**
+	 * 将图像数据存放至给定画布的给定位置上
+	 * @param ctx
+	 * @param imageData
+	 * @param dx
+	 * @param dy
+	 */
+	var putCanvasImageData = function(ctx, imageData, dx, dy){
+		var hScale, vScale;
+		if(ctx.canvas[canvasInitFlag] && ctx.canvas.scale){
+			hScale = vScale = ctx.canvas.scale;
+		}else{
+			var canvasOffsetWidth = ctx.canvas.offsetWidth, canvasOffsetHeight = ctx.canvas.offsetHeight;
+			hScale = canvasOffsetWidth === 0? 1: (ctx.canvas.width / canvasOffsetWidth);
+			vScale = canvasOffsetHeight === 0? 1: (ctx.canvas.height / canvasOffsetHeight);
+		}
+
+		dx *= hScale;
+		dy *= vScale;
+
+		ctx.putImageData(imageData, dx, dy);
 	};
 
 	/**
@@ -656,6 +686,7 @@
 
 		initCanvas: initCanvas,
 		getCanvasImageData: getCanvasImageData,
+		putCanvasImageData: putCanvasImageData,
 		calcRenderingWidth: calcRenderingWidth,
 		calcRenderingHeight: calcRenderingHeight,
 		getLinePosition: getLinePosition,
