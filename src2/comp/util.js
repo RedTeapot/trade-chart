@@ -103,8 +103,6 @@
 				ctx.backingStorePixelRatio || 1;
 		var ratio = dpr / bspr;
 
-		ratio = 2;
-
 		return function(){
 			return ratio;
 		};
