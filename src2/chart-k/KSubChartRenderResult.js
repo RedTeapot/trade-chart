@@ -90,6 +90,15 @@
 		};
 
 		/**
+		 * 清除画布
+		 * @returns {KSubChartRenderResult}
+		 */
+		this.clearCanvas = function(){
+			canvasObj.getContext("2d").clearRect(0, 0, canvasObj.width, canvasObj.height);
+			return this;
+		};
+
+		/**
 		 * 获取关联的，持有“生成绘制结果的K线子图”的K线图实例
 		 * @returns {KChart}
 		 */
