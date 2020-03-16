@@ -145,7 +145,7 @@
 		/**
 		 * 设置“向右拖动时经过的，不再可见的较新的数据个数”
 		 * @param {Number} _elapsedRenderableGroupCount 个数
-		 * @returns {CommonDataManager}
+		 * @returns {Boolean}
 		 */
 		this.setElapsedRenderableGroupCount = function(_elapsedRenderableGroupCount){
 			if(elapsedRenderableDataCount !== _elapsedRenderableGroupCount){

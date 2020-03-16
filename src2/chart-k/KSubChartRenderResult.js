@@ -158,6 +158,25 @@
 		};
 
 		/**
+		 * 获取自左向右第一个渲染的数据自左向右的索引位置
+		 * @returns {Number}
+		 */
+		this.getLeftMostRenderingDataIndex = function(){
+			var dataManager = kChart.getDataManager();
+			var rightMostRenderingDataIndex = dataManager.getRightMostRenderingDataIndex();
+			if(-1 === rightMostRenderingDataIndex){
+				TradeChart2.showLog && console.warn("No data rendered.");
+				return -1;
+			}
+
+			var renderingGroupCount = this.getRenderingGroupCount();
+			if(renderingGroupCount === 0)
+				return -1;
+
+			return rightMostRenderingDataIndex - renderingGroupCount + 1;
+		};
+
+		/**
 		 * 获取指定的相对横坐标对应的数据索引
 		 * @param {Number} x 相对于图形坐标系的横坐标。坐标系原点为画布：Canvas的左上角
 		 * @returns {Number} 相对横坐标对应的数据索引。如果位置在区域左侧，则返回0；如果在区域右侧，则返回最后一条数据的索引。如果数据区域中没有任何数据，则返回-1
