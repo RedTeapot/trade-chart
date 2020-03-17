@@ -162,7 +162,7 @@
 		 * @returns {Number}
 		 */
 		this.getLeftMostRenderingDataIndex = function(){
-			var dataManager = kChart.getDataManager();
+			var dataManager = this.getKChart().getDataManager();
 			var rightMostRenderingDataIndex = dataManager.getRightMostRenderingDataIndex();
 			if(-1 === rightMostRenderingDataIndex){
 				TradeChart2.showLog && console.warn("No data rendered.");
