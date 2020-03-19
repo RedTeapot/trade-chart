@@ -149,13 +149,13 @@
 			return this.getKChart().getDataManager().getConvertedRenderingDataList(this.getRenderingGroupCount());
 		};
 
-		/**
-		 * 获取图形正文的横向绘制偏移（用于满足场景：'数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧'）
-		 * @returns {Number} 取值为正，代表图形正文向左偏移
-		 */
-		this.getChartContentHorizontalRenderingOffset = function(){
-			return kSubChart._getChartContentHorizontalRenderingOffsetFromRight(kChartSketch);
-		};
+		// /**
+		//  * 获取图形正文的横向绘制偏移（用于满足场景：'数据量不足以展现满屏时，需要保证图形显示在左侧，而非右侧'）
+		//  * @returns {Number} 取值为正，代表图形正文向左偏移
+		//  */
+		// this.getChartContentHorizontalRenderingOffset = function(){
+		// 	return kSubChart._getChartContentHorizontalRenderingOffsetFromRight(kChartSketch);
+		// };
 
 		/**
 		 * 获取自左向右第一个渲染的数据自左向右的索引位置
@@ -174,6 +174,21 @@
 				return -1;
 
 			return rightMostRenderingDataIndex - renderingGroupCount + 1;
+		};
+
+		/**
+		 * 获取自左向右最后一个个渲染的数据自左向右的索引位置
+		 * @returns {Number}
+		 */
+		this.getRightMostRenderingDataIndex = function(){
+			var dataManager = this.getKChart().getDataManager();
+			var rightMostRenderingDataIndex = dataManager.getRightMostRenderingDataIndex();
+			if(-1 === rightMostRenderingDataIndex){
+				TradeChart2.showLog && console.warn("No data rendered.");
+				return -1;
+			}
+
+			return rightMostRenderingDataIndex;
 		};
 
 		/**
@@ -292,17 +307,17 @@
 			return util.initCanvas(canvasObj, this.getConfigItemValue("width"), this.getConfigItemValue("height"));
 		};
 
-		/**
-		 * 根据给定的量计算其在画布上对应的纵坐标位置
-		 * @param {Number} amount 纵坐标量
-		 * @returns {*}
-		 */
-		this._calcYPosition = function(amount){
-			if(null == kSubChartSketch || null == dataSketch)
-				return null;
-
-			return util.getLinePosition(kSubChart.getConfigItemValue("paddingTop") + kSubChartSketch.calculateHeight(Math.abs(dataSketch.getAmountCeiling() - amount)));
-		};
+		// /**
+		//  * 根据给定的量计算其在画布上对应的纵坐标位置
+		//  * @param {Number} amount 纵坐标量
+		//  * @returns {*}
+		//  */
+		// this._calcYPosition = function(amount){
+		// 	if(null == kSubChartSketch || null == dataSketch)
+		// 		return null;
+		//
+		// 	return util.getLinePosition(kSubChart.getConfigItemValue("paddingTop") + kSubChartSketch.calculateHeight(Math.abs(dataSketch.getAmountCeiling() - amount)));
+		// };
 	};
 
 	util.defineReadonlyProperty(TradeChart2, "KSubChartRenderResult", KSubChartRenderResult);
