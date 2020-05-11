@@ -348,7 +348,9 @@
 			util.try2Call(revertDataHighlightAction);
 
 			var offsetX = layerX - lastX;
-			kChart.updateRenderingOffsetBy(offsetX, canvasObj.width);
+
+			/* 使用 offsetWidth 而非 width 是因为 pixelRatio 可能大于1 */
+			kChart.updateRenderingOffsetBy(offsetX, canvasObj.offsetWidth);
 			lastX = layerX;
 		};
 
